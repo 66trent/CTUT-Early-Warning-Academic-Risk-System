@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Biến giả cho CI — không phải secret thật.
+env:
+  NEXT_PUBLIC_APP_NAME: CTUT-EWARS
+  DATABASE_URL: postgresql://ewars:ewars_ci@localhost:5432/ewars
+  REDIS_URL: redis://localhost:6379
+  AUTH_SECRET: ci-only-secret-0123456789abcdef0123456789
+  BETTER_AUTH_URL: http://localhost:3000
+  STAFF_EMAIL_DOMAIN: '@ctuet.edu.vn'
+  ADMIN_SEED_EMAIL: admin@ctuet.edu.vn
+  ADMIN_SEED_PASSWORD: ci-admin-password
+  DEMO_MODE: 'true'
+  DEMO_ADVISOR_PASSWORD: ci-advisor-password
+  MINIO_ENDPOINT: localhost
+  MINIO_PORT: '9000'
+  MINIO_ACCESS_KEY: ci-minio
+  MINIO_SECRET_KEY: ci-minio-secret
+  MINIO_BUCKET: ewars-imports
+  SMTP_HOST: localhost
+  SMTP_PORT: '1025'
+  SMTP_FROM: no-reply@ctuet.edu.vn
+
+jobs:
+  ci:
+    name: typecheck → lint → format → db → test → build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ewars
+          POSTGRES_PASSWORD: ewars_ci
+          POSTGRES_DB: ewars
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ewars -d ewars"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Kiểm tra lỗ hổng dependency production (high/critical)
+        run: npm audit --omit=dev --audit-level=high
+
+      # Thứ tự bắt buộc theo docs/rules/01-architecture.md
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run db:init
+      - run: npm run migration:run
+      - name: Kiểm tra schema drift (entity khớp migration)
+        run: npm run migration:check
+      - run: npm run seed
+      - run: npm test
+      - run: npm run build
