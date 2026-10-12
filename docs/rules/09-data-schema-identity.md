@@ -36,7 +36,7 @@ RÀNG BUỘC liên kết Student–User: với mọi `Student`, `User` tương �
 | departmentId | String(10) | NOT NULL | PK | VD: `K.CNTT` |
 | departmentName | String(150) | NOT NULL | | |
 
-Danh sách khoa nạp bằng seed (danh mục chính thức do người dùng cung cấp): `K.CNTT` Khoa Công nghệ thông tin · `K.DDT` Khoa Điện - Điện tử · `K.CK` Khoa Kỹ thuật Cơ khí · `K.KTXD` Khoa Kỹ thuật Xây dựng · `K.CNSH` Khoa Công nghệ sinh học - Công nghệ hóa học - Công nghệ thực phẩm · `K.KTQL` Khoa Kinh tế - Quản lý công nghiệp · `K.KHXH` Khoa Khoa học Xã hội. Admin chỉ xem, không có màn hình sửa.
+Danh sách khoa nạp bằng seed (danh mục chính thức do người dùng cung cấp): `K.CNTT` Khoa Công nghệ thông tin · `K.DDT` Khoa Điện - Điện tử · `K.KTCK` Khoa Kỹ thuật Cơ khí · `K.KTXD` Khoa Kỹ thuật Xây dựng · `K.CNSH` Khoa Công nghệ sinh học - Công nghệ hóa học - Công nghệ thực phẩm · `K.KTQL` Khoa Kinh tế - Quản lý công nghiệp · `K.KHXH` Khoa Khoa học Xã hội. Admin chỉ xem, không có màn hình sửa.
 
 ## AdministrativeClass (Lớp sinh hoạt) — đơn vị gán CVHT
 
