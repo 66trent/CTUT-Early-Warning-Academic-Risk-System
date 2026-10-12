@@ -5,6 +5,7 @@
 
 ## Luôn đọc trước khi code
 
+@docs/HANDOFF.md
 @docs/rules/00-project-context.md
 @docs/rules/01-architecture.md
 @docs/rules/02-code-quality.md
