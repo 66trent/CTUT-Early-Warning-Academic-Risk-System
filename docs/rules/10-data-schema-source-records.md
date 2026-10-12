@@ -2,7 +2,11 @@
 
 Xem `00-project-context.md` và `09-data-schema-identity.md` trước (đặc biệt `Enrollment`). File này đặc tả 3 bảng dữ liệu nguồn — đầu vào duy nhất của `rule-engine`. Cả 3 bảng trỏ qua `enrollmentId`, KHÔNG trỏ thẳng `studentId` + `courseId`.
 
-Ba nguồn tương ứng định dạng xuất phổ biến của hệ thống e-learning (VD: Moodle — báo cáo bài kiểm tra, báo cáo điểm danh) và cổng đào tạo (bảng điểm học phần). Cột CSV từng loại: xem `12-data-schema-ops.md`.
+Ba nguồn tương ứng định dạng xuất phổ biến của hệ thống e-learning (VD: Moodle — báo cáo bài kiểm tra, báo cáo điểm danh) và cổng đào tạo (bảng điểm học phần). Cột file từng loại: xem `12-data-schema-ops.md`.
+
+**Thời gian trong file nguồn** không ghi múi giờ → MUST hiểu là giờ Việt Nam (UTC+7). Cột chỉ có ngày (`ngay_chot`, `ngay_cong_bo`) → 00:00 giờ Việt Nam của ngày đó. Lưu `timestamptz` (UTC) trong DB.
+
+**Nạp lại là cập nhật, không nhân đôi**: cả 3 bảng upsert theo khóa nghiệp vụ (UNIQUE bên dưới). Audit Log ghi ở cấp lô nhập (số dòng thêm mới / cập nhật), không ghi từng dòng.
 
 ## AttendanceSummary — số liệu điểm danh tổng hợp tại 1 ngày chốt
 
@@ -21,7 +25,7 @@ Ba nguồn tương ứng định dạng xuất phổ biến của hệ thống e
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 | createdAt | DateTime | NOT NULL | | |
 
-RÀNG BUỘC: UNIQUE `(enrollmentId, snapshotDate)`. Nhập lại cùng ngày chốt → cập nhật bản ghi đó (ghi Audit Log); ngày chốt khác → bản ghi mới. MUST NOT xóa/ghi đè snapshot của ngày khác (`ATT-02` cần lịch sử). Validate: các số ≥ 0 và `present + late + excusedAbsence + unexcusedAbsence ≤ totalSessions`, sai → dòng lỗi `OUT_OF_RANGE`.
+RÀNG BUỘC: UNIQUE `(enrollmentId, snapshotDate)`. Nhập lại cùng ngày chốt → cập nhật bản ghi đó; ngày chốt khác → bản ghi mới. MUST NOT xóa/ghi đè snapshot của ngày khác (`ATT-02` cần lịch sử). Validate: các số nguyên ≥ 0, `present + late + excusedAbsence + unexcusedAbsence ≤ totalSessions`, `plannedSessions ≥ totalSessions` khi có, sai → `OUT_OF_RANGE`. `snapshotDate` phải nằm trong `[Term.startDate, Term.endDate]` của học kỳ đã chọn, sai → `TERM_MISMATCH`.
 
 ## LmsQuizAttempt — 1 lượt làm bài kiểm tra trên LMS
 
@@ -41,7 +45,7 @@ RÀNG BUỘC: UNIQUE `(enrollmentId, snapshotDate)`. Nhập lại cùng ngày ch
 | sectionCode | String(30) | NULL | | Như `AttendanceSummary.sectionCode` |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 
-RÀNG BUỘC: UNIQUE `(enrollmentId, quizKey, attemptNumber)`. Chỉ lưu lượt có thật — MUST NOT tạo bản ghi "chưa làm" (bài bị bỏ được suy ra ở `rule-engine`, xem `LMS-01` trong `08`). Validate: `score ≤ maxScore`, `submittedAt ≥ startedAt`.
+RÀNG BUỘC: UNIQUE `(enrollmentId, quizKey, attemptNumber)`. File LMS thường xuất lũy kế (chứa cả lượt cũ) → nạp lại cùng lượt thì cập nhật (VD `IN_PROGRESS` → `SUBMITTED`). Chỉ lưu lượt có thật — MUST NOT tạo bản ghi "chưa làm" (bài bị bỏ được suy ra ở `rule-engine`, xem `LMS-01` trong `08`). Validate: `0 ≤ score ≤ maxScore`, `submittedAt ≥ startedAt`; `SUBMITTED` MUST có `submittedAt` và `score`. `startedAt` phải nằm trong thời gian học kỳ, sai → `TERM_MISMATCH`.
 
 ## CourseResult — kết quả 1 học phần của 1 sinh viên trong 1 học kỳ
 
@@ -52,15 +56,18 @@ RÀNG BUỘC: UNIQUE `(enrollmentId, quizKey, attemptNumber)`. Chỉ lưu lượ
 | processScore | Float | NULL | | Điểm quá trình, thang 10 |
 | examScore | Float | NULL | | Điểm thi, thang 10 |
 | finalScore | Float | NULL | | Điểm tổng kết, thang 10 |
-| letterGrade | String(1) | NULL | | `A`/`B`/`C`/`D`/`F`. Trống mà có `finalScore` → quy đổi: 8,5–10 = A; 7,0–8,4 = B; 5,5–6,9 = C; 4,0–5,4 = D; < 4,0 = F |
-| gradePoint4 | Float | NULL | | Hệ 4, quy đổi từ `letterGrade` khi nạp (theo `gradeScale` của `ACA-03`) |
+| letterGrade | String(2) | NULL | | Thang 9 mức theo quy chế trường (người dùng xác nhận): 9,5–10 = `A+` · 8,5–9,4 = `A` · 8,0–8,4 = `B+` · 7,0–7,9 = `B` · 6,5–6,9 = `C+` · 5,5–6,4 = `C` · 5,0–5,4 = `D+` · 4,0–4,9 = `D` (đạt) · 0,0–3,9 = `F` (không đạt). Trống mà có `finalScore` → quy đổi theo thang này |
 | passed | Boolean | NULL | | Từ cột `ket_qua`; nếu trống thì `letterGrade != 'F'` (F = không đạt, phải học lại); NULL khi chưa có kết quả cuối |
 | resultStatus | CourseResultStatus (enum) | NOT NULL | | `PROCESS_ONLY` (mới có điểm quá trình) / `FINAL` |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Batch cập nhật gần nhất |
 | publishedAt | DateTime | NOT NULL | | Ngày công bố điểm (`ngay_cong_bo`); trống thì = `importedAt`. Dùng cho mốc `asOf` |
 | importedAt | DateTime | NOT NULL | | Thời điểm nạp |
 
-RÀNG BUỘC: nhập lần đầu chỉ có điểm quá trình → `PROCESS_ONLY`; nhập lại khi có `finalScore` hoặc `ket_qua` → cập nhật thành `FINAL` (ghi Audit Log). Khi `FINAL`: cập nhật `Enrollment.attemptOutcome` (`PASSED`/`FAILED`) và `enrollmentStatus = COMPLETED`. MUST NOT chuyển `FINAL` về `PROCESS_ONLY`. `diem_chu` lệch với `diem_tong_ket` theo thang trên → vẫn nạp theo `diem_chu` của nguồn, ghi cảnh báo trong kết quả batch. MUST NOT ghi `Student.officialAcademicStatus`.
+Không lưu điểm hệ 4: `rule-engine` quy đổi từ `letterGrade` theo `gradeScale` của `ACA-03` lúc đánh giá (xem `08`).
+
+RÀNG BUỘC: nhập lần đầu chỉ có điểm quá trình → `PROCESS_ONLY`; nhập lại khi có `finalScore` hoặc `ket_qua` → cập nhật thành `FINAL`. Khi `FINAL`: cập nhật `Enrollment.attemptOutcome` (`PASSED`/`FAILED`) và `enrollmentStatus = COMPLETED`. MUST NOT chuyển `FINAL` về `PROCESS_ONLY`: dòng chỉ có điểm quá trình cho kết quả đã `FINAL` → lỗi `RESULT_ALREADY_FINAL`. Nhập lại `FINAL` với điểm khác (đính chính) → cập nhật. Điểm thang 10 phải trong `[0, 10]`, sai → `OUT_OF_RANGE`. `diem_chu` lệch với `diem_tong_ket` theo thang trên → vẫn nạp theo `diem_chu` của nguồn, ghi cảnh báo vào `ImportBatch.warnings`. `ngay_cong_bo` có thể sau ngày kết thúc học kỳ (không kiểm tra). MUST NOT ghi `Student.officialAcademicStatus`.
+
+**Tính lại lần học**: khi `attemptOutcome` của 1 `Enrollment` thay đổi (có/đính chính kết quả `FINAL`), MUST tính lại `attemptNumber` của các `Enrollment` cùng `(studentId, courseId)` ở học kỳ SAU (theo `Term.startDate`) trong cùng transaction — để thứ tự nạp file không làm sai `COMB-02`.
 
 ## Quan hệ tóm tắt
 

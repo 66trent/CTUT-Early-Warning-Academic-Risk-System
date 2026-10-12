@@ -21,8 +21,9 @@
 | 0 | Hạ tầng | — |
 | 1 | Xác thực và danh tính | 0 |
 | 2 | Danh mục quản trị | 1 |
-| 3 | Nhập dữ liệu | 2 |
-| 4 | Rule engine | 3 |
+| 3a | Khung nhập dữ liệu, danh sách sinh viên | 2 |
+| 3b | Nhập 3 nguồn dữ liệu học tập | 3a |
+| 4 | Rule engine | 3b |
 | 5 | Cảnh báo, giao diện CVHT và sinh viên | 4 |
 | 6 | Quản trị và vận hành | 5 |
 | 7 | Hoàn thiện và demo | 6 |
@@ -63,15 +64,24 @@
 
 **DoD:** không thể có 2 học kỳ hiện tại (test lỗi `23505`); duyệt CVHT → đăng nhập được; mọi Server Action trả DTO thuần. **Kiểm tra tay:** tạo lớp, gán CVHT, thấy sĩ số đúng.
 
-## Phase 3 — Nhập dữ liệu
+## Phase 3a — Khung nhập dữ liệu và danh sách sinh viên
 
-- [ ] `ImportBatch`, `ImportErrorRow` (`12`); upload kiểm tra MIME, đuôi, ≤ 20MB; `sourceChecksum` chống nạp trùng; file gốc lưu MinIO; job `import-batch-process`.
-- [ ] Parser: RFC 4180, header có dấu/không dấu → tên chuẩn, chuẩn hóa định dạng VN (`HH:mm DD/MM/YYYY`, `8/10`, `12 phút`, `Đã nộp`, `Đạt`/`Không đạt`), bỏ qua cột thừa.
-- [ ] 4 loại nhập: `STUDENT`, `ATTENDANCE_SUMMARY`, `LMS_QUIZ`, `COURSE_RESULT`; entity `Course`, `Enrollment`, `AttendanceSummary`, `LmsQuizAttempt`, `CourseResult` (`09`, `10`).
-- [ ] Tự upsert `Course` và tạo `Enrollment` (tính `attemptNumber`) trong cùng transaction; `CourseResult` `PROCESS_ONLY` → `FINAL` cập nhật `attemptOutcome`, `COMPLETED`, `Course.credits`.
-- [ ] Màn nhập: chọn loại, chọn học kỳ (mặc định hiện tại, chặn học kỳ đã chốt), tải 4 mẫu `public/templates/`, lịch sử batch, xem/tải dòng lỗi có diễn giải tiếng Việt. Lời văn theo `07` (không số file rules, không tên bảng).
+- [ ] Entity `ImportBatch`, `ImportErrorRow` (`12`: có `fileName`, `warnings`, `summary`, `errorMessage`; partial unique index chống nạp trùng); migration.
+- [ ] Upload (Server Action, chỉ Admin, rate-limit): kiểm tra đuôi `.csv`/`.xlsx` + nội dung thật + ≤ 20MB; SHA-256; lưu file gốc MinIO (tự tạo bucket); tạo batch `UPLOADING` → job `import-batch-process` (`jobId` = id batch).
+- [ ] Bộ đọc file dùng chung: CSV (BOM, `,`/`;`, số `7,5`, RFC 4180, stream) và XLSX (sheet đầu); chuẩn hóa header có dấu/không dấu + bí danh; chuẩn hóa ngày (`YYYY-MM-DD`, `DD/MM/YYYY`, `HH:mm DD/MM/YYYY`, từ chối ngày mơ hồ), giờ Việt Nam; bỏ qua cột thừa.
+- [ ] Quy trình 2 bước: `VALIDATING` → `STAGED` (xem trước: số dòng hợp lệ/lỗi, vài dòng mẫu) → Admin **Xác nhận nạp** (→ `LOADED` → `RECONCILED`) hoặc **Hủy** (`DISCARDED`, AlertDialog); lỗi cả file → `REJECTED` kèm lý do. Audit Log mọi thao tác batch.
+- [ ] Loại nhập `STUDENT`: tạo/cập nhật `Student` + `User` sinh viên; `CLASS_NOT_FOUND`, email sai đuôi, trùng trong file, email thuộc người khác.
+- [ ] Màn hình nhập: chọn loại, chọn học kỳ (mặc định hiện tại, chặn học kỳ đã chốt), tải 4 file mẫu `public/templates/`, lịch sử batch (lọc, phân trang), chi tiết batch + bảng dòng lỗi, nút **Tải file lỗi** (Route Handler, CSV UTF-8 BOM, có cột diễn giải tiếng Việt), nạp lại file đã sửa (`parentBatchId`). Lời văn theo `07`.
 
-**DoD:** nạp được 5 file `docs/demo-data/` theo đúng thứ tự, 0 dòng lỗi; số bản ghi khớp file; nạp lại cùng file bị chặn; nạp lại cùng ngày chốt cập nhật chứ không nhân đôi; dòng `mssv` lạ → `STUDENT_NOT_FOUND`. **Kiểm tra tay:** sửa 1 dòng sai trong file, nạp, tải file lỗi về thấy lý do dễ hiểu.
+**DoD:** nạp `docs/demo-data/01_sinh_vien.csv` (cả bản CSV và bản lưu lại bằng Excel `.xlsx`) → 13 sinh viên, 0 lỗi; nạp lại cùng file bị chặn; hủy batch `STAGED` không ghi dữ liệu; file thiếu cột → `REJECTED`; dòng lớp lạ → `CLASS_NOT_FOUND`; test bộ đọc (BOM, `;`, `7,5`, ngày mơ hồ bị từ chối). **Kiểm tra tay:** sửa 1 dòng sai, nạp, tải file lỗi thấy lý do dễ hiểu; trang Lớp sinh hoạt thấy sĩ số KTPM2311 = 12, KHMT2311 = 1 (mục còn lại của Phase 2).
+
+## Phase 3b — Nhập 3 nguồn dữ liệu học tập
+
+- [ ] Entity `Course`, `Enrollment`, `AttendanceSummary`, `LmsQuizAttempt`, `CourseResult` (`09`, `10`: `letterGrade` 2 ký tự, không lưu điểm hệ 4); migration.
+- [ ] 3 loại nhập `ATTENDANCE_SUMMARY`, `LMS_QUIZ`, `COURSE_RESULT` trên khung 3a; upsert theo khóa nghiệp vụ (nạp lại = cập nhật); kiểm tra ngày trong thời gian học kỳ (`TERM_MISMATCH`); chuẩn hóa `8/10`, `12 phút`, `Đã nộp`, `Đạt`/`Không đạt`.
+- [ ] Tự upsert `Course` và tạo `Enrollment` (tính `attemptNumber`) trong cùng transaction; `CourseResult` `PROCESS_ONLY` → `FINAL` cập nhật `attemptOutcome`, `COMPLETED`, `Course.credits`; `RESULT_ALREADY_FINAL`; cảnh báo điểm chữ lệch thang 9 mức; tính lại `attemptNumber` học kỳ sau khi kết quả thay đổi.
+
+**DoD:** nạp được 5 file `docs/demo-data/` theo đúng thứ tự, 0 dòng lỗi, 0 cảnh báo; số bản ghi khớp file; nạp lại cùng file bị chặn; nạp lại cùng ngày chốt / cùng lượt làm bài cập nhật chứ không nhân đôi; dòng `mssv` lạ → `STUDENT_NOT_FOUND`; KTPM2311009 · KTPM103 · HK1_2026 có `attemptNumber = 2` kể cả khi nạp file HK1 trước file HK2. **Kiểm tra tay:** sửa 1 dòng sai trong file điểm danh, nạp, tải file lỗi thấy lý do dễ hiểu.
 
 ## Phase 4 — Rule engine
 

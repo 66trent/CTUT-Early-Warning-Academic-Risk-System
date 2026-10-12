@@ -85,8 +85,8 @@ Lấy 2 bài đến hạn gần nhất (theo lượt làm đầu tiên của nh�
 Đếm `CourseResult` `FINAL` có `passed = false` trong học kỳ: 1 → `HIGH`; ≥ 2 → `CRITICAL`.
 
 **ACA-03 — Điểm trung bình học kỳ thấp** (`PER_STUDENT`)
-`GPA4 = Σ(gradePoint4 × credits) / Σ credits` trên các kết quả `FINAL` có `gradePoint4` và `credits` khác NULL. Chỉ xét khi `Σ credits ≥ minCredits` (mặc định 6). `GPA4 < 2.0` → `HIGH` (so sánh `Σ(gradePoint4 × credits) < 2 × Σ credits`, tránh sai số làm tròn).
-Quy đổi điểm chữ → hệ 4 đọc từ `condition.gradeScale` (người dùng xác nhận): A = 4, B = 3, C = 2, D = 1, F = 0.
+`GPA4 = Σ(gradePoint4 × credits) / Σ credits` trên các kết quả `FINAL` có `letterGrade` và `credits` khác NULL; `gradePoint4` do engine quy đổi từ `letterGrade` lúc đánh giá (KHÔNG lưu ở `CourseResult` — đổi thang không phải sửa dữ liệu cũ). Chỉ xét khi `Σ credits ≥ minCredits` (mặc định 6). `GPA4 < 2.0` → `HIGH`. So sánh bằng số nguyên theo nửa điểm: `Σ(2 × gradePoint4 × credits) < 4 × Σ credits` (thang có các mức x,5).
+Quy đổi điểm chữ → hệ 4 đọc từ `condition.gradeScale` (người dùng xác nhận theo quy chế trường): A+ = 4 · A = 4 · B+ = 3,5 · B = 3 · C+ = 2,5 · C = 2 · D+ = 1,5 · D = 1 · F = 0. Điểm chữ chưa có trong `gradeScale` → bỏ qua kết quả đó và ghi cảnh báo chất lượng dữ liệu vào `EvaluationRun`.
 
 ## Nhóm kết hợp (chạy sau cùng, trên cùng `Enrollment`, cùng lần chạy)
 
