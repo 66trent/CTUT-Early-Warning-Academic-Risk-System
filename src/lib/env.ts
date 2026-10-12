@@ -54,6 +54,13 @@ const envSchema = z
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   })
   .superRefine((env, ctx) => {
+    if (!env.ADMIN_SEED_EMAIL.toLowerCase().endsWith(env.STAFF_EMAIL_DOMAIN.toLowerCase())) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ADMIN_SEED_EMAIL'],
+        message: 'Phải có đuôi STAFF_EMAIL_DOMAIN',
+      });
+    }
     if (env.DEMO_MODE && (!env.DEMO_ADVISOR_PASSWORD || env.DEMO_ADVISOR_PASSWORD.length < 8)) {
       ctx.addIssue({
         code: 'custom',

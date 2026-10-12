@@ -3,8 +3,17 @@ import { DataSource } from 'typeorm';
 import { getEnv } from '@/lib/env';
 import { SnakeNamingStrategy } from './naming-strategy';
 
-// Entity: import trực tiếp từng class (thêm từ Phase 1).
-// Migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
+import { AdministrativeClass } from './entities/administrative-class.entity';
+import { AuditLog } from './entities/audit-log.entity';
+import { Department } from './entities/department.entity';
+import { Student } from './entities/student.entity';
+import { Term } from './entities/term.entity';
+import { User } from './entities/user.entity';
+import { Phase1Identity1791766886196 } from './migrations/1791766886196-Phase1Identity';
+
+// Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
+export const ENTITIES = [User, Department, AdministrativeClass, Student, Term, AuditLog];
+const MIGRATIONS = [Phase1Identity1791766886196];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;
 
@@ -22,8 +31,8 @@ export function createDataSource(): DataSource {
     migrationsRun: false,
     logging: env.NODE_ENV === 'development' ? ['error', 'warn', 'migration'] : ['error'],
     namingStrategy: new SnakeNamingStrategy(),
-    entities: [],
-    migrations: [],
+    entities: ENTITIES,
+    migrations: MIGRATIONS,
     migrationsTableName: 'typeorm_migrations',
     extra: {
       max: POOL_MAX[env.PROCESS_ROLE],
