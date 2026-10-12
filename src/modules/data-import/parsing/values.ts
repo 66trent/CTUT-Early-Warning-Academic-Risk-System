@@ -88,3 +88,36 @@ export function stripDiacritics(text: string): string {
     .replace(/Đ/g, 'D')
     .toLowerCase();
 }
+
+/** Nhãn tiếng Việt → khóa so khớp: bỏ dấu, chữ thường, khoảng trắng/gạch → `_` (VD `Không đạt` → `khong_dat`). */
+export function labelKey(text: string): string {
+  return stripDiacritics(text)
+    .trim()
+    .replace(/[\s-]+/g, '_');
+}
+
+/** Điểm LMS: `8` hoặc dạng gộp `8/10` (tách điểm và thang điểm). */
+export function parseScore(
+  raw: string,
+  decimalComma: boolean,
+): Parsed<{ score: number; maxScore: number | null }> {
+  const [scoreText = '', maxText, extra] = raw.split('/');
+  if (extra !== undefined) return fail(`Điểm "${raw}" không đúng định dạng.`);
+  const score = parseDecimal(scoreText, decimalComma);
+  if (!score.ok) return fail(`Điểm "${raw}" không phải số.`);
+  if (maxText === undefined) return ok({ score: score.value, maxScore: null });
+  const max = parseDecimal(maxText, decimalComma);
+  if (!max.ok) return fail(`Điểm "${raw}" không đúng định dạng (VD 8/10).`);
+  return ok({ score: score.value, maxScore: max.value });
+}
+
+/** Thời lượng làm bài theo phút: `12`, `12.5`, `12 phút`, `12 phut`. */
+export function parseMinutes(raw: string, decimalComma: boolean): Parsed<number> {
+  const text = stripDiacritics(raw)
+    .trim()
+    .replace(/\s*phut$/, '');
+  const value = parseDecimal(text, decimalComma);
+  return value.ok
+    ? value
+    : fail(`Thời gian làm bài "${raw}" phải là số phút (VD 12 hoặc 12 phút).`);
+}

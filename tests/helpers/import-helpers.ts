@@ -36,6 +36,17 @@ export function demoStudentsCsv(): string {
 
 export const TEST_CLASSES = ['TSTK2311', 'TSTH2311'] as const;
 
+/**
+ * File demo học tập (02–05) đổi sang mã `TST…`: sinh viên như `demoStudentsCsv()`,
+ * học phần KTPM101 → TSTC101 (cả mã lớp học phần).
+ */
+export function demoAcademicCsv(fileName: string): string {
+  return readFileSync(`docs/demo-data/${fileName}`, 'utf8')
+    .replace(/KTPM2311/g, 'TSTK2311')
+    .replace(/KHMT2311/g, 'TSTH2311')
+    .replace(/KTPM(\d{3})(?!\d)/g, 'TSTC$1');
+}
+
 export async function csvToXlsx(csv: string): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Sinh viên');
@@ -68,8 +79,13 @@ export async function confirmAndLoad(ds: DataSource, batchId: string): Promise<I
   return ds.getRepository(ImportBatch).findOneByOrFail({ id: batchId });
 }
 
-/** Dọn lô nhập của test (tên file bắt đầu bằng `tst-`). */
+/** Dọn lô nhập của test (tên file bắt đầu bằng `tst-`) cùng dữ liệu nguồn và Enrollment lô tạo. */
 export async function cleanupImportBatches(ds: DataSource): Promise<void> {
+  const tstBatches = `SELECT id FROM import_batches WHERE file_name LIKE 'tst-%'`;
+  for (const table of ['attendance_summaries', 'lms_quiz_attempts', 'course_results']) {
+    await ds.query(`DELETE FROM ${table} WHERE import_batch_id IN (${tstBatches})`);
+  }
+  await ds.query(`DELETE FROM enrollments WHERE first_seen_batch_id IN (${tstBatches})`);
   await ds.query(
     `DELETE FROM audit_logs WHERE target_type = 'ImportBatch'
        AND target_id IN (SELECT id::text FROM import_batches WHERE file_name LIKE 'tst-%')`,

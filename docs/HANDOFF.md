@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-12 (sau Phase 3a).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-12 (sau Phase 3b).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -10,10 +10,11 @@
 | 0 Hạ tầng | Xong, đạt DoD | `phase-0` | #1 → `main` | xanh |
 | 1 Xác thực, danh tính | Xong | `phase-1` | #2 → `phase-0` | xanh |
 | 2 Danh mục quản trị | Xong (mục sĩ số đã kiểm ở 3a) | `phase-2` | #3 → `phase-1` | xanh |
-| 3a Khung nhập + sinh viên | Xong | `phase-3a` (đang checkout) | #4 → `phase-2` | xanh |
-| **3b Nhập 3 nguồn học tập** | **Việc tiếp theo** | tạo `phase-3b` từ `phase-3a` | base `phase-3a` | — |
+| 3a Khung nhập + sinh viên | Xong | `phase-3a` | #4 → `phase-2` | xanh |
+| 3b Nhập 3 nguồn học tập | Xong | `phase-3b` (đang checkout) | #5 → `phase-3a` | xem PR |
+| **4 Rule engine** | **Việc tiếp theo** | tạo `phase-4` từ `phase-3b` | base `phase-3b` | — |
 
-- Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **PR xếp chồng, CHƯA merge**. Người dùng merge theo thứ tự #1 → #2 → #3 → #4 (GitHub tự đổi base).
+- Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **PR xếp chồng, CHƯA merge**. Người dùng merge theo thứ tự #1 → #2 → #3 → #4 → #5 (GitHub tự đổi base).
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
 - `gh` CLI đã cài và đăng nhập (tài khoản `66trent`). Trong Git Bash gọi bằng `"/c/Program Files/GitHub CLI/gh.exe"`.
 
@@ -25,7 +26,9 @@
 - Dữ liệu trong DB dev (của người dùng, KHÔNG tự xóa/sửa):
   - Tài khoản: `ADMIN` (seed), `GV001`/`GV002` (seed:demo), `GV02` (người dùng tự đăng ký, ACTIVE, đang phụ trách lớp `KTPM2311`), `CVHT0001` (người dùng, PENDING).
   - Học kỳ: `HK2_2025`, `HK1_2026`, `HK2_2026` (**người dùng tự tạo và đặt làm hiện tại**). Lưu ý: `npm run seed:demo` đặt lại học kỳ hiện tại = `HK1_2026`.
-  - Lớp: `KTPM2311` (GV02), `KHMT2311` (GV002). Sinh viên: 0 (lô demo đã được hoàn tác để người dùng tự kiểm tra tay).
+  - Lớp: `KTPM2311` (GV02), `KHMT2311` (GV002). Sinh viên: 13 (người dùng tự nạp lại `01_sinh_vien.csv`).
+  - **`HK1_2026` đã bị người dùng CHỐT** → mọi lô nhập HK1_2026 bị từ chối; không mở lại được. Muốn chạy demo đầy đủ cần DB demo riêng/làm lại (hỏi người dùng).
+  - Bảng `courses` có KTPM101–103 (còn lại sau khi thử nạp + hoàn tác file 02 — hoàn tác không xóa Course).
 - Chạy app ở máy (khi cần thử giao diện): `docker compose stop app worker` → Browser pane `preview_start` tên `next-dev` (cổng 3000, `.claude/launch.json`) + worker bằng `npx tsx src/workers/index.ts` chạy nền. Xong thì tắt worker (xem bẫy #4) và `docker compose --profile dev up -d --build app worker`.
 
 ## 3. Quyết định đã chốt với người dùng (ngoài/đã ghi vào rules)
@@ -60,9 +63,9 @@
 11. Test tích hợp chạy với Postgres thật (+ MailHog cho test đăng ký). Dữ liệu test dùng tiền tố `TST`; dọn lô nhập có tên file `tst-%` — **đừng đặt tên file thử bằng tay bắt đầu bằng `tst-`**.
 12. Dữ liệu người dùng tự tạo trong DB (GV02, CVHT0001, HK2_2026…) là dữ liệu thật của họ — không xóa/sửa khi dọn dữ liệu thử.
 
-## 6. Việc tiếp theo: Phase 3b
+## 6. Việc tiếp theo: Phase 4
 
-Theo `docs/implement.md` mục Phase 3b, rule `09`, `10`, `12`. Khung nhập 3a đã có registry (`src/modules/data-import/types/registry.ts`) — thêm 3 file loại nhập `ATTENDANCE_SUMMARY`, `LMS_QUIZ`, `COURSE_RESULT` theo mẫu `student.import.ts`; entity `Course`, `Enrollment`, `AttendanceSummary`, `LmsQuizAttempt`, `CourseResult` + migration; tự upsert Course/Enrollment trong cùng transaction; cập nhật dữ liệu dẫn xuất ở bước RECONCILED (chỗ đánh dấu "Phase 3b" trong `import-processor.service.ts`); `rollback()` của mỗi loại xóa bản ghi nguồn + Enrollment do lô tạo. DoD: 5 file demo nạp đúng thứ tự, 0 lỗi, 0 cảnh báo; `attemptNumber = 2` cho KTPM2311009 · KTPM103 · HK1_2026 kể cả khi nạp file HK1 trước file HK2.
+Theo `docs/implement.md` mục Phase 4, rule `08`, `11`. Hỏi trước 2 câu ở mục 4 (trọng số RiskScore; điều kiện hoàn tác "chưa có EvaluationRun"). Chỗ kích hoạt `EvaluationRun AUTO_AFTER_IMPORT`: comment "Phase 4" trong `loadImportBatch()` (`import-processor.service.ts`). Dữ liệu nguồn đọc qua `Enrollment`; điểm hệ 4 quy đổi từ `letterGrade` lúc đánh giá. Test nghiệm thu: helper `demoAcademicCsv()` + học kỳ thử `TSTHK2_25`/`TSTHK1_26` như `tests/integration/import-academic.test.ts`.
 
 ## 7. Phong cách làm việc với người dùng
 

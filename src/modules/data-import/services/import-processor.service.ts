@@ -1,6 +1,6 @@
 import { type EntityManager } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
-import { ImportBatch } from '@/db/entities/import-batch.entity';
+import { ImportBatch, type ImportWarning } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
 import { ImportBatchStatus } from '@/db/enums';
@@ -11,9 +11,20 @@ import { FileRejectedError } from '../parsing/errors';
 import { type ImportFileKind } from '../parsing/file-sniff';
 import { buildHeaderMap, type HeaderMap, missingColumns } from '../parsing/headers';
 import { openRowSource, type RawRow } from '../parsing/row-reader';
-import { type ImportTypeDefinition, type LoadResult, type RowError } from '../types/definition';
+import {
+  type ImportTypeDefinition,
+  type LoadResult,
+  type RowError,
+  type RowWarning,
+} from '../types/definition';
 import { getImportDefinition } from '../types/registry';
-import { type ImportSummary, readSummary, writeSummary } from './import-summary';
+import {
+  type ImportSummary,
+  MAX_WARNINGS,
+  readSummary,
+  writeSummary,
+  writeWarnings,
+} from './import-summary';
 
 const CHUNK_SIZE = 500;
 
@@ -21,6 +32,7 @@ interface PendingRow {
   rowNumber: number;
   raw: Record<string, string>;
   value: unknown;
+  warnings: RowWarning[];
 }
 
 interface PassResult {
@@ -29,6 +41,8 @@ interface PassResult {
   successRows: number;
   errorRows: number;
   preview: Record<string, string>[];
+  /** Cảnh báo không chặn nạp của các dòng hợp lệ (tối đa MAX_WARNINGS). */
+  warnings: ImportWarning[];
   load: LoadResult;
 }
 
@@ -91,6 +105,7 @@ async function runPass(
     successRows: 0,
     errorRows: 0,
     preview: [],
+    warnings: [],
     load: { inserted: 0, updated: 0, unchanged: 0, createdKeys: [] },
   };
   const seenKeys = new Map<string, number>();
@@ -127,7 +142,14 @@ async function runPass(
       }
       result.errorRows += rowErrors.length;
       result.successRows += valid.length;
-      for (const row of valid) if (result.preview.length < 5) result.preview.push(row.raw);
+      for (const row of valid) {
+        if (result.preview.length < 5) result.preview.push(row.raw);
+        for (const warning of row.warnings) {
+          if (result.warnings.length < MAX_WARNINGS) {
+            result.warnings.push({ row: row.rowNumber, ...warning });
+          }
+        }
+      }
       if (load && valid.length > 0) {
         const loaded = await def.load(
           valid.map((r) => r.value),
@@ -163,7 +185,12 @@ async function runPass(
         });
       } else {
         for (const key of def.uniqueKeys(parsed.value)) seenKeys.set(key, row.rowNumber);
-        pending.push({ rowNumber: row.rowNumber, raw, value: parsed.value });
+        pending.push({
+          rowNumber: row.rowNumber,
+          raw,
+          value: parsed.value,
+          warnings: parsed.warnings ?? [],
+        });
       }
     }
     if (pending.length + errors.length >= CHUNK_SIZE) await flush();
@@ -236,6 +263,7 @@ export async function validateImportBatch(batchId: string): Promise<void> {
       totalRows: pass.totalRows,
       successRows: pass.successRows,
       errorRows: pass.errorRows,
+      warnings: writeWarnings(pass.warnings),
       summary: writeSummary(summary),
       stagedAt: new Date(),
     });
@@ -299,11 +327,14 @@ export async function loadImportBatch(
             totalRows: pass.totalRows,
             successRows: pass.successRows,
             errorRows: pass.errorRows,
+            warnings: writeWarnings(pass.warnings),
             summary: writeSummary(summary),
             loadedAt: now,
           },
         );
-        // Phase 3b: cập nhật dữ liệu dẫn xuất (attemptOutcome, attemptNumber, Course.credits) tại đây.
+        // Dữ liệu dẫn xuất (Course.credits, attemptOutcome, enrollmentStatus, attemptNumber) đã cập
+        // nhật trong CÙNG transaction với từng lô dòng (docs/rules/10) → lô đã đối soát.
+        // Phase 4: kích hoạt EvaluationRun AUTO_AFTER_IMPORT tại đây.
         await em.update(
           ImportBatch,
           { id: batchId },

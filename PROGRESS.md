@@ -41,3 +41,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Quyết định kỹ thuật (đã ghi rule 05/12): bỏ papaparse (stream chậm bậc hai: 50.000 dòng ~38 giây); XLSX đọc cả file vào bộ nhớ vì bản stream của exceljs bỏ sót dữ liệu (đo ~270MB ở mức trần); lưu thứ tự cột gốc vì jsonb tự sắp xếp khóa.
 - Việc còn lại (3b): 3 nguồn dữ liệu học tập; điều kiện hoàn tác "chưa chạy đánh giá" thêm ở Phase 4.
 - Tự kiểm tra: Admin → Nhập dữ liệu → nạp `docs/demo-data/01_sinh_vien.csv` → Xác nhận nạp → Khoa và lớp sinh hoạt thấy sĩ số; sửa 1 dòng (VD lớp `KTPM9999`), nạp → tải file lỗi.
+
+## Phase 3b — Nhập 3 nguồn dữ liệu học tập (2026-10-12)
+
+- Làm: entity `Course`, `Enrollment`, `AttendanceSummary`, `LmsQuizAttempt`, `CourseResult` + migration `Phase3bSourceRecords` (chỉ tạo bảng mới); 3 loại nhập `ATTENDANCE_SUMMARY`, `LMS_QUIZ`, `COURSE_RESULT` trên khung 3a; upsert theo khóa nghiệp vụ; `TERM_MISMATCH` (cột `hoc_ky`, ngày ngoài học kỳ); chuẩn hóa `8/10`, `12 phút`, `Đã nộp`, `Đạt`/`Không đạt`; thang điểm chữ 9 mức; tự tạo Course/Enrollment + tính lại `attemptNumber` trong cùng transaction; `RESULT_ALREADY_FINAL`; cảnh báo `LETTER_GRADE_MISMATCH`/`RESULT_MISMATCH` (`ImportBatch.warnings`, hiện ở trang chi tiết lô); hoàn tác lô nguồn (xóa dòng + Enrollment mồ côi, trả outcome, tính lại lần học); chặn hoàn tác lô sinh viên đã có dữ liệu học tập.
+- File chính: `src/db/entities/{course,enrollment,attendance-summary,lms-quiz-attempt,course-result}.entity.ts`, `src/modules/data-import/types/{academic-row,attendance,lms-quiz,course-result}.import.ts`, `services/{enrollment-sync,source-rollback}.ts`, `parsing/grade-scale.ts`.
+- Đổi ngày trong `docs/demo-data` 02–05 sang `YYYY-MM-DD` (quyết định đã chốt, file trước đó chưa đổi).
+- Kiểm tra: typecheck, lint, format, migration, schema drift, test 183 (+1 bỏ qua), coverage data-import 84%, build, worker:build — xanh. DoD: 4 file demo → 29/17/32/10 bản ghi, 0 lỗi, 0 cảnh báo; nạp lại bị chặn; cùng ngày chốt / cùng lượt → cập nhật; mssv lạ → STUDENT_NOT_FOUND; KTPM2311009·KTPM103·HK1 = lần 2 cả khi nạp HK2 sau.
+- Kiểm tra tay (Docker, trình duyệt): file 02 + 1 dòng sai vào HK2_2025 → xem trước 29/1, file lỗi "Điểm thi 11 phải từ 0 đến 10", nạp 29, hoàn tác về 0.
+- Lưu ý: DB dev của bạn đã CHỐT `HK1_2026` → không nạp được file 03/04/05 vào học kỳ đó (đúng luật, chốt không mở lại).
+- Tự kiểm tra: Nhập dữ liệu → Điểm danh tổng hợp → chọn học kỳ còn mở → sửa 1 dòng (VD `co_mat` lớn hơn `tong_buoi`) → nạp → tải file lỗi.

@@ -8,7 +8,14 @@ export interface RowError {
   detail: string;
 }
 
-export type ParsedRow<T> = { ok: true; value: T } | ({ ok: false } & RowError);
+/** Cảnh báo không chặn nạp (VD điểm chữ lệch điểm tổng kết) — ghi vào `ImportBatch.warnings`. */
+export interface RowWarning {
+  code: string;
+  message: string;
+}
+
+export type ParsedRow<T> =
+  { ok: true; value: T; warnings?: RowWarning[] } | ({ ok: false } & RowError);
 
 export interface ParseOptions {
   decimalComma: boolean;
