@@ -9,6 +9,7 @@ const eslintConfig = tseslint.config(
       '.next/**',
       'node_modules/**',
       'coverage/**',
+      'dist/**',
       'playwright-report/**',
       'test-results/**',
       'next-env.d.ts',

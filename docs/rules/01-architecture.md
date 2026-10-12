@@ -43,7 +43,7 @@ tests/                 # Vitest; dùng docs/demo-data làm fixture nghiệm thu
 
 - MUST: `synchronize: false` ở MỌI môi trường. Schema chỉ thay đổi qua migration.
 - MUST: `tsconfig.json` bật `experimentalDecorators` + `emitDecoratorMetadata`; `import 'reflect-metadata'` ở điểm vào của `data-source.ts`; `next.config` khai báo `serverExternalPackages: ['typeorm']` (kiểm tra tên option theo phiên bản Next.js đang dùng) để bundler không phá decorator.
-- MUST: `DataSource` là singleton qua cache `globalThis` (tránh tạo nhiều connection pool khi hot-reload dev); hàm `getDataSource()` tự `initialize()` nếu chưa khởi tạo.
+- MUST: `DataSource` cache qua `globalThis` (tránh tạo nhiều connection pool khi hot-reload dev); hàm `getDataSource()` tự `initialize()` nếu chưa khởi tạo. Cache theo class `User` của từng bản sao module: bản build production của Next.js nhân bản module dùng chung giữa route handler và trang, mà TypeORM tra metadata theo đúng đối tượng class — dùng 1 DataSource chung cho mọi bản sao gây `EntityMetadataNotFoundError` (đã gặp ở Phase 1, chỉ lộ ra khi `next build`). Dev hot-reload: bản sao mới hủy DataSource cũ.
 - MUST: khai báo kiểu cột tường minh (`@Column({ type: 'varchar', length: 20 })`, `type: 'jsonb'`, `type: 'enum'`) và quan hệ dạng arrow `@ManyToOne(() => Student, ...)` — MUST NOT dựa vào suy luận kiểu từ metadata (dễ lỗi khi bundle, dễ sinh migration sai).
 - MUST: dùng `SnakeNamingStrategy` — property camelCase trong code, cột snake_case trong DB. Tên property khớp 100% với data schema (`09`–`12`).
 - MUST NOT: dùng `eager: true` hoặc lazy relation (`Promise<...>`). Luôn nạp quan hệ tường minh qua `relations`/`QueryBuilder` để tránh N+1 và tải thừa.

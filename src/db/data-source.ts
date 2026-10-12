@@ -17,9 +17,17 @@ const MIGRATIONS = [Phase1Identity1791766886196];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;
 
+/**
+ * Next.js production nhân bản module dùng chung giữa route handler và trang → mỗi bản sao có
+ * class entity riêng; TypeORM tra metadata theo đúng đối tượng class, nên 1 DataSource dùng chung
+ * sẽ báo EntityMetadataNotFoundError. Vì vậy cache theo class `User` của từng bản sao.
+ * Dev (hot-reload): bản sao mới thay bản cũ → hủy DataSource cũ để không rò connection.
+ */
 declare global {
-  var __ewarsDataSource: Promise<DataSource> | undefined;
+  var __ewarsDataSources: Map<typeof User, Promise<DataSource>> | undefined;
 }
+
+const MODULE_KEY = User;
 
 export function createDataSource(): DataSource {
   const env = getEnv();
@@ -42,23 +50,32 @@ export function createDataSource(): DataSource {
   });
 }
 
-/**
- * Singleton qua globalThis — tránh tạo nhiều pool khi hot-reload dev.
- * Cache Promise để các lời gọi song song không initialize 2 lần.
- */
+/** DataSource của bản sao module này — tự `initialize()` lần đầu, các lời gọi song song dùng chung Promise. */
 export function getDataSource(): Promise<DataSource> {
-  globalThis.__ewarsDataSource ??= createDataSource()
+  const cache = (globalThis.__ewarsDataSources ??= new Map<typeof User, Promise<DataSource>>());
+  const existing = cache.get(MODULE_KEY);
+  if (existing) return existing;
+
+  if (process.env.NODE_ENV === 'development') {
+    for (const [key, stale] of cache) {
+      cache.delete(key);
+      void stale.then((ds) => ds.destroy()).catch(() => undefined);
+    }
+  }
+  const pending = createDataSource()
     .initialize()
     .catch((error: unknown) => {
-      globalThis.__ewarsDataSource = undefined;
+      cache.delete(MODULE_KEY);
       throw error;
     });
-  return globalThis.__ewarsDataSource;
+  cache.set(MODULE_KEY, pending);
+  return pending;
 }
 
 export async function closeDataSource(): Promise<void> {
-  const pending = globalThis.__ewarsDataSource;
-  globalThis.__ewarsDataSource = undefined;
+  const cache = globalThis.__ewarsDataSources;
+  const pending = cache?.get(MODULE_KEY);
+  cache?.delete(MODULE_KEY);
   if (!pending) return;
   const dataSource = await pending.catch(() => undefined);
   if (dataSource?.isInitialized) await dataSource.destroy();

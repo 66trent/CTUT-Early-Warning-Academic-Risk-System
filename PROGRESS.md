@@ -18,6 +18,7 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - File chính: `src/lib/{auth,auth-policy,auth-server,authz,audit}.ts`, `src/db/entities/*`, `src/modules/admin/{actions,services,validators}/*advisor*`, `src/app/{login,register,no-profile,pending-approval,admin,advisor,student}`.
 - Kiểm tra: typecheck, lint, format, db:init, migration, schema drift, seed (chạy 2 lần), test 59/59, build — xanh. Test DoD: NO_STUDENT_PROFILE/INVALID_DOMAIN/STAFF_ACCOUNT_NOT_FOUND không phát sinh bản ghi; CVHT chờ duyệt bị chặn; demo tắt → 403; CVHT A không đọc được SV lớp CVHT B; bảng auth.* khớp Better Auth 1.7.
 - Kiểm tra tay (đã làm trên trình duyệt): đăng nhập Admin; sai mật khẩu báo lỗi; Admin mở /advisor bị chuyển về /admin; đăng ký CVHT → email MailHog → xác minh → trang "Đang chờ duyệt".
+- Sửa sau khi chạy Docker: bản production nhân bản module → TypeORM không nhận entity (lỗi 500 khi đăng nhập); DataSource giờ cache theo từng bản sao. Đã thử lại trong container.
 - Chưa kiểm chứng: đăng nhập Google thật (cần tài khoản sinh viên có hồ sơ — có từ Phase 3 khi nhập danh sách sinh viên).
 - Lưu ý: Better Auth cảnh báo AUTH_SECRET có độ ngẫu nhiên thấp — nên thay bằng chuỗi ngẫu nhiên.
 - Tự kiểm tra: http://localhost:3000 → tab Cán bộ → "Quản trị viên"; /register đăng ký CVHT, mở email ở http://localhost:8025, bấm liên kết → thấy trang chờ duyệt.
