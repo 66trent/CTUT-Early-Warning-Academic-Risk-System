@@ -67,14 +67,14 @@ describe('Đăng nhập Google — từ chối và KHÔNG phát sinh bản ghi',
     expect(await countByEmail(ds, email)).toEqual({ authUsers: 0, users: 0 });
   });
 
-  it('email ngoài trường → INVALID_DOMAIN', async () => {
+  it.runIf(getEnv().STAFF_EMAIL_DOMAIN !== '*')('email ngoài trường → INVALID_DOMAIN', async () => {
     const email = 'tst_outsider@gmail.com';
     await expectRejected(createOAuthUser(email), 'INVALID_DOMAIN');
     expect(await countByEmail(ds, email)).toEqual({ authUsers: 0, users: 0 });
   });
 
   it('email cán bộ chưa có tài khoản → STAFF_ACCOUNT_NOT_FOUND', async () => {
-    const email = `tst_nobody${env.STAFF_EMAIL_DOMAIN}`;
+    const email = staffEmail('tst_nobody', env.STAFF_EMAIL_DOMAIN);
     await expectRejected(createOAuthUser(email), 'STAFF_ACCOUNT_NOT_FOUND');
     expect(await countByEmail(ds, email)).toEqual({ authUsers: 0, users: 0 });
   });
@@ -107,7 +107,7 @@ describe('Endpoint Better Auth', () => {
   it('đăng ký công khai qua HTTP bị chặn (chỉ đăng ký qua form Cố vấn học tập)', async () => {
     const response = await auth.handler(
       authRequest('/sign-up/email', {
-        email: `tst_hacker${env.STAFF_EMAIL_DOMAIN}`,
+        email: staffEmail('tst_hacker', env.STAFF_EMAIL_DOMAIN),
         password: 'password-123',
         name: 'x',
       }),

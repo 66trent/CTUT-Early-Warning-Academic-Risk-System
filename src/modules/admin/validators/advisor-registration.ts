@@ -1,11 +1,11 @@
 import { z } from 'zod';
+import { isStaffEmail, staffEmailHint } from '@/lib/email-domains';
 
 /**
  * Form đăng ký Cố vấn học tập (docs/rules/06). KHÔNG có trường vai trò — server luôn gán ADVISOR.
  * `staffEmailDomain` đọc từ biến môi trường STAFF_EMAIL_DOMAIN, truyền vào để dùng chung client/server.
  */
 export function advisorRegistrationSchema(staffEmailDomain: string) {
-  const domain = staffEmailDomain.toLowerCase();
   return z
     .object({
       staffCode: z
@@ -19,7 +19,7 @@ export function advisorRegistrationSchema(staffEmailDomain: string) {
         .trim()
         .toLowerCase()
         .pipe(z.email('Email không hợp lệ'))
-        .refine((v) => v.endsWith(domain), `Dùng email cán bộ có đuôi ${domain}`)
+        .refine((v) => isStaffEmail(v, staffEmailDomain), staffEmailHint(staffEmailDomain))
         .refine((v) => v.length <= 100, 'Email tối đa 100 ký tự'),
       password: z
         .string()

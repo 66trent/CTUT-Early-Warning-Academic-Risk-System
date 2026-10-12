@@ -1,8 +1,8 @@
 import { Check, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { STUDENT_EMAIL_DOMAIN } from '@/lib/email-domains';
 import { UserAccountStatus, UserRole } from '../enums';
 
-/** Đuôi email bắt buộc của sinh viên (docs/rules/06, 09). */
-export const STUDENT_EMAIL_DOMAIN = '@student.ctuet.edu.vn';
+export { STUDENT_EMAIL_DOMAIN };
 
 /**
  * Tài khoản nghiệp vụ (schema public) — docs/rules/09.

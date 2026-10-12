@@ -4,6 +4,7 @@ import { Department } from '@/db/entities/department.entity';
 import { Student } from '@/db/entities/student.entity';
 import { User } from '@/db/entities/user.entity';
 import { OfficialAcademicStatus, UserAccountStatus, UserRole } from '@/db/enums';
+import { staffDomainForSamples } from '@/lib/email-domains';
 
 /**
  * Dữ liệu mẫu cho test tích hợp — mọi mã bắt đầu bằng `TST` để dọn sạch sau khi chạy.
@@ -22,7 +23,7 @@ export const FX = {
 } as const;
 
 export function staffEmail(userId: string, staffDomain: string): string {
-  return `${userId.toLowerCase()}${staffDomain}`;
+  return `${userId.toLowerCase()}${staffDomainForSamples(staffDomain)}`;
 }
 
 export async function createIdentityFixtures(ds: DataSource, staffDomain: string): Promise<void> {

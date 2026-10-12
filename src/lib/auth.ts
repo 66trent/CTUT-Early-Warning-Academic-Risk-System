@@ -4,6 +4,7 @@ import { setSessionCookie } from 'better-auth/cookies';
 import pg from 'pg';
 import { z } from 'zod';
 import { APP_NAME } from './app-config';
+import { staffDomainForSamples } from './email-domains';
 import { writeAuditLog } from './audit';
 import {
   decideNewAuthUser,
@@ -98,7 +99,7 @@ const blockPublicSignUp = createAuthMiddleware(async (ctx) => {
 function demoAccountEmail(account: DemoAccount, env: Env): string {
   return account === 'ADMIN'
     ? env.ADMIN_SEED_EMAIL
-    : `${account.toLowerCase()}${env.STAFF_EMAIL_DOMAIN}`;
+    : `${account.toLowerCase()}${staffDomainForSamples(env.STAFF_EMAIL_DOMAIN)}`;
 }
 
 /** POST /api/auth/demo/quick-login — trả 403 khi DEMO_MODE=false (kiểm tra ở server). */

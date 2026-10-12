@@ -23,7 +23,7 @@ Xem `00-project-context.md` cho glossary/enum dùng chung. File này là đặc 
 | userId | String(20) | NOT NULL | PK | `STUDENT`: = mã sinh viên. `ADVISOR`/`ADMIN`: mã cán bộ (nhập khi đăng ký, duy nhất; Admin sửa được trước khi duyệt). Admin đầu tiên do seed tạo có mã `ADMIN` |
 | fullName | String(100) | NOT NULL | | |
 | role | UserRole (enum) | NOT NULL | | `STUDENT`/`ADVISOR`/`ADMIN` |
-| email | String(100) | NOT NULL | UNIQUE | Luôn lưu chữ thường (CHECK ở DB). `STUDENT`: MUST kết thúc `@student.ctuet.edu.vn` (CHECK ở DB). `ADVISOR`: MUST kết thúc bằng đuôi email cán bộ đọc từ biến môi trường `STAFF_EMAIL_DOMAIN`. Validate bằng Zod ở server, không chỉ ở UI |
+| email | String(100) | NOT NULL | UNIQUE | Luôn lưu chữ thường (CHECK ở DB). `STUDENT`: MUST kết thúc `@student.ctuet.edu.vn` (CHECK ở DB). `ADVISOR`: MUST kết thúc bằng đuôi email cán bộ đọc từ biến môi trường `STAFF_EMAIL_DOMAIN` (giá trị `*` = mọi email trừ email sinh viên, chỉ dùng khi thử nghiệm — xem `06`). Validate bằng Zod ở server, không chỉ ở UI |
 | accountStatus | UserAccountStatus (enum) | NOT NULL | | `PENDING_APPROVAL`/`ACTIVE`/`REJECTED`/`SUSPENDED`. Chỉ `ACTIVE` mới truy cập được dữ liệu |
 | authUserId | String(64) | NULL | UNIQUE | Id tài khoản Better Auth (schema `auth`). Gán ở lần đăng nhập đầu tiên bằng cách khớp `email` |
 

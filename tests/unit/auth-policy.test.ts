@@ -92,3 +92,22 @@ describe('Chính sách tạo tài khoản đăng nhập — không tự tạo h�
     });
   });
 });
+
+describe('STAFF_EMAIL_DOMAIN=* — nhận mọi email cán bộ (thử nghiệm khi chưa có email trường)', () => {
+  it('email cá nhân được coi là email cán bộ', () => {
+    expect(decideNewAuthUser(google('someone@gmail.com'), null, '*')).toMatchObject({
+      code: 'STAFF_ACCOUNT_NOT_FOUND',
+    });
+    const fresh = profile(UserRole.ADVISOR, UserAccountStatus.PENDING_APPROVAL);
+    expect(decideNewAuthUser(registration('someone@gmail.com'), fresh, '*')).toEqual({
+      allowed: true,
+    });
+  });
+
+  it('email sinh viên vẫn KHÔNG được đăng ký làm cán bộ', () => {
+    const p = profile(UserRole.ADVISOR, UserAccountStatus.PENDING_APPROVAL);
+    expect(decideNewAuthUser(registration('x@student.ctuet.edu.vn'), p, '*')).toMatchObject({
+      code: 'INVALID_DOMAIN',
+    });
+  });
+});

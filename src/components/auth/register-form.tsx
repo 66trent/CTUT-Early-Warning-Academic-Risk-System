@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { staffEmailHint } from '@/lib/email-domains';
 import { registerAdvisorAction } from '@/modules/admin/actions/register-advisor.action';
 import {
   type AdvisorRegistrationInput,
@@ -31,7 +32,7 @@ const FIELDS: {
 }[] = [
   { name: 'staffCode', label: 'Mã cán bộ', type: 'text', autoComplete: 'off' },
   { name: 'fullName', label: 'Họ và tên', type: 'text', autoComplete: 'name' },
-  { name: 'email', label: 'Email cán bộ', type: 'email', autoComplete: 'email' },
+  { name: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
   { name: 'password', label: 'Mật khẩu', type: 'password', autoComplete: 'new-password' },
   {
     name: 'confirmPassword',
@@ -82,7 +83,7 @@ export function RegisterForm({ staffEmailDomain }: { staffEmailDomain: string })
       <CardHeader>
         <CardTitle className="text-2xl">Đăng ký Cố vấn học tập</CardTitle>
         <CardDescription>
-          Tài khoản cần Quản trị viên duyệt trước khi sử dụng. Dùng email cán bộ {staffEmailDomain}.
+          Tài khoản cần Quản trị viên duyệt trước khi sử dụng. {staffEmailHint(staffEmailDomain)}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

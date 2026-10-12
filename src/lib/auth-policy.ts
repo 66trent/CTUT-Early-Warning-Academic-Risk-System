@@ -1,6 +1,7 @@
 import { getDataSource } from '@/db/data-source';
-import { STUDENT_EMAIL_DOMAIN, User } from '@/db/entities/user.entity';
+import { User } from '@/db/entities/user.entity';
 import { UserAccountStatus, UserRole } from '@/db/enums';
+import { isStaffEmail, isStudentEmail } from './email-domains';
 
 /**
  * Chính sách cho phép tạo/liên kết tài khoản đăng nhập (docs/rules/01, 06, 09).
@@ -43,7 +44,7 @@ export function decideNewAuthUser(
 ): PolicyDecision {
   const email = request.email.trim().toLowerCase();
 
-  if (email.endsWith(STUDENT_EMAIL_DOMAIN)) {
+  if (isStudentEmail(email)) {
     if (request.isAdvisorRegistration) return deny('INVALID_DOMAIN');
     if (!request.emailVerified) return deny('EMAIL_NOT_VERIFIED');
     if (!profile || profile.role !== UserRole.STUDENT) return deny('NO_STUDENT_PROFILE');
@@ -51,7 +52,7 @@ export function decideNewAuthUser(
     return { allowed: true };
   }
 
-  if (email.endsWith(staffEmailDomain.toLowerCase())) {
+  if (isStaffEmail(email, staffEmailDomain)) {
     if (!profile || profile.role === UserRole.STUDENT) return deny('STAFF_ACCOUNT_NOT_FOUND');
     if (request.isAdvisorRegistration) {
       const isFreshRegistration =

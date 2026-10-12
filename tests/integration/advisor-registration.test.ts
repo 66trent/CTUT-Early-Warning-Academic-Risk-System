@@ -3,6 +3,7 @@ import { type DataSource } from 'typeorm';
 import { closeDataSource, getDataSource } from '@/db/data-source';
 import { User } from '@/db/entities/user.entity';
 import { UserAccountStatus, UserRole } from '@/db/enums';
+import { staffDomainForSamples } from '@/lib/email-domains';
 import { getEnv } from '@/lib/env';
 import { AppError } from '@/lib/errors';
 import { registerAdvisor } from '@/modules/admin/services/advisor-registration.service';
@@ -11,12 +12,13 @@ import { cleanupIdentityFixtures, countByEmail } from '../helpers/identity-fixtu
 
 let ds: DataSource;
 const domain = () => getEnv().STAFF_EMAIL_DOMAIN;
+const sampleDomain = () => staffDomainForSamples(domain());
 
 const input = (code: string) =>
   advisorRegistrationSchema(domain()).parse({
     staffCode: code,
     fullName: 'Cố vấn thử',
-    email: `${code.toLowerCase()}${domain()}`,
+    email: `${code.toLowerCase()}${sampleDomain()}`,
     password: 'mat-khau-thu-123',
     confirmPassword: 'mat-khau-thu-123',
   });
@@ -34,7 +36,11 @@ afterAll(async () => {
 describe('Đăng ký Cố vấn học tập', () => {
   it('form không có trường vai trò; email phải đúng đuôi cán bộ', () => {
     const schema = advisorRegistrationSchema(domain());
-    const bad = schema.safeParse({ ...input('TSTREG0'), email: 'tst@gmail.com', role: 'ADMIN' });
+    const bad = schema.safeParse({
+      ...input('TSTREG0'),
+      email: 'tst@student.ctuet.edu.vn',
+      role: 'ADMIN',
+    });
     expect(bad.success).toBe(false);
     const ok = schema.parse({ ...input('TSTREG0'), role: 'ADMIN' });
     expect(ok).not.toHaveProperty('role');
