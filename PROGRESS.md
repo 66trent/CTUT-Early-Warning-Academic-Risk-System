@@ -22,3 +22,12 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Chưa kiểm chứng: đăng nhập Google thật (cần tài khoản sinh viên có hồ sơ — có từ Phase 3 khi nhập danh sách sinh viên).
 - Lưu ý: Better Auth cảnh báo AUTH_SECRET có độ ngẫu nhiên thấp — nên thay bằng chuỗi ngẫu nhiên.
 - Tự kiểm tra: http://localhost:3000 → tab Cán bộ → "Quản trị viên"; /register đăng ký CVHT, mở email ở http://localhost:8025, bấm liên kết → thấy trang chờ duyệt.
+
+## Phase 2 — Danh mục quản trị (2026-10-12)
+
+- Làm: Học kỳ (tạo theo số học kỳ + năm, đặt hiện tại trong transaction, chốt có xác nhận); Khoa (chỉ xem, số lớp); Lớp sinh hoạt (tạo, sửa, gán/đổi CVHT trong transaction, sĩ số bằng COUNT … GROUP BY); Tài khoản (lọc vai trò/trạng thái, tìm kiếm, phân trang, duyệt/từ chối/khóa/mở khóa, đổi vai trò ADVISOR↔ADMIN, sửa mã khi chờ duyệt; cấm tự đổi của mình; CVHT đang phụ trách lớp không khóa/đổi vai trò được); mọi thao tác ghi Audit Log; `runAction()` dùng chung cho Server Action; `seed:demo` (GV001/GV002, KTPM2311/KHMT2311, HK2_2025/HK1_2026 hiện tại).
+- File chính: `src/modules/admin/{services,actions,validators}/{term,class,account}*`, `src/components/admin/*`, `src/components/data-table/data-table.tsx`, `src/app/admin/{terms,classes,users}/page.tsx`, `src/db/seeds/demo-seed.ts`, `src/lib/{action,dates}.ts`.
+- Kiểm tra: typecheck, lint, format, db:init, migration, schema drift, seed, seed:demo (chạy 2 lần), test 82 (+1 bỏ qua ở chế độ `STAFF_EMAIL_DOMAIN=*`), build — xanh. DoD: 2 học kỳ hiện tại → lỗi 23505; duyệt CVHT → đăng nhập được và đọc được SV lớp mình; DTO thuần (kiểm tra prototype).
+- Lỗi tìm ra khi chạy giao diện: danh sách CVHT truyền instance entity xuống client ("Only plain objects…") — đã sửa và thêm vào test DTO.
+- Cần người dùng xác nhận: mã khoa Cơ khí `K.CK` (rule 09) hay `K.KTCK` (code seed) — DB đang có cả 2.
+- Tự kiểm tra: Admin → Tài khoản → duyệt `GV02`; Khoa và lớp sinh hoạt → tạo lớp, gán CVHT; Học kỳ → đổi học kỳ hiện tại, header đổi theo. Sĩ số > 0 sẽ thấy sau khi nhập danh sách sinh viên (Phase 3).

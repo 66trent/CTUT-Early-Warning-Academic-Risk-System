@@ -1,4 +1,10 @@
-import { AlertStatus, DataCompletenessLevel, Severity, UserRole } from '@/db/enums';
+import {
+  AlertStatus,
+  DataCompletenessLevel,
+  Severity,
+  UserAccountStatus,
+  UserRole,
+} from '@/db/enums';
 
 /** Nhãn tiếng Việt hiển thị cho người dùng — 1 nơi duy nhất, nhất quán toàn app (docs/rules/07). */
 
@@ -6,6 +12,13 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.STUDENT]: 'Sinh viên',
   [UserRole.ADVISOR]: 'Cố vấn học tập',
   [UserRole.ADMIN]: 'Quản trị viên',
+};
+
+export const ACCOUNT_STATUS_LABELS: Record<UserAccountStatus, string> = {
+  [UserAccountStatus.PENDING_APPROVAL]: 'Chờ duyệt',
+  [UserAccountStatus.ACTIVE]: 'Đang hoạt động',
+  [UserAccountStatus.REJECTED]: 'Đã từ chối',
+  [UserAccountStatus.SUSPENDED]: 'Tạm khóa',
 };
 
 export const SEVERITY_LABELS: Record<Severity, string> = {

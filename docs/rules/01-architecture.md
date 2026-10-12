@@ -69,7 +69,8 @@ tests/                 # Vitest; dùng docs/demo-data làm fixture nghiệm thu
 
 ## Server Action — dữ liệu trả về
 
-- MUST: Server Action trả về object thuần (POJO/DTO) qua hàm map tường minh (VD: `toClassDto(entity)`), dạng `{ ok: true, data } | { ok: false, code, message }`. MUST NOT trả instance entity TypeORM hay object có quan hệ vòng — Next.js báo lỗi "Only plain objects… can be passed to Client Components".
+- MUST: Server Action trả về object thuần (POJO/DTO) qua hàm map tường minh (VD: `toClassDto(entity)`), dạng `{ ok: true, data } | { ok: false, code, message }`. MUST NOT trả instance entity TypeORM hay object có quan hệ vòng — Next.js báo lỗi "Only plain objects… can be passed to Client Components". Quy tắc này áp dụng cả cho dữ liệu Server Component truyền xuống Client Component (kể cả kết quả `repo.find({ select })` — vẫn là instance entity). Test tích hợp kiểm tra `Object.getPrototypeOf(dto) === Object.prototype` cho mọi hàm `list*` trả dữ liệu ra giao diện.
+- Khung chung: `runAction(raw, { roles, schema, revalidate, run })` trong `src/lib/action.ts` — kiểm tra phiên/vai trò → Zod → service → `revalidatePath(…, 'layout')`; lỗi lạ chỉ ghi log. Client Component chỉ `import type` DTO từ `services/`.
 
 ## BullMQ Worker
 
