@@ -110,6 +110,8 @@ Có trigger mức ≥ `MEDIUM` ở ≥ 2 trong 3 nhóm: điểm danh (`ATT-01`/`
 - Điểm danh là số tổng hợp → không phát hiện "vắng liên tiếp" chính xác; `ATT-02` là xấp xỉ theo mức tăng giữa 2 lần nhập.
 - Nguồn điểm danh đếm theo buổi, quy chế tính theo tiết → `ATT-01` chỉ chính xác khi các buổi của học phần có cùng số tiết.
 - Không biết sinh viên rút học phần từ 3 nguồn → Admin đánh dấu tay.
+- Không có danh sách đăng ký học phần: sinh viên không xuất hiện trong file nguồn nào của học phần thì hệ thống không biết sinh viên có học — phụ thuộc file điểm danh liệt kê đủ sinh viên.
+- Nạp một phần (nhiều dòng LMS bị lỗi) làm lệch tỷ lệ "phần lớn lớp đã làm" của `LMS-01` → màn xem trước cảnh báo khi tỷ lệ lỗi > 10% (xem `12`).
 Cảnh báo nghi báo sai do các giới hạn này: CVHT dùng `DISMISSED` kèm lý do.
 
 ## Gộp nguyên nhân & chống trùng cảnh báo (Bước 7)

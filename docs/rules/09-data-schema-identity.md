@@ -58,7 +58,7 @@ RÀNG BUỘC: CVHT quản lý sinh viên QUA lớp sinh hoạt — phạm vi c�
 |---|---|---|---|---|
 | studentId | String(20) | NOT NULL | PK | Mã số sinh viên |
 | fullName | String(100) | NOT NULL | | |
-| classId | String(20) | NOT NULL | FK → AdministrativeClass | Lớp sinh hoạt. Khoa, khóa, CVHT suy ra từ lớp — MUST NOT lưu lặp lại ở `Student` |
+| classId | String(20) | NOT NULL | FK → AdministrativeClass | Lớp sinh hoạt. Khoa, khóa, CVHT suy ra từ lớp — MUST NOT lưu lặp lại ở `Student`. Đổi lớp (qua nhập danh sách sinh viên) → từ Phase 5 MUST chuyển `Alert` đang mở của sinh viên đó sang CVHT của lớp mới trong cùng transaction |
 | officialAcademicStatus | OfficialAcademicStatus (enum) | NOT NULL | | `ACTIVE`/`RESERVED`/`SUSPENDED`/`GRADUATED`/`DISMISSED`. MUST chỉ ghi bởi tiến trình nhập dữ liệu từ SIS (MVP: file CSV/seed), không do rule-engine/alerts/admin ghi — xem ràng buộc phạm vi ở `00-project-context.md` |
 
 ## Term

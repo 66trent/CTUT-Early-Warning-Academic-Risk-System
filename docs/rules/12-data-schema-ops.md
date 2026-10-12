@@ -32,11 +32,23 @@ Quy trình 2 bước (người dùng chọn) — trạng thái:
 - `LOADED`: đã ghi các dòng hợp lệ (đọc lại file gốc từ MinIO, không dùng bảng tạm), theo lô ≤ 500 dòng/transaction; mọi thao tác là upsert theo khóa nghiệp vụ → chạy lại an toàn khi job lỗi giữa chừng.
 - `RECONCILED`: đã cập nhật xong dữ liệu dẫn xuất (`Course.credits`, `attemptOutcome`, `enrollmentStatus`, tính lại `attemptNumber`) → từ Phase 4 kích hoạt `EvaluationRun` `AUTO_AFTER_IMPORT`.
 - `REJECTED`: lỗi cả file — không đọc được, thiếu cột bắt buộc, không có dòng hợp lệ nào, học kỳ đã chốt. Ghi `errorMessage`.
+- `ROLLED_BACK`: lô đã nạp bị hoàn tác (xem "Hoàn tác lô").
 
 RÀNG BUỘC:
-- Chỉ hủy được (`DISCARDED`) khi `status = STAGED` (chưa ghi dữ liệu nghiệp vụ nào).
-- Chống nạp trùng: partial unique index `(sourceChecksum, dataType, COALESCE(termId, ''))` `WHERE status NOT IN ('REJECTED', 'DISCARDED')` — file đã bị từ chối/hủy được nạp lại.
+- Chỉ hủy được (`DISCARDED`) khi `status = STAGED` (chưa ghi dữ liệu nghiệp vụ nào). Lô `STAGED` quá 7 ngày không xác nhận → tự `DISCARDED` (job hằng ngày).
+- **Kiểm tra lại khi xác nhận**: bước `LOADED` MUST kiểm tra lại mọi dòng với dữ liệu nền tại thời điểm nạp (sinh viên, lớp, học kỳ có thể đã đổi từ lúc xem trước); dòng mới thành lỗi được thêm vào `ImportErrorRow`, `successRows`/`errorRows` cập nhật lại.
+- **Màn xem trước**: hiện số dòng hợp lệ/lỗi, vài dòng mẫu; tỷ lệ lỗi > 10% → cảnh báo nổi bật (với `LMS_QUIZ`, thiếu dòng làm lệch tỷ lệ "phần lớn lớp đã làm" của `LMS-01`).
+- **Nạp đồng thời**: bước nạp giữ khóa theo `(dataType, termId)` (PostgreSQL advisory lock) — lô thứ hai cùng loại, cùng học kỳ chờ lô đầu xong.
+- **Giới hạn file**: ≤ 20MB tải lên, ≤ 50.000 dòng dữ liệu (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`.
+
+**Hoàn tác lô** (người dùng chọn "có điều kiện") — Admin bấm "Hoàn tác" trên lô `LOADED`/`RECONCILED`, xác nhận lần 2 (AlertDialog), chỉ khi ĐỦ cả 3 điều kiện:
+1. Lô chỉ THÊM dòng mới, không cập nhật dòng có sẵn (`summary.updated = 0`).
+2. Chưa có `EvaluationRun` nào của học kỳ đó bắt đầu sau khi lô nạp xong (dữ liệu chưa được dùng để tính cảnh báo).
+3. Không dòng nào của lô đã bị lô khác cập nhật sau đó (`importBatchId` của mọi dòng vẫn là lô này).
+Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `Enrollment` có `firstSeenBatchId` = lô và không còn dữ liệu nguồn nào; với lô `STUDENT`: xóa `Student`/`User` lô đã tạo nếu chưa đăng nhập lần nào (`authUserId` NULL) và chưa có dữ liệu học tập; tính lại dữ liệu dẫn xuất (`attemptOutcome`, `attemptNumber`); `status = ROLLED_BACK`; ghi Audit Log `IMPORT_ROLLED_BACK`. Không đủ điều kiện → nút bị vô hiệu kèm lý do; cách sửa là nạp file đúng (ghi đè) và Cố vấn học tập đánh dấu cảnh báo sai là "không còn hiệu lực" (`INVALIDATED`).
+- Chống nạp trùng: partial unique index `(sourceChecksum, dataType, COALESCE(termId, ''))` `WHERE status NOT IN ('REJECTED', 'DISCARDED', 'ROLLED_BACK')` — file đã bị từ chối/hủy/hoàn tác được nạp lại.
 - BullMQ `jobId` = `ImportBatch.id` (mỗi lô 1 mã; trùng file đã chặn ở DB). Job xác nhận nạp dùng `${id}:load`.
+- Partial unique index chống trùng loại trừ cả `ROLLED_BACK` (file đã hoàn tác được nạp lại).
 - Học kỳ đã chốt (`closedAt` khác NULL) → từ chối MỌI loại nhập có `termId`.
 
 ## ImportErrorRow
@@ -52,7 +64,7 @@ RÀNG BUỘC:
 
 `STUDENT_NOT_FOUND`: `mssv` chưa có trong danh sách sinh viên — MUST NOT tự tạo sinh viên. `TERM_MISMATCH`: cột `hoc_ky` khác học kỳ đã chọn, hoặc ngày chốt điểm danh / giờ bắt đầu làm bài nằm ngoài thời gian học kỳ. `DUPLICATE`: trùng khóa với 1 dòng trước đó trong CÙNG file (giữ dòng đầu), hoặc email sinh viên đã thuộc tài khoản khác. `RESULT_ALREADY_FINAL`: dòng chỉ có điểm quá trình cho kết quả đã chốt cuối kỳ.
 
-**File lỗi tải về** (Route Handler GET — export file): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`).
+**File lỗi tải về** (Route Handler GET — export file, chỉ Admin): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), chống chèn công thức (xem `06`), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`).
 
 ## Định dạng file và cột — header tiếng Việt không dấu
 

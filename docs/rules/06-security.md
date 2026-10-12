@@ -49,6 +49,7 @@ Xem `00-project-context.md` cho glossary và bảng phạm vi role.
 - MUST NOT: dùng `dangerouslySetInnerHTML` cho bất kỳ dữ liệu nào có nguồn gốc từ người dùng nhập (`Intervention.content`, `RuleTrigger.reason` nếu cho nhập tự do).
 - MUST: dùng repository/`QueryBuilder` của TypeORM với tham số (`:name` + `setParameters`) cho mọi truy vấn. Nếu buộc dùng `dataSource.query()`, MUST truyền tham số dạng mảng (`$1`, `$2`) — MUST NOT nối chuỗi SQL thủ công.
 - MUST: kiểm tra đuôi file + nội dung thật của file (magic bytes / văn bản hợp lệ) + giới hạn kích thước (≤ 20MB) trước khi xử lý file upload — MUST NOT tin tưởng đuôi file người dùng đặt, cũng KHÔNG dựa vào MIME trình duyệt gửi (xem `12`).
+- MUST: chống chèn công thức (CSV/formula injection, OWASP) ở MỌI file xuất cho người dùng mở bằng Excel (file dòng lỗi, báo cáo): ô bắt đầu bằng `=`, `+`, `-`, `@`, tab hoặc CR → thêm tiền tố `'`.
 
 ## Thông báo và email sinh viên
 

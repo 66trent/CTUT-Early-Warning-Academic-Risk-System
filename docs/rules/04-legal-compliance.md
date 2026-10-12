@@ -23,6 +23,7 @@ Route `/legal/privacy-policy` MUST trình bày đủ 7 mục:
 - MUST: khi có yêu cầu xóa dữ liệu cá nhân, dùng cơ chế ẩn danh hóa (thay `studentId` bằng mã không thể truy ngược) thay vì xóa cứng — vì Audit Log là append-only, không thể xóa bản ghi log liên quan.
 - MUST NOT: log toàn bộ payload chứa dữ liệu cá nhân ra console/file log không kiểm soát truy cập — dùng logger có redact field nhạy cảm (`email`, `Intervention.content`) trước khi ghi log vận hành thông thường (khác Audit Log nghiệp vụ).
 - MUST NOT: gửi dữ liệu cá nhân sinh viên qua dịch vụ bên thứ ba chưa xác nhận cam kết bảo mật. Ưu tiên SMTP nội bộ của trường thay vì dịch vụ email công cộng.
+- MUST: file gốc các lô nhập (MinIO) chứa dữ liệu cá nhân → chỉ Admin tải được, giữ tối thiểu 1 học kỳ và tối đa theo quy định lưu trữ hồ sơ đào tạo của trường, nêu rõ trong mục "Thời gian lưu trữ" của trang chính sách.
 - MUST NOT: dùng dữ liệu sinh viên thật trong seed/demo data — dữ liệu môi trường dev/test phải giả lập hoàn toàn hoặc đã ẩn danh hóa.
 
 ## Việc cần xác nhận thủ công (ngoài phạm vi code)
