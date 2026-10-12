@@ -10,15 +10,22 @@ import { Course } from './entities/course.entity';
 import { CourseResult } from './entities/course-result.entity';
 import { Department } from './entities/department.entity';
 import { Enrollment } from './entities/enrollment.entity';
+import { EvaluationRun } from './entities/evaluation-run.entity';
 import { ImportBatch } from './entities/import-batch.entity';
 import { ImportErrorRow } from './entities/import-error-row.entity';
 import { LmsQuizAttempt } from './entities/lms-quiz-attempt.entity';
+import { RiskScoreLog } from './entities/risk-score-log.entity';
+import { RuleTrigger } from './entities/rule-trigger.entity';
+import { RuleVersion } from './entities/rule-version.entity';
+import { Rule } from './entities/rule.entity';
 import { Student } from './entities/student.entity';
 import { Term } from './entities/term.entity';
 import { User } from './entities/user.entity';
 import { Phase1Identity1791766886196 } from './migrations/1791766886196-Phase1Identity';
 import { Phase3aImport1791807992637 } from './migrations/1791807992637-Phase3aImport';
 import { Phase3bSourceRecords1791810699905 } from './migrations/1791810699905-Phase3bSourceRecords';
+import { Phase4ProcessPublishedAt1791826670549 } from './migrations/1791826670549-Phase4ProcessPublishedAt';
+import { Phase4RuleEngine1791825968315 } from './migrations/1791825968315-Phase4RuleEngine';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
@@ -35,11 +42,18 @@ export const ENTITIES = [
   AttendanceSummary,
   LmsQuizAttempt,
   CourseResult,
+  Rule,
+  RuleVersion,
+  EvaluationRun,
+  RuleTrigger,
+  RiskScoreLog,
 ];
 const MIGRATIONS = [
   Phase1Identity1791766886196,
   Phase3aImport1791807992637,
   Phase3bSourceRecords1791810699905,
+  Phase4RuleEngine1791825968315,
+  Phase4ProcessPublishedAt1791826670549,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

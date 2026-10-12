@@ -79,6 +79,17 @@ export function parseInteger(raw: string): Parsed<number> {
   return ok(Number(text));
 }
 
+/**
+ * Chữ tiếng Việt đã bị mất khi file được lưu sai bảng mã (VD Excel "CSV (Comma delimited)"
+ * biến `Trương` thành `Tr??ng`) — phát hiện qua ký tự `?` hoặc ký tự thay thế U+FFFD.
+ */
+export function hasLostDiacritics(text: string): boolean {
+  return /[?�]/.test(text);
+}
+
+export const LOST_DIACRITICS_HINT =
+  'có ký tự "?" — file bị lưu sai bảng mã nên mất dấu tiếng Việt. Dùng file mẫu .xlsx, hoặc trong Excel lưu dạng "CSV UTF-8 (Comma delimited)".';
+
 /** Bỏ dấu tiếng Việt, chữ thường. */
 export function stripDiacritics(text: string): string {
   return text

@@ -30,6 +30,7 @@ import {
   demoAcademicCsv,
   demoStudentsCsv,
   IMPORT_ACTOR,
+  noEnqueue,
   TEST_CLASSES,
   uploadAndValidate,
   useMemoryStorage,
@@ -341,7 +342,7 @@ describe('Lần học không phụ thuộc thứ tự nạp file', () => {
       courseId: 'TSTC103',
       termId: HK2,
     });
-    await rollbackImportBatch(hk2.firstSeenBatchId, IMPORT_ACTOR);
+    await rollbackImportBatch(hk2.firstSeenBatchId, IMPORT_ACTOR, noEnqueue);
     expect(await ds.getRepository(Enrollment).countBy({ termId: HK2 })).toBe(0);
     expect(await enrollmentOf('TSTK2311009', 'TSTC103', HK1)).toMatchObject({ attemptNumber: 1 });
   });

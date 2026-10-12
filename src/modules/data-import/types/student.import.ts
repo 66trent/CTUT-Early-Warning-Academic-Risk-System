@@ -6,7 +6,7 @@ import { Student } from '@/db/entities/student.entity';
 import { User } from '@/db/entities/user.entity';
 import { OfficialAcademicStatus, UserAccountStatus, UserRole } from '@/db/enums';
 import { STUDENT_EMAIL_DOMAIN } from '@/lib/email-domains';
-import { stripDiacritics } from '../parsing/values';
+import { hasLostDiacritics, LOST_DIACRITICS_HINT, stripDiacritics } from '../parsing/values';
 import { type ImportTypeDefinition, type ParsedRow, type RowError } from './definition';
 
 export interface StudentRow {
@@ -64,6 +64,7 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
       return invalid('Mã số sinh viên gồm 3–20 chữ cái hoặc chữ số, không để trống.');
     }
     if (fullName.length < 2 || fullName.length > 100) return invalid('Họ tên từ 2 đến 100 ký tự.');
+    if (hasLostDiacritics(fullName)) return invalid(`Họ tên "${fullName}" ${LOST_DIACRITICS_HINT}`);
     if (!emailSchema.safeParse(email).success || email.length > 100) {
       return invalid(`Email "${record.email ?? ''}" không hợp lệ.`);
     }

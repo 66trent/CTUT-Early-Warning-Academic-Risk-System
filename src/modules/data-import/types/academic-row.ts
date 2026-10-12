@@ -3,6 +3,7 @@ import { type EntityManager } from 'typeorm';
 import { type ImportBatch } from '@/db/entities/import-batch.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
+import { hasLostDiacritics, LOST_DIACRITICS_HINT } from '../parsing/values';
 import { type RowError } from './definition';
 
 /** Phần chung của 1 dòng dữ liệu học tập (điểm danh, LMS, kết quả học phần). */
@@ -36,6 +37,9 @@ export function parseAcademicBase(
     return { ok: false, detail: 'Mã học phần gồm 2–20 chữ cái hoặc chữ số, không để trống.' };
   }
   if (courseName.length > 150) return { ok: false, detail: 'Tên học phần tối đa 150 ký tự.' };
+  if (hasLostDiacritics(courseName)) {
+    return { ok: false, detail: `Tên học phần "${courseName}" ${LOST_DIACRITICS_HINT}` };
+  }
   return {
     ok: true,
     value: {

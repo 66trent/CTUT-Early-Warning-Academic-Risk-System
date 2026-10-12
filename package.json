@@ -28,7 +28,9 @@
     "seed": "tsx scripts/seed.ts",
     "seed:demo": "tsx scripts/seed.ts --demo",
     "prepare": "husky || true",
-    "worker:build": "esbuild src/workers/index.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outfile=dist/worker/index.mjs"
+    "worker:build": "esbuild src/workers/index.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outfile=dist/worker/index.mjs",
+    "templates:build": "tsx scripts/build-templates.ts",
+    "demo:load": "tsx scripts/load-demo-data.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [

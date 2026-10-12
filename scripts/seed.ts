@@ -15,7 +15,7 @@ async function main(): Promise<void> {
   const env = getEnv();
   const report = await seedBase(await getDataSource(), getAuth(), env);
   console.log(
-    `seed — ${report.departments} khoa; Admin ${report.adminCreated ? 'đã tạo' : 'đã có sẵn'} (${env.ADMIN_SEED_EMAIL}).`,
+    `seed — ${report.departments} khoa; Admin ${report.adminCreated ? 'đã tạo' : 'đã có sẵn'} (${env.ADMIN_SEED_EMAIL}); ${report.rulesCreated} luật mới (10 luật + RISK-SCORE).`,
   );
   if (process.argv.includes('--demo')) {
     const demo = await seedDemo(await getDataSource(), getAuth(), env);

@@ -57,7 +57,10 @@ export interface DemoSeedReport {
   advisorsCreated: number;
 }
 
-/** Idempotent: chạy lại không tạo trùng; lớp/học kỳ được đưa về đúng giá trị demo. */
+/**
+ * Idempotent: chạy lại không tạo trùng; lớp (CVHT), học kỳ (ngày, chưa chốt, học kỳ hiện tại)
+ * được đưa về đúng giá trị demo trong `docs/demo-data/KET_QUA_MONG_DOI.md`.
+ */
 export async function seedDemo(
   dataSource: DataSource,
   auth: Auth,
@@ -87,6 +90,9 @@ export async function seedDemo(
         academicYear: t.academicYear,
         startDate: vnStartOfDay(t.startDate),
         endDate: vnEndOfDay(t.endDate),
+        // Ngoại lệ CHỈ cho dữ liệu demo (DEMO_MODE): đưa học kỳ demo về chưa chốt để diễn tập lại
+        // kịch bản bảo vệ. Ở chế độ thường, học kỳ đã chốt không mở lại được (docs/rules/09).
+        closedAt: null,
       })),
       ['termId'],
     );

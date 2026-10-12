@@ -8,10 +8,10 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 |---|---|---|---|---|
 | ruleCode | String(20) | NOT NULL | PK | VD: `ATT-01` — MUST giữ nguyên định dạng `NHÓM-số` trong `08` |
 | ruleName | String(100) | NOT NULL | | |
-| ruleGroup | RuleGroup (enum) | NOT NULL | | `ATTENDANCE`/`ACADEMIC`/`LMS`/`COMBINED`/`EXCEPTION` |
+| ruleGroup | RuleGroup (enum) | NOT NULL | | `ATTENDANCE`/`ACADEMIC`/`LMS`/`COMBINED`/`EXCEPTION`/`RISK_SCORE` (chỉ `Rule` cấu hình trọng số `RISK-SCORE`, xem `08`) |
 | scope | String(30) | NOT NULL | | `PER_COURSE`/`PER_STUDENT` |
 | priority | Int | NOT NULL | | Thứ tự ưu tiên khi có xung đột luật |
-| cooldown | Int | NOT NULL | | Số GIỜ (đơn vị cố định: giờ) trước khi cho phép tạo `Alert` mới cho cùng khóa tương quan — xem `08-business-rules-catalog.md` |
+| cooldown | Int | NOT NULL | | Seed tạm 168 (7 ngày) — chốt ở Phase 5. Số GIỜ (đơn vị cố định: giờ) trước khi cho phép tạo `Alert` mới cho cùng khóa tương quan — xem `08-business-rules-catalog.md` |
 | status | RuleStatus (enum) | NOT NULL | | `DRAFT`/`ACTIVE`/`INACTIVE`/`ARCHIVED` |
 
 ## RuleVersion — MUST tạo bản ghi mới khi sửa, KHÔNG ghi đè
@@ -22,7 +22,7 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | ruleCode | String(20) | NOT NULL | FK → Rule | |
 | version | Int | NOT NULL | | Tăng dần |
 | condition | Json | NOT NULL | | Ngưỡng/toán tử cụ thể — MUST validate bằng Zod trước khi ghi |
-| severity | Severity (enum) | NOT NULL | | `LOW`/`MEDIUM`/`HIGH`/`CRITICAL` |
+| severity | Severity (enum) | NOT NULL | | `LOW`/`MEDIUM`/`HIGH`/`CRITICAL`. Luật nhiều mức (`ATT-01`, `LMS-01`, `ACA-02`, `COMB-02`): các mức nằm trong `condition`, cột này = mức cao nhất luật có thể ra (chỉ hiển thị) |
 | action | Json | NOT NULL | | Danh sách hành động khi kích hoạt |
 | effectiveFrom | DateTime | NOT NULL | | |
 | effectiveTo | DateTime | NULL | | NULL = đang dùng |
@@ -30,14 +30,15 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | configuredBy | String(20) | NOT NULL | FK → User | |
 | lastDryRunAt | DateTime | NULL | | Thời điểm chạy thử (dry-run) gần nhất. MUST NOT chuyển `status` sang `ACTIVE` khi còn NULL |
 
-RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
+RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastDryRunAt` = thời điểm seed (ngưỡng mặc định của `08` coi như đã chạy thử). Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
 
 ## RuleTrigger — bằng chứng, KHÔNG hiển thị trực tiếp cho người dùng
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
 | id | String (uuid) | NOT NULL | PK | |
-| alertId | String (uuid) | NOT NULL | FK → Alert | |
+| alertId | String (uuid) | NULL | FK → Alert | Phase 4 để NULL; Phase 5 gắn trigger vào `Alert` (người dùng chốt) |
+| evaluationRunId | String (uuid) | NOT NULL | FK → EvaluationRun | Lần chạy tạo ra trigger — test nghiệm thu so khớp theo lần chạy |
 | ruleCode | String(20) | NOT NULL | FK → Rule | |
 | ruleVersionId | String (uuid) | NOT NULL | FK → RuleVersion | Bắt buộc để tái lập kết quả |
 | studentId | String(20) | NOT NULL | FK → Student | |
@@ -57,8 +58,9 @@ RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Rule Engine CHỈ đọc `RuleVersio
 | termId | String(10) | NOT NULL | FK → Term | |
 | riskScoreValue | Float | NULL | | NULL nếu `dataCompletenessLevel = INSUFFICIENT` |
 | dataCompletenessLevel | DataCompletenessLevel (enum) | NOT NULL | | `FULL`/`PARTIAL`/`INSUFFICIENT` — xem tầng 2 trong `00-project-context.md` |
-| componentsUsed | Json | NOT NULL | | VD: `["Attendance","GPA"]` |
-| ruleVersionId | String (uuid) | NOT NULL | FK → RuleVersion | Phiên bản trọng số dùng để tính |
+| componentsUsed | Json | NOT NULL | | `[{ group: ATTENDANCE/LMS/ACADEMIC, status, weight, rawValue, normalized }]` — validate Zod |
+| ruleVersionId | String (uuid) | NOT NULL | FK → RuleVersion | Phiên bản `RISK-SCORE` (trọng số) dùng để tính |
+| evaluationRunId | String (uuid) | NOT NULL | FK → EvaluationRun | Lần chạy tạo bản ghi — job chạy lại xóa và ghi lại theo lần chạy (idempotent) |
 | calculatedAt | DateTime | NOT NULL | | |
 
 ## Alert — cái CVHT thực sự thấy và xử lý
@@ -160,7 +162,7 @@ RÀNG BUỘC: không expose `UPDATE`/`DELETE` ở tầng ứng dụng (xem `06-s
 | finishedAt | DateTime | NULL | | |
 | createdAt | DateTime | NOT NULL | | |
 
-RÀNG BUỘC: không cho 2 `EvaluationRun` `QUEUED`/`RUNNING` cùng `(termId, courseId)` — MUST từ chối lần bấm thứ hai và báo "đang chạy".
+RÀNG BUỘC: không cho 2 `EvaluationRun` `QUEUED`/`RUNNING` cùng `(termId, courseId)` — MUST từ chối lần bấm thứ hai (`MANUAL`) và báo "đang chạy". `AUTO_AFTER_IMPORT` khi đã có lần `QUEUED` cùng phạm vi → gộp vào lần đó; khi chỉ có lần `RUNNING` → tạo lần `QUEUED` mới, chạy sau (khóa advisory theo phạm vi). Partial unique index `(termId, COALESCE(courseId, ''))` `WHERE status = 'QUEUED'` (viết tay trong migration).
 
 ## Quan hệ tóm tắt
 

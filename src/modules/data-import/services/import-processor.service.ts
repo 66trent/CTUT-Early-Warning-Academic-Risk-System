@@ -7,6 +7,7 @@ import { ImportBatchStatus } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { getStorage } from '@/lib/storage';
+import { requestAutoEvaluation } from '@/modules/rule-engine/services/evaluation-run.service';
 import { FileRejectedError } from '../parsing/errors';
 import { type ImportFileKind } from '../parsing/file-sniff';
 import { buildHeaderMap, type HeaderMap, missingColumns } from '../parsing/headers';
@@ -293,7 +294,11 @@ async function withImportLock<T>(batch: ImportBatch, run: () => Promise<T>): Pro
  */
 export async function loadImportBatch(
   batchId: string,
-  options: { retried: boolean },
+  options: {
+    retried: boolean;
+    /** Sau khi lô học tập RECONCILED: đánh giá lại học kỳ (mặc định tạo EvaluationRun tự động). */
+    afterReconciled?: (batch: ImportBatch) => Promise<unknown>;
+  },
 ): Promise<void> {
   const dataSource = await getDataSource();
   const repo = dataSource.getRepository(ImportBatch);
@@ -334,7 +339,6 @@ export async function loadImportBatch(
         );
         // Dữ liệu dẫn xuất (Course.credits, attemptOutcome, enrollmentStatus, attemptNumber) đã cập
         // nhật trong CÙNG transaction với từng lô dòng (docs/rules/10) → lô đã đối soát.
-        // Phase 4: kích hoạt EvaluationRun AUTO_AFTER_IMPORT tại đây.
         await em.update(
           ImportBatch,
           { id: batchId },
@@ -355,6 +359,10 @@ export async function loadImportBatch(
           em,
         );
       });
+      // Sau commit: lô dữ liệu học tập → EvaluationRun AUTO_AFTER_IMPORT (docs/rules/08).
+      if (requireDefinition(batch).requiresTerm) {
+        await (options.afterReconciled ?? requestAutoEvaluation)(batch);
+      }
     } catch (error) {
       if (error instanceof FileRejectedError) return rejectBatch(batchId, error.message);
       throw error;

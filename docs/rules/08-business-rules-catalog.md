@@ -16,7 +16,7 @@ Xem `00-project-context.md` cho glossary/enum và `10-data-schema-source-records
 
 ## Thời điểm tính và chống rò rỉ thời gian
 
-Mỗi lần chạy có mốc `asOf` (lưu ở `EvaluationRun.asOf`), mặc định = thời điểm tạo `EvaluationRun`; khi `DEMO_MODE=true`, Admin được chọn `asOf` sớm hơn để chạy lại bộ dữ liệu demo có ngày cố định (ghi Audit Log). MUST chỉ dùng: snapshot điểm danh có `snapshotDate ≤ asOf`; lượt làm bài có `startedAt ≤ asOf`; kết quả học phần có `publishedAt ≤ asOf`. Đơn vị đánh giá là 1 `Enrollment` (sinh viên × học phần × học kỳ); `ACA-02`/`ACA-03` gom theo sinh viên × học kỳ.
+Mỗi lần chạy có mốc `asOf` (lưu ở `EvaluationRun.asOf`), mặc định = thời điểm tạo `EvaluationRun`; khi `DEMO_MODE=true`, Admin được chọn `asOf` sớm hơn để chạy lại bộ dữ liệu demo có ngày cố định (ghi Audit Log). MUST chỉ dùng: snapshot điểm danh có `snapshotDate ≤ asOf`; lượt làm bài có `startedAt ≤ asOf`; kết quả học phần có `publishedAt ≤ asOf`. Trạng thái dẫn xuất cũng tính theo `asOf`, KHÔNG đọc trạng thái hiện tại trong DB: `attemptOutcome` / `COMPLETED` chỉ khi `CourseResult` `FINAL` có `publishedAt ≤ asOf`; `attemptNumber` = 1 + số học kỳ trước có kết quả FAILED đã công bố `≤ asOf` (tránh chạy lại mốc cũ sau khi đã nạp điểm cuối kỳ cho kết quả khác). `WITHDRAWN` là đánh dấu tay, dùng trạng thái hiện tại. Đơn vị đánh giá là 1 `Enrollment` (sinh viên × học phần × học kỳ); `ACA-02`/`ACA-03` gom theo sinh viên × học kỳ.
 
 ## Trình tự xử lý bắt buộc — 10 bước, không được đảo thứ tự
 
@@ -36,6 +36,11 @@ Mỗi lần chạy có mốc `asOf` (lưu ở `EvaluationRun.asOf`), mặc đị
 - Tự động: sau khi batch `ATTENDANCE_SUMMARY`, `LMS_QUIZ` hoặc `COURSE_RESULT` đạt `RECONCILED` → tạo `EvaluationRun` (`AUTO_AFTER_IMPORT`) cho học kỳ của batch.
 - Thủ công: `ADMIN` bấm "Chạy đánh giá ngay", chọn học kỳ (tùy chọn học phần) → `EvaluationRun` (`MANUAL`).
 - MUST: 2 đường dùng chung 1 job; chỉ dùng `RuleVersion` `ACTIVE`; chạy lại MUST NOT tạo `Alert` trùng.
+- Chạy cho 1 học phần (`courseId`): luật `PER_COURSE` chỉ xét học phần đó; `ACA-02`/`ACA-03` vẫn tính đầy đủ cho các sinh viên có `Enrollment` của học phần đó.
+
+## Tham số dữ liệu dùng chung — đặt trong `condition` của `RISK-SCORE` (1 nguồn, không lặp ở từng luật)
+
+`{ weights: { attendance 0.4, lms 0.3, academic 0.3 }, attendance: { freshnessDays 14, denominator PLANNED, countExcused true, normalizer 0.2 }, lms: { participationThreshold 0.5, graceDays 3 }, academic: { passScore 5 } }`. `freshnessDays` quyết định `STALE` cho mọi `ATT-*`; `lms` định nghĩa "bài đến hạn" cho `LMS-01`, `LMS-02` và RiskScore. Ngưỡng riêng của từng luật nằm trong `condition` của luật đó (VD dải `ATT-01` dạng `{ percent, op: gte|gt, severity }`). Mốc `asOf` chọn theo ngày = hết ngày đó giờ Việt Nam (không vượt quá thời điểm hiện tại).
 
 ## DataStatus từng nhóm (bước 4)
 
@@ -48,7 +53,9 @@ Mỗi lần chạy có mốc `asOf` (lưu ở `EvaluationRun.asOf`), mặc đị
 - Điểm danh: `min(1, absenceRate / 0.20)` (0.20 đọc từ ngưỡng `CRITICAL` của `ATT-01`).
 - LMS: số bài đến hạn bị bỏ / số bài đến hạn (0 nếu chưa có bài đến hạn).
 - Học lực: `min(1, max(0, (5 − processScore) / 5))`, hoặc dùng `finalScore` nếu đã có.
-- Trọng số mặc định 0.4 / 0.3 / 0.3, đọc từ cấu hình RiskScore. Thành phần không `AVAILABLE` bị loại khỏi tử và mẫu.
+- Trọng số mặc định 0.4 / 0.3 / 0.3, đọc từ cấu hình RiskScore = `RuleVersion` `ACTIVE` của `Rule` đặc biệt `RISK-SCORE` (`ruleGroup = RISK_SCORE`, `condition = { weights: { attendance, lms, academic } }`, mỗi trọng số ≥ 0, tổng > 0 — Zod). Dùng chung cơ chế phiên bản / chạy thử / kích hoạt / Audit Log với 10 luật; `RiskScoreLog.ruleVersionId` trỏ phiên bản này. `RISK-SCORE` KHÔNG nằm trong registry luật, KHÔNG tạo `RuleTrigger` (người dùng chọn, 2026-10-12: dễ trình diễn trước hội đồng — đổi trọng số → phiên bản mới → chạy thử → kích hoạt trên cùng màn hình cấu hình luật). Thành phần không `AVAILABLE` bị loại khỏi tử và mẫu.
+- **Gộp nhiều học phần → 1 điểm/sinh viên/học kỳ** (người dùng chốt "cộng dồn số liệu"): điểm danh = Σ buổi vắng / Σ mẫu số `ATT-01` trên các `Enrollment` có điểm danh `AVAILABLE`; LMS = Σ bài đến hạn bị bỏ / Σ bài đến hạn trên các `Enrollment` LMS `AVAILABLE`; học lực = trung bình điểm (`finalScore` nếu có, không thì `processScore`) rồi chuẩn hóa như trên. Nhóm `AVAILABLE` khi ≥ 1 `Enrollment` của nhóm `AVAILABLE`; `NOT_APPLICABLE` khi mọi `Enrollment` đều `NOT_APPLICABLE`.
+- RiskScore CHỈ để hiển thị và sắp xếp (danh sách CVHT, tổng quan) — KHÔNG tạo `RuleTrigger`/`Alert` (không có luật ngưỡng RiskScore trong bảng 10 luật).
 
 ## Nhóm điểm danh (nguồn: snapshot mới nhất của `Enrollment`)
 
@@ -68,13 +75,13 @@ Chênh lệch âm (dữ liệu bị sửa) → không kích hoạt, ghi cảnh b
 
 ## Nhóm LMS (nguồn: `LmsQuizAttempt` của học phần × học kỳ)
 
-Bài kiểm tra Q được coi là **đến hạn** khi đồng thời: (a) tỷ lệ sinh viên của nhóm có ≥1 lượt `SUBMITTED` cho Q ≥ `participationThreshold` (mặc định 0.5); (b) `asOf −` lượt làm đầu tiên của cả nhóm cho Q `≥ graceDays` (mặc định 3 ngày). "Nhóm" = các `Enrollment` của cùng học phần × học kỳ; nếu MỌI lượt làm bài LMS của học phần đó có `sectionCode` thì tách nhóm theo `sectionCode` của chính các lượt làm bài.
+Bài kiểm tra Q được coi là **đến hạn** khi đồng thời: (a) tỷ lệ sinh viên của nhóm có ≥1 lượt `SUBMITTED` cho Q ≥ `participationThreshold` (mặc định 0.5); (b) `asOf −` lượt làm đầu tiên của cả nhóm cho Q `≥ graceDays` (mặc định 3 ngày). "Nhóm" = các `Enrollment` của cùng học phần × học kỳ; nếu MỌI lượt làm bài LMS của học phần đó có `sectionCode` thì tách nhóm theo `sectionCode` của chính các lượt làm bài; sinh viên không có lượt nào lấy `sectionCode` từ snapshot điểm danh mới nhất (không có thì thuộc nhóm chung) — để không bỏ sót sinh viên bỏ MỌI bài.
 
 **LMS-01 — Bỏ bài kiểm tra**
 Đếm bài đến hạn mà sinh viên không có lượt `SUBMITTED`: 1 bài → `MEDIUM`; ≥ 2 bài → `HIGH`.
 
 **LMS-02 — Điểm kiểm tra thấp**
-Lấy 2 bài đến hạn gần nhất (theo lượt làm đầu tiên của nhóm) mà sinh viên đã nộp; điểm mỗi bài = lượt cao nhất `score / maxScore`. Cả 2 bài `< 0.5` → `MEDIUM`. Chưa đủ 2 bài đã nộp → không xét.
+Lấy 2 bài đến hạn gần nhất (theo lượt làm đầu tiên của nhóm) mà sinh viên đã nộp; điểm mỗi bài = lượt cao nhất `score / maxScore`. Lượt có `maxScore` NULL bị bỏ qua và ghi cảnh báo chất lượng dữ liệu vào `EvaluationRun`. Cả 2 bài `< 0.5` → `MEDIUM`. Chưa đủ 2 bài đã nộp → không xét.
 
 ## Nhóm học lực (nguồn: `CourseResult`)
 
@@ -112,6 +119,8 @@ Có trigger mức ≥ `MEDIUM` ở ≥ 2 trong 3 nhóm: điểm danh (`ATT-01`/`
 - Không biết sinh viên rút học phần từ 3 nguồn → Admin đánh dấu tay.
 - Không có danh sách đăng ký học phần: sinh viên không xuất hiện trong file nguồn nào của học phần thì hệ thống không biết sinh viên có học — phụ thuộc file điểm danh liệt kê đủ sinh viên.
 - Nạp một phần (nhiều dòng LMS bị lỗi) làm lệch tỷ lệ "phần lớn lớp đã làm" của `LMS-01` → màn xem trước cảnh báo khi tỷ lệ lỗi > 10% (xem `12`).
+- Mỗi `Enrollment` chỉ 1 dòng `CourseResult` (dòng `FINAL` ghi đè dòng giữa kỳ): engine dùng `CourseResult.processPublishedAt` để chạy lại mốc giữa kỳ vẫn thấy điểm quá trình; nếu file cuối kỳ SỬA điểm quá trình thì lần chạy lại mốc cũ thấy điểm đã sửa.
+
 Cảnh báo nghi báo sai do các giới hạn này: CVHT dùng `DISMISSED` kèm lý do.
 
 ## Gộp nguyên nhân & chống trùng cảnh báo (Bước 7)

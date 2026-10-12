@@ -1,6 +1,6 @@
 /**
  * Entry point của BullMQ worker — chạy container riêng, tự khởi tạo DataSource riêng (pool 10).
- * Processor: Phase 3 (nhập dữ liệu), 4 (rule engine), 5 (thông báo).
+ * Processor: nhập dữ liệu (Phase 3), đánh giá luật (Phase 4), thông báo (Phase 5).
  */
 import 'dotenv/config';
 import { Worker, type Job } from 'bullmq';
@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { createRedisConnection } from '@/lib/queue/connection';
 import { getQueue, QUEUE_NAMES, type QueueName } from '@/lib/queue/queues';
 import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
+import { onEvaluationJobFailed, processEvaluationJob } from './processors/evaluation-run.processor';
 import { onImportJobFailed, processImportJob } from './processors/import-batch.processor';
 
 process.env.PROCESS_ROLE = 'worker';
@@ -22,13 +23,18 @@ const notImplemented =
   (job) =>
     Promise.reject(new Error(`Queue "${queue}" chưa có processor (job ${job.id ?? '?'})`));
 
-/** Nhập dữ liệu chạy 1 job/lần: giới hạn bộ nhớ khi đọc XLSX và tránh tranh khóa nạp (docs/rules/05, 12). */
-const CONCURRENCY: Partial<Record<QueueName, number>> = { [QUEUE_NAMES.importBatchProcess]: 1 };
+/**
+ * Nhập dữ liệu chạy 1 job/lần: giới hạn bộ nhớ khi đọc XLSX và tránh tranh khóa nạp (docs/rules/05, 12).
+ * Đánh giá chạy 1 job/lần: các lần chạy lần lượt, không tranh tài nguyên DB.
+ */
+const CONCURRENCY: Partial<Record<QueueName, number>> = {
+  [QUEUE_NAMES.importBatchProcess]: 1,
+  [QUEUE_NAMES.evaluationRun]: 1,
+};
 
 const PROCESSORS: Record<QueueName, Processor> = {
   [QUEUE_NAMES.importBatchProcess]: processImportJob,
-  [QUEUE_NAMES.calculateRiskScore]: notImplemented(QUEUE_NAMES.calculateRiskScore),
-  [QUEUE_NAMES.evaluateHardTriggers]: notImplemented(QUEUE_NAMES.evaluateHardTriggers),
+  [QUEUE_NAMES.evaluationRun]: processEvaluationJob,
   [QUEUE_NAMES.sendNotifications]: notImplemented(QUEUE_NAMES.sendNotifications),
 };
 
@@ -46,11 +52,15 @@ async function main(): Promise<void> {
     );
     worker.on('failed', (job, error) => {
       logger.error({ queue: name, jobId: job?.id, err: error.message }, 'job lỗi');
-      if (name === QUEUE_NAMES.importBatchProcess) {
-        onImportJobFailed(job).catch((e: unknown) =>
-          logger.error({ err: String(e) }, 'không đánh dấu được lô lỗi'),
-        );
-      }
+      const onFailed =
+        name === QUEUE_NAMES.importBatchProcess
+          ? onImportJobFailed
+          : name === QUEUE_NAMES.evaluationRun
+            ? onEvaluationJobFailed
+            : null;
+      onFailed?.(job).catch((e: unknown) =>
+        logger.error({ queue: name, err: String(e) }, 'không đánh dấu được job lỗi'),
+      );
     });
     return worker;
   });

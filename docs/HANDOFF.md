@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-12 (sau Phase 3b).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-13 (sau Phase 4).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -11,24 +11,25 @@
 | 1 Xác thực, danh tính | Xong | `phase-1` | #2 → `phase-0` | xanh |
 | 2 Danh mục quản trị | Xong (mục sĩ số đã kiểm ở 3a) | `phase-2` | #3 → `phase-1` | xanh |
 | 3a Khung nhập + sinh viên | Xong | `phase-3a` | #4 → `phase-2` | xanh |
-| 3b Nhập 3 nguồn học tập | Xong | `phase-3b` (đang checkout) | #5 → `phase-3a` | xem PR |
-| **4 Rule engine** | **Việc tiếp theo** | tạo `phase-4` từ `phase-3b` | base `phase-3b` | — |
+| 3b Nhập 3 nguồn học tập | Xong | `phase-3b` | #5 → `phase-3a` | xem PR |
+| 4 Rule engine (+ sửa lỗi font/mẫu Excel của Phase 3) | Xong | `phase-4` (đang checkout) | #6 → `phase-3b` | xem PR |
+| **5 Cảnh báo, CVHT, sinh viên** | **Việc tiếp theo** | tạo `phase-5` từ `phase-4` | base `phase-4` | — |
 
-- Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **PR xếp chồng, CHƯA merge**. Người dùng merge theo thứ tự #1 → #2 → #3 → #4 → #5 (GitHub tự đổi base).
+- Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **PR xếp chồng, CHƯA merge**. Người dùng merge theo thứ tự #1 → #2 → #3 → #4 → #5 → #6 (GitHub tự đổi base).
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
 - `gh` CLI đã cài và đăng nhập (tài khoản `66trent`). Trong Git Bash gọi bằng `"/c/Program Files/GitHub CLI/gh.exe"`.
 
 ## 2. Môi trường đang chạy
 
-- Docker Compose (project `ewars`): `app` (3000), `worker`, `postgres` (5432), `redis` (6379), `minio` (9000/9001), `mailhog` (1025/8025, profile `dev`) — port chỉ mở `127.0.0.1`. Image app/worker đã build theo code Phase 3a.
+- Docker Compose (project `ewars`): `app` (3000), `worker`, `postgres` (5432), `redis` (6379), `minio` (9000/9001), `mailhog` (1025/8025, profile `dev`) — port chỉ mở `127.0.0.1`. Image app/worker đã build theo code Phase 4 (worker có queue `evaluation-run`).
 - Container dự án CŨ (`ctut-ewars-*`, ở `E:\CTUT-EWARS`) đã **dừng** (không xóa) để nhường port.
 - `.env` (không commit): `STAFF_EMAIL_DOMAIN=*` (tạm thời, người dùng chưa có email trường — phải đặt lại `@ctuet.edu.vn` khi triển khai thật); `DEMO_MODE=true`; có thêm `POSTGRES_USER/PASSWORD/DB` khớp `DATABASE_URL`. Better Auth cảnh báo `AUTH_SECRET` độ ngẫu nhiên thấp — đã nhắc người dùng thay.
 - Dữ liệu trong DB dev (của người dùng, KHÔNG tự xóa/sửa):
   - Tài khoản: `ADMIN` (seed), `GV001`/`GV002` (seed:demo), `GV02` (người dùng tự đăng ký, ACTIVE, đang phụ trách lớp `KTPM2311`), `CVHT0001` (người dùng, PENDING).
-  - Học kỳ: `HK2_2025`, `HK1_2026`, `HK2_2026` (**người dùng tự tạo và đặt làm hiện tại**). Lưu ý: `npm run seed:demo` đặt lại học kỳ hiện tại = `HK1_2026`.
-  - Lớp: `KTPM2311` (GV02), `KHMT2311` (GV002). Sinh viên: 13 (người dùng tự nạp lại `01_sinh_vien.csv`).
-  - **`HK1_2026` đã bị người dùng CHỐT** → mọi lô nhập HK1_2026 bị từ chối; không mở lại được. Muốn chạy demo đầy đủ cần DB demo riêng/làm lại (hỏi người dùng).
-  - Bảng `courses` có KTPM101–103 (còn lại sau khi thử nạp + hoàn tác file 02 — hoàn tác không xóa Course).
+  - Học kỳ: `HK2_2025`, `HK1_2026` (hiện tại, đã mở lại bằng `seed:demo` 2026-10-12 theo yêu cầu người dùng), `HK2_2026` (người dùng tự tạo).
+  - Lớp: `KTPM2311` (GV001 — `seed:demo` đặt lại theo kịch bản demo), `KHMT2311` (GV002). Sinh viên: 13.
+  - Đã nạp đủ demo 02–05 bằng `npm run demo:load` (2026-10-13) + 5 lần chạy đánh giá (4 tự động, 1 tay mốc 10/10 → 13 trigger). Rule seed 10 luật + `RISK-SCORE` v1.
+  - Backup trước khi đổi: `backups/before-demo-reset-20261012.dump`.
 - Chạy app ở máy (khi cần thử giao diện): `docker compose stop app worker` → Browser pane `preview_start` tên `next-dev` (cổng 3000, `.claude/launch.json`) + worker bằng `npx tsx src/workers/index.ts` chạy nền. Xong thì tắt worker (xem bẫy #4) và `docker compose --profile dev up -d --build app worker`.
 
 ## 3. Quyết định đã chốt với người dùng (ngoài/đã ghi vào rules)
@@ -43,8 +44,8 @@
 
 ## 4. Câu hỏi còn mở (hỏi người dùng đúng lúc)
 
-- **Phase 4**: trọng số RiskScore "đọc từ cấu hình RiskScore" (`08`) nhưng `RiskScoreLog.ruleVersionId` trỏ `RuleVersion` — cần 1 "luật" cấu hình trọng số hay bảng riêng?
-- **Phase 4**: bổ sung điều kiện hoàn tác lô "chưa có `EvaluationRun` sau khi nạp" vào `getRollbackEligibility()`.
+- Đã chốt Phase 4 (ghi `00`, `01`, `08`, `10`, `11`, `12`): trọng số + tham số dữ liệu chung ở `Rule` `RISK-SCORE`; `RuleTrigger.alertId` NULL + `evaluationRunId`; RiskScore cộng dồn, chỉ hiển thị; `INSUFFICIENT` = 0 nhóm; bỏ điều kiện hoàn tác "chưa có EvaluationRun"; trạng thái/lần học/kết quả theo `asOf` (`CourseResult.processPublishedAt`); 1 queue `evaluation-run`.
+- **Phase 5**: chốt `Rule.cooldown` (đang tạm 168 giờ) và cách gộp trigger → Alert.
 - **Phase 5**: khóa chống trùng Alert `(studentId, ruleCode, scopeId, termId)` trong khi `Alert` không có `ruleCode`/`scopeId` và gộp nhiều luật — cần thống nhất cách gộp. Sinh viên đổi lớp → chuyển Alert đang mở (đã ghi `09`).
 - **Trước Phase 6**: Tremor 3 chỉ nhận React 18 → chọn lại thư viện biểu đồ.
 
@@ -62,10 +63,12 @@
 10. Index có biểu thức (COALESCE) viết tay trong migration + `@Index(name, { synchronize: false })` để `migration:check` không đòi xóa.
 11. Test tích hợp chạy với Postgres thật (+ MailHog cho test đăng ký). Dữ liệu test dùng tiền tố `TST`; dọn lô nhập có tên file `tst-%` — **đừng đặt tên file thử bằng tay bắt đầu bằng `tst-`**.
 12. Dữ liệu người dùng tự tạo trong DB (GV02, CVHT0001, HK2_2026…) là dữ liệu thật của họ — không xóa/sửa khi dọn dữ liệu thử.
+13. TypeORM sinh trùng `CREATE TYPE` khi nhiều bảng dùng chung 1 `enumName` (`severity`, `rule_status`) — xóa câu trùng trong migration vừa sinh TRƯỚC khi chạy. Cột jsonb cấu trúc thay đổi theo luật: khai báo `object` (kiểu JSON đệ quy làm TypeORM báo "excessively deep").
+14. Comment `/** … */` chứa `ATT-*/LMS-*` bị đóng sớm bởi `*/`.
 
-## 6. Việc tiếp theo: Phase 4
+## 6. Việc tiếp theo: Phase 5
 
-Theo `docs/implement.md` mục Phase 4, rule `08`, `11`. Hỏi trước 2 câu ở mục 4 (trọng số RiskScore; điều kiện hoàn tác "chưa có EvaluationRun"). Chỗ kích hoạt `EvaluationRun AUTO_AFTER_IMPORT`: comment "Phase 4" trong `loadImportBatch()` (`import-processor.service.ts`). Dữ liệu nguồn đọc qua `Enrollment`; điểm hệ 4 quy đổi từ `letterGrade` lúc đánh giá. Test nghiệm thu: helper `demoAcademicCsv()` + học kỳ thử `TSTHK2_25`/`TSTHK1_26` như `tests/integration/import-academic.test.ts`.
+Theo `docs/implement.md` mục Phase 5, rule `06`, `07`, `11`. Trigger lưu theo `evaluationRunId`, `alertId` NULL — Phase 5 thêm bảng `alerts` + FK `rule_triggers.alert_id`, gộp trigger mỗi lần chạy vào Alert (bước 7–10 của `08`), xóa phần "Phase 5" ở `processEvaluationRun()` (`evaluation-run.service.ts`, đếm `alertsCreated/Updated`). Hỏi trước câu hỏi mở ở mục 4. Test nghiệm thu dùng `tests/integration/rule-engine-acceptance.test.ts` (học kỳ thử `TSTHK2_25`/`TSTHK1_26`).
 
 ## 7. Phong cách làm việc với người dùng
 

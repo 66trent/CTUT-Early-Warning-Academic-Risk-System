@@ -86,12 +86,12 @@
 
 ## Phase 4 — Rule engine
 
-- [ ] Entity `Rule`, `RuleVersion`, `RuleTrigger`, `RiskScoreLog`, `EvaluationRun` (có `asOf`) theo `11`; seed 10 luật với ngưỡng mặc định của `08`.
-- [ ] Evaluator thuần, mỗi luật 1 file + registry; 10 bước; `DataStatus` từng nhóm; RiskScore chuẩn hóa; `COMB-*` chạy sau cùng.
-- [ ] `EvaluationRun`: tự động sau nạp `RECONCILED` và chạy tay; chặn 2 lần chạy cùng phạm vi; cập nhật tiến độ; `asOf` chọn được khi `DEMO_MODE=true`; queue `calculate-risk-score`, `evaluate-hard-triggers`.
-- [ ] Sửa luật tạo `RuleVersion` mới; dry-run read-only; chặn kích hoạt khi chưa dry-run.
-- [ ] Test mỗi luật: kích hoạt, sát ngưỡng, ngoại lệ, thiếu dữ liệu; test `FULL`/`PARTIAL`/`INSUFFICIENT`; test chống rò rỉ thời gian.
-- [ ] **Test nghiệm thu:** nạp `docs/demo-data/`, chạy 2 lần với `asOf` trong `KET_QUA_MONG_DOI.md`, so khớp đúng và đủ danh sách trigger.
+- [x] Entity `Rule`, `RuleVersion`, `RuleTrigger`, `RiskScoreLog`, `EvaluationRun` (có `asOf`) theo `11`; seed 10 luật với ngưỡng mặc định của `08`.
+- [x] Evaluator thuần, mỗi luật 1 file + registry; 10 bước; `DataStatus` từng nhóm; RiskScore chuẩn hóa; `COMB-*` chạy sau cùng.
+- [x] `EvaluationRun`: tự động sau nạp `RECONCILED` và chạy tay; chặn 2 lần chạy cùng phạm vi; cập nhật tiến độ; `asOf` chọn được khi `DEMO_MODE=true`; queue `evaluation-run` (1 job / lần chạy, thay 2 queue cũ — `01`).
+- [x] Sửa luật tạo `RuleVersion` mới; dry-run read-only; chặn kích hoạt khi chưa dry-run.
+- [x] Test mỗi luật: kích hoạt, sát ngưỡng, ngoại lệ, thiếu dữ liệu; test `FULL`/`PARTIAL`/`INSUFFICIENT`; test chống rò rỉ thời gian.
+- [x] **Test nghiệm thu:** nạp `docs/demo-data/`, chạy 2 lần với `asOf` trong `KET_QUA_MONG_DOI.md`, so khớp đúng và đủ danh sách trigger.
 
 **DoD:** toàn bộ test xanh, test nghiệm thu khớp 100%; engine không ghi `officialAcademicStatus`.
 

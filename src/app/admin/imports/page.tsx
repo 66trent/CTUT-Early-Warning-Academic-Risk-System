@@ -65,16 +65,32 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
                 : null
             }
           />
-          <div className="flex flex-wrap items-center gap-2 border-t pt-4">
-            <span className="text-sm text-muted-foreground">File mẫu:</span>
-            {options.types.map((t) => (
-              <Button key={t.dataType} asChild size="sm" variant="outline">
-                <a href={t.templatePath} download>
-                  <Download aria-hidden />
-                  {t.label}
-                </a>
-              </Button>
-            ))}
+          <div className="flex flex-col gap-3 border-t pt-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-muted-foreground">File mẫu Excel:</span>
+              {options.types.map((t) => (
+                <span key={t.dataType} className="inline-flex items-center gap-1">
+                  <Button asChild size="sm" variant="outline">
+                    <a href={t.templatePath.replace(/\.csv$/, '.xlsx')} download>
+                      <Download aria-hidden />
+                      {t.label}
+                    </a>
+                  </Button>
+                  <a
+                    href={t.templatePath}
+                    download
+                    className="text-xs text-muted-foreground underline underline-offset-2"
+                  >
+                    CSV
+                  </a>
+                </span>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Nên dùng file Excel (.xlsx). Nếu sửa file CSV bằng Excel, khi lưu chọn “CSV UTF-8
+              (Comma delimited)” và ghi ngày dạng 2026-10-05 — lưu kiểu khác sẽ mất dấu tiếng Việt
+              hoặc đổi ngày sang kiểu Mỹ.
+            </p>
           </div>
         </CardContent>
       </Card>
