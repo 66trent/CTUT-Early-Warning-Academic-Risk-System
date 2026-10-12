@@ -159,6 +159,7 @@ export enum ImportBatchStatus {
   RECONCILED = 'RECONCILED',
   REJECTED = 'REJECTED',
   DISCARDED = 'DISCARDED',
+  ROLLED_BACK = 'ROLLED_BACK',
 }
 
 export const IMPORT_DATA_TYPES = [
@@ -176,5 +177,6 @@ export const IMPORT_ERROR_REASONS = [
   'DUPLICATE',
   'OUT_OF_RANGE',
   'TERM_MISMATCH',
+  'RESULT_ALREADY_FINAL',
 ] as const;
 export type ImportErrorReason = (typeof IMPORT_ERROR_REASONS)[number];

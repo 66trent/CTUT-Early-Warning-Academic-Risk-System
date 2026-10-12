@@ -18,7 +18,9 @@ Xem `00-project-context.md` trước. File này đặc tả các bảng vận h�
 | successRows | Int | NOT NULL | | |
 | errorRows | Int | NOT NULL | | |
 | warnings | Json | NULL | | Cảnh báo không chặn nạp (VD `diem_chu` lệch `diem_tong_ket`): `[{ row, code, message }]`, tối đa 500 mục — validate Zod |
-| summary | Json | NULL | | Kết quả nạp: số dòng thêm mới / cập nhật, số `Course`/`Enrollment` tạo mới |
+| summary | Json | NULL | | `columns` (header gốc theo thứ tự file — jsonb không giữ thứ tự khóa), `preview` (5 dòng đầu), `errorRate`, `confirmedAt/By`, `inserted/updated/unchanged`, `createdKeys` (khóa bản ghi lô tạo mới — dùng hoàn tác), `retried` — validate Zod |
+| stagedAt | DateTime | NULL | | Lúc kiểm tra xong — tự hủy lô chờ quá 7 ngày |
+| loadedAt | DateTime | NULL | | Lúc ghi xong — điều kiện hoàn tác lô |
 | errorMessage | String (text) | NULL | | Lý do khi `REJECTED` (lỗi cả file) |
 | parentBatchId | String (uuid) | NULL | FK → ImportBatch | Liên kết batch sửa lỗi với batch gốc |
 | originalFilePath | String(255) | NOT NULL | | Lưu trong MinIO — xem `01-architecture.md` |
@@ -42,12 +44,12 @@ RÀNG BUỘC:
 - **Giới hạn file**: ≤ 20MB tải lên, ≤ 50.000 dòng dữ liệu (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`.
 
 **Hoàn tác lô** (người dùng chọn "có điều kiện") — Admin bấm "Hoàn tác" trên lô `LOADED`/`RECONCILED`, xác nhận lần 2 (AlertDialog), chỉ khi ĐỦ cả 3 điều kiện:
-1. Lô chỉ THÊM dòng mới, không cập nhật dòng có sẵn (`summary.updated = 0`).
+1. Lô chỉ THÊM dòng mới, không cập nhật dòng có sẵn (`summary.updated = 0`), và job nạp không phải chạy lại sau sự cố (`summary.retried` khác true).
 2. Chưa có `EvaluationRun` nào của học kỳ đó bắt đầu sau khi lô nạp xong (dữ liệu chưa được dùng để tính cảnh báo).
 3. Không dòng nào của lô đã bị lô khác cập nhật sau đó (`importBatchId` của mọi dòng vẫn là lô này).
 Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `Enrollment` có `firstSeenBatchId` = lô và không còn dữ liệu nguồn nào; với lô `STUDENT`: xóa `Student`/`User` lô đã tạo nếu chưa đăng nhập lần nào (`authUserId` NULL) và chưa có dữ liệu học tập; tính lại dữ liệu dẫn xuất (`attemptOutcome`, `attemptNumber`); `status = ROLLED_BACK`; ghi Audit Log `IMPORT_ROLLED_BACK`. Không đủ điều kiện → nút bị vô hiệu kèm lý do; cách sửa là nạp file đúng (ghi đè) và Cố vấn học tập đánh dấu cảnh báo sai là "không còn hiệu lực" (`INVALIDATED`).
 - Chống nạp trùng: partial unique index `(sourceChecksum, dataType, COALESCE(termId, ''))` `WHERE status NOT IN ('REJECTED', 'DISCARDED', 'ROLLED_BACK')` — file đã bị từ chối/hủy/hoàn tác được nạp lại.
-- BullMQ `jobId` = `ImportBatch.id` (mỗi lô 1 mã; trùng file đã chặn ở DB). Job xác nhận nạp dùng `${id}:load`.
+- BullMQ `jobId` = `ImportBatch.id` (mỗi lô 1 mã; trùng file đã chặn ở DB). Job xác nhận nạp dùng `${id}-load` (BullMQ không cho dấu `:` trong jobId). Queue nhập chạy 1 job/lần (`05`).
 - Partial unique index chống trùng loại trừ cả `ROLLED_BACK` (file đã hoàn tác được nạp lại).
 - Học kỳ đã chốt (`closedAt` khác NULL) → từ chối MỌI loại nhập có `termId`.
 
@@ -59,6 +61,7 @@ Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 | sourceRowNumber | Int | NOT NULL | | Số dòng trong file gốc, để người nhập đối chiếu khi sửa |
 | rawData | Json | NOT NULL | | Dữ liệu nguyên trạng dòng lỗi |
+| errorDetail | String(255) | NULL | | Diễn giải cụ thể bằng tiếng Việt (VD "Lớp KTPM9999 chưa có trong hệ thống") |
 | errorReason | String(40) | NOT NULL | | Kiểu TS `ImportErrorReason` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `INVALID_FORMAT`/`STUDENT_NOT_FOUND`/`CLASS_NOT_FOUND`/`DUPLICATE`/`OUT_OF_RANGE`/`TERM_MISMATCH`/`RESULT_ALREADY_FINAL` |
 | resolved | Boolean | NOT NULL, default `false` | | |
 
@@ -74,7 +77,7 @@ Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `
 
 **Header**: bỏ dấu, chữ thường, ký tự khác chữ/số → `_` rồi so khớp tên chuẩn (VD `Mã học phần` → `ma_hoc_phan`) + vài bí danh phổ biến (`ma_sv`, `ma_so_sinh_vien` → `mssv`). Thiếu cột bắt buộc → `REJECTED` cả file, báo rõ cột thiếu.
 
-Học kỳ chọn trên form nhập (mặc định học kỳ hiện tại); cột `hoc_ky` là tùy chọn, nếu có MUST khớp. Ngày: `YYYY-MM-DD` hoặc `DD/MM/YYYY`; ngày giờ: `YYYY-MM-DD HH:mm`. Ngày dạng có thể đọc 2 cách (VD `10/2/2026` theo kiểu Mỹ do Excel tự đổi) MUST báo `INVALID_FORMAT` với hướng dẫn dùng `YYYY-MM-DD` — KHÔNG đoán. Parser MUST chấp nhận thêm dạng xuất phổ biến của LMS Việt Nam: `HH:mm DD/MM/YYYY`, điểm `8/10`, thời lượng `12 phút`, trạng thái tiếng Việt (`Đã nộp`, `Đạt`, `Không đạt`) — chuẩn hóa về kiểu ở `10` trước khi validate. Cột thừa (VD: `ho_ten`, `lop`) được bỏ qua, không báo lỗi.
+Học kỳ chọn trên form nhập (mặc định học kỳ hiện tại); cột `hoc_ky` là tùy chọn, nếu có MUST khớp. Ngày: `YYYY-MM-DD` hoặc `DD/MM/YYYY` với ngày và tháng đủ 2 chữ số (VD `05/10/2026`); ngày giờ: `YYYY-MM-DD HH:mm`, `DD/MM/YYYY HH:mm`, `HH:mm DD/MM/YYYY`. Dạng không đủ 2 chữ số mà ngày, tháng đều ≤ 12 và khác nhau (VD `10/2/2026` — Excel máy cài kiểu Mỹ tự đổi) hoặc tháng > 12 (VD `9/14/2026`) MUST báo `INVALID_FORMAT` với hướng dẫn dùng `YYYY-MM-DD` — KHÔNG đoán. Ô ngày trong XLSX đọc theo giá trị ngày của Excel. Số dòng báo lỗi = số dòng thật trong file (header = dòng 1). Parser MUST chấp nhận thêm dạng xuất phổ biến của LMS Việt Nam: `HH:mm DD/MM/YYYY`, điểm `8/10`, thời lượng `12 phút`, trạng thái tiếng Việt (`Đã nộp`, `Đạt`, `Không đạt`) — chuẩn hóa về kiểu ở `10` trước khi validate. Cột thừa (VD: `ho_ten`, `lop`) được bỏ qua, không báo lỗi.
 
 - `STUDENT`: `mssv,ho_ten,email,ma_lop_sinh_hoat,trang_thai_hoc_vu`. Lớp sinh hoạt MUST tồn tại (sai → `CLASS_NOT_FOUND`). Email MUST đuôi `@student.ctuet.edu.vn` (sai → `INVALID_FORMAT`). `trang_thai_hoc_vu` ∈ `OfficialAcademicStatus` (chấp nhận nhãn tiếng Việt: Đang học/Bảo lưu/Đình chỉ/Tốt nghiệp/Buộc thôi học). Tạo/cập nhật `Student` + `User` (`role = STUDENT`, `accountStatus = ACTIVE`, `authUserId = NULL`); sinh viên không có trong file KHÔNG bị xóa. Đây là đường DUY NHẤT ghi `Student.officialAcademicStatus`.
 - `ATTENDANCE_SUMMARY`: `mssv,ma_hoc_phan,ten_hoc_phan,ngay_chot,tong_buoi,co_mat,di_tre,vang_co_phep,vang_khong_phep` + tùy chọn `tong_buoi_ke_hoach,ma_lop_hoc_phan`. → `AttendanceSummary`.

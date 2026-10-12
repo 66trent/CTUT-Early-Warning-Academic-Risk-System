@@ -6,14 +6,26 @@ import { SnakeNamingStrategy } from './naming-strategy';
 import { AdministrativeClass } from './entities/administrative-class.entity';
 import { AuditLog } from './entities/audit-log.entity';
 import { Department } from './entities/department.entity';
+import { ImportBatch } from './entities/import-batch.entity';
+import { ImportErrorRow } from './entities/import-error-row.entity';
 import { Student } from './entities/student.entity';
 import { Term } from './entities/term.entity';
 import { User } from './entities/user.entity';
 import { Phase1Identity1791766886196 } from './migrations/1791766886196-Phase1Identity';
+import { Phase3aImport1791807992637 } from './migrations/1791807992637-Phase3aImport';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
-export const ENTITIES = [User, Department, AdministrativeClass, Student, Term, AuditLog];
-const MIGRATIONS = [Phase1Identity1791766886196];
+export const ENTITIES = [
+  User,
+  Department,
+  AdministrativeClass,
+  Student,
+  Term,
+  AuditLog,
+  ImportBatch,
+  ImportErrorRow,
+];
+const MIGRATIONS = [Phase1Identity1791766886196, Phase3aImport1791807992637];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;
 
