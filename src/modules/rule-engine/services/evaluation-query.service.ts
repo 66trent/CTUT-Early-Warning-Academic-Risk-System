@@ -31,6 +31,8 @@ export interface EvaluationRunListItemDto {
   processedStudents: number;
   triggerCount: number;
   insufficientCount: number;
+  alertsCreated: number;
+  alertsUpdated: number;
   triggeredBy: string | null;
   createdAt: string;
 }
@@ -98,6 +100,8 @@ function toListItem(run: EvaluationRun, triggerCount: number): EvaluationRunList
     processedStudents: run.processedStudents,
     triggerCount,
     insufficientCount: run.insufficientCount,
+    alertsCreated: run.alertsCreated,
+    alertsUpdated: run.alertsUpdated,
     triggeredBy: run.triggeredBy,
     createdAt: run.createdAt.toISOString(),
   };

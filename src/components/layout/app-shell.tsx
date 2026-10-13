@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { CalendarDays, Menu } from 'lucide-react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
+import { NotificationBell } from '@/components/alerts/notification-bell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -109,6 +110,7 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
           </Badge>
 
           <div className="ml-auto flex items-center gap-2">
+            {user.role === UserRole.ADVISOR && <NotificationBell />}
             <ThemeToggle />
             <div className="text-right leading-tight">
               <p className="text-sm font-semibold">{user.fullName}</p>

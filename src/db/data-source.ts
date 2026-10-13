@@ -4,6 +4,8 @@ import { getEnv } from '@/lib/env';
 import { SnakeNamingStrategy } from './naming-strategy';
 
 import { AdministrativeClass } from './entities/administrative-class.entity';
+import { AlertStateHistory } from './entities/alert-state-history.entity';
+import { Alert } from './entities/alert.entity';
 import { AttendanceSummary } from './entities/attendance-summary.entity';
 import { AuditLog } from './entities/audit-log.entity';
 import { Course } from './entities/course.entity';
@@ -13,7 +15,9 @@ import { Enrollment } from './entities/enrollment.entity';
 import { EvaluationRun } from './entities/evaluation-run.entity';
 import { ImportBatch } from './entities/import-batch.entity';
 import { ImportErrorRow } from './entities/import-error-row.entity';
+import { Intervention } from './entities/intervention.entity';
 import { LmsQuizAttempt } from './entities/lms-quiz-attempt.entity';
+import { Notification } from './entities/notification.entity';
 import { RiskScoreLog } from './entities/risk-score-log.entity';
 import { RuleTrigger } from './entities/rule-trigger.entity';
 import { RuleVersion } from './entities/rule-version.entity';
@@ -26,6 +30,7 @@ import { Phase3aImport1791807992637 } from './migrations/1791807992637-Phase3aIm
 import { Phase3bSourceRecords1791810699905 } from './migrations/1791810699905-Phase3bSourceRecords';
 import { Phase4ProcessPublishedAt1791826670549 } from './migrations/1791826670549-Phase4ProcessPublishedAt';
 import { Phase4RuleEngine1791825968315 } from './migrations/1791825968315-Phase4RuleEngine';
+import { Phase5Alerts1791894767461 } from './migrations/1791894767461-Phase5Alerts';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
@@ -47,6 +52,10 @@ export const ENTITIES = [
   EvaluationRun,
   RuleTrigger,
   RiskScoreLog,
+  Alert,
+  AlertStateHistory,
+  Intervention,
+  Notification,
 ];
 const MIGRATIONS = [
   Phase1Identity1791766886196,
@@ -54,6 +63,7 @@ const MIGRATIONS = [
   Phase3bSourceRecords1791810699905,
   Phase4RuleEngine1791825968315,
   Phase4ProcessPublishedAt1791826670549,
+  Phase5Alerts1791894767461,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

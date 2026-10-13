@@ -81,6 +81,16 @@ export async function confirmAndLoad(ds: DataSource, batchId: string): Promise<I
 
 /** Dọn lô nhập của test (tên file bắt đầu bằng `tst-`) cùng dữ liệu nguồn và Enrollment lô tạo. */
 export async function cleanupImportBatches(ds: DataSource): Promise<void> {
+  // Cảnh báo của sinh viên thử (Phase 5) trước, vì trỏ tới sinh viên / lần chạy / RiskScore.
+  const tstAlerts = `SELECT alert_id FROM alerts WHERE student_id LIKE 'TST%'`;
+  await ds.query(`DELETE FROM notifications WHERE alert_id IN (${tstAlerts})`);
+  await ds.query(`DELETE FROM interventions WHERE alert_id IN (${tstAlerts})`);
+  await ds.query(`DELETE FROM alert_state_history WHERE alert_id IN (${tstAlerts})`);
+  await ds.query(`UPDATE rule_triggers SET alert_id = NULL WHERE alert_id IN (${tstAlerts})`);
+  await ds.query(
+    `DELETE FROM audit_logs WHERE target_type = 'Alert' AND target_id IN (SELECT alert_id::text FROM alerts WHERE student_id LIKE 'TST%')`,
+  );
+  await ds.query(`DELETE FROM alerts WHERE student_id LIKE 'TST%'`);
   const tstBatches = `SELECT id FROM import_batches WHERE file_name LIKE 'tst-%'`;
   // Lần chạy đánh giá trên học kỳ thử hoặc do lô thử kích hoạt, cùng kết quả của chúng.
   const tstRuns = `SELECT id FROM evaluation_runs WHERE term_id LIKE 'TST%' OR import_batch_id IN (${tstBatches})`;

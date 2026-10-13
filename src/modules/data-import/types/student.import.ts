@@ -6,6 +6,7 @@ import { Student } from '@/db/entities/student.entity';
 import { User } from '@/db/entities/user.entity';
 import { OfficialAcademicStatus, UserAccountStatus, UserRole } from '@/db/enums';
 import { STUDENT_EMAIL_DOMAIN } from '@/lib/email-domains';
+import { transferOpenAlerts } from '@/modules/alerts/services/alert-lifecycle.service';
 import { hasLostDiacritics, LOST_DIACRITICS_HINT, stripDiacritics } from '../parsing/values';
 import { type ImportTypeDefinition, type ParsedRow, type RowError } from './definition';
 
@@ -135,6 +136,7 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
     const result = { inserted: 0, updated: 0, unchanged: 0, createdKeys: [] as string[] };
     const newUsers: Partial<User>[] = [];
     const newStudents: Partial<Student>[] = [];
+    const classChanges: StudentRow[] = [];
 
     for (const row of rows) {
       const user = userById.get(row.studentId);
@@ -168,7 +170,6 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
         result.unchanged += 1;
         continue;
       }
-      // Phase 5: đổi lớp → chuyển Alert đang mở sang CVHT lớp mới (docs/rules/09).
       await em.update(
         User,
         { userId: row.studentId },
@@ -184,6 +185,12 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
         },
       );
       result.updated += 1;
+      // Đổi lớp → chuyển cảnh báo đang mở sang Cố vấn học tập của lớp mới (docs/rules/09).
+      if (student.classId !== row.classId) classChanges.push(row);
+    }
+    for (const row of classChanges) {
+      const target = await em.findOneBy(AdministrativeClass, { classId: row.classId });
+      await transferOpenAlerts(em, [row.studentId], target?.advisorId ?? null, null);
     }
 
     // Thêm mới theo lô — 1 câu INSERT cho cả nhóm (docs/rules/05).

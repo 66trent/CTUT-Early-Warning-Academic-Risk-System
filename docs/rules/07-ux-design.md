@@ -22,6 +22,8 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 ## Sinh viên — cần trấn an, không gây hoảng loạn
 
+- MUST: chỉ hiển thị cảnh báo đã được Cố vấn học tập xác nhận (xem `06`); mức hiển thị "Cần chú ý" khi có cảnh báo đã xác nhận mức ≥ `MEDIUM` chưa xử lý xong, ngược lại "Ổn định". Kèm số liệu từng học phần (tỷ lệ vắng, bài kiểm tra chưa làm, điểm quá trình) và gợi ý hành động.
+
 - MUST NOT: dùng từ "cảnh báo"/"rủi ro" làm tiêu đề chính trên trang cá nhân sinh viên — dùng khung tích cực ("Tình hình học tập của bạn") kèm gợi ý cụ thể, dễ hành động.
 - MUST NOT: hiển thị con số `RiskScoreLog.riskScoreValue` thô (0.0–1.0) cho role `STUDENT` — chỉ hiển thị mức đã diễn giải (VD: "Cần chú ý" / "Ổn định").
 - MUST: có nút/link liên hệ CVHT trực tiếp ngay trên trang cảnh báo cá nhân.

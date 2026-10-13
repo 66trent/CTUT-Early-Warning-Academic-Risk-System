@@ -61,3 +61,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra tay (Docker): `demo:load` → 4 lần chạy tự động; chạy tay HK1 mốc 10/10 trên giao diện → 13 dấu hiệu (2 Rất cao · 5 Cao · 5 Trung bình · 1 Thấp).
 - Còn lại (Phase 5): gắn trigger vào Alert, cooldown (đang tạm 168 giờ), thông báo.
 - Tự kiểm tra: Admin → Chạy đánh giá → Học kỳ 1 → mốc 2026-10-10 → Chạy đánh giá ngay → so với `docs/demo-data/KET_QUA_MONG_DOI.md`.
+
+## Phase 5 — Cảnh báo, giao diện Cố vấn học tập và sinh viên (2026-10-13)
+
+- Làm: entity `Alert` (1 / sinh viên / học kỳ, CHECK chỉ tham khảo), `AlertStateHistory`, `Intervention`, `Notification` + migration (đưa `cooldown` về 0); gộp trigger vào cảnh báo trong cùng transaction lần chạy (tạo / cập nhật mức / mở lại theo dấu hiệu mới-nặng hơn / mốc cũ chỉ thêm bằng chứng / không còn hiệu lực sau hoàn tác); máy trạng thái + lịch sử + Audit Log; can thiệp (tự sang Đang xử lý, nội dung bảo mật ẩn với Admin); chuyển cảnh báo khi đổi Cố vấn học tập của lớp hoặc sinh viên đổi lớp; thông báo trong ứng dụng + email qua `send-notifications` (chuông, số chưa đọc).
+- Giao diện: Cố vấn học tập (danh sách cần xử lý, Sheet chi tiết nhóm 3 nguồn + bằng chứng tải khi mở, ghi can thiệp, đánh dấu đã xem mức Thấp, sinh viên phụ trách, hồ sơ theo học phần); sinh viên ("Tình hình học tập", liên hệ Cố vấn học tập); Admin (cảnh báo chỉ đọc, lọc "chưa có Cố vấn học tập", xem hồ sơ ghi Audit Log); đăng nhập nhanh 2 sinh viên demo.
+- Kiểm tra: typecheck, lint, format, migration, schema drift, test 302 (+1 bỏ qua), build — xanh. Nghiệm thu: đúng 12 cảnh báo theo bảng mới của `KET_QUA_MONG_DOI.md`, 12 thông báo + 11 email; chạy lại không tạo trùng; kịch bản mở lại và tăng mức đúng; Admin không xử lý được, Cố vấn học tập khác không xem được, sinh viên chỉ xem của mình.
+- Kiểm tra tay (Docker): chạy 2 mốc → 12 cảnh báo, 11 email trong MailHog; GV001 thấy 8 (HK1), GV002 chỉ KHMT2311012; GV001 xử lý KTPM2311003 tới Đã giải quyết; đổi lớp KTPM2311 sang GV002 → GV001 mất quyền ngay (đã trả lại GV001); sinh viên KTPM2311003/001 đăng nhập nhanh thấy đúng trang của mình.
+- Lỗi tìm ra khi tự rà: đánh dấu "không còn hiệu lực" sau hoàn tác có thể bắt nhầm cảnh báo chỉ được thêm bằng chứng — đã sửa (chỉ khi sinh viên không còn trigger nào).
+- Tự kiểm tra: đăng nhập nhanh "Cố vấn học tập GV001" → Cảnh báo cần xử lý → Xem → Xác nhận đã xem → Lưu can thiệp → Đánh dấu đã giải quyết; MailHog http://localhost:8025; đăng nhập nhanh "Sinh viên KTPM2311003".
+

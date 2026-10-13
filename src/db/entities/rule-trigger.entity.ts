@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Severity } from '../enums';
 import { type JsonPrimitive } from '../json';
+import { Alert } from './alert.entity';
 import { EvaluationRun } from './evaluation-run.entity';
 import { RuleVersion } from './rule-version.entity';
 import { Rule } from './rule.entity';
@@ -17,12 +18,14 @@ import { Term } from './term.entity';
 
 /**
  * 1 bằng chứng: 1 lần 1 RuleVersion đúng với dữ liệu của 1 sinh viên (docs/rules/11).
- * Không hiển thị trực tiếp — là input tạo Alert. `alertId` NULL ở Phase 4, Phase 5 gắn Alert
- * (khóa ngoại tới bảng alerts thêm ở Phase 5).
+ * Không hiển thị trực tiếp — là input tạo Alert. `alertId` NULL với trigger cũ của Phase 4
+ * (trước khi có bảng alerts) — chạy lại đánh giá để gắn vào cảnh báo.
  */
 @Entity('rule_triggers')
 @Index(['evaluationRunId'])
 @Index(['studentId', 'termId'])
+@Index(['alertId'])
+@Index(['termId', 'ruleCode'])
 export class RuleTrigger {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -62,6 +65,10 @@ export class RuleTrigger {
 
   @Column({ type: 'enum', enum: Severity, enumName: 'severity' })
   severity!: Severity;
+
+  @ManyToOne(() => Alert, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'alert_id' })
+  alert?: Relation<Alert> | null;
 
   @ManyToOne(() => EvaluationRun, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'evaluation_run_id' })

@@ -12,16 +12,14 @@ import { getQueue, QUEUE_NAMES, type QueueName } from '@/lib/queue/queues';
 import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
 import { onEvaluationJobFailed, processEvaluationJob } from './processors/evaluation-run.processor';
 import { onImportJobFailed, processImportJob } from './processors/import-batch.processor';
+import {
+  onNotificationJobFailed,
+  processNotificationJob,
+} from './processors/notification.processor';
 
 process.env.PROCESS_ROLE = 'worker';
 
 type Processor = (job: Job) => Promise<unknown>;
-
-/** Chưa có processor: job bị đánh lỗi rõ ràng thay vì biến mất âm thầm. */
-const notImplemented =
-  (queue: QueueName): Processor =>
-  (job) =>
-    Promise.reject(new Error(`Queue "${queue}" chưa có processor (job ${job.id ?? '?'})`));
 
 /**
  * Nhập dữ liệu chạy 1 job/lần: giới hạn bộ nhớ khi đọc XLSX và tránh tranh khóa nạp (docs/rules/05, 12).
@@ -35,7 +33,7 @@ const CONCURRENCY: Partial<Record<QueueName, number>> = {
 const PROCESSORS: Record<QueueName, Processor> = {
   [QUEUE_NAMES.importBatchProcess]: processImportJob,
   [QUEUE_NAMES.evaluationRun]: processEvaluationJob,
-  [QUEUE_NAMES.sendNotifications]: notImplemented(QUEUE_NAMES.sendNotifications),
+  [QUEUE_NAMES.sendNotifications]: processNotificationJob,
 };
 
 async function main(): Promise<void> {
@@ -57,7 +55,7 @@ async function main(): Promise<void> {
           ? onImportJobFailed
           : name === QUEUE_NAMES.evaluationRun
             ? onEvaluationJobFailed
-            : null;
+            : onNotificationJobFailed;
       onFailed?.(job).catch((e: unknown) =>
         logger.error({ queue: name, err: String(e) }, 'không đánh dấu được job lỗi'),
       );

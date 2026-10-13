@@ -123,6 +123,14 @@ Có trigger mức ≥ `MEDIUM` ở ≥ 2 trong 3 nhóm: điểm danh (`ATT-01`/`
 
 Cảnh báo nghi báo sai do các giới hạn này: CVHT dùng `DISMISSED` kèm lý do.
 
-## Gộp nguyên nhân & chống trùng cảnh báo (Bước 7)
+## Gộp nguyên nhân & chống trùng cảnh báo (Bước 7–9) — người dùng chốt 2026-10-13
 
-Khóa tương quan: `(studentId, ruleCode, scopeId, termId)`. Có `Alert` đang mở khớp khóa VÀ còn trong `Rule.cooldown` (giờ) → cập nhật `lastDetectedAt` + thêm `RuleTrigger`, MUST NOT tạo `Alert` mới. Chỉ tạo `Alert` mới khi `Alert` cũ đã đóng VÀ điều kiện tái xuất hiện sau cooldown.
+- **Đơn vị gộp: 1 `Alert` / sinh viên / học kỳ** — gộp MỌI trigger (mọi luật, mọi học phần) của sinh viên trong học kỳ. "Dấu hiệu" = cặp `(ruleCode, scopeId)`; chi tiết cảnh báo nhóm dấu hiệu theo 3 nguồn. Tối đa 1 `Alert` CHƯA ĐÓNG / `(studentId, termId)` (partial unique index).
+- Mỗi lần chạy có trigger của sinh viên: gắn trigger vào `Alert` của `(studentId, termId)`; `lastDetectedAt` = lúc chạy; `severity` = max severity các trigger của **lần chạy gần nhất** đã áp dụng.
+  - Chưa có `Alert` → tạo `OPEN` (thông báo).
+  - `Alert` đang mở (`OPEN`/`ACKNOWLEDGED`/`IN_PROGRESS`/`REOPENED`) → cập nhật; `severity` tăng → thông báo; giảm thì chỉ cập nhật.
+  - `Alert` đã đóng (`RESOLVED`/`DISMISSED`) → **mở lại theo dấu hiệu, không theo thời gian**: có dấu hiệu MỚI (cặp `(ruleCode, scopeId)` chưa có trong cảnh báo) hoặc dấu hiệu cũ NẶNG HƠN mức đã ghi nhận → `REOPENED` (thông báo); dấu hiệu y hệt/nhẹ hơn → chỉ gắn trigger làm bằng chứng, không đổi trạng thái, không thông báo. `Rule.cooldown` (giờ) mặc định 0 = tắt; > 0 thì còn phải qua đủ số giờ kể từ lúc đóng mới được mở lại.
+  - `Alert` `INVALIDATED` → không mở lại; dấu hiệu xuất hiện lại sau đó tạo `Alert` mới.
+- Lần chạy có `asOf` CŨ hơn mốc dữ liệu đã áp dụng cho `Alert` (`Alert.lastAsOf`, VD chạy lại mốc quá khứ khi demo) → chỉ gắn trigger làm bằng chứng, MUST NOT đổi mức/trạng thái.
+- Hoàn tác lô (xem `12`): lần chạy lại sau hoàn tác mà `Alert` đang mở không còn trigger nào → hệ thống chuyển `INVALIDATED` (`changedBy` NULL, lý do "dữ liệu nguồn đã được hoàn tác"). Ngoài trường hợp này hệ thống KHÔNG tự đóng cảnh báo — sinh viên cải thiện thì Cố vấn học tập chuyển `RESOLVED`.
+- Job chạy lại (retry) MUST NOT tạo `Alert` hay thông báo trùng: unique index ở trên + `jobId` thông báo theo `(alertId, sự kiện, evaluationRunId)`.

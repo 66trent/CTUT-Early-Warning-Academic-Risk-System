@@ -97,15 +97,16 @@
 
 ## Phase 5 — Cảnh báo, giao diện CVHT và sinh viên
 
-- [ ] Entity `Alert`, `AlertStateHistory`, `Intervention`, `Notification`, `AuditLog` (`11`).
-- [ ] Tạo/cập nhật `Alert` theo khóa tương quan + cooldown; severity = max; `isReferenceOnly = true`.
-- [ ] Máy trạng thái, mỗi chuyển ghi `AlertStateHistory` + Audit Log; `DISMISSED`/`INVALIDATED` bắt buộc lý do; chỉ CVHT phụ trách xử lý.
-- [ ] Đổi CVHT của lớp → chuyển `Alert` đang mở trong cùng transaction (bổ sung vào chức năng Phase 2).
-- [ ] Thông báo `send-notifications` theo sự kiện ở `06` (không chống gửi trùng); email qua Nodemailer (MailHog ở dev).
-- [ ] CVHT: danh sách cần xử lý (sắp theo Severity), chi tiết nhóm lý do theo 3 nguồn kèm số liệu và ngày dữ liệu, ghi can thiệp trong Sheet, hồ sơ sinh viên theo học phần.
-- [ ] Sinh viên: "Tình hình học tập của bạn", lời văn tích cực, nút liên hệ CVHT.
-- [ ] Admin: xem cảnh báo chỉ đọc, ẩn nội dung `SENSITIVE`.
-- [ ] Sinh viên đổi lớp (qua nhập danh sách) → chuyển `Alert` đang mở sang CVHT lớp mới trong cùng transaction.
+- [x] Entity `Alert` (1 / sinh viên / học kỳ, `lastAsOf`, `assignedAdvisorId` NULL được, CHECK `isReferenceOnly`), `AlertStateHistory`, `Intervention` (`status` DONE/FOLLOW_UP), `Notification` (`readAt`); FK `rule_triggers.alert_id` (`11`). `AuditLog` đã có từ Phase 1. Đổi `Rule.cooldown` đã seed (168) về 0.
+- [x] Gộp trigger mỗi lần chạy vào `Alert` theo `08` (bước 7–9): severity = max lần chạy gần nhất; mở lại theo dấu hiệu mới/nặng hơn; lần chạy mốc cũ chỉ thêm bằng chứng; `INVALIDATED` sau hoàn tác lô; đếm `alertsCreated/Updated`.
+- [x] Máy trạng thái theo bảng chuyển ở `11`, mỗi chuyển ghi `AlertStateHistory` + Audit Log; `DISMISSED`/`INVALIDATED` bắt buộc lý do; `RESOLVED` bắt buộc có can thiệp; chỉ Cố vấn học tập phụ trách (suy ra qua lớp) xử lý.
+- [x] Đổi Cố vấn học tập của lớp (kể cả lớp chưa có người) → chuyển `Alert` đang mở trong cùng transaction; sinh viên đổi lớp qua nhập danh sách → như vậy.
+- [x] Thông báo `send-notifications` chỉ tới Cố vấn học tập theo `06` (LOW chỉ IN_APP); email Nodemailer (MailHog ở dev); chuông thông báo + số chưa đọc; jobId chống trùng khi retry.
+- [x] Cố vấn học tập: danh sách cần xử lý (sắp theo Severity, lọc học kỳ), chi tiết nhóm lý do theo 3 nguồn kèm số liệu và ngày dữ liệu (Accordion, tải bằng chứng khi mở), xác nhận + ghi can thiệp trong Sheet (≤ 2 click), "Đánh dấu đã xem" cho LOW, hồ sơ sinh viên theo học phần.
+- [x] Sinh viên: "Tình hình học tập của bạn" — chỉ cảnh báo đã xác nhận, mức "Cần chú ý"/"Ổn định", số liệu từng học phần, lời văn tích cực, nút liên hệ Cố vấn học tập (email).
+- [x] Admin: xem cảnh báo chỉ đọc, ẩn nội dung `SENSITIVE`, mục "Chưa có Cố vấn học tập phụ trách"; mở hồ sơ sinh viên ghi Audit Log.
+- [x] Đăng nhập nhanh demo thêm 2 sinh viên (`KTPM2311003`, `KTPM2311001`) khi `DEMO_MODE=true`.
+- [x] Test nghiệm thu cảnh báo theo bảng "Cảnh báo mong đợi (Phase 5)" + kịch bản mở lại/tăng mức trong `KET_QUA_MONG_DOI.md`.
 
 **DoD:** test: Admin không đổi được trạng thái `Alert`; CVHT khác không xử lý được; sinh viên không thấy của người khác; chạy lại đánh giá không tạo `Alert` trùng. **Kiểm tra tay:** làm hết mục "Kiểm tra phân quyền bằng tay" trong `KET_QUA_MONG_DOI.md`; CVHT xử lý 1 cảnh báo đến `RESOLVED`.
 

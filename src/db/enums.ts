@@ -186,3 +186,20 @@ export const IMPORT_ERROR_REASONS = [
   'RESULT_ALREADY_FINAL',
 ] as const;
 export type ImportErrorReason = (typeof IMPORT_ERROR_REASONS)[number];
+
+// ── Cảnh báo (11) — danh sách hay mở rộng: varchar + union/Zod ──────
+/** `Intervention.status`: đã thực hiện / cần theo dõi tiếp (có `nextFollowUpAt`). */
+export const INTERVENTION_STATUSES = ['DONE', 'FOLLOW_UP'] as const;
+export type InterventionStatus = (typeof INTERVENTION_STATUSES)[number];
+
+/** Sự kiện làm phát sinh thông báo (docs/rules/06). */
+export const NOTIFICATION_EVENTS = ['CREATED', 'REOPENED', 'SEVERITY_INCREASED'] as const;
+export type NotificationEvent = (typeof NOTIFICATION_EVENTS)[number];
+
+/** Cảnh báo chưa đóng — Cố vấn học tập còn phải xử lý. */
+export const OPEN_ALERT_STATUSES: readonly AlertStatus[] = [
+  AlertStatus.OPEN,
+  AlertStatus.ACKNOWLEDGED,
+  AlertStatus.IN_PROGRESS,
+  AlertStatus.REOPENED,
+];
