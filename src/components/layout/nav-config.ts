@@ -22,7 +22,7 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
-/** Menu theo vai trò. Trang chưa làm sẽ được thêm dần theo phase. */
+/** Menu theo vai trò. */
 export const NAV_ITEMS: Record<UserRole, NavItem[]> = {
   [UserRole.ADMIN]: [
     { title: 'Bắt đầu', href: '/admin/getting-started', icon: ClipboardCheck },
@@ -31,6 +31,7 @@ export const NAV_ITEMS: Record<UserRole, NavItem[]> = {
     { title: 'Học kỳ', href: '/admin/terms', icon: CalendarRange },
     { title: 'Khoa và lớp sinh hoạt', href: '/admin/classes', icon: Building2 },
     { title: 'Nhập dữ liệu', href: '/admin/imports', icon: FileUp },
+    { title: 'Sinh viên', href: '/admin/students', icon: GraduationCap },
     { title: 'Cấu hình luật', href: '/admin/rules', icon: SlidersHorizontal },
     { title: 'Chạy đánh giá', href: '/admin/evaluations', icon: Activity },
     { title: 'Cảnh báo sớm', href: '/admin/alerts', icon: ShieldAlert },

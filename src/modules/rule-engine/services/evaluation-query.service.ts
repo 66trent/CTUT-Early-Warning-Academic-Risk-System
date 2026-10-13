@@ -1,5 +1,6 @@
 import { In } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
+import { Enrollment } from '@/db/entities/enrollment.entity';
 import { EvaluationRun } from '@/db/entities/evaluation-run.entity';
 import { RiskScoreLog } from '@/db/entities/risk-score-log.entity';
 import { RuleTrigger } from '@/db/entities/rule-trigger.entity';
@@ -60,6 +61,8 @@ export interface EvaluationRunDetailDto extends EvaluationRunListItemDto {
   importBatchId: string | null;
   finishedAt: string | null;
   warnings: { code: string; studentId: string | null; courseId: string | null; message: string }[];
+  /** Số cảnh báo chất lượng dữ liệu theo loại — nhiều nhất trước. */
+  warningSummary: { code: string; count: number }[];
   triggers: EvaluationTriggerDto[];
   risks: EvaluationRiskDto[];
   bySeverity: { severity: Severity; count: number }[];
@@ -67,6 +70,8 @@ export interface EvaluationRunDetailDto extends EvaluationRunListItemDto {
 
 export interface EvaluationFormOptionsDto {
   terms: { termId: string; termName: string; isCurrent: boolean }[];
+  /** Học phần đã có dữ liệu trong từng học kỳ — để chạy đánh giá riêng 1 học phần. */
+  courses: { termId: string; courseId: string; courseName: string }[];
   /** Chỉ khi DEMO_MODE=true mới chọn được mốc asOf trong quá khứ (docs/rules/06). */
   canChooseAsOf: boolean;
 }
@@ -113,10 +118,33 @@ export async function getEvaluationFormOptions(): Promise<EvaluationFormOptionsD
     order: { isCurrent: 'DESC', startDate: 'DESC' },
     take: 50,
   });
+  const open = terms.filter((t) => !t.closedAt);
+  const courses =
+    open.length === 0
+      ? []
+      : await (
+          await getDataSource()
+        )
+          .getRepository(Enrollment)
+          .createQueryBuilder('e')
+          .innerJoin('e.course', 'c')
+          .select('e.termId', 'termId')
+          .addSelect('e.courseId', 'courseId')
+          .addSelect('c.courseName', 'courseName')
+          .where('e.termId IN (:...termIds)', { termIds: open.map((t) => t.termId) })
+          .groupBy('e.termId')
+          .addGroupBy('e.courseId')
+          .addGroupBy('c.courseName')
+          .orderBy('e.courseId', 'ASC')
+          .limit(2000)
+          .getRawMany<{ termId: string; courseId: string; courseName: string }>();
   return {
-    terms: terms
-      .filter((t) => !t.closedAt)
-      .map((t) => ({ termId: t.termId, termName: t.termName, isCurrent: t.isCurrent })),
+    terms: open.map((t) => ({ termId: t.termId, termName: t.termName, isCurrent: t.isCurrent })),
+    courses: courses.map((c) => ({
+      termId: c.termId,
+      courseId: c.courseId,
+      courseName: c.courseName,
+    })),
     canChooseAsOf: getEnv().DEMO_MODE,
   };
 }
@@ -155,6 +183,9 @@ export async function getEvaluationRunDetail(
   });
   const studentOf = new Map(students.map((s) => [s.studentId, s]));
   const ruleName = new Map(rules.map((r) => [r.ruleCode, r.ruleName]));
+  const warningCounts = new Map<string, number>();
+  for (const w of run.dataWarnings ?? [])
+    warningCounts.set(w.code, (warningCounts.get(w.code) ?? 0) + 1);
   const counts = new Map<Severity, number>();
   for (const t of triggers) counts.set(t.severity, (counts.get(t.severity) ?? 0) + 1);
 
@@ -169,6 +200,9 @@ export async function getEvaluationRunDetail(
       courseId: w.courseId ?? null,
       message: w.message,
     })),
+    warningSummary: [...warningCounts.entries()]
+      .map(([code, count]) => ({ code, count }))
+      .sort((a, b) => b.count - a.count || a.code.localeCompare(b.code)),
     triggers: triggers
       .map((t) => ({
         studentId: t.studentId,

@@ -26,9 +26,9 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | action | Json | NOT NULL | | Danh sách hành động khi kích hoạt |
 | effectiveFrom | DateTime | NOT NULL | | |
 | effectiveTo | DateTime | NULL | | NULL = đang dùng |
-| status | RuleStatus (enum) | NOT NULL | | `DRAFT`/`ACTIVE`/`INACTIVE`/`ARCHIVED` |
+| status | RuleStatus (enum) | NOT NULL | | `DRAFT`/`ACTIVE`/`INACTIVE`/`ARCHIVED`. `INACTIVE` = bị phiên bản mới thay thế; `ARCHIVED` = bản nháp Admin bỏ (giữ làm lịch sử, Audit Log `RULE_VERSION_DISCARDED`). Mỗi luật tối đa 1 `DRAFT` (tạo thêm → `DRAFT_EXISTS`) — Phase 6 |
 | configuredBy | String(20) | NOT NULL | FK → User | |
-| lastDryRunAt | DateTime | NULL | | Thời điểm chạy thử (dry-run) gần nhất. MUST NOT chuyển `status` sang `ACTIVE` khi còn NULL |
+| lastDryRunAt | DateTime | NULL | | Thời điểm chạy thử (dry-run) gần nhất. MUST NOT chuyển `status` sang `ACTIVE` khi còn NULL. Chạy thử trên học kỳ hiện tại, không ghi DB ngoài cột này; hiển thị số sinh viên kích hoạt theo bản `ACTIVE` vs bản nháp và danh sách sinh viên thêm/bớt (tối đa 50 dòng) — người dùng chốt 2026-10-13 |
 
 RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastDryRunAt` = thời điểm seed (ngưỡng mặc định của `08` coi như đã chạy thử). Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
 

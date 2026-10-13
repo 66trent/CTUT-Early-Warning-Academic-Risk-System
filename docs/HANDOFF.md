@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-13 (sau Phase 5).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-13 (sau Phase 6).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -13,8 +13,9 @@
 | 3a Khung nhập + sinh viên | Xong | `phase-3a` | #4 → `phase-2` | xanh |
 | 3b Nhập 3 nguồn học tập | Xong | `phase-3b` | #5 → `phase-3a` | xanh |
 | 4 Rule engine (+ sửa lỗi font/mẫu Excel của Phase 3) | Xong | `phase-4` | #6 → `phase-3b` | xanh |
-| 5 Cảnh báo, CVHT, sinh viên | Xong | `phase-5` (đang checkout) | #7 → `phase-4` | xanh |
-| **6 Quản trị và vận hành** | **Việc tiếp theo** | tạo `phase-6` từ `phase-5` | base `phase-5` | — |
+| 5 Cảnh báo, CVHT, sinh viên | Xong | `phase-5` | #7 → `phase-4` | xanh |
+| 6 Quản trị và vận hành | Xong | `phase-6` (đang checkout) | #8 → `phase-5` | — |
+| **7 Hoàn thiện và demo** | **Việc tiếp theo** | tạo `phase-7` từ `phase-6` | base `phase-6` | — |
 
 - Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **PR xếp chồng, CHƯA merge** (kiểm lại 2026-10-13: cả 7 PR OPEN, CI xanh; cây làm việc sạch, HEAD `phase-5`). Người dùng merge theo thứ tự #1 → #2 → #3 → #4 → #5 → #6 → #7 (GitHub tự đổi base).
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
@@ -22,15 +23,13 @@
 
 ## 2. Môi trường đang chạy
 
-- Docker Compose (project `ewars`): `app` (3000), `worker`, `postgres` (5432), `redis` (6379), `minio` (9000/9001), `mailhog` (1025/8025, profile `dev`) — port chỉ mở `127.0.0.1`. Image app/worker đã build theo code Phase 5 (worker có `evaluation-run` + `send-notifications`).
+- Docker Compose (project `ewars`): `app` (3000), `worker`, `postgres` (5432), `redis` (6379), `minio` (9000/9001), `mailhog` (1025/8025, profile `dev`) — port chỉ mở `127.0.0.1`. Image app/worker đã build theo code Phase 6.
 - Container dự án CŨ (`ctut-ewars-*`, ở `E:\CTUT-EWARS`) đã **dừng** (không xóa) để nhường port.
 - `.env` (không commit): `STAFF_EMAIL_DOMAIN=*` (tạm thời, người dùng chưa có email trường — phải đặt lại `@ctuet.edu.vn` khi triển khai thật); `DEMO_MODE=true`; có thêm `POSTGRES_USER/PASSWORD/DB` khớp `DATABASE_URL`. Better Auth cảnh báo `AUTH_SECRET` độ ngẫu nhiên thấp — đã nhắc người dùng thay.
-- Dữ liệu trong DB dev (của người dùng, KHÔNG tự xóa/sửa):
-  - Tài khoản: `ADMIN` (seed), `GV001`/`GV002` (seed:demo), `GV02` (người dùng tự đăng ký, ACTIVE — trước đây phụ trách `KTPM2311`, `seed:demo` đã đặt lại lớp này cho GV001), `CVHT0001` (người dùng, PENDING).
-  - Học kỳ: `HK2_2025`, `HK1_2026` (hiện tại, đã mở lại bằng `seed:demo` 2026-10-12 theo yêu cầu người dùng), `HK2_2026` (người dùng tự tạo).
-  - Lớp: `KTPM2311` (GV001 — `seed:demo` đặt lại theo kịch bản demo), `KHMT2311` (GV002). Sinh viên: 13.
-  - Đã nạp đủ demo 02–05 bằng `npm run demo:load` (2026-10-13). Sau Phase 5 đã chạy tay HK2 mốc 15/06 + HK1 mốc 10/10 → 12 cảnh báo; GV001 đã xử lý KTPM2311003 tới RESOLVED (thử tay). Sinh viên KTPM2311003 có tài khoản đăng nhập (tạo qua đăng nhập nhanh demo) → lô danh sách sinh viên không hoàn tác được nữa.
-  - Backup trước khi đổi: `backups/before-demo-reset-20261012.dump`.
+- Dữ liệu trong DB dev (KHÔNG tự xóa/sửa): **đã xóa sạch và làm lại từ đầu qua giao diện khi kiểm DoD Phase 6 (2026-10-13, người dùng đồng ý)**. Dữ liệu cũ (GV02, CVHT0001, HK2_2026, cảnh báo đã xử lý…) nằm trong `backups/before-phase6-dod-20261013.dump` (khôi phục: `pg_restore --clean`). Hiện có:
+  - Tài khoản: `ADMIN` (seed), `GV001`/`GV002` (đăng ký qua form + xác minh MailHog + Admin duyệt; mật khẩu thử KHÔNG phải `DEMO_ADVISOR_PASSWORD` — người dùng đăng nhập bằng nút đăng nhập nhanh demo hoặc đặt lại qua `seed:demo`).
+  - Học kỳ `HK2_2025`, `HK1_2026` (hiện tại); lớp `KTPM2311` (GV001), `KHMT2311` (GV002); 13 sinh viên; đã nạp 5 file demo; đã chạy HK2 mốc 15/06 + HK1 mốc 10/10 → 12 cảnh báo `OPEN`.
+  - Backup cũ hơn: `backups/before-demo-reset-20261012.dump`.
 - Chạy app ở máy (khi cần thử giao diện): `docker compose stop app worker` → Browser pane `preview_start` tên `next-dev` (cổng 3000, `.claude/launch.json`) + worker bằng `npx tsx src/workers/index.ts` chạy nền. Xong thì tắt worker (xem bẫy #4) và `docker compose --profile dev up -d --build app worker`.
 
 ## 2b. Bản đồ code (đã có đến Phase 5)
@@ -39,7 +38,7 @@
 - `src/modules/data-import`: khung nhập 2 bước (`services/import-{batch,processor}.service.ts`), loại nhập trong `types/*.import.ts` + `registry.ts`, đọc file `parsing/*`, tự tạo Course/Enrollment + tính lần học `services/enrollment-sync.ts`.
 - `src/modules/rule-engine`: evaluator thuần `evaluator/` (mỗi luật 1 file trong `rules/`, `engine.ts`, `facts.ts` theo asOf, `lms-groups.ts`, `risk-score.ts`, cấu hình chung `config.ts`), lần chạy `services/evaluation-run.service.ts` (lô 200 SV → gộp cảnh báo → thông báo), luật/phiên bản `services/rule-config.service.ts`, chạy thử `services/dry-run.service.ts`.
 - `src/modules/alerts`: quyết định gộp/mở lại thuần `services/alert-decision.ts`, gộp vào DB `alert-sync.service.ts`, máy trạng thái + can thiệp + chuyển người phụ trách `alert-lifecycle.service.ts`, truy vấn `alert-query.service.ts`, hồ sơ/trang sinh viên `student-profile.service.ts`, thông báo `notification.service.ts`, Server Action `actions/alert.actions.ts`.
-- Giao diện: `src/app/{admin,advisor,student}/**`, component `src/components/{alerts,evaluations,imports,admin,domain}/*`. Menu `src/components/layout/nav-config.ts` — mục Admin chưa có trang: `/admin/getting-started`, `/admin/rules`, `/admin/audit-logs` (Phase 6); trang `/admin` (tổng quan) còn sơ sài.
+- Giao diện: `src/app/{admin,advisor,student}/**`, component `src/components/{alerts,evaluations,imports,admin,domain}/*`. Menu `src/components/layout/nav-config.ts`. Phase 6: `src/app/admin/{rules,audit-logs,getting-started,students}`, `/legal/privacy-policy`, component `src/components/{rules,admin}/*`, service `src/modules/admin/services/{overview,getting-started,setup-steps,audit-log,enrollment,student-search}*`, `rule-engine/services/rule-query.service.ts`, form luật tự sinh `rule-engine/condition-schema.ts` + `components/rules/condition-editor.tsx`, biểu đồ `components/ui/chart.tsx` (shadcn).
 - Worker: `src/workers/index.ts` + `processors/{import-batch,evaluation-run,notification}.processor.ts`; 3 queue ở `src/lib/queue/queues.ts`.
 - Test: `tests/unit/**`, `tests/integration/**` (Postgres thật); helper dữ liệu demo `tests/helpers/demo-setup.ts`, `import-helpers.ts`, `evaluator-fixtures.ts`. Nghiệm thu: `rule-engine-acceptance.test.ts` (trigger), `alerts.test.ts` (cảnh báo).
 - Lệnh thêm: `npm run demo:load` (nạp file demo 02–05 qua worker), `npm run templates:build` (sinh mẫu `.xlsx` từ `.csv`).
@@ -58,7 +57,7 @@
 
 - Đã chốt Phase 4 (ghi `00`, `01`, `08`, `10`, `11`, `12`): trọng số + tham số dữ liệu chung ở `Rule` `RISK-SCORE`; `RuleTrigger.alertId` NULL + `evaluationRunId`; RiskScore cộng dồn, chỉ hiển thị; `INSUFFICIENT` = 0 nhóm; bỏ điều kiện hoàn tác "chưa có EvaluationRun"; trạng thái/lần học/kết quả theo `asOf` (`CourseResult.processPublishedAt`); 1 queue `evaluation-run`.
 - Đã chốt trước Phase 5 (2026-10-13, ghi `06`, `07`, `08`, `11`, `KET_QUA_MONG_DOI.md`, `implement.md`): 1 Alert / sinh viên / học kỳ; mở lại theo dấu hiệu mới/nặng hơn, `cooldown` mặc định 0; sinh viên chỉ thấy cảnh báo sau khi Cố vấn học tập xác nhận, không nhận email; đăng nhập nhanh demo thêm `KTPM2311003`, `KTPM2311001`. Mặc định đề xuất (người dùng không phản đối): `assignedAdvisorId` NULL được, `Notification.readAt`, bảng chuyển trạng thái, `RESOLVED` bắt buộc có can thiệp, `Intervention.status` DONE/FOLLOW_UP, Admin xem hồ sơ ghi Audit Log, lần chạy mốc cũ chỉ thêm bằng chứng, CHECK `isReferenceOnly`.
-- **Trước Phase 6**: Tremor 3 chỉ nhận React 18 → chọn lại thư viện biểu đồ.
+- Đã chốt trước Phase 6 (2026-10-13, ghi `00`, `03`, `04`, `05`, `07`, `08`, `09`, `11`, `implement.md`): biểu đồ Recharts + shadcn `Chart`; ẩn danh hóa HOÃN (người dùng bỏ khỏi Phase 6, bổ sung khi cần); trang chính sách đọc biến môi trường `PRIVACY_*`, thiếu → `[Cần nhà trường xác nhận]`; `WITHDRAWN` đánh dấu ở hồ sơ SV, bỏ được, không tự chạy đánh giá; dry-run so sánh với bản ACTIVE + danh sách thêm/bớt ≤ 50; Audit Log lọc thời gian/hành động/người/đối tượng. **DoD từ DB rỗng: người dùng chọn backup rồi xóa DB dev hiện tại** (`pg_dump` vào `backups/` trước, hỏi xác nhận lần cuối trước khi xóa).
 
 ## 5. Bẫy đã gặp — đừng lặp lại
 
@@ -79,14 +78,16 @@
 15. **Đừng xóa file migration trước khi `migration:revert` chạy xong** — `data-source.ts` import file đó, revert sẽ lỗi; đã phải gỡ tay bảng (Phase 5). Đúng thứ tự: revert → xóa file → bỏ import → generate lại.
 16. Heredoc trong Bash tool hay lỗi "unexpected EOF" khi nội dung có dấu nháy/backtick lồng nhau → viết file bằng tool Write (hoặc script Python ở scratchpad).
 17. Test tích hợp gọi `processEvaluationRun(runId, noEnqueue)` — mặc định đẩy email vào Redis thật, worker Docker sẽ xử lý job của dữ liệu thử.
+18. `npx shadcn add <component>` hỏi ghi đè file có sẵn (trả lời `n`) và có thể sinh import sai (`chart.tsx` ra `from 'cn'`) — kiểm lại import + chạy prettier/lint sau khi thêm.
+19. Browser pane bị che: `computer` click lỗi "not on screen" → thao tác bằng `javascript_tool` (Radix Select như bẫy #6, tải file lên bằng `DataTransfer` gán vào `input[type=file]`); điều hướng đầy đủ làm mất biến `window.*` → bấm link ở thanh bên (điều hướng phía client) để giữ hàm trợ giúp.
 
-## 6. Việc tiếp theo: Phase 6
+## 6. Việc tiếp theo: Phase 7
 
-Theo `docs/implement.md` mục Phase 6, rule `03`, `04`, `07`. Hỏi trước: thư viện biểu đồ (Tremor 3 không nhận React 19). Service luật đã có từ Phase 4 (`createRuleVersion`, `dryRunRuleVersion(em, …)`, `activateRuleVersion`) — Phase 6 làm giao diện cấu hình luật + "Chạy đánh giá ngay" có chọn học phần. Đánh dấu rút học phần (`Enrollment.WITHDRAWN`) chưa có. Test dữ liệu demo dùng chung: `tests/helpers/demo-setup.ts`.
+Theo `docs/implement.md` mục Phase 7 (bảo mật `06`, hiệu năng `05`, backup/restore, responsive + dark mode, kịch bản demo). Ẩn danh hóa sinh viên vẫn HOÃN — chỉ làm khi người dùng yêu cầu. Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút.
 
 ## 6b. Mở đầu phiên mới
 
-Người dùng chỉ cần gõ: **"Đọc docs/HANDOFF.md, kiểm tra lại trạng thái PR trên GitHub, rồi làm rõ Phase 6 và hỏi tôi các quyết định cần chốt"** (hoặc "Thực hiện Phase 6" nếu đã chốt). Agent: kiểm `gh pr list`, `git status`, `docker compose ps` trước; nếu người dùng đã merge PR thì tạo nhánh từ nhánh mới nhất còn lại.
+Người dùng chỉ cần gõ: **"Đọc docs/HANDOFF.md, kiểm tra lại trạng thái PR trên GitHub, rồi làm rõ Phase 7 và hỏi tôi các quyết định cần chốt"** (hoặc "Thực hiện Phase 7" nếu đã chốt). Agent: kiểm `gh pr list`, `git status`, `docker compose ps` trước; nếu người dùng đã merge PR thì tạo nhánh từ nhánh mới nhất còn lại.
 
 ## 7. Phong cách làm việc với người dùng
 

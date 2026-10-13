@@ -16,9 +16,9 @@ Hệ thống KHÔNG BAO GIỜ được tự động ghi hoặc sửa trạng th�
 
 ## Tech stack
 
-Next.js 16 (App Router, fullstack) · PostgreSQL · TypeORM · Better Auth · BullMQ + Redis (job nền) · Rule Engine tự viết (không dùng thư viện luật ngoài) · Tailwind CSS 4 + shadcn/ui · Tremor (biểu đồ) · Nodemailer + SMTP nội bộ · Docker.
+Next.js 16 (App Router, fullstack) · PostgreSQL · TypeORM · Better Auth · BullMQ + Redis (job nền) · Rule Engine tự viết (không dùng thư viện luật ngoài) · Tailwind CSS 4 + shadcn/ui · Recharts qua shadcn Chart (biểu đồ) · Nodemailer + SMTP nội bộ · Docker.
 
-Phiên bản chốt ở Phase 0: Node 22 · TypeScript 5.9 (chưa dùng TS 7) · TypeORM 0.3.x (chưa dùng 1.x — cần kiểm chứng decorator) · Zod 4 · BullMQ 6 · Tailwind 4 · ESLint 9. Tremor 3 khai báo peer dependency chỉ nhận React 18 (dự án dùng React 19) — chọn lại thư viện biểu đồ trước Phase 6 (hỏi người dùng).
+Phiên bản chốt ở Phase 0: Node 22 · TypeScript 5.9 (chưa dùng TS 7) · TypeORM 0.3.x (chưa dùng 1.x — cần kiểm chứng decorator) · Zod 4 · BullMQ 6 · Tailwind 4 · ESLint 9. Biểu đồ: Recharts + component `Chart` của shadcn/ui (người dùng chốt 2026-10-13 — Tremor 3 chỉ nhận React 18, dự án dùng React 19).
 
 ## Vai trò người dùng (roles) và phạm vi truy cập dữ liệu
 

@@ -22,8 +22,8 @@ Xem `00-project-context.md` cho glossary.
 
 ## Frontend
 
-- MUST: dùng React Server Components mặc định — chỉ đánh dấu `"use client"` khi thực sự cần tương tác (form, biểu đồ Tremor, dropdown filter).
-- MUST: biểu đồ Tremor render dữ liệu đã tổng hợp sẵn ở server — MUST NOT gửi raw data lớn xuống client để tính toán ở trình duyệt.
+- MUST: dùng React Server Components mặc định — chỉ đánh dấu `"use client"` khi thực sự cần tương tác (form, biểu đồ (Recharts), dropdown filter).
+- MUST: biểu đồ (Recharts) render dữ liệu đã tổng hợp sẵn ở server — MUST NOT gửi raw data lớn xuống client để tính toán ở trình duyệt.
 - MUST: lazy-load nội dung `RuleTrigger.inputSnapshot` chi tiết — chỉ fetch khi người dùng mở Accordion, không tải sẵn toàn bộ evidence của mọi `Alert` trong danh sách.
 - SHOULD: cache danh mục ít thay đổi (`Course`, `Rule` — không phải `RuleVersion`) bằng `unstable_cache`/`revalidateTag`.
 

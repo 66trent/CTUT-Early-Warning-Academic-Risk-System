@@ -12,6 +12,7 @@ import { User } from '@/db/entities/user.entity';
 import {
   AlertStatus,
   type CourseResultStatus,
+  type EnrollmentStatus,
   QuizAttemptStatus,
   Severity,
   SEVERITY_ORDER,
@@ -19,6 +20,8 @@ import {
 import { type SignalSource, sourceOf, STUDENT_SUGGESTIONS } from './alert-presentation';
 
 export interface CourseSnapshotDto {
+  enrollmentId: string;
+  enrollmentStatus: EnrollmentStatus;
   courseId: string;
   courseName: string;
   credits: number | null;
@@ -45,6 +48,8 @@ export interface StudentProfileDto {
   classId: string;
   termId: string;
   termName: string;
+  /** Học kỳ đã chốt — không sửa dữ liệu (VD đánh dấu rút học phần) được nữa. */
+  termClosed: boolean;
   courses: CourseSnapshotDto[];
 }
 
@@ -79,11 +84,14 @@ export async function getStudentProfile(
     classId: student.classId,
     termId,
     termName: term.termName,
+    termClosed: term.closedAt !== null,
     courses: enrollments.map((e) => {
       const latest = snapshots.find((s) => s.enrollmentId === e.enrollmentId);
       const mine = attempts.filter((a) => a.enrollmentId === e.enrollmentId);
       const r = results.find((x) => x.enrollmentId === e.enrollmentId);
       return {
+        enrollmentId: e.enrollmentId,
+        enrollmentStatus: e.enrollmentStatus,
         courseId: e.courseId,
         courseName: e.course?.courseName ?? e.courseId,
         credits: e.course?.credits ?? null,

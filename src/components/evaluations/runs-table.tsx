@@ -18,7 +18,14 @@ const columns: ColumnDef<EvaluationRunListItemDto>[] = [
       </Link>
     ),
   },
-  { accessorKey: 'termName', header: 'Học kỳ' },
+  {
+    accessorKey: 'termName',
+    header: 'Phạm vi',
+    cell: ({ row }) =>
+      row.original.courseId
+        ? `${row.original.termName} · ${row.original.courseId}`
+        : row.original.termName,
+  },
   {
     accessorKey: 'trigger',
     header: 'Cách chạy',

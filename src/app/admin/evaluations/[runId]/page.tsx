@@ -21,7 +21,7 @@ import {
 import { EvaluationRunStatus, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
-import { RUN_TRIGGER_LABELS } from '@/modules/rule-engine/labels';
+import { DATA_WARNING_LABELS, RUN_TRIGGER_LABELS } from '@/modules/rule-engine/labels';
 import { getEvaluationRunDetail } from '@/modules/rule-engine/services/evaluation-query.service';
 
 export const metadata: Metadata = { title: 'Kết quả chạy đánh giá' };
@@ -47,6 +47,8 @@ export default async function EvaluationRunPage({
   if (!run) notFound();
   const busy =
     run.status === EvaluationRunStatus.QUEUED || run.status === EvaluationRunStatus.RUNNING;
+  const progress =
+    run.totalStudents > 0 ? Math.round((run.processedStudents / run.totalStudents) * 100) : 0;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -59,7 +61,10 @@ export default async function EvaluationRunPage({
           </Link>
         </Button>
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1>Kết quả đánh giá · {run.termName}</h1>
+          <h1>
+            Kết quả đánh giá · {run.termName}
+            {run.courseId ? ` · ${run.courseId}` : ''}
+          </h1>
           <RunStatusBadge status={run.status} />
         </div>
         <p className="mt-1 text-muted-foreground">
@@ -82,9 +87,25 @@ export default async function EvaluationRunPage({
 
       {busy && (
         <Card className="shadow-sm">
-          <CardContent className="text-muted-foreground">
-            Hệ thống đang chạy đánh giá ({run.processedStudents}/{run.totalStudents} sinh viên) —
-            trang tự cập nhật.
+          <CardContent className="flex flex-col gap-2">
+            <p className="text-muted-foreground">
+              {run.status === EvaluationRunStatus.QUEUED
+                ? 'Đang chờ đến lượt chạy — trang tự cập nhật.'
+                : `Đang chạy đánh giá: ${run.processedStudents}/${run.totalStudents} sinh viên — trang tự cập nhật.`}
+            </p>
+            <div
+              role="progressbar"
+              aria-label="Tiến độ chạy đánh giá"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress}
+              className="h-2 overflow-hidden rounded-full bg-muted"
+            >
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </CardContent>
         </Card>
       )}
@@ -167,7 +188,15 @@ export default async function EvaluationRunPage({
               Dữ liệu bị bỏ qua khi tính — nên kiểm tra lại với nơi xuất dữ liệu.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
+            <ul className="flex flex-wrap gap-2">
+              {run.warningSummary.map((s) => (
+                <li key={s.code} className="rounded-md border bg-background px-3 py-1.5 text-sm">
+                  {DATA_WARNING_LABELS[s.code] ?? s.code}:{' '}
+                  <span className="font-semibold tabular-nums">{s.count}</span>
+                </li>
+              ))}
+            </ul>
             <ul className="flex flex-col gap-2 text-sm">
               {run.warnings.map((w, i) => (
                 <li key={i} className="flex gap-2">

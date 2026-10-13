@@ -5,7 +5,7 @@ Xem `00-project-context.md` cho glossary (đặc biệt: enum `Severity`, `DataC
 ## Thư viện component
 
 - MUST: dùng shadcn/ui cho mọi thành phần chuẩn (Form, Table, Dialog, Dropdown, Badge, Tabs, Sheet, Toast).
-- MUST: dùng Tremor chỉ cho khu vực biểu đồ/KPI (màn hình tổng quan của CVHT và trang tổng quan ADMIN). MUST NOT dùng Tremor cho form nhập liệu hoặc bảng có thao tác dòng — dùng shadcn `Table`.
+- MUST: dùng biểu đồ (Recharts qua shadcn `Chart`) chỉ cho khu vực biểu đồ/KPI (màn hình tổng quan của CVHT và trang tổng quan ADMIN). MUST NOT dùng biểu đồ cho form nhập liệu hoặc bảng có thao tác dòng — dùng shadcn `Table`.
 - MUST NOT: cài thêm UI kit thứ 3 (Ant Design, MUI...). Nhu cầu mới chưa có trong shadcn/ui thì tự dựng bằng Radix primitives + Tailwind.
 
 ## Nhận diện giao diện — trắng và xanh dương (chuẩn hệ thống quản lý trường học)
@@ -31,7 +31,7 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 - MUST: font `Be Vietnam Pro` (hỗ trợ đầy đủ tiếng Việt) nạp qua `next/font/google` với subset `vietnamese` + `latin`; font phụ fallback `system-ui`. Cỡ chữ nội dung tối thiểu 14px, tiêu đề trang 24px.
 - MUST: radius thống nhất `0.5rem`; khoảng cách theo thang 4px của Tailwind; MUST NOT dùng gradient sặc sỡ, hình nền nặng hoặc hiệu ứng động gây xao nhãng. Chuyển động chỉ ≤200ms, dùng cho hover/mở Sheet.
 - MUST: tương phản chữ/nền tối thiểu WCAG AA (4.5:1). Chữ trắng trên `--primary` đạt chuẩn — MUST NOT dùng blue-400 trở nhạt làm nền nút có chữ trắng.
-- MUST: Tremor cấu hình theo thang xanh dương (`blue`, `sky`, `slate`) cho biểu đồ thông thường. Biểu đồ phân bố theo Severity MUST dùng đúng bảng màu Severity bên dưới, không dùng thang xanh.
+- MUST: biểu đồ cấu hình theo thang xanh dương (`blue`, `sky`, `slate`) cho biểu đồ thông thường. Biểu đồ phân bố theo Severity MUST dùng đúng bảng màu Severity bên dưới, không dùng thang xanh.
 - SHOULD: trang đăng nhập 2 cột trên desktop — bên trái nền `--primary-soft` với logo và một câu giới thiệu hệ thống, bên phải form trên nền trắng.
 
 ## Hệ thống màu theo Severity — định nghĩa 1 lần, dùng khắp app

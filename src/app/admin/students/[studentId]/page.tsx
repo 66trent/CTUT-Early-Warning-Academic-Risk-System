@@ -26,8 +26,9 @@ export default async function AdminStudentProfile({
     <StudentProfilePage
       studentId={studentId}
       requestedTerm={(await searchParams).term}
-      backHref="/admin/alerts"
-      backLabel="Cảnh báo sớm"
+      backHref="/admin/students"
+      backLabel="Sinh viên"
+      manageEnrollments
     />
   );
 }

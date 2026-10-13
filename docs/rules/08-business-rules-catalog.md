@@ -105,7 +105,7 @@ Có trigger mức ≥ `MEDIUM` ở ≥ 2 trong 3 nhóm: điểm danh (`ATT-01`/`
 
 ## Ngoại lệ — Bước 3, chặn TRƯỚC khi luật chạy
 
-- `Enrollment.enrollmentStatus = WITHDRAWN` (Admin đánh dấu đã rút) → bỏ qua mọi luật của `Enrollment` đó.
+- `Enrollment.enrollmentStatus = WITHDRAWN` (Admin đánh dấu đã rút) → bỏ qua mọi luật của `Enrollment` đó. Đánh dấu/bỏ đánh dấu KHÔNG tự chạy đánh giá và không sửa `Alert` ngay; lần chạy kế tiếp xử lý theo luật gộp hiện có (người dùng chốt 2026-10-13).
 - Học kỳ đã chốt (`Term.closedAt` khác NULL) → không tạo `EvaluationRun`.
 - Điểm danh `STALE`/`INVALID`/`MISSING` → không chạy `ATT-*`.
 - `totalSessions < minSessions` → không chạy `ATT-01` (tránh 1/2 buổi = 50% ở đầu kỳ).

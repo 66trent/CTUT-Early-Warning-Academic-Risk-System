@@ -56,6 +56,10 @@ const envSchema = z
     /** Bắt buộc khi DEMO_MODE=true (mật khẩu tài khoản CVHT demo do seed:demo tạo). */
     DEMO_ADVISOR_PASSWORD: optionalString,
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+    /** Trang chính sách dữ liệu cá nhân (docs/rules/04) — trống thì hiện "[Cần nhà trường xác nhận]". */
+    PRIVACY_CONTROLLER_NAME: optionalString,
+    PRIVACY_CONTACT: optionalString,
+    PRIVACY_RETENTION: optionalString,
   })
   .superRefine((env, ctx) => {
     if (!isStaffEmail(env.ADMIN_SEED_EMAIL, env.STAFF_EMAIL_DOMAIN)) {

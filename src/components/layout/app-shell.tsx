@@ -82,6 +82,12 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
         <Brand />
         <SidebarNav role={user.role} />
+        <Link
+          href="/legal/privacy-policy"
+          className="mt-auto border-t border-sidebar-border px-6 py-4 text-xs text-muted-foreground hover:underline"
+        >
+          Chính sách bảo vệ dữ liệu cá nhân
+        </Link>
       </aside>
 
       <div className="flex min-h-screen flex-col lg:pl-64">
