@@ -1,0 +1,24 @@
+# BullMQ worker — container riêng (docs/rules/01). Bundle bằng esbuild, chỉ cài dependency production.
+FROM node:22-alpine AS base
+WORKDIR /app
+
+FROM base AS builder
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run worker:build
+
+FROM base AS prod-deps
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+FROM base AS runner
+ENV NODE_ENV=production \
+    PROCESS_ROLE=worker
+RUN addgroup -S -g 1001 worker && adduser -S -u 1001 -G worker worker
+COPY --from=prod-deps --chown=worker:worker /app/node_modules ./node_modules
+COPY --from=builder --chown=worker:worker /app/dist/worker ./dist/worker
+COPY --chown=worker:worker package.json ./
+USER worker
+CMD ["node", "dist/worker/index.mjs"]
