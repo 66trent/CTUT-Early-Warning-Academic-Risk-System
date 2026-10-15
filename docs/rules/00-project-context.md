@@ -68,7 +68,7 @@ Có 2 TẦNG enum trạng thái dữ liệu, KHÔNG được gộp làm một:
 - **Tầng 2 — `DataCompletenessLevel`** (mức tổng hợp của TOÀN BỘ RiskScore 1 sinh viên, suy ra TỪ tầng 1): `FULL` (cả 3 nhóm chỉ số đều `AVAILABLE`) / `PARTIAL` (≥1 nhóm không `AVAILABLE`, đã renormalize trọng số trên các nhóm còn `AVAILABLE`) / `INSUFFICIENT` (không đủ nhóm `AVAILABLE` để tính có ý nghĩa — `RiskScoreLog.riskScoreValue = NULL`, KHÔNG được hiển thị như "rủi ro thấp"). Dùng enum này khi ghi kết quả vào `RiskScoreLog`.
 - **Severity**: `LOW` < `MEDIUM` < `HIGH` < `CRITICAL`. Khi nhiều luật cùng kích hoạt cho 1 sinh viên, severity cuối cùng của `Alert` = giá trị lớn nhất trong số đó (không cộng dồn, không trung bình).
 - **AttemptOutcome**: `PENDING` / `PASSED` / `FAILED` — cập nhật từ `CourseResult` `FINAL`, là nguồn tính `attemptNumber` cho `Enrollment` của cùng học phần ở học kỳ sau.
-- **ImportBatch.status**: `UPLOADING` → `VALIDATING` → `STAGED` → `LOADED` → `RECONCILED` (thành công) hoặc `REJECTED` (lỗi nghiêm trọng) hoặc `DISCARDED` (bị hủy khi còn `STAGED`, chưa dùng để tính RiskScore).
+- **ImportBatch.status**: `UPLOADING` → `VALIDATING` → `STAGED` → `LOADED` → `RECONCILED` (thành công) hoặc `REJECTED` (lỗi nghiêm trọng) hoặc `DISCARDED` (bị hủy khi còn `STAGED`, chưa dùng để tính RiskScore) hoặc `ROLLED_BACK` (lô đã nạp được hoàn tác có điều kiện — xem `12`).
 
 ## Nguyên tắc tính điểm rủi ro (RiskScore) — cần biết trước khi đụng vào `modules/rule-engine`
 

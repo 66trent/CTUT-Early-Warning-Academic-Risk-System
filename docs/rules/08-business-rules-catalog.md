@@ -85,8 +85,8 @@ Lấy 2 bài đến hạn gần nhất (theo lượt làm đầu tiên của nh�
 Đếm `CourseResult` `FINAL` có `passed = false` trong học kỳ: 1 → `HIGH`; ≥ 2 → `CRITICAL`.
 
 **ACA-03 — Điểm trung bình học kỳ thấp** (`PER_STUDENT`)
-`GPA4 = Σ(gradePoint4 × credits) / Σ credits` trên các kết quả `FINAL` có `gradePoint4` và `credits` khác NULL. Chỉ xét khi `Σ credits ≥ minCredits` (mặc định 6). `GPA4 < 2.0` → `HIGH` (so sánh `Σ(gradePoint4 × credits) < 2 × Σ credits`, tránh sai số làm tròn).
-Quy đổi điểm chữ → hệ 4 đọc từ `condition.gradeScale` (người dùng xác nhận): A = 4, B = 3, C = 2, D = 1, F = 0.
+`GPA4 = Σ(gradePoint4 × credits) / Σ credits` trên các kết quả `FINAL` có `letterGrade` và `credits` khác NULL; `gradePoint4` do engine quy đổi từ `letterGrade` lúc đánh giá (KHÔNG lưu ở `CourseResult` — đổi thang không phải sửa dữ liệu cũ). Chỉ xét khi `Σ credits ≥ minCredits` (mặc định 6). `GPA4 < 2.0` → `HIGH`. So sánh bằng số nguyên theo nửa điểm: `Σ(2 × gradePoint4 × credits) < 4 × Σ credits` (thang có các mức x,5).
+Quy đổi điểm chữ → hệ 4 đọc từ `condition.gradeScale` (người dùng xác nhận theo quy chế trường): A+ = 4 · A = 4 · B+ = 3,5 · B = 3 · C+ = 2,5 · C = 2 · D+ = 1,5 · D = 1 · F = 0. Điểm chữ chưa có trong `gradeScale` → bỏ qua kết quả đó và ghi cảnh báo chất lượng dữ liệu vào `EvaluationRun`.
 
 ## Nhóm kết hợp (chạy sau cùng, trên cùng `Enrollment`, cùng lần chạy)
 
@@ -110,6 +110,8 @@ Có trigger mức ≥ `MEDIUM` ở ≥ 2 trong 3 nhóm: điểm danh (`ATT-01`/`
 - Điểm danh là số tổng hợp → không phát hiện "vắng liên tiếp" chính xác; `ATT-02` là xấp xỉ theo mức tăng giữa 2 lần nhập.
 - Nguồn điểm danh đếm theo buổi, quy chế tính theo tiết → `ATT-01` chỉ chính xác khi các buổi của học phần có cùng số tiết.
 - Không biết sinh viên rút học phần từ 3 nguồn → Admin đánh dấu tay.
+- Không có danh sách đăng ký học phần: sinh viên không xuất hiện trong file nguồn nào của học phần thì hệ thống không biết sinh viên có học — phụ thuộc file điểm danh liệt kê đủ sinh viên.
+- Nạp một phần (nhiều dòng LMS bị lỗi) làm lệch tỷ lệ "phần lớn lớp đã làm" của `LMS-01` → màn xem trước cảnh báo khi tỷ lệ lỗi > 10% (xem `12`).
 Cảnh báo nghi báo sai do các giới hạn này: CVHT dùng `DISMISSED` kèm lý do.
 
 ## Gộp nguyên nhân & chống trùng cảnh báo (Bước 7)

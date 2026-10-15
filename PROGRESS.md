@@ -31,3 +31,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Lỗi tìm ra khi chạy giao diện: danh sách CVHT truyền instance entity xuống client ("Only plain objects…") — đã sửa và thêm vào test DTO.
 - Cần người dùng xác nhận: mã khoa Cơ khí `K.CK` (rule 09) hay `K.KTCK` (code seed) — DB đang có cả 2.
 - Tự kiểm tra: Admin → Tài khoản → duyệt `GV02`; Khoa và lớp sinh hoạt → tạo lớp, gán CVHT; Học kỳ → đổi học kỳ hiện tại, header đổi theo. Sĩ số > 0 sẽ thấy sau khi nhập danh sách sinh viên (Phase 3).
+
+## Phase 3a — Khung nhập dữ liệu và danh sách sinh viên (2026-10-12)
+
+- Làm: entity `ImportBatch`, `ImportErrorRow` + migration (partial unique index chống nạp trùng chỉ với lô còn hiệu lực); lưu file gốc MinIO (interface, test dùng bộ nhớ); bộ đọc CSV theo stream (`csv-parse`: BOM, `,`/`;`, `7,5`, RFC 4180, số dòng thật) và XLSX (sheet đầu, chỉ giá trị ô); chuẩn hóa header có dấu + bí danh, ngày VN (từ chối ngày mơ hồ), kiểm tra file theo nội dung thật, chống zip bomb, ≤ 50.000 dòng; registry loại nhập + loại `STUDENT`; quy trình 2 bước (kiểm tra → xem trước → xác nhận, kiểm tra lại khi nạp, khóa theo loại+học kỳ, tự hủy lô chờ > 7 ngày); hoàn tác lô có điều kiện; file lỗi CSV (BOM, lý do tiếng Việt, chống chèn công thức); worker xử lý queue nhập 1 job/lần + lịch hằng ngày; màn Nhập dữ liệu, lịch sử, chi tiết lô.
+- File chính: `src/modules/data-import/{parsing,types,services,actions}/*`, `src/lib/storage.ts`, `src/workers/processors/import-batch.processor.ts`, `src/app/admin/imports/**`, `src/app/api/imports/[batchId]/errors/route.ts`.
+- Kiểm tra: typecheck, lint, format, migration, schema drift, test 130 (129 xanh + 1 bỏ qua ở chế độ `*`), build — xanh. DoD: file demo CSV và XLSX → 13 sinh viên, 0 lỗi; nạp lại bị chặn; hủy lô không ghi dữ liệu; thiếu cột → từ chối; lớp lạ → CLASS_NOT_FOUND; lớp bị xóa giữa chừng → dòng lỗi khi nạp; hoàn tác đúng; ô `=1+1` có tiền tố `'`.
+- Kiểm tra tay (trình duyệt, MinIO + worker thật): nạp demo → sĩ số KTPM2311 = 12, KHMT2311 = 1 (đạt mục còn lại của Phase 2); file `;` + header có dấu + lỗi → bảng lỗi và file lỗi đúng; hoàn tác lô demo → DB về 0 sinh viên.
+- Quyết định kỹ thuật (đã ghi rule 05/12): bỏ papaparse (stream chậm bậc hai: 50.000 dòng ~38 giây); XLSX đọc cả file vào bộ nhớ vì bản stream của exceljs bỏ sót dữ liệu (đo ~270MB ở mức trần); lưu thứ tự cột gốc vì jsonb tự sắp xếp khóa.
+- Việc còn lại (3b): 3 nguồn dữ liệu học tập; điều kiện hoàn tác "chưa chạy đánh giá" thêm ở Phase 4.
+- Tự kiểm tra: Admin → Nhập dữ liệu → nạp `docs/demo-data/01_sinh_vien.csv` → Xác nhận nạp → Khoa và lớp sinh hoạt thấy sĩ số; sửa 1 dòng (VD lớp `KTPM9999`), nạp → tải file lỗi.

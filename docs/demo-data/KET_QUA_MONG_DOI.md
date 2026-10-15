@@ -1,6 +1,6 @@
 # Bộ dữ liệu demo — thứ tự nạp và kết quả mong đợi
 
-Bộ dữ liệu này vừa là **kịch bản demo** khi bảo vệ, vừa là **test nghiệm thu** (xem `docs/rules/02-code-quality.md`). Mọi con số dưới đây đã được tính lại bằng một bộ tính độc lập theo đúng `08-business-rules-catalog.md` với ngưỡng mặc định: vắng tính cả có phép và không phép trên tổng số buổi theo kế hoạch (`tong_buoi_ke_hoach`), cấm thi khi vượt quá 20%; thang hệ 4 A=4, B=3, C=2, D=1, F=0. Khi đổi luật hoặc ngưỡng mặc định: sửa file này trước, rồi mới sửa code.
+Bộ dữ liệu này vừa là **kịch bản demo** khi bảo vệ, vừa là **test nghiệm thu** (xem `docs/rules/02-code-quality.md`). Mọi con số dưới đây đã được tính lại bằng một bộ tính độc lập theo đúng `08-business-rules-catalog.md` với ngưỡng mặc định: vắng tính cả có phép và không phép trên tổng số buổi theo kế hoạch (`tong_buoi_ke_hoach`), cấm thi khi vượt quá 20%; thang điểm chữ 9 mức và hệ 4 A+=4, A=4, B+=3,5, B=3, C+=2,5, C=2, D+=1,5, D=1, F=0 (xem `08`, `10`). Khi đổi luật hoặc ngưỡng mặc định: sửa file này trước, rồi mới sửa code.
 
 ## Dữ liệu nền (tạo bằng `npm run seed:demo`, chỉ khi `DEMO_MODE=true`)
 
@@ -33,7 +33,7 @@ Lần chạy tự động sau mỗi lần nạp dùng `asOf` = thời điểm th
 | KTPM2311009 | `ACA-02` | CRITICAL | Rớt 2 học phần (KTPM101, KTPM103) |
 | KTPM2311009 | `ACA-03` | HIGH | GPA4 = (0 + 1 + 0) × 3 / 9 = 0,33 |
 | KTPM2311010 | `ACA-02` | HIGH | Rớt 1 học phần (KTPM101) |
-| KTPM2311011 | `ACA-03` | HIGH | Đạt hết (D, D, C) nhưng GPA4 = (1 + 1 + 2) × 3 / 9 = 1,33 |
+| KTPM2311011 | `ACA-03` | HIGH | Đạt hết (D, D+, C) nhưng GPA4 = (1 + 1,5 + 2) × 3 / 9 = 1,5 |
 
 ### Học kỳ `HK1_2026` (asOf 2026-10-10)
 
@@ -58,7 +58,7 @@ Lần chạy tự động sau mỗi lần nạp dùng `asOf` = thời điểm th
 | Sinh viên | Học phần | Vì sao không |
 |---|---|---|
 | KTPM2311001 | mọi học phần | Đối chứng, không có tín hiệu |
-| KTPM2311010 | `HK2_2025` | `ACA-03`: GPA4 = (0 + 3 + 3) × 3 / 9 = đúng 2,0 (luật là `< 2.0`) |
+| KTPM2311010 | `HK2_2025` | `ACA-03`: GPA4 = (0 + 3 + 3) × 3 / 9 = đúng 2,0 (luật là `< 2.0`) — F, B, B |
 | KTPM2311007, KTPM2311013 | KTPM201 | Vắng 1/30 = 3,3%, dưới 10% |
 | KTPM2311003 | KTPM201 | `LMS-02`: Q03 = 5/10 đúng bằng 50% (luật là `< 0.5`) |
 | KTPM2311006 | KTPM201 | `ACA-01`: điểm quá trình 5,0 (luật là `< 5.0`) |

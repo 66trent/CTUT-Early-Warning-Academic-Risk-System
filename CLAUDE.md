@@ -1,10 +1,11 @@
 # CTUT-EWARS — Hệ thống cảnh báo sớm rủi ro học tập dựa trên luật nghiệp vụ
 
 Đồ án tốt nghiệp. Next.js 16 fullstack · PostgreSQL · TypeORM · Better Auth · BullMQ + Redis · MinIO · Tailwind 4 + shadcn/ui · Docker.
-3 role: `STUDENT`, `ADVISOR` (cố vấn học tập), `ADMIN`. Dữ liệu vào bằng CSV: danh sách sinh viên + 3 nguồn (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần). 10 luật cảnh báo.
+3 role: `STUDENT`, `ADVISOR` (cố vấn học tập), `ADMIN`. Dữ liệu vào bằng file CSV hoặc Excel (.xlsx): danh sách sinh viên + 3 nguồn (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần). 10 luật cảnh báo.
 
 ## Luôn đọc trước khi code
 
+@docs/HANDOFF.md
 @docs/rules/00-project-context.md
 @docs/rules/01-architecture.md
 @docs/rules/02-code-quality.md

@@ -29,7 +29,7 @@ Xem `00-project-context.md` cho glossary.
 
 ## Xử lý file nhập liệu
 
-- MUST: đọc file CSV/Excel theo stream (papaparse `step` callback / exceljs streaming reader) — MUST NOT load toàn bộ file vào memory trước khi xử lý.
+- MUST: đọc file CSV theo stream (`csv-parse`) — MUST NOT load toàn bộ file vào memory trước khi xử lý. Ngoại lệ đã đo và chấp nhận: XLSX đọc cả file vào bộ nhớ (`exceljs` `xlsx.load`) vì bản stream của exceljs bỏ sót dữ liệu tùy thứ tự mục trong file nén; bộ nhớ có trần nhờ giới hạn 20MB / 100MB giải nén / 50.000 dòng (~270MB heap ở mức trần), queue nhập chạy 1 job/lần. (`papaparse` ở chế độ stream chậm bậc hai theo kích thước mảnh — 50.000 dòng mất ~38 giây — nên không dùng.)
 - MUST: validate + đối chiếu danh mục chạy theo batch trong transaction TypeORM (`dataSource.transaction`) vừa đủ nhỏ (khuyến nghị 500 dòng/transaction) — MUST NOT mở 1 transaction cho toàn bộ file.
 
 ## Redis

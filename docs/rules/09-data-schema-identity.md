@@ -58,7 +58,7 @@ RÀNG BUỘC: CVHT quản lý sinh viên QUA lớp sinh hoạt — phạm vi c�
 |---|---|---|---|---|
 | studentId | String(20) | NOT NULL | PK | Mã số sinh viên |
 | fullName | String(100) | NOT NULL | | |
-| classId | String(20) | NOT NULL | FK → AdministrativeClass | Lớp sinh hoạt. Khoa, khóa, CVHT suy ra từ lớp — MUST NOT lưu lặp lại ở `Student` |
+| classId | String(20) | NOT NULL | FK → AdministrativeClass | Lớp sinh hoạt. Khoa, khóa, CVHT suy ra từ lớp — MUST NOT lưu lặp lại ở `Student`. Đổi lớp (qua nhập danh sách sinh viên) → từ Phase 5 MUST chuyển `Alert` đang mở của sinh viên đó sang CVHT của lớp mới trong cùng transaction |
 | officialAcademicStatus | OfficialAcademicStatus (enum) | NOT NULL | | `ACTIVE`/`RESERVED`/`SUSPENDED`/`GRADUATED`/`DISMISSED`. MUST chỉ ghi bởi tiến trình nhập dữ liệu từ SIS (MVP: file CSV/seed), không do rule-engine/alerts/admin ghi — xem ràng buộc phạm vi ở `00-project-context.md` |
 
 ## Term
@@ -96,7 +96,7 @@ Tạo tự động (upsert theo `courseId`) khi một file nguồn nhắc tới 
 | courseId | String(20) | NOT NULL | FK → Course | |
 | termId | String(10) | NOT NULL | FK → Term | |
 | enrollmentStatus | EnrollmentStatus (enum) | NOT NULL | | `REGISTERED` / `WITHDRAWN` (Admin đánh dấu tay, có Audit Log) / `COMPLETED` (khi có kết quả `FINAL`) |
-| attemptNumber | Int | NOT NULL | | = 1 + số học kỳ TRƯỚC có `attemptOutcome = FAILED` cho cùng `(studentId, courseId)`. Tính khi tạo |
+| attemptNumber | Int | NOT NULL | | = 1 + số học kỳ TRƯỚC (theo `Term.startDate`) có `attemptOutcome = FAILED` cho cùng `(studentId, courseId)`. Tính khi tạo; tính lại khi kết quả `FINAL` của học kỳ trước thay đổi (xem `10`) |
 | attemptOutcome | AttemptOutcome (enum) | NOT NULL, default `PENDING` | | `PENDING`/`PASSED`/`FAILED` — cập nhật từ `CourseResult` |
 | firstSeenBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Batch đầu tiên làm phát sinh bản ghi |
 | createdAt | DateTime | NOT NULL | | |
