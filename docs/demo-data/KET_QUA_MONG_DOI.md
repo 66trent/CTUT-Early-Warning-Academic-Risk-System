@@ -66,6 +66,29 @@ Lần chạy tự động sau mỗi lần nạp dùng `asOf` = thời điểm th
 | mọi sinh viên | KTPM201 | Q04 (lượt làm đầu 08/10) chưa đến hạn: chưa đủ 3 ngày và chỉ 2/10 sinh viên làm |
 | KTPM2311010, KTPM2311011 | `HK1_2026` | Không có dữ liệu học kỳ này |
 
+## Cảnh báo mong đợi (Phase 5) — 1 cảnh báo / sinh viên / học kỳ, mức = cao nhất
+
+Sau 2 lần chạy ở bước 3 và 7 (mỗi học kỳ 1 lần), PHẢI có đúng các cảnh báo `OPEN` sau, mỗi cảnh báo gắn đúng các trigger ở bảng trên:
+
+| Học kỳ | Sinh viên | Mức | Dấu hiệu | Cố vấn học tập |
+|---|---|---|---|---|
+| `HK2_2025` | KTPM2311009 | CRITICAL | `ACA-02`, `ACA-03` | GV001 |
+| `HK2_2025` | KTPM2311010 | HIGH | `ACA-02` | GV001 |
+| `HK2_2025` | KTPM2311011 | HIGH | `ACA-03` | GV001 |
+| `HK1_2026` | KTPM2311002 | MEDIUM | `ATT-01` | GV001 |
+| `HK1_2026` | KTPM2311003 | CRITICAL | `ATT-01`, `ATT-02` | GV001 |
+| `HK1_2026` | KTPM2311004 | LOW | `ATT-03` | GV001 |
+| `HK1_2026` | KTPM2311005 | HIGH | `LMS-01` | GV001 |
+| `HK1_2026` | KTPM2311006 | MEDIUM | `LMS-02` | GV001 |
+| `HK1_2026` | KTPM2311007 | HIGH | `ACA-01` | GV001 |
+| `HK1_2026` | KTPM2311008 | CRITICAL | `ATT-01`, `LMS-01`, `COMB-01` | GV001 |
+| `HK1_2026` | KTPM2311009 | HIGH | `LMS-01`, `COMB-02` (học phần KTPM103) | GV001 |
+| `HK1_2026` | KHMT2311012 | HIGH | `ATT-01` | GV002 |
+
+Chạy lại cùng mốc: KHÔNG thêm cảnh báo nào (chỉ thêm trigger vào cảnh báo cũ), không gửi thông báo mới. Thông báo khi tạo: 12 `IN_APP` + 11 `EMAIL` (KTPM2311004 mức LOW chỉ `IN_APP`).
+
+**Kịch bản mở lại (demo):** GV001 xử lý cảnh báo HK1 của KTPM2311003 tới `RESOLVED` → chạy lại mốc 10/10 → vẫn `RESOLVED` (dấu hiệu y hệt) → nạp thêm điểm danh ngày chốt 2026-10-16 cho KTPM2311003 (KTPM201: 18 buổi, có mặt 9, vắng có phép 1, vắng không phép 8, kế hoạch 30) → chạy mốc 2026-10-16 → `ATT-02` vẫn HIGH, `ATT-01` vẫn CRITICAL → dấu hiệu y hệt (cùng luật, cùng học phần, không nặng hơn) → KHÔNG mở lại. Kịch bản tăng mức: thêm điểm danh 2026-10-16 cho KTPM2311004 (18 buổi, có mặt 11, đi trễ 3, vắng không phép 4, kế hoạch 30) → chạy mốc 2026-10-16 → cảnh báo KTPM2311004 tăng LOW → HIGH (ATT-01 13,3% MEDIUM, ATT-02 tăng 4 buổi HIGH), có thông báo.
+
 ## Kiểm tra phân quyền bằng tay
 
 - Đăng nhập `GV001`: thấy cảnh báo của các sinh viên `KTPM2311*`, KHÔNG thấy `KHMT2311012`.

@@ -1,7 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { In, IsNull, type EntityManager } from 'typeorm';
 import { z } from 'zod';
 import { getDataSource } from '@/db/data-source';
 import { type EvaluationDataWarning, EvaluationRun } from '@/db/entities/evaluation-run.entity';
+import { ImportBatch } from '@/db/entities/import-batch.entity';
+import { Notification } from '@/db/entities/notification.entity';
 import { RiskScoreLog } from '@/db/entities/risk-score-log.entity';
 import { RuleTrigger } from '@/db/entities/rule-trigger.entity';
 import { Term } from '@/db/entities/term.entity';
@@ -10,10 +13,22 @@ import {
   DataStatus,
   EvaluationRunStatus,
   EvaluationTrigger,
+  ImportBatchStatus,
+  NotificationChannel,
+  NotificationStatus,
 } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
+import {
+  invalidateAlertsAfterRollback,
+  syncAlertsForChunk,
+} from '@/modules/alerts/services/alert-sync.service';
+import { createNotificationsForEvents } from '@/modules/alerts/services/notification.service';
+import {
+  enqueueNotificationEmails,
+  type NotificationEnqueuer,
+} from '@/modules/alerts/services/notification-queue';
 import { evaluateStudent, type StudentEvaluation } from '../evaluator/engine';
 import { listTermStudents, loadLmsContexts, loadStudentInputs } from './evaluation-loader';
 import { type EvaluationEnqueuer, enqueueEvaluationJob } from './evaluation-queue';
@@ -178,11 +193,42 @@ async function persistChunk(
   run: EvaluationRun,
   ruleSet: ActiveRuleSet,
   results: StudentEvaluation[],
-): Promise<void> {
+): Promise<{ created: number; updated: number }> {
   const now = new Date();
+  const logIds = new Map(results.map((r) => [r.studentId, randomUUID()]));
+  if (results.length > 0) {
+    await em.insert(
+      RiskScoreLog,
+      results.map((r) => ({
+        id: logIds.get(r.studentId),
+        studentId: r.studentId,
+        termId: run.termId,
+        riskScoreValue: r.riskScore.value,
+        dataCompletenessLevel: r.riskScore.level,
+        componentsUsed: componentsSchema.parse(r.riskScore.components),
+        ruleVersionId: ruleSet.configVersionId,
+        evaluationRunId: run.id,
+        calculatedAt: now,
+      })),
+    );
+  }
+  // Bước 7–9: gộp dấu hiệu vào cảnh báo (1 / sinh viên / học kỳ) rồi gắn trigger vào cảnh báo.
+  const sync = await syncAlertsForChunk(
+    em,
+    run,
+    results.map((r) => ({
+      studentId: r.studentId,
+      riskScoreLogId: logIds.get(r.studentId) ?? null,
+      signals: r.triggers.map((t) => ({
+        ruleCode: t.ruleCode,
+        scopeId: t.scopeId,
+        severity: t.severity,
+      })),
+    })),
+  );
   const triggers = results.flatMap((r) =>
     r.triggers.map((t) => ({
-      alertId: null,
+      alertId: sync.alertIdByStudent.get(r.studentId) ?? null,
       evaluationRunId: run.id,
       ruleCode: t.ruleCode,
       ruleVersionId: t.ruleVersionId,
@@ -196,21 +242,9 @@ async function persistChunk(
     })),
   );
   if (triggers.length > 0) await em.insert(RuleTrigger, triggers);
-  if (results.length > 0) {
-    await em.insert(
-      RiskScoreLog,
-      results.map((r) => ({
-        studentId: r.studentId,
-        termId: run.termId,
-        riskScoreValue: r.riskScore.value,
-        dataCompletenessLevel: r.riskScore.level,
-        componentsUsed: componentsSchema.parse(r.riskScore.components),
-        ruleVersionId: ruleSet.configVersionId,
-        evaluationRunId: run.id,
-        calculatedAt: now,
-      })),
-    );
-  }
+  // Bước 10: thông báo — tạo trong cùng transaction, gửi email sau khi lần chạy xong.
+  await createNotificationsForEvents(em, sync.events, run.id);
+  return { created: sync.created, updated: sync.updated };
 }
 
 /** Chạy toàn bộ: lô 200 sinh viên, cập nhật tiến độ sau mỗi lô. */
@@ -228,6 +262,8 @@ async function executeRun(run: EvaluationRun): Promise<void> {
 
   const warnings: EvaluationDataWarning[] = [];
   let insufficient = 0;
+  let alertsCreated = 0;
+  let alertsUpdated = 0;
   for (let i = 0; i < students.length; i += EVALUATION_CHUNK_SIZE) {
     const ids = students.slice(i, i + EVALUATION_CHUNK_SIZE);
     const inputs = await loadStudentInputs(em, term, ids, run.asOf, lms);
@@ -239,9 +275,14 @@ async function executeRun(run: EvaluationRun): Promise<void> {
       }
     }
     await dataSource.transaction(async (tx) => {
-      await persistChunk(tx, run, ruleSet, results);
+      const counts = await persistChunk(tx, run, ruleSet, results);
+      alertsCreated += counts.created;
+      alertsUpdated += counts.updated;
       await tx.update(EvaluationRun, { id: run.id }, { processedStudents: i + ids.length });
     });
+  }
+  if (await isRollbackRun(run)) {
+    await dataSource.transaction((tx) => invalidateAlertsAfterRollback(tx, run));
   }
   await em.update(
     EvaluationRun,
@@ -250,19 +291,50 @@ async function executeRun(run: EvaluationRun): Promise<void> {
       status: EvaluationRunStatus.COMPLETED,
       finishedAt: new Date(),
       insufficientCount: insufficient,
+      alertsCreated,
+      alertsUpdated,
       dataWarnings: warnings.length > 0 ? warningsSchema.parse(warnings) : null,
     },
   );
 }
 
+/** Lần chạy lại sau khi hoàn tác lô (docs/rules/12) — được phép đánh dấu cảnh báo không còn hiệu lực. */
+async function isRollbackRun(run: EvaluationRun): Promise<boolean> {
+  if (!run.importBatchId) return false;
+  const batch = await (
+    await getDataSource()
+  )
+    .getRepository(ImportBatch)
+    .findOneBy({ id: run.importBatchId });
+  return batch?.status === ImportBatchStatus.ROLLED_BACK;
+}
+
+/** Email còn chờ của lần chạy → hàng đợi (jobId = id thông báo nên gửi lại không trùng). */
+async function enqueuePendingEmails(runId: string, notify: NotificationEnqueuer): Promise<void> {
+  const pending = await (await getDataSource()).getRepository(Notification).find({
+    select: { notificationId: true },
+    where: {
+      evaluationRunId: runId,
+      channel: NotificationChannel.EMAIL,
+      status: NotificationStatus.QUEUED,
+    },
+  });
+  await notify(pending.map((n) => n.notificationId));
+}
+
 /**
- * Job `evaluation-run`: idempotent — chạy lại (retry) xóa kết quả cũ của CHÍNH lần chạy rồi tính
- * lại. Không ghi `Student.officialAcademicStatus` (docs/rules/00).
+ * Job `evaluation-run`: idempotent — chạy lại (retry) xóa trigger/RiskScore cũ của CHÍNH lần chạy rồi
+ * tính lại; cảnh báo không bị tạo trùng (unique theo sinh viên × học kỳ), email không gửi trùng
+ * (jobId = id thông báo). Không ghi `Student.officialAcademicStatus` (docs/rules/00).
  */
-export async function processEvaluationRun(runId: string): Promise<void> {
+export async function processEvaluationRun(
+  runId: string,
+  notify: NotificationEnqueuer = enqueueNotificationEmails,
+): Promise<void> {
   const repo = (await getDataSource()).getRepository(EvaluationRun);
   const initial = await repo.findOneBy({ id: runId });
-  if (!initial || initial.status === EvaluationRunStatus.COMPLETED) return;
+  if (!initial) return;
+  if (initial.status === EvaluationRunStatus.COMPLETED) return enqueuePendingEmails(runId, notify);
   await withScopeLock(initial, async () => {
     const run = await repo.findOneByOrFail({ id: runId });
     if (run.status === EvaluationRunStatus.COMPLETED) return;
@@ -274,6 +346,7 @@ export async function processEvaluationRun(runId: string): Promise<void> {
     });
     await executeRun(run);
   });
+  await enqueuePendingEmails(runId, notify);
 }
 
 /** Job lỗi hết số lần thử → FAILED kèm lý do, không treo "đang chạy" mãi. */

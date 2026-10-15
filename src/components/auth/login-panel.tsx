@@ -26,6 +26,8 @@ const DEMO_BUTTONS = [
   { account: 'ADMIN', label: 'Quản trị viên' },
   { account: 'GV001', label: 'Cố vấn học tập GV001' },
   { account: 'GV002', label: 'Cố vấn học tập GV002' },
+  { account: 'KTPM2311003', label: 'Sinh viên KTPM2311003' },
+  { account: 'KTPM2311001', label: 'Sinh viên KTPM2311001' },
 ] as const;
 
 interface LoginPanelProps {

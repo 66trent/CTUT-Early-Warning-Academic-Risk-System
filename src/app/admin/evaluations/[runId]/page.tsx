@@ -69,9 +69,13 @@ export default async function EvaluationRunPage({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <Stat label="Sinh viên đã xét" value={`${run.processedStudents}/${run.totalStudents}`} />
         <Stat label="Dấu hiệu phát hiện" value={run.triggerCount} />
+        <Stat
+          label="Cảnh báo mới / cập nhật"
+          value={`${run.alertsCreated} / ${run.alertsUpdated}`}
+        />
         <Stat label="Thiếu dữ liệu để tính điểm" value={run.insufficientCount} />
         <Stat label="Cảnh báo chất lượng dữ liệu" value={run.warnings.length} />
       </div>

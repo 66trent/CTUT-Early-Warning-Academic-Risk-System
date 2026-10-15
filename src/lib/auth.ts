@@ -15,6 +15,9 @@ import {
 import { type Env, getEnv, isGoogleConfigured } from './env';
 import { logger } from './logger';
 import { sendMail } from './mailer';
+import { getDataSource } from '@/db/data-source';
+import { User } from '@/db/entities/user.entity';
+import { UserRole } from '@/db/enums';
 
 /**
  * Better Auth — bảng nằm trong schema `auth` (tạo bởi `npm run db:init`), Pool `pg` riêng
@@ -25,7 +28,9 @@ const SESSION_EXPIRES_SECONDS = 8 * 60 * 60;
 const ADVISOR_SIGN_UP_PATH = '/sign-up/email';
 
 /** Tài khoản demo đăng nhập nhanh — chỉ khi DEMO_MODE=true (docs/rules/06). */
-export const DEMO_ACCOUNTS = ['ADMIN', 'GV001', 'GV002'] as const;
+/** 2 sinh viên demo đăng nhập không cần Google (người dùng chốt 2026-10-13, docs/rules/06). */
+export const DEMO_STUDENT_ACCOUNTS = ['KTPM2311003', 'KTPM2311001'] as const;
+export const DEMO_ACCOUNTS = ['ADMIN', 'GV001', 'GV002', ...DEMO_STUDENT_ACCOUNTS] as const;
 export type DemoAccount = (typeof DEMO_ACCOUNTS)[number];
 
 function rejectSignIn(code: SignInErrorCode): APIError {
@@ -96,10 +101,21 @@ const blockPublicSignUp = createAuthMiddleware(async (ctx) => {
   return Promise.resolve();
 });
 
-function demoAccountEmail(account: DemoAccount, env: Env): string {
-  return account === 'ADMIN'
-    ? env.ADMIN_SEED_EMAIL
-    : `${account.toLowerCase()}${staffDomainForSamples(env.STAFF_EMAIL_DOMAIN)}`;
+const isDemoStudent = (account: DemoAccount) =>
+  (DEMO_STUDENT_ACCOUNTS as readonly string[]).includes(account);
+
+/** Email của tài khoản demo; sinh viên lấy theo hồ sơ đã nhập (không suy ra từ mã — docs/rules/09). */
+async function demoAccountEmail(account: DemoAccount, env: Env): Promise<string | null> {
+  if (account === 'ADMIN') return env.ADMIN_SEED_EMAIL;
+  if (!isDemoStudent(account)) {
+    return `${account.toLowerCase()}${staffDomainForSamples(env.STAFF_EMAIL_DOMAIN)}`;
+  }
+  const user = await (
+    await getDataSource()
+  )
+    .getRepository(User)
+    .findOne({ select: { email: true }, where: { userId: account, role: UserRole.STUDENT } });
+  return user?.email ?? null;
 }
 
 /** POST /api/auth/demo/quick-login — trả 403 khi DEMO_MODE=false (kiểm tra ở server). */
@@ -114,9 +130,18 @@ function demoQuickLoginPlugin(env: Env) {
           if (!env.DEMO_MODE) {
             throw new APIError('FORBIDDEN', { code: 'DEMO_DISABLED', message: 'DEMO_DISABLED' });
           }
-          const email = demoAccountEmail(ctx.body.account, env);
-          const profile = await findAccountProfileByEmail(email);
-          const authUser = await ctx.context.internalAdapter.findUserByEmail(email);
+          const email = await demoAccountEmail(ctx.body.account, env);
+          const profile = email ? await findAccountProfileByEmail(email) : null;
+          let authUser = email ? await ctx.context.internalAdapter.findUserByEmail(email) : null;
+          // Sinh viên demo chưa từng đăng nhập Google: tạo tài khoản đăng nhập (đã có hồ sơ do Admin nhập).
+          if (email && profile && !authUser && isDemoStudent(ctx.body.account)) {
+            const created = await ctx.context.internalAdapter.createUser(
+              { email, name: profile.userId, emailVerified: true },
+              ctx,
+            );
+            await linkAuthUserId(email, created.id);
+            authUser = { user: created, accounts: [] };
+          }
           if (!profile || !authUser) {
             throw new APIError('NOT_FOUND', {
               code: 'DEMO_ACCOUNT_MISSING',

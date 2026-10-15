@@ -99,8 +99,8 @@ export async function seedRules(em: EntityManager, actorId: string): Promise<num
         ruleGroup: meta.ruleGroup,
         scope: meta.scope,
         priority: meta.priority,
-        // Tạm 7 ngày — chốt khi làm khóa chống trùng Alert ở Phase 5.
-        cooldown: 168,
+        // 0 = tắt: cảnh báo mở lại theo dấu hiệu mới/nặng hơn, không theo thời gian (docs/rules/08).
+        cooldown: 0,
         status: RuleStatus.ACTIVE,
       })
       .orIgnore()

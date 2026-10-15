@@ -8,6 +8,10 @@ import { UserAccountStatus, UserRole } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { type ChangeAdvisor, type CreateClass, type UpdateClass } from '../validators/class';
+import {
+  studentIdsOfClass,
+  transferOpenAlerts,
+} from '@/modules/alerts/services/alert-lifecycle.service';
 
 export interface DepartmentDto {
   departmentId: string;
@@ -156,7 +160,8 @@ export async function updateClass(input: UpdateClass, actorId: string): Promise<
 
 /**
  * Gán/đổi CVHT của lớp trong 1 transaction + Audit Log (docs/rules/06, 09).
- * Phase 5 bổ sung: chuyển `Alert.assignedAdvisorId` của các cảnh báo đang mở trong cùng transaction.
+ * Chuyển các cảnh báo đang mở của lớp sang Cố vấn học tập mới trong CÙNG transaction (docs/rules/09)
+ * — kể cả khi lớp trước đó chưa có người phụ trách.
  */
 export async function changeClassAdvisor(input: ChangeAdvisor, actorId: string): Promise<void> {
   const dataSource = await getDataSource();
@@ -183,6 +188,12 @@ export async function changeClassAdvisor(input: ChangeAdvisor, actorId: string):
         detail: { fromAdvisorId: current.advisorId, toAdvisorId: input.advisorId },
       },
       em,
+    );
+    await transferOpenAlerts(
+      em,
+      await studentIdsOfClass(em, input.classId),
+      input.advisorId,
+      actorId,
     );
   });
 }

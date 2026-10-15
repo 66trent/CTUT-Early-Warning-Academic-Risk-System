@@ -111,7 +111,7 @@ async function evaluate(termId: string, asOf: Date): Promise<string> {
     noEnqueue,
   );
   if (!runId) throw new Error('không tạo được lần chạy');
-  await processEvaluationRun(runId);
+  await processEvaluationRun(runId, noEnqueue);
   return runId;
 }
 
@@ -203,7 +203,7 @@ describe('Nghiệm thu: danh sách cảnh báo mong đợi (KET_QUA_MONG_DOI.md)
 
   it('job chạy lại (retry) cùng lần chạy → xóa kết quả cũ của lần đó rồi tính lại', async () => {
     await ds.getRepository(EvaluationRun).update(hk1RunId, { status: EvaluationRunStatus.RUNNING });
-    await processEvaluationRun(hk1RunId);
+    await processEvaluationRun(hk1RunId, noEnqueue);
     expect(await triggerKeys(hk1RunId)).toEqual(EXPECTED_HK1.sort());
   });
 
@@ -266,7 +266,7 @@ describe('Lần chạy đánh giá — chặn trùng, học kỳ đã chốt, t�
     });
     // Tự động trong lúc đang chờ → gộp vào lần chờ, không tạo thêm.
     expect(await requestAutoEvaluation({ id: 'x', termId: HK1 }, noEnqueue)).toBeNull();
-    await processEvaluationRun(first ?? '');
+    await processEvaluationRun(first ?? '', noEnqueue);
   });
 
   it('học kỳ đã chốt → không tạo lần chạy', async () => {
@@ -307,7 +307,7 @@ describe('Lần chạy đánh giá — chặn trùng, học kỳ đã chốt, t�
       triggeredBy: null,
       termId: HK1,
     });
-    await processEvaluationRun(run.id);
+    await processEvaluationRun(run.id, noEnqueue);
   });
 });
 
