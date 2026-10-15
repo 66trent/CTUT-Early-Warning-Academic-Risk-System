@@ -39,6 +39,7 @@ import {
 } from '@/modules/alerts/labels';
 import type { AlertDetailDto } from '@/modules/alerts/services/alert-query.service';
 import { InterventionForm } from './intervention-form';
+import { SignalsClearedNote } from './signals-cleared-note';
 
 interface AlertSheetProps {
   alertId: string | null;
@@ -188,6 +189,7 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
               </div>
             </SheetHeader>
             <ReferenceOnlyNotice />
+            {detail.signalsClearedAt && <SignalsClearedNote at={detail.signalsClearedAt} />}
 
             <section className="flex flex-col gap-2">
               <h3 className="font-semibold">{detail.summary}</h3>

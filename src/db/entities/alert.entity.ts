@@ -57,6 +57,21 @@ export class Alert {
   @Column({ type: 'uuid' })
   lastEvaluationRunId!: string;
 
+  /**
+   * Lần chạy cả học kỳ gần nhất KHÔNG còn dấu hiệu nào của sinh viên (cảnh báo vẫn mở — chỉ
+   * Cố vấn học tập đóng). NULL = còn dấu hiệu. Docs/rules/08, người dùng chốt 2026-10-15.
+   */
+  @Column({ type: 'timestamptz', nullable: true })
+  signalsClearedAt!: Date | null;
+
+  /**
+   * "Dấu hiệu hiện tại" = các RuleTrigger đang tạo nên cảnh báo (docs/rules/08). Lần chạy cả học
+   * kỳ thay toàn bộ, trừ dấu hiệu điểm danh của học phần có dữ liệu QUÁ HẠN (giữ lại); lần chạy
+   * theo học phần chỉ thay dấu hiệu của học phần đó. Phase 7, người dùng chốt 2026-10-15.
+   */
+  @Column({ type: 'uuid', array: true, default: () => "'{}'" })
+  currentTriggerIds!: string[];
+
   /** Lúc chuyển RESOLVED/DISMISSED gần nhất — tính cooldown (nếu bật). */
   @Column({ type: 'timestamptz', nullable: true })
   closedAt!: Date | null;

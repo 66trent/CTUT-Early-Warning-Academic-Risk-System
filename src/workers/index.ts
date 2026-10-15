@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { createRedisConnection } from '@/lib/queue/connection';
 import { getQueue, QUEUE_NAMES, type QueueName } from '@/lib/queue/queues';
 import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
+import { SCHEDULED_EVALUATION_JOB } from '@/modules/rule-engine/services/evaluation-queue';
 import { onEvaluationJobFailed, processEvaluationJob } from './processors/evaluation-run.processor';
 import { onImportJobFailed, processImportJob } from './processors/import-batch.processor';
 import {
@@ -68,6 +69,18 @@ async function main(): Promise<void> {
     { pattern: '0 2 * * *', tz: 'Asia/Ho_Chi_Minh' },
     { name: IMPORT_JOB.expireStaged },
   );
+  // Chạy đánh giá cả học kỳ hiện tại mỗi đêm (docs/rules/05) — giờ đọc từ EVALUATION_SCHEDULE.
+  // DEMO_MODE=true: TẮT (dữ liệu demo có ngày cố định — người dùng chốt 2026-10-15).
+  const evaluationQueue = getQueue(QUEUE_NAMES.evaluationRun);
+  if (getEnv().DEMO_MODE) {
+    await evaluationQueue.removeJobScheduler(SCHEDULED_EVALUATION_JOB);
+  } else {
+    await evaluationQueue.upsertJobScheduler(
+      SCHEDULED_EVALUATION_JOB,
+      { pattern: getEnv().EVALUATION_SCHEDULE, tz: 'Asia/Ho_Chi_Minh' },
+      { name: SCHEDULED_EVALUATION_JOB },
+    );
+  }
   logger.info({ queues: Object.keys(PROCESSORS) }, 'worker đã sẵn sàng');
 
   const shutdown = async (signal: string) => {

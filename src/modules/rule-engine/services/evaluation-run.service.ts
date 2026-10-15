@@ -19,6 +19,7 @@ import {
   NotificationStatus,
 } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
+import { getEnv } from '@/lib/env';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import {
@@ -96,8 +97,8 @@ async function insertRun(em: EntityManager, input: RequestEvaluationInput): Prom
       status: In([EvaluationRunStatus.QUEUED, EvaluationRunStatus.RUNNING]),
     },
   });
-  // Tự động: đã có lần chờ thì lần đó sẽ đọc luôn dữ liệu mới. Thủ công: từ chối (docs/rules/11).
-  if (input.trigger === EvaluationTrigger.AUTO_AFTER_IMPORT) {
+  // Tự động / theo lịch: đã có lần chờ thì lần đó sẽ đọc luôn dữ liệu mới. Thủ công: từ chối (docs/rules/11).
+  if (input.trigger !== EvaluationTrigger.MANUAL) {
     if (busy.some((r) => r.status === EvaluationRunStatus.QUEUED)) return null;
   } else if (busy.length > 0) {
     throw new AppError(
@@ -180,6 +181,41 @@ export async function requestAutoEvaluation(
   }
 }
 
+/**
+ * Lịch mỗi đêm (docs/rules/05): chạy cả học kỳ hiện tại với asOf = bây giờ — bắt bài LMS mới đến
+ * hạn và điểm danh quá hạn khi không có file mới. Không có học kỳ hiện tại / đã chốt → bỏ qua.
+ */
+export async function requestScheduledEvaluation(
+  enqueue: EvaluationEnqueuer = enqueueEvaluationJob,
+): Promise<string | null> {
+  const term = await (await getDataSource()).getRepository(Term).findOneBy({ isCurrent: true });
+  if (!term || term.closedAt) return null;
+  return requestEvaluation(
+    {
+      termId: term.termId,
+      courseId: null,
+      trigger: EvaluationTrigger.SCHEDULED,
+      asOf: new Date(),
+      actorId: null,
+      importBatchId: null,
+    },
+    enqueue,
+  );
+}
+
+/**
+ * Sau khi lô dữ liệu học tập nạp xong (RECONCILED). `DEMO_MODE=true`: KHÔNG tự chạy — dữ liệu demo
+ * có ngày cố định, Admin chạy với mốc demo để kết quả khớp KET_QUA_MONG_DOI (người dùng chốt
+ * 2026-10-15). Chạy lại sau hoàn tác lô vẫn tự chạy (`requestAutoEvaluation`).
+ */
+export async function requestEvaluationAfterImport(
+  batch: { id: string; termId: string | null },
+  enqueue: EvaluationEnqueuer = enqueueEvaluationJob,
+): Promise<string | null> {
+  if (getEnv().DEMO_MODE) return null;
+  return requestAutoEvaluation(batch, enqueue);
+}
+
 /** Khóa theo phạm vi (học kỳ, học phần): 2 lần chạy cùng phạm vi chạy lần lượt. */
 async function withScopeLock<T>(run: EvaluationRun, work: () => Promise<T>): Promise<T> {
   const runner = (await getDataSource()).createQueryRunner();
@@ -200,9 +236,15 @@ async function persistChunk(
   run: EvaluationRun,
   ruleSet: ActiveRuleSet,
   results: StudentEvaluation[],
+  rollback: boolean,
 ): Promise<{ created: number; updated: number }> {
   const now = new Date();
   const logIds = new Map(results.map((r) => [r.studentId, randomUUID()]));
+  // Id trigger sinh trước: cảnh báo lưu "dấu hiệu hiện tại" theo id (docs/rules/08).
+  const withIds = results.map((r) => ({
+    ...r,
+    triggers: r.triggers.map((t) => ({ ...t, id: randomUUID() })),
+  }));
   if (results.length > 0) {
     await em.insert(
       RiskScoreLog,
@@ -222,19 +264,22 @@ async function persistChunk(
   // Bước 7–9: gộp dấu hiệu vào cảnh báo (1 / sinh viên / học kỳ) rồi gắn trigger vào cảnh báo.
   const sync = await syncAlertsForChunk(
     em,
-    run,
-    results.map((r) => ({
+    { id: run.id, termId: run.termId, asOf: run.asOf, courseId: run.courseId, rollback },
+    withIds.map((r) => ({
       studentId: r.studentId,
       riskScoreLogId: logIds.get(r.studentId) ?? null,
       signals: r.triggers.map((t) => ({
         ruleCode: t.ruleCode,
         scopeId: t.scopeId,
         severity: t.severity,
+        triggerId: t.id,
       })),
+      staleScopes: r.staleScopes,
     })),
   );
-  const triggers = results.flatMap((r) =>
+  const triggers = withIds.flatMap((r) =>
     r.triggers.map((t) => ({
+      id: t.id,
       alertId: sync.alertIdByStudent.get(r.studentId) ?? null,
       evaluationRunId: run.id,
       ruleCode: t.ruleCode,
@@ -266,6 +311,7 @@ async function executeRun(run: EvaluationRun): Promise<void> {
   await em.update(EvaluationRun, { id: run.id }, { totalStudents: students.length });
   const lms = await loadLmsContexts(em, run.termId, run.asOf, ruleSet.config.lms);
   const context = { ...ruleSet, asOf: run.asOf, courseId: run.courseId };
+  const rollback = await isRollbackRun(run);
 
   const warnings: EvaluationDataWarning[] = [];
   let insufficient = 0;
@@ -282,13 +328,13 @@ async function executeRun(run: EvaluationRun): Promise<void> {
       }
     }
     await dataSource.transaction(async (tx) => {
-      const counts = await persistChunk(tx, run, ruleSet, results);
+      const counts = await persistChunk(tx, run, ruleSet, results, rollback);
       alertsCreated += counts.created;
       alertsUpdated += counts.updated;
       await tx.update(EvaluationRun, { id: run.id }, { processedStudents: i + ids.length });
     });
   }
-  if (await isRollbackRun(run)) {
+  if (rollback) {
     await dataSource.transaction((tx) => invalidateAlertsAfterRollback(tx, run));
   }
   await em.update(

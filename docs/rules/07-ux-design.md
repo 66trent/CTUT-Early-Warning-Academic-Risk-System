@@ -63,4 +63,5 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 ## Nhất quán thuật ngữ
 
 - MUST: dùng đúng 1 tên gọi xuyên suốt app/email/tài liệu cho mỗi vai trò/khái niệm (tên hệ thống trên giao diện, email và báo cáo MUST giống nhau; "Cố vấn học tập" — không đổi thành "CVHT"/"Giảng viên chủ nhiệm"/"Advisor" tùy màn hình; "Cảnh báo sớm" — không đổi tên khác ở nơi khác).
+- MUST: bộ lọc Khoa (suy ra qua lớp sinh hoạt) ở Tổng quan Admin, danh sách cảnh báo Admin và ô chọn học phần khi chạy đánh giá — người dùng chốt 2026-10-15.
 - MUST: trang Nhật ký kiểm toán (Admin, chỉ đọc, phân trang) lọc theo khoảng thời gian, loại hành động, người thực hiện (mã/email), đối tượng (MSSV, mã lô…) — người dùng chốt 2026-10-13.

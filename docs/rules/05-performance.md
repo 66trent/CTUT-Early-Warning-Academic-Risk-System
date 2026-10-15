@@ -4,14 +4,14 @@ Xem `00-project-context.md` cho glossary.
 
 ## Truy vấn cơ sở dữ liệu
 
-- MUST: mọi query danh sách (tổng quan, lịch sử nhập liệu, danh sách cảnh báo) phân trang (keyset theo `(createdAt, id)` cho danh sách lớn; `take`/`skip` cho danh sách nhỏ) — MUST NOT truy vấn danh sách không có `take`/giới hạn.
+- MUST: mọi query danh sách (tổng quan, lịch sử nhập liệu, danh sách cảnh báo) phân trang (keyset theo `(createdAt, id)` cho danh sách lớn; `take`/`skip` cho danh sách nhỏ — người dùng chốt 2026-10-15: danh sách nào > 300ms mới đổi sang keyset — đo Phase 7 với 5.000 sinh viên: mọi danh sách < 110ms, giữ `take`/`skip`; xem `docs/bao-cao/02-hieu-nang.md`) — MUST NOT truy vấn danh sách không có `take`/giới hạn.
 - MUST: có index trên `Alert(studentId, termId, status)`, `RuleTrigger(termId, ruleCode)`, `ImportErrorRow(importBatchId, resolved)` ngoài các unique index theo khóa nghiệp vụ đã có trong `00-project-context.md`.
 - MUST: chọn cột tường minh (`select` của `find*` hoặc `QueryBuilder.select()`) và nạp quan hệ tường minh — MUST NOT load nguyên entity khi chỉ cần vài field, đặc biệt tránh load `RuleTrigger.inputSnapshot` (jsonb lớn) khi chỉ cần đếm số lượng. Khai báo index bằng `@Index`.
 - MUST: job tính RiskScore cho toàn khoa chạy theo batch/chunk qua `Enrollment` (khuyến nghị 200 sinh viên/lần) — MUST NOT load toàn bộ dữ liệu 1 khoa vào memory cùng lúc.
 
 ## Job nền (BullMQ)
 
-- MUST: job `calculate-risk-score`/`evaluate-hard-triggers` chạy theo lịch off-peak (ví dụ 2h sáng) — MUST NOT chạy đồng bộ trong request-response người dùng.
+- MUST: ngoài chạy tự động sau nạp và chạy tay, có lịch chạy đánh giá cả học kỳ hiện tại mỗi đêm (job lặp BullMQ trên queue `evaluation-run`, giờ đọc từ biến môi trường, mặc định 02:00 giờ Việt Nam; `EvaluationRun.trigger = SCHEDULED`) — để bắt bài LMS mới đến hạn và điểm danh quá hạn khi không có file mới (người dùng chốt 2026-10-15, không có nút bật/tắt; TẮT khi `DEMO_MODE=true` vì dữ liệu demo có ngày cố định). MUST NOT chạy đánh giá đồng bộ trong request-response người dùng.
 - MUST: giới hạn concurrency worker phù hợp connection pool PostgreSQL (ví dụ `concurrency: 5`).
 - SHOULD: log thời gian thực thi mỗi job để phát hiện suy giảm hiệu năng theo thời gian.
 

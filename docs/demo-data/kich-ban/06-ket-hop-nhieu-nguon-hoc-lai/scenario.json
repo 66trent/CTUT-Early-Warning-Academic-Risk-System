@@ -1,0 +1,79 @@
+{
+  "id": "06",
+  "title": "COMB-01 nhiều nguồn cùng xấu, COMB-02 học lại vẫn sa sút",
+  "students": [
+    "KTPM2311601",
+    "KTPM2311602",
+    "KTPM2311603",
+    "KTPM2311604"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null
+    },
+    {
+      "file": "02_HK2_ket_qua_cuoi_ky.csv",
+      "dataType": "COURSE_RESULT",
+      "termId": "HK2_2025"
+    },
+    {
+      "file": "03_HK1_diem_danh.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026"
+    },
+    {
+      "file": "04_HK1_ket_qua_giua_ky.csv",
+      "dataType": "COURSE_RESULT",
+      "termId": "HK1_2026"
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK2_2025",
+      "asOf": "2026-06-15",
+      "triggers": [
+        "KTPM2311603|KTPM2311603|ACA-02|HIGH",
+        "KTPM2311604|KTPM2311604|ACA-02|HIGH"
+      ],
+      "alerts": [
+        [
+          "KTPM2311603",
+          "HIGH"
+        ],
+        [
+          "KTPM2311604",
+          "HIGH"
+        ]
+      ]
+    },
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [
+        "KTPM2311601|KTPM561|ATT-01|MEDIUM",
+        "KTPM2311601|KTPM561|ACA-01|HIGH",
+        "KTPM2311601|KTPM561|COMB-01|CRITICAL",
+        "KTPM2311602|KTPM561|ATT-03|LOW",
+        "KTPM2311602|KTPM561|ACA-01|HIGH",
+        "KTPM2311603|KTPM562|ATT-01|MEDIUM",
+        "KTPM2311603|KTPM562|COMB-02|HIGH"
+      ],
+      "alerts": [
+        [
+          "KTPM2311601",
+          "CRITICAL"
+        ],
+        [
+          "KTPM2311602",
+          "HIGH"
+        ],
+        [
+          "KTPM2311603",
+          "HIGH"
+        ]
+      ]
+    }
+  ]
+}

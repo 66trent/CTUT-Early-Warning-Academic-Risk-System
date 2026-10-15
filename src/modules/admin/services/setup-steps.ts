@@ -166,7 +166,7 @@ function termSteps(c: SetupCounts): StepDraft[] {
       key: 'evaluation',
       phase: 'DURING_TERM',
       title: 'Chạy đánh giá',
-      description: 'Tự chạy sau mỗi lần nạp; Admin có thể chạy ngay.',
+      description: 'Tự chạy sau mỗi lần nạp và mỗi đêm (chế độ demo: Admin bấm chạy với mốc demo).',
       done: c.completedRuns > 0,
       status: c.completedRuns > 0 ? `${c.completedRuns} lần chạy xong` : 'Chưa chạy',
       href: '/admin/evaluations',

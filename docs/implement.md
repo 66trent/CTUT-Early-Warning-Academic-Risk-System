@@ -124,10 +124,20 @@
 
 ## Phase 7 — Hoàn thiện và demo
 
-- [ ] Rà bảo mật theo `06` (STRIDE, rate-limit, TLS, không `dangerouslySetInnerHTML`, `npm audit` không có high/critical).
-- [ ] Hiệu năng theo `05`: seed lớn (≥ 5.000 sinh viên), `EXPLAIN ANALYZE` truy vấn danh sách cảnh báo và đánh giá; thời gian chạy đánh giá 1 học kỳ.
-- [ ] Backup/restore thử 1 lần (RPO ≤ 24h, RTO ≤ 4h).
-- [ ] Responsive 3 kích thước màn hình; dark mode.
-- [ ] Kịch bản demo 10 phút theo `KET_QUA_MONG_DOI.md`; chụp màn hình và số liệu hiệu năng cho báo cáo.
+Làm trước (chốt 2026-10-15, chạy lại nghiệm thu sau khi xong):
+- [x] Sửa: lần chạy theo 1 học phần không được hạ mức cảnh báo (`08`).
+- [x] Nhãn "lần đánh giá gần nhất không còn dấu hiệu" trên cảnh báo đang mở (`08`).
+- [x] Lịch chạy đánh giá mỗi đêm, `EvaluationTrigger.SCHEDULED` (migration thêm giá trị enum) (`05`, `08`) — tắt khi `DEMO_MODE=true`; chế độ demo cũng không tự chạy sau nạp.
+- [x] (Thêm, chốt 2026-10-15) Dữ liệu quá hạn ≠ hết dấu hiệu: `Alert.currentTriggerIds`, giữ dấu hiệu điểm danh của học phần quá hạn (`08`, `11`).
+- [x] Bộ lọc Khoa: Tổng quan, cảnh báo Admin, chọn học phần khi chạy đánh giá (`07`).
+
+- [x] Rà bảo mật theo `06` (STRIDE, rate-limit, TLS, không `dangerouslySetInnerHTML`, `npm audit` không có high/critical).
+- [x] Hiệu năng theo `05`: seed lớn (≥ 5.000 sinh viên), `EXPLAIN ANALYZE` truy vấn danh sách cảnh báo và đánh giá; thời gian chạy đánh giá 1 học kỳ.
+- [x] Backup/restore: lệnh `npm run backup` / `npm run restore` chạy tay + hướng dẫn đặt lịch trong README; diễn tập khôi phục 1 lần vào DB tạm, ghi thời gian (RPO ≤ 24h, RTO ≤ 4h).
+- [x] Đo hiệu năng trên DB riêng `ewars_perf` (seed ≥ 5.000 SV giả); danh sách > 300ms mới đổi keyset; bảng số liệu cho báo cáo.
+- [x] Playwright 2 luồng (nhập file lỗi → sửa → nhập lại; CVHT xác nhận + ghi can thiệp), chạy local, không vào CI.
+- [x] README chạy từ máy sạch (kèm hướng dẫn TLS khi triển khai, cấu hình Google OAuth, sinh `AUTH_SECRET`); sinh `AUTH_SECRET` mới; đặt lại `STAFF_EMAIL_DOMAIN=@ctuet.edu.vn`.
+- [x] Responsive 3 kích thước màn hình; dark mode.
+- [x] Kịch bản demo theo `KET_QUA_MONG_DOI.md`, phủ MỌI tình huống hệ thống đáp ứng được: 1 kịch bản chính (bộ demo hiện tại, trình bày 10 phút) + nhiều kịch bản nhỏ ở `docs/demo-data/kich-ban/NN-ten/` (file dữ liệu + các bước + kết quả mong đợi riêng; dùng chung lớp KTPM2311/KHMT2311 + GV001/GV002, mỗi kịch bản 1 dải MSSV riêng để nạp chồng không đụng nhau; mỗi kịch bản 1 test nghiệm thu); `docs/demo-script.md` có mục "hội đồng hỏi X → mở kịch bản Y"; `docs/demo-script.md`; lệnh `npm run demo:reset`; ảnh chụp màn hình; bảng số liệu hiệu năng. (Sinh viên đăng nhập bằng đăng nhập nhanh demo; ẩn danh hóa vẫn hoãn — ghi là hướng phát triển.)
 
 **DoD:** build production chạy từ máy sạch theo README; demo trọn kịch bản không lỗi.

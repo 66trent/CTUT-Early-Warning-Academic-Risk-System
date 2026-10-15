@@ -1,7 +1,8 @@
 /**
- * npm run demo:load — nạp 4 file nguồn học tập của docs/demo-data (02–05) vào DB theo đúng thứ
- * tự trong KET_QUA_MONG_DOI.md, qua ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử
- * lý). Chỉ khi DEMO_MODE=true. Cần đã nạp `01_sinh_vien.csv` và chạy `npm run seed:demo`.
+ * npm run demo:load — nạp file của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md, qua
+ * ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
+ * Mặc định nạp 02–05 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
+ * nạp cả 01 trước (dùng trong `demo:reset`).
  */
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
@@ -16,6 +17,7 @@ import {
   createImportBatch,
 } from '../src/modules/data-import/services/import-batch.service';
 
+const STUDENTS_FILE = ['01_sinh_vien.csv', 'STUDENT', null] as const;
 const FILES = [
   ['02_HK2_2025_ket_qua_hoc_phan.csv', 'COURSE_RESULT', 'HK2_2025'],
   ['03_HK1_2026_diem_danh_tong_hop.csv', 'ATTENDANCE_SUMMARY', 'HK1_2026'],
@@ -36,7 +38,8 @@ async function waitFor(batchId: string, done: (b: ImportBatch) => boolean): Prom
 
 async function main(): Promise<void> {
   if (!getEnv().DEMO_MODE) throw new Error('demo:load chỉ chạy khi DEMO_MODE=true.');
-  for (const [file, dataType, termId] of FILES) {
+  const files = process.argv.includes('--with-students') ? [STUDENTS_FILE, ...FILES] : FILES;
+  for (const [file, dataType, termId] of files) {
     const data = readFileSync(`docs/demo-data/${file}`);
     const { batchId } = await createImportBatch(
       { dataType, termId, parentBatchId: null, fileName: file, data },
