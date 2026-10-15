@@ -6,10 +6,10 @@ Xem `00-project-context.md` cho glossary và bảng phạm vi role.
 
 - MUST: dùng cơ chế hash mặc định của Better Auth — MUST NOT tự viết hàm hash mật khẩu riêng.
 - MUST: session hết hạn sau thời gian không hoạt động hợp lý (khuyến nghị 8 giờ phiên thường, tối đa 30 ngày cho "remember me").
-- MUST: đăng nhập thất bại nhiều lần liên tiếp bị rate-limit và ghi Audit Log.
+- MUST: đăng nhập thất bại nhiều lần liên tiếp bị rate-limit và ghi Audit Log. Cài đặt: rate-limit của Better Auth lưu bảng `auth.rateLimit` (`/sign-in/email` 5 lần/phút); mỗi lần sai ghi `LOGIN_FAILED`; Google bị từ chối ghi `SIGN_IN_REJECTED`; form đăng ký CVHT 5 lần/giờ/IP (Redis).
 - MUST: Google OAuth của sinh viên kiểm tra ở SERVER: email đã xác minh (`email_verified`) VÀ kết thúc `@student.ctuet.edu.vn` VÀ khớp 1 `User` `role = STUDENT` đã được Admin nhập. Thiếu 1 trong 3 → từ chối, không tạo phiên. Tham số `hd` của Google chỉ là gợi ý giao diện, MUST NOT dùng làm kiểm tra.
-- MUST: form đăng ký CVHT luôn tạo `role = ADVISOR`, `accountStatus = PENDING_APPROVAL` — MUST NOT nhận `role` từ client; MUST NOT có đường tự đăng ký `ADMIN`. Email MUST đúng `STAFF_EMAIL_DOMAIN` và đã xác minh. Rate-limit form đăng ký.
-- MUST: `DEMO_MODE=true` mới bật: nút đăng nhập nhanh tài khoản mẫu, điền sẵn tài khoản demo ở `/login`, chọn mốc `asOf` trong quá khứ khi chạy đánh giá. Kiểm tra ở server (trả 403 khi tắt), không chỉ ẩn nút. Mật khẩu tài khoản seed đọc từ `ADMIN_SEED_PASSWORD` — MUST NOT ghi cứng trong code hay tài liệu.
+- MUST: form đăng ký CVHT luôn tạo `role = ADVISOR`, `accountStatus = PENDING_APPROVAL` — MUST NOT nhận `role` từ client; MUST NOT có đường tự đăng ký `ADMIN`. Email MUST đúng `STAFF_EMAIL_DOMAIN` và đã xác minh. Rate-limit form đăng ký. Tạm thời (người dùng yêu cầu, vì chưa có email trường để thử): `STAFF_EMAIL_DOMAIN=*` nhận mọi email trừ email sinh viên — MUST đặt lại `@ctuet.edu.vn` khi triển khai thật. Email sinh viên KHÔNG BAO GIỜ được dùng cho tài khoản cán bộ, kể cả khi là `*`.
+- MUST: `DEMO_MODE=true` mới bật: nút đăng nhập nhanh tài khoản mẫu, điền sẵn tài khoản demo ở `/login`, chọn mốc `asOf` trong quá khứ khi chạy đánh giá. Kiểm tra ở server (trả 403 khi tắt), không chỉ ẩn nút — cài thành endpoint Better Auth `POST /api/auth/demo/quick-login` (plugin trong `src/lib/auth.ts`), tạo phiên bằng Better Auth, ghi Audit Log `DEMO_QUICK_LOGIN`. Mật khẩu tài khoản seed đọc từ `ADMIN_SEED_PASSWORD` — MUST NOT ghi cứng trong code hay tài liệu.
 - MUST: mọi truy vấn dữ liệu kiểm tra `accountStatus = ACTIVE`; tài khoản `PENDING_APPROVAL`/`REJECTED`/`SUSPENDED` chỉ thấy trang thông báo trạng thái.
 
 ## Phân quyền theo phạm vi (Scope-based Authorization) — không thương lượng

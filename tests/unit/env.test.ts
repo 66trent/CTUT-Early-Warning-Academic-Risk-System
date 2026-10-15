@@ -80,3 +80,22 @@ describe('env — kiểm tra biến môi trường khi khởi động', () => {
     ).toBe(true);
   });
 });
+
+describe('env — STAFF_EMAIL_DOMAIN', () => {
+  it('nhận "*" và cho Admin dùng email cá nhân', () => {
+    const env = parseEnv({ ...VALID, STAFF_EMAIL_DOMAIN: '*', ADMIN_SEED_EMAIL: 'me@gmail.com' });
+    expect(env.STAFF_EMAIL_DOMAIN).toBe('*');
+  });
+
+  it('Admin không được dùng email sinh viên', () => {
+    expect(() =>
+      parseEnv({ ...VALID, STAFF_EMAIL_DOMAIN: '*', ADMIN_SEED_EMAIL: 'a@student.ctuet.edu.vn' }),
+    ).toThrow('ADMIN_SEED_EMAIL');
+  });
+
+  it('khi giới hạn đuôi, email Admin phải đúng đuôi', () => {
+    expect(() => parseEnv({ ...VALID, ADMIN_SEED_EMAIL: 'me@gmail.com' })).toThrow(
+      'ADMIN_SEED_EMAIL',
+    );
+  });
+});

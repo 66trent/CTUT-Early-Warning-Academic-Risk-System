@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { CalendarDays, Menu } from 'lucide-react';
+import { SignOutButton } from '@/components/auth/sign-out-button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -113,6 +114,7 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
               <p className="text-sm font-semibold">{user.fullName}</p>
               <p className="text-xs text-muted-foreground">{ROLE_LABELS[user.role]}</p>
             </div>
+            <SignOutButton compact />
           </div>
         </header>
 

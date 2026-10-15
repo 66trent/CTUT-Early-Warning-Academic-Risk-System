@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isStaffEmail } from './email-domains';
 
 /**
  * Biến môi trường phía server — validate bằng Zod (docs/rules/01-architecture.md).
@@ -29,7 +30,10 @@ const envSchema = z
     STAFF_EMAIL_DOMAIN: z
       .string()
       .trim()
-      .regex(/^@[a-z0-9.-]+\.[a-z]{2,}$/i, 'Dạng "@ten-mien.edu.vn"'),
+      .regex(
+        /^(\*|@[a-z0-9.-]+\.[a-z]{2,})$/i,
+        'Dạng "@ten-mien.edu.vn", hoặc "*" để nhận mọi email (trừ email sinh viên)',
+      ),
     ADMIN_SEED_EMAIL: z.email(),
     ADMIN_SEED_PASSWORD: z.string().min(8, 'ADMIN_SEED_PASSWORD cần ít nhất 8 ký tự'),
     DEMO_MODE: booleanString,
@@ -54,6 +58,13 @@ const envSchema = z
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   })
   .superRefine((env, ctx) => {
+    if (!isStaffEmail(env.ADMIN_SEED_EMAIL, env.STAFF_EMAIL_DOMAIN)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ADMIN_SEED_EMAIL'],
+        message: 'Phải là email cán bộ theo STAFF_EMAIL_DOMAIN (không dùng email sinh viên)',
+      });
+    }
     if (env.DEMO_MODE && (!env.DEMO_ADVISOR_PASSWORD || env.DEMO_ADVISOR_PASSWORD.length < 8)) {
       ctx.addIssue({
         code: 'custom',

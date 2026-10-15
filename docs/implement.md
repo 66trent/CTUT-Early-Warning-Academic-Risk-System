@@ -44,13 +44,13 @@
 
 ## Phase 1 — Xác thực và danh tính
 
-- [ ] Entity: `User` (có `accountStatus`, `authUserId`), `Department`, `AdministrativeClass`, `Student`, `Term` theo `09`; seed 7 khoa và tài khoản Admin từ biến môi trường.
-- [ ] Better Auth: Google cho sinh viên; email/mật khẩu cho CVHT/Admin; hook `create.before` với 4 mã lỗi và `create.after` gán `authUserId` (theo `01`, `06`). Không tự tạo hồ sơ.
-- [ ] `getCurrentUser()` bọc `React.cache()`; `assertScope()`: sinh viên chỉ mình; CVHT qua `AdministrativeClass.advisorId`; Admin đọc tất cả, không xử lý `Alert`.
-- [ ] Trang `/login` 2 tab (Sinh viên / Cán bộ), ánh xạ mã lỗi; ẩn nút Google khi chưa cấu hình. Trang `/no-profile`, `/pending-approval`.
-- [ ] Đăng ký CVHT (mã cán bộ, họ tên, email đúng `STAFF_EMAIL_DOMAIN`) → `PENDING_APPROVAL`; rate-limit.
-- [ ] `DEMO_MODE`: nút đăng nhập nhanh tài khoản mẫu, kiểm tra ở server.
-- [ ] Layout theo role, chặn ở server.
+- [x] Entity: `User` (có `accountStatus`, `authUserId`), `Department`, `AdministrativeClass`, `Student`, `Term` theo `09`; seed 7 khoa và tài khoản Admin từ biến môi trường.
+- [x] Better Auth: Google cho sinh viên; email/mật khẩu cho CVHT/Admin; hook `create.before` với 4 mã lỗi và `create.after` gán `authUserId` (theo `01`, `06`). Không tự tạo hồ sơ.
+- [x] `getCurrentUser()` bọc `React.cache()`; `assertScope()`: sinh viên chỉ mình; CVHT qua `AdministrativeClass.advisorId`; Admin đọc tất cả, không xử lý `Alert`.
+- [x] Trang `/login` 2 tab (Sinh viên / Cán bộ), ánh xạ mã lỗi; ẩn nút Google khi chưa cấu hình. Trang `/no-profile`, `/pending-approval`.
+- [x] Đăng ký CVHT (mã cán bộ, họ tên, email đúng `STAFF_EMAIL_DOMAIN`) → `PENDING_APPROVAL`; rate-limit.
+- [x] `DEMO_MODE`: nút đăng nhập nhanh tài khoản mẫu, kiểm tra ở server.
+- [x] Layout theo role, chặn ở server.
 
 **DoD (test tự động):** email sinh viên chưa có hồ sơ → `NO_STUDENT_PROFILE`, không phát sinh bản ghi; email ngoài trường → `INVALID_DOMAIN`; email cán bộ chưa có tài khoản → `STAFF_ACCOUNT_NOT_FOUND`; CVHT chờ duyệt bị chặn mọi dữ liệu; `DEMO_MODE=false` → đăng nhập nhanh trả 403; CVHT A không đọc được sinh viên lớp của CVHT B. **Kiểm tra tay:** đăng nhập Admin; đăng ký 1 CVHT và thấy trang chờ duyệt.
 
