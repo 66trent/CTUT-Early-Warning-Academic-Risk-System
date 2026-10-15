@@ -56,10 +56,10 @@
 
 ## Phase 2 — Danh mục quản trị
 
-- [ ] Học kỳ: tạo, đặt hiện tại (transaction, partial unique index), chốt học kỳ (AlertDialog); badge học kỳ hiện tại trên header.
-- [ ] Khoa (chỉ xem). Lớp sinh hoạt: tạo, sửa, gán/đổi CVHT; sĩ số bằng `COUNT ... GROUP BY`.
-- [ ] Tài khoản: danh sách, lọc trạng thái, duyệt/từ chối/khóa CVHT (Audit Log), đổi vai trò (cấm tự đổi của mình).
-- [ ] `npm run seed:demo` tạo dữ liệu nền demo theo `docs/demo-data/KET_QUA_MONG_DOI.md`.
+- [x] Học kỳ: tạo, đặt hiện tại (transaction, partial unique index), chốt học kỳ (AlertDialog); badge học kỳ hiện tại trên header.
+- [x] Khoa (chỉ xem). Lớp sinh hoạt: tạo, sửa, gán/đổi CVHT; sĩ số bằng `COUNT ... GROUP BY`.
+- [x] Tài khoản: danh sách, lọc trạng thái, duyệt/từ chối/khóa CVHT (Audit Log), đổi vai trò (cấm tự đổi của mình).
+- [x] `npm run seed:demo` tạo dữ liệu nền demo theo `docs/demo-data/KET_QUA_MONG_DOI.md`.
 
 **DoD:** không thể có 2 học kỳ hiện tại (test lỗi `23505`); duyệt CVHT → đăng nhập được; mọi Server Action trả DTO thuần. **Kiểm tra tay:** tạo lớp, gán CVHT, thấy sĩ số đúng.
 
