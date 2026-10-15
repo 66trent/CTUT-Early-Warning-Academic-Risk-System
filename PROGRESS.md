@@ -51,3 +51,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra tay (Docker, trình duyệt): file 02 + 1 dòng sai vào HK2_2025 → xem trước 29/1, file lỗi "Điểm thi 11 phải từ 0 đến 10", nạp 29, hoàn tác về 0.
 - Lưu ý: DB dev của bạn đã CHỐT `HK1_2026` → không nạp được file 03/04/05 vào học kỳ đó (đúng luật, chốt không mở lại).
 - Tự kiểm tra: Nhập dữ liệu → Điểm danh tổng hợp → chọn học kỳ còn mở → sửa 1 dòng (VD `co_mat` lớn hơn `tong_buoi`) → nạp → tải file lỗi.
+
+## Phase 4 — Rule engine (2026-10-13)
+
+- Làm: entity `Rule`, `RuleVersion`, `RuleTrigger` (`alertId` NULL, có `evaluationRunId`), `RiskScoreLog`, `EvaluationRun` + 2 migration; seed 10 luật + `RISK-SCORE` (trọng số + tham số dữ liệu chung); evaluator thuần (mỗi luật 1 file + registry, 10 bước, DataStatus, trạng thái/lần học tính theo `asOf`, nhóm LMS theo lớp học phần); RiskScore cộng dồn học phần, chỉ hiển thị; queue `evaluation-run` (lô 200 SV, idempotent khi retry); tự chạy sau nạp/hoàn tác lô; chặn 2 lần chạy cùng phạm vi; tạo phiên bản luật, chạy thử chỉ đọc, chặn kích hoạt khi chưa chạy thử; trang Admin "Chạy đánh giá" + chi tiết lần chạy.
+- Gộp sửa lỗi Phase 3: file mẫu `.xlsx`, BOM cho CSV, báo lỗi tên mất dấu; `seed:demo` mở lại học kỳ demo; lệnh `npm run demo:load`.
+- Lỗi tìm ra khi viết test: dòng `FINAL` ghi đè ngày công bố điểm giữa kỳ → chạy lại mốc 10/10 mất `ACA-01`; thêm `CourseResult.processPublishedAt` (rule `10`).
+- Kiểm tra: typecheck, lint, format, migration, schema drift, test 275 (+1 bỏ qua), coverage rule-engine 92%, build — xanh. Nghiệm thu: HK2 asOf 15/06 đúng 4 trigger, HK1 asOf 10/10 đúng 13 trigger; chạy lại không đổi; thêm dữ liệu sau 10/10 không đổi kết quả mốc 10/10.
+- Kiểm tra tay (Docker): `demo:load` → 4 lần chạy tự động; chạy tay HK1 mốc 10/10 trên giao diện → 13 dấu hiệu (2 Rất cao · 5 Cao · 5 Trung bình · 1 Thấp).
+- Còn lại (Phase 5): gắn trigger vào Alert, cooldown (đang tạm 168 giờ), thông báo.
+- Tự kiểm tra: Admin → Chạy đánh giá → Học kỳ 1 → mốc 2026-10-10 → Chạy đánh giá ngay → so với `docs/demo-data/KET_QUA_MONG_DOI.md`.

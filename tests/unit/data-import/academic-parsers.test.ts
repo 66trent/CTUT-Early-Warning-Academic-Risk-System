@@ -277,3 +277,27 @@ describe('Kết quả học phần — parseRow', () => {
     ).toMatchObject({ ok: true, value: { processScore: 7.5 } });
   });
 });
+
+describe('Phát hiện file bị lưu sai bảng mã (mất dấu tiếng Việt)', () => {
+  it('họ tên "Tr??ng Minh Thu?n" → INVALID_FORMAT kèm hướng dẫn lưu CSV UTF-8', async () => {
+    const { studentImport } = await import('@/modules/data-import/types/student.import');
+    const parsed = studentImport.parseRow(
+      {
+        mssv: 'KTPM2311019',
+        ho_ten: 'Tr??ng Minh Thu?n',
+        email: 'ktpm2311019@student.ctuet.edu.vn',
+        ma_lop_sinh_hoat: 'KTPM2311',
+        trang_thai_hoc_vu: 'ACTIVE',
+      },
+      opts,
+    );
+    expect(parsed).toMatchObject({ ok: false, reason: 'INVALID_FORMAT' });
+    expect(!parsed.ok && parsed.detail).toContain('CSV UTF-8');
+  });
+
+  it('tên học phần có "?" → INVALID_FORMAT', () => {
+    expect(
+      attendanceImport.parseRow(attendance({ ten_hoc_phan: 'C?ng ngh? ph?n m?m' }), opts),
+    ).toMatchObject({ ok: false, reason: 'INVALID_FORMAT' });
+  });
+});

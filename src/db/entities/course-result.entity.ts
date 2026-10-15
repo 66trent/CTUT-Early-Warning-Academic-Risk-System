@@ -56,6 +56,13 @@ export class CourseResult {
   @Column({ type: 'timestamptz' })
   importedAt!: Date;
 
+  /**
+   * Ngày công bố điểm quá trình (lần nạp PROCESS_ONLY) — GIỮ LẠI khi kết quả chuyển FINAL, để
+   * chạy lại đánh giá ở mốc giữa kỳ vẫn thấy điểm quá trình (chống rò rỉ thời gian, docs/rules/08).
+   */
+  @Column({ type: 'timestamptz', nullable: true })
+  processPublishedAt!: Date | null;
+
   @ManyToOne(() => Enrollment, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'enrollment_id' })
   enrollment?: Relation<Enrollment>;

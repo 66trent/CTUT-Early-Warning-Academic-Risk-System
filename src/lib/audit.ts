@@ -31,6 +31,10 @@ export const AUDIT_ACTIONS = [
   'IMPORT_DISCARDED',
   'IMPORT_EXPIRED',
   'IMPORT_ROLLED_BACK',
+  'RULE_VERSION_CREATED',
+  'RULE_DRY_RUN',
+  'RULE_ACTIVATED',
+  'EVALUATION_RUN_REQUESTED',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 

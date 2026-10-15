@@ -5,7 +5,9 @@ import { QuizAttemptStatus } from '@/db/enums';
 import { ensureEnrollments } from '../services/enrollment-sync';
 import { rollbackSourceRows } from '../services/source-rollback';
 import {
+  hasLostDiacritics,
   labelKey,
+  LOST_DIACRITICS_HINT,
   parseDateTime,
   parseDecimal,
   parseInteger,
@@ -131,6 +133,8 @@ export const lmsQuizImport: ImportTypeDefinition<LmsQuizRow> = {
     const quizName = (record.ten_bai ?? '').trim().replace(/\s+/g, ' ');
     const quizKey = quizKeyOf(record.ma_bai ?? '', quizName);
     if (!quizName || quizName.length > 200) return invalid('Tên bài từ 1 đến 200 ký tự.');
+    if (hasLostDiacritics(quizName))
+      return invalid(`Tên bài "${quizName}" ${LOST_DIACRITICS_HINT}`);
     if (quizKey.length > 100) return invalid('Mã bài tối đa 100 ký tự.');
     const attempt = parseInteger(record.lan_lam ?? '');
     if (!attempt.ok) return invalid(`Lần làm: ${attempt.message}`);

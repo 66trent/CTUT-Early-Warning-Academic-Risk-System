@@ -91,7 +91,13 @@ export enum RuleGroup {
   LMS = 'LMS',
   COMBINED = 'COMBINED',
   EXCEPTION = 'EXCEPTION',
+  /** Chỉ `Rule` cấu hình chung `RISK-SCORE` (trọng số + tham số dữ liệu) — không phải luật cảnh báo. */
+  RISK_SCORE = 'RISK_SCORE',
 }
+
+/** Phạm vi luật (docs/rules/08) — lưu varchar(30). */
+export const RULE_SCOPES = ['PER_COURSE', 'PER_STUDENT'] as const;
+export type RuleScope = (typeof RULE_SCOPES)[number];
 
 export enum RuleStatus {
   DRAFT = 'DRAFT',

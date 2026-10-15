@@ -43,11 +43,10 @@ RÀNG BUỘC:
 - **Nạp đồng thời**: bước nạp giữ khóa theo `(dataType, termId)` (PostgreSQL advisory lock) — lô thứ hai cùng loại, cùng học kỳ chờ lô đầu xong.
 - **Giới hạn file**: ≤ 20MB tải lên, ≤ 50.000 dòng dữ liệu (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`.
 
-**Hoàn tác lô** (người dùng chọn "có điều kiện") — Admin bấm "Hoàn tác" trên lô `LOADED`/`RECONCILED`, xác nhận lần 2 (AlertDialog), chỉ khi ĐỦ cả 3 điều kiện:
+**Hoàn tác lô** (người dùng chọn "có điều kiện") — Admin bấm "Hoàn tác" trên lô `LOADED`/`RECONCILED`, xác nhận lần 2 (AlertDialog), chỉ khi ĐỦ cả 2 điều kiện (người dùng bỏ điều kiện "chưa có `EvaluationRun`" vì mỗi lô nạp xong đều tự chạy đánh giá, điều kiện đó khiến lô học tập không bao giờ hoàn tác được):
 1. Lô chỉ THÊM dòng mới, không cập nhật dòng có sẵn (`summary.updated = 0`), và job nạp không phải chạy lại sau sự cố (`summary.retried` khác true).
-2. Chưa có `EvaluationRun` nào của học kỳ đó bắt đầu sau khi lô nạp xong (dữ liệu chưa được dùng để tính cảnh báo).
-3. Không dòng nào của lô đã bị lô khác cập nhật sau đó (`importBatchId` của mọi dòng vẫn là lô này).
-Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `Enrollment` có `firstSeenBatchId` = lô và không còn dữ liệu nguồn nào; với lô `STUDENT`: xóa `Student`/`User` lô đã tạo nếu chưa đăng nhập lần nào (`authUserId` NULL) và chưa có dữ liệu học tập; tính lại dữ liệu dẫn xuất (`attemptOutcome`, `attemptNumber`); `status = ROLLED_BACK`; ghi Audit Log `IMPORT_ROLLED_BACK`. Không đủ điều kiện → nút bị vô hiệu kèm lý do; cách sửa là nạp file đúng (ghi đè) và Cố vấn học tập đánh dấu cảnh báo sai là "không còn hiệu lực" (`INVALIDATED`).
+2. Không dòng nào của lô đã bị lô khác cập nhật sau đó (`importBatchId` của mọi dòng vẫn là lô này).
+Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `Enrollment` có `firstSeenBatchId` = lô và không còn dữ liệu nguồn nào; với lô `STUDENT`: xóa `Student`/`User` lô đã tạo nếu chưa đăng nhập lần nào (`authUserId` NULL) và chưa có dữ liệu học tập; tính lại dữ liệu dẫn xuất (`attemptOutcome`, `attemptNumber`); `status = ROLLED_BACK`; ghi Audit Log `IMPORT_ROLLED_BACK`; với lô dữ liệu học tập: tạo `EvaluationRun` (`AUTO_AFTER_IMPORT`, `importBatchId` = lô) để đánh giá lại — `RuleTrigger` cũ giữ làm lịch sử; từ Phase 5, `Alert` không còn trigger mới nào ở lần chạy lại được hệ thống chuyển `INVALIDATED` (`changedBy` NULL, lý do "dữ liệu nguồn đã được hoàn tác"). Không đủ điều kiện → nút bị vô hiệu kèm lý do; cách sửa là nạp file đúng (ghi đè) và Cố vấn học tập đánh dấu cảnh báo sai là "không còn hiệu lực" (`INVALIDATED`).
 - Chống nạp trùng: partial unique index `(sourceChecksum, dataType, COALESCE(termId, ''))` `WHERE status NOT IN ('REJECTED', 'DISCARDED', 'ROLLED_BACK')` — file đã bị từ chối/hủy/hoàn tác được nạp lại.
 - BullMQ `jobId` = `ImportBatch.id` (mỗi lô 1 mã; trùng file đã chặn ở DB). Job xác nhận nạp dùng `${id}-load` (BullMQ không cho dấu `:` trong jobId). Queue nhập chạy 1 job/lần (`05`).
 - Partial unique index chống trùng loại trừ cả `ROLLED_BACK` (file đã hoàn tác được nạp lại).
@@ -70,6 +69,8 @@ Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `
 **File lỗi tải về** (Route Handler GET — export file, chỉ Admin): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), chống chèn công thức (xem `06`), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`).
 
 ## Định dạng file và cột — header tiếng Việt không dấu
+
+**File mẫu** (`public/templates/`): mỗi loại có `.xlsx` (khuyên dùng — Excel giữ đúng tiếng Việt và ô ngày) và `.csv` UTF-8 CÓ BOM (Excel Windows mới nhận đúng tiếng Việt). `.xlsx` sinh từ `.csv` bằng `npm run templates:build` — sửa file `.csv` rồi chạy lại lệnh. File demo `docs/demo-data/*.csv` cũng có BOM. Tên (họ tên, tên học phần, tên bài) chứa `?` hoặc ký tự U+FFFD → `INVALID_FORMAT` kèm hướng dẫn: dấu hiệu Excel đã lưu CSV sai bảng mã ("CSV (Comma delimited)" thay vì "CSV UTF-8").
 
 **Kiểm tra file trước khi đọc** (`06`): đuôi `.csv`/`.xlsx` + nội dung thật (CSV: văn bản, không có byte NUL; XLSX: chữ ký ZIP) + ≤ 20MB. KHÔNG dựa vào MIME trình duyệt gửi (Windows gửi CSV dạng `application/vnd.ms-excel`).
 

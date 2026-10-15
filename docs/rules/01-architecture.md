@@ -75,7 +75,7 @@ tests/                 # Vitest; dùng docs/demo-data làm fixture nghiệm thu
 ## BullMQ Worker
 
 - MUST: worker chạy container Docker riêng, không chung process với Next.js server; worker tự khởi tạo `DataSource` riêng.
-- MUST: có các queue: `import-batch-process`, `calculate-risk-score`, `evaluate-hard-triggers`, `send-notifications`.
+- MUST: có các queue: `import-batch-process`, `evaluation-run`, `send-notifications`. Mỗi `EvaluationRun` là 1 job (`jobId` = `EvaluationRun.id`) tính cả RiskScore lẫn 10 luật theo lô 200 sinh viên — `08` yêu cầu 2 đường kích hoạt dùng chung 1 job (thay cho 2 queue `calculate-risk-score`/`evaluate-hard-triggers` cũ).
 - MUST: mọi job idempotent — dùng khóa nghiệp vụ làm BullMQ `jobId` để chặn job trùng.
 - MUST: job lỗi có retry giới hạn (`attempts: 3`, backoff exponential), không để lỗi biến mất âm thầm.
 

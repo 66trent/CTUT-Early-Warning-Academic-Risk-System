@@ -8,6 +8,7 @@ import { ImportBatchStatus, ImportSource } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { getStorage } from '@/lib/storage';
+import { requestAutoEvaluation } from '@/modules/rule-engine/services/evaluation-run.service';
 import { FileRejectedError } from '../parsing/errors';
 import { sniffImportFile } from '../parsing/file-sniff';
 import { getImportDefinition } from '../types/registry';
@@ -213,7 +214,10 @@ export async function expireStagedBatches(now = new Date()): Promise<number> {
 
 export type RollbackEligibility = { allowed: true } | { allowed: false; reason: string };
 
-/** 3 điều kiện hoàn tác lô (docs/rules/12). Điều kiện "chưa chạy đánh giá" bổ sung ở Phase 4. */
+/**
+ * Điều kiện hoàn tác lô (docs/rules/12). Người dùng bỏ điều kiện "chưa có EvaluationRun" (mỗi lô
+ * nạp xong đều tự chạy đánh giá) — hoàn tác xong tự đánh giá lại.
+ */
 export async function getRollbackEligibility(batch: ImportBatch): Promise<RollbackEligibility> {
   if (batch.status !== ImportBatchStatus.LOADED && batch.status !== ImportBatchStatus.RECONCILED) {
     return { allowed: false, reason: 'Chỉ hoàn tác được lô đã nạp.' };
@@ -250,7 +254,12 @@ export async function getRollbackEligibility(batch: ImportBatch): Promise<Rollba
 }
 
 /** Hoàn tác lô có điều kiện: xóa đúng bản ghi lô đã tạo, trong 1 transaction, có Audit Log. */
-export async function rollbackImportBatch(batchId: string, actorId: string): Promise<void> {
+export async function rollbackImportBatch(
+  batchId: string,
+  actorId: string,
+  /** Sau hoàn tác lô học tập: đánh giá lại học kỳ (docs/rules/12). */
+  afterRollback: (batch: ImportBatch) => Promise<unknown> = requestAutoEvaluation,
+): Promise<void> {
   const batch = await findBatch(batchId);
   const eligibility = await getRollbackEligibility(batch);
   if (!eligibility.allowed) throw new AppError('ROLLBACK_NOT_ALLOWED', eligibility.reason);
@@ -288,6 +297,7 @@ export async function rollbackImportBatch(batchId: string, actorId: string): Pro
       em,
     );
   });
+  if (def.requiresTerm) await afterRollback(batch);
 }
 
 /** Lô đang chờ xác nhận nhưng đã có thao tác đang chạy → client tự làm mới. */

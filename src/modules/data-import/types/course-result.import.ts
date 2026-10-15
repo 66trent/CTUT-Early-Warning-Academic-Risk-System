@@ -301,13 +301,16 @@ export const courseResultImport: ImportTypeDefinition<CourseResultRow> = {
       const current = existing.get(pairKey(row));
       if (!current) {
         const id = randomUUID();
+        const publishedAt = row.publishedAt ? vnMidnight(row.publishedAt) : now;
         inserts.push({
           id,
           enrollmentId,
           ...values,
           importBatchId: batch.id,
-          publishedAt: row.publishedAt ? vnMidnight(row.publishedAt) : now,
+          publishedAt,
           importedAt: now,
+          processPublishedAt:
+            row.resultStatus === CourseResultStatus.PROCESS_ONLY ? publishedAt : null,
         });
         result.createdKeys.push(id);
       } else if (sameValues(current, row)) {
@@ -321,6 +324,10 @@ export const courseResultImport: ImportTypeDefinition<CourseResultRow> = {
             importBatchId: batch.id,
             importedAt: now,
             ...(row.publishedAt ? { publishedAt: vnMidnight(row.publishedAt) } : {}),
+            // Nạp lại điểm giữa kỳ → cập nhật ngày công bố điểm quá trình; chuyển FINAL → giữ nguyên.
+            ...(row.resultStatus === CourseResultStatus.PROCESS_ONLY
+              ? { processPublishedAt: row.publishedAt ? vnMidnight(row.publishedAt) : now }
+              : {}),
           },
         );
         result.updated += 1;

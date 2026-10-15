@@ -75,13 +75,18 @@ export async function uploadAndValidate(
 /** Xác nhận + nạp (bước 2). */
 export async function confirmAndLoad(ds: DataSource, batchId: string): Promise<ImportBatch> {
   await confirmImportBatch(batchId, IMPORT_ACTOR, noEnqueue);
-  await loadImportBatch(batchId, { retried: false });
+  await loadImportBatch(batchId, { retried: false, afterReconciled: noEnqueue });
   return ds.getRepository(ImportBatch).findOneByOrFail({ id: batchId });
 }
 
 /** Dọn lô nhập của test (tên file bắt đầu bằng `tst-`) cùng dữ liệu nguồn và Enrollment lô tạo. */
 export async function cleanupImportBatches(ds: DataSource): Promise<void> {
   const tstBatches = `SELECT id FROM import_batches WHERE file_name LIKE 'tst-%'`;
+  // Lần chạy đánh giá trên học kỳ thử hoặc do lô thử kích hoạt, cùng kết quả của chúng.
+  const tstRuns = `SELECT id FROM evaluation_runs WHERE term_id LIKE 'TST%' OR import_batch_id IN (${tstBatches})`;
+  await ds.query(`DELETE FROM rule_triggers WHERE evaluation_run_id IN (${tstRuns})`);
+  await ds.query(`DELETE FROM risk_score_logs WHERE evaluation_run_id IN (${tstRuns})`);
+  await ds.query(`DELETE FROM evaluation_runs WHERE id IN (${tstRuns})`);
   for (const table of ['attendance_summaries', 'lms_quiz_attempts', 'course_results']) {
     await ds.query(`DELETE FROM ${table} WHERE import_batch_id IN (${tstBatches})`);
   }

@@ -62,6 +62,7 @@ RÀNG BUỘC: UNIQUE `(enrollmentId, quizKey, attemptNumber)`. File LMS thườn
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Batch cập nhật gần nhất |
 | publishedAt | DateTime | NOT NULL | | Ngày công bố điểm (`ngay_cong_bo`); trống thì = `importedAt`. Dùng cho mốc `asOf` |
 | importedAt | DateTime | NOT NULL | | Thời điểm nạp |
+| processPublishedAt | DateTime | NULL | | Ngày công bố điểm quá trình (lần nạp `PROCESS_ONLY`), GIỮ LẠI khi chuyển `FINAL` — để chạy lại đánh giá ở mốc giữa kỳ không mất `ACA-01` (chống rò rỉ thời gian, xem `08`) |
 
 Không lưu điểm hệ 4: `rule-engine` quy đổi từ `letterGrade` theo `gradeScale` của `ACA-03` lúc đánh giá (xem `08`).
 
