@@ -1,6 +1,7 @@
 import {
   AlertStatus,
   DataCompletenessLevel,
+  OfficialAcademicStatus,
   Severity,
   UserAccountStatus,
   UserRole,
@@ -42,6 +43,15 @@ export const DATA_COMPLETENESS_LABELS: Record<DataCompletenessLevel, string> = {
   [DataCompletenessLevel.FULL]: 'Đủ dữ liệu',
   [DataCompletenessLevel.PARTIAL]: 'Thiếu một phần dữ liệu',
   [DataCompletenessLevel.INSUFFICIENT]: 'Chưa đủ dữ liệu',
+};
+
+/** Tình trạng học vụ chính thức — bản sao chỉ đọc từ phòng đào tạo (docs/rules/00). */
+export const OFFICIAL_STATUS_LABELS: Record<OfficialAcademicStatus, string> = {
+  [OfficialAcademicStatus.ACTIVE]: 'Đang học',
+  [OfficialAcademicStatus.RESERVED]: 'Bảo lưu',
+  [OfficialAcademicStatus.SUSPENDED]: 'Đình chỉ',
+  [OfficialAcademicStatus.GRADUATED]: 'Tốt nghiệp',
+  [OfficialAcademicStatus.DISMISSED]: 'Buộc thôi học',
 };
 
 export const REFERENCE_ONLY_NOTICE =

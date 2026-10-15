@@ -14,11 +14,14 @@ export async function StudentProfilePage({
   requestedTerm,
   backHref,
   backLabel,
+  manageEnrollments = false,
 }: {
   studentId: string;
   requestedTerm?: string;
   backHref: string;
   backLabel: string;
+  /** Admin: đánh dấu rút học phần (chỉ khi học kỳ chưa chốt). */
+  manageEnrollments?: boolean;
 }) {
   const terms = await listTermOptions();
   const term = pickTerm(terms, requestedTerm);
@@ -45,7 +48,12 @@ export async function StudentProfilePage({
           <CardDescription>Số liệu điểm danh lấy theo ngày chốt gần nhất.</CardDescription>
         </CardHeader>
         <CardContent>
-          <CourseSnapshotTable courses={profile.courses} />
+          <CourseSnapshotTable
+            courses={profile.courses}
+            manageStudentId={
+              manageEnrollments && !profile.termClosed ? profile.studentId : undefined
+            }
+          />
         </CardContent>
       </Card>
     </div>

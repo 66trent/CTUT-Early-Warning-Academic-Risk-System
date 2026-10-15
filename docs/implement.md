@@ -112,12 +112,13 @@
 
 ## Phase 6 — Quản trị và vận hành
 
-- [ ] Cấu hình luật: xem bản `ACTIVE`, tạo phiên bản mới, dry-run (ước tính số sinh viên bị ảnh hưởng), kích hoạt có xác nhận, rồi gợi ý chạy ngay.
-- [ ] "Chạy đánh giá ngay": chọn học kỳ (tùy chọn học phần), tiến độ thật, tóm tắt kết quả và cảnh báo chất lượng dữ liệu.
-- [ ] Đánh dấu "đã rút học phần" cho 1 `Enrollment` (Audit Log).
-- [ ] Nhật ký kiểm toán (lọc, chỉ đọc); trang chính sách dữ liệu cá nhân theo `04`; ẩn danh hóa sinh viên.
-- [ ] Tổng quan Admin: số sinh viên theo lớp, số cảnh báo theo mức, chất lượng nhập liệu, sinh viên `INSUFFICIENT`.
-- [ ] Trang "Bắt đầu": checklist theo "Quy trình vận hành" ở `00`, tự đánh dấu bước đã có dữ liệu.
+- [x] Cấu hình luật: xem bản `ACTIVE`, tạo phiên bản mới, dry-run (ước tính số sinh viên bị ảnh hưởng), kích hoạt có xác nhận, rồi gợi ý chạy ngay.
+- [x] "Chạy đánh giá ngay": chọn học kỳ (tùy chọn học phần), tiến độ thật, tóm tắt kết quả và cảnh báo chất lượng dữ liệu.
+- [x] Đánh dấu "đã rút học phần" cho 1 `Enrollment` (Audit Log).
+- [x] Nhật ký kiểm toán (lọc, chỉ đọc); trang chính sách dữ liệu cá nhân theo `04`. (Ẩn danh hóa sinh viên: hoãn theo yêu cầu người dùng 2026-10-13.)
+- [x] Tổng quan Admin: số sinh viên theo lớp, số cảnh báo theo mức, chất lượng nhập liệu, sinh viên `INSUFFICIENT`.
+- [x] Trang "Bắt đầu": checklist theo "Quy trình vận hành" ở `00`, tự đánh dấu bước đã có dữ liệu.
+- [x] (Thêm) Trang tìm sinh viên `/admin/students` — lối vào hồ sơ để đánh dấu rút học phần khi sinh viên chưa có cảnh báo.
 
 **DoD:** **kiểm tra tay** từ DB rỗng (chỉ `seed`), làm theo trang "Bắt đầu" và `KET_QUA_MONG_DOI.md` đến khi CVHT thấy đúng các cảnh báo mong đợi, không sửa DB tay.
 

@@ -137,6 +137,13 @@ export async function createRuleVersion(
     order: { version: 'DESC' },
     lock: { mode: 'pessimistic_write' },
   });
+  // Mỗi luật tối đa 1 bản nháp — tránh nhầm bản nào đã chạy thử.
+  if (await em.existsBy(RuleVersion, { ruleCode, status: RuleStatus.DRAFT })) {
+    throw new AppError(
+      'DRAFT_EXISTS',
+      'Luật này đang có bản nháp — kích hoạt hoặc bỏ bản nháp trước.',
+    );
+  }
   const severity = severityOf(ruleCode, parsed);
   const version = em.create(RuleVersion, {
     ruleCode,
@@ -162,6 +169,33 @@ export async function createRuleVersion(
     em,
   );
   return version;
+}
+
+/** Bỏ bản nháp → ARCHIVED (giữ lại làm lịch sử, không xóa). Có Audit Log. */
+export async function discardRuleVersion(
+  em: EntityManager,
+  versionId: string,
+  actorId: string,
+): Promise<void> {
+  const version = await em.findOne(RuleVersion, {
+    where: { id: versionId },
+    lock: { mode: 'pessimistic_write' },
+  });
+  if (!version) throw new AppError('RULE_VERSION_NOT_FOUND', 'Không tìm thấy phiên bản luật.');
+  if (version.status !== RuleStatus.DRAFT) {
+    throw new AppError('INVALID_STATUS', 'Chỉ bỏ được phiên bản nháp.');
+  }
+  await em.update(RuleVersion, { id: versionId }, { status: RuleStatus.ARCHIVED });
+  await writeAuditLog(
+    {
+      actorId,
+      action: 'RULE_VERSION_DISCARDED',
+      targetType: 'RuleVersion',
+      targetId: versionId,
+      detail: { ruleCode: version.ruleCode, version: version.version },
+    },
+    em,
+  );
 }
 
 /**

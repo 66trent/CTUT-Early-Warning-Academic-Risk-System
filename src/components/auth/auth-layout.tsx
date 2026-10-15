@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { APP_NAME, UNIVERSITY_NAME } from '@/lib/app-config';
 
@@ -27,6 +28,11 @@ export function AuthLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
           {children}
+          <p className="mt-6 text-center text-sm">
+            <Link href="/legal/privacy-policy" className="text-muted-foreground hover:underline">
+              Chính sách bảo vệ dữ liệu cá nhân
+            </Link>
+          </p>
         </div>
       </main>
     </div>

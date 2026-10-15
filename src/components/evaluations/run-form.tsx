@@ -17,17 +17,29 @@ import {
 import { requestEvaluationAction } from '@/modules/rule-engine/actions/evaluation.actions';
 import type { EvaluationFormOptionsDto } from '@/modules/rule-engine/services/evaluation-query.service';
 
-/** "Chạy đánh giá ngay": chọn học kỳ; ở chế độ demo được chọn mốc dữ liệu trong quá khứ. */
+/** Giá trị Select cho "cả học kỳ" (Radix Select không nhận chuỗi rỗng). */
+const ALL_COURSES = '__all__';
+
+/**
+ * "Chạy đánh giá ngay": chọn học kỳ, tùy chọn 1 học phần; ở chế độ demo được chọn mốc dữ liệu
+ * trong quá khứ.
+ */
 export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; busy: boolean }) {
   const router = useRouter();
   const current = options.terms.find((t) => t.isCurrent) ?? options.terms[0];
   const [termId, setTermId] = useState(current?.termId ?? '');
+  const [courseId, setCourseId] = useState(ALL_COURSES);
   const [asOfDate, setAsOfDate] = useState('');
   const [pending, setPending] = useState(false);
+  const courses = options.courses.filter((c) => c.termId === termId);
 
   const submit = async () => {
     setPending(true);
-    const result = await requestEvaluationAction({ termId, asOfDate });
+    const result = await requestEvaluationAction({
+      termId,
+      courseId: courseId === ALL_COURSES ? '' : courseId,
+      asOfDate,
+    });
     setPending(false);
     if (!result.ok) {
       toast.error(result.message);
@@ -45,10 +57,16 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
         void submit();
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <div className="grid gap-2">
           <Label htmlFor="run-term">Học kỳ</Label>
-          <Select value={termId} onValueChange={setTermId}>
+          <Select
+            value={termId}
+            onValueChange={(value) => {
+              setTermId(value);
+              setCourseId(ALL_COURSES);
+            }}
+          >
             <SelectTrigger id="run-term" className="w-full">
               <SelectValue placeholder="Chọn học kỳ" />
             </SelectTrigger>
@@ -57,6 +75,22 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
                 <SelectItem key={t.termId} value={t.termId}>
                   {t.termName}
                   {t.isCurrent ? ' (hiện tại)' : ''}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="run-course">Học phần</Label>
+          <Select value={courseId} onValueChange={setCourseId}>
+            <SelectTrigger id="run-course" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_COURSES}>Tất cả học phần</SelectItem>
+              {courses.map((c) => (
+                <SelectItem key={c.courseId} value={c.courseId}>
+                  {c.courseId} · {c.courseName}
                 </SelectItem>
               ))}
             </SelectContent>

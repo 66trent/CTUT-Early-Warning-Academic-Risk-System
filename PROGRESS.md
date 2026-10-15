@@ -71,3 +71,12 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Lỗi tìm ra khi tự rà: đánh dấu "không còn hiệu lực" sau hoàn tác có thể bắt nhầm cảnh báo chỉ được thêm bằng chứng — đã sửa (chỉ khi sinh viên không còn trigger nào).
 - Tự kiểm tra: đăng nhập nhanh "Cố vấn học tập GV001" → Cảnh báo cần xử lý → Xem → Xác nhận đã xem → Lưu can thiệp → Đánh dấu đã giải quyết; MailHog http://localhost:8025; đăng nhập nhanh "Sinh viên KTPM2311003".
 
+
+## Phase 6 — Quản trị và vận hành (2026-10-13)
+
+- Làm: trang Cấu hình luật (danh sách 10 luật + RISK-SCORE; form ngưỡng tự sinh từ Zod của luật; bản nháp → chạy thử so với bản đang áp dụng + danh sách sinh viên thêm/bớt ≤ 50 → kích hoạt có xác nhận → gợi ý "Chạy đánh giá ngay"; bỏ nháp = `ARCHIVED`; mỗi luật tối đa 1 nháp); "Chạy đánh giá ngay" chọn được học phần, thanh tiến độ, tóm tắt cảnh báo chất lượng dữ liệu; đánh dấu / bỏ đánh dấu rút học phần ở hồ sơ sinh viên (Audit Log); trang tìm sinh viên `/admin/students`; Nhật ký hệ thống (lọc thời gian, hành động, người, đối tượng — chỉ đọc); trang `/legal/privacy-policy` 7 mục (biến `PRIVACY_*`, thiếu → "[Cần nhà trường xác nhận]"); Tổng quan Admin (KPI, biểu đồ Recharts theo mức/lớp, chất lượng nhập liệu, sinh viên chưa đủ dữ liệu); trang "Bắt đầu" 12 bước, tự đánh dấu, khóa bước thiếu dữ liệu.
+- Quyết định (ghi rule `00`, `03`, `04`, `05`, `07`, `08`, `09`, `11`): biểu đồ = Recharts + shadcn Chart; ẩn danh hóa HOÃN theo yêu cầu người dùng.
+- Kiểm tra: typecheck, lint, format, migration, schema drift, test 338 (+1 bỏ qua), build — xanh. Lưu ý: chạy cả bộ test liền nhau trong < 1 phút có thể vấp giới hạn đăng nhập 5 lần/phút (test đăng nhập đỏ chập chờn), chạy lại sau 1 phút là xanh.
+- DoD (Docker, DB rỗng chỉ `seed`, backup `backups/before-phase6-dod-20261013.dump`): làm theo trang "Bắt đầu" trên giao diện — đăng ký GV001/GV002 (xác minh qua MailHog) → duyệt → tạo 2 lớp → 2 học kỳ → nạp 5 file demo (0 lỗi) → chạy HK2 mốc 15/06 (4 dấu hiệu) và HK1 mốc 10/10 (13 dấu hiệu) → GV001 thấy 3 + 8 cảnh báo, GV002 chỉ KHMT2311012. Không sửa DB tay.
+- Còn lại (Phase 7): bảo mật, hiệu năng, backup/restore, responsive/dark mode, kịch bản demo.
+- Tự kiểm tra: Admin → Bắt đầu; Cấu hình luật → ATT-03 → sửa "Số lần đi trễ từ" = 1 → Lưu bản nháp → Chạy thử (mốc 2026-10-10) → xem 3 sinh viên thêm vào → Bỏ bản nháp; Sinh viên → tìm KTPM2311003 → Đánh dấu đã rút; Nhật ký hệ thống → lọc "Đánh dấu rút học phần".

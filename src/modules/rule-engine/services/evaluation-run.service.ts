@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { In, IsNull, type EntityManager } from 'typeorm';
 import { z } from 'zod';
 import { getDataSource } from '@/db/data-source';
+import { Enrollment } from '@/db/entities/enrollment.entity';
 import { type EvaluationDataWarning, EvaluationRun } from '@/db/entities/evaluation-run.entity';
 import { ImportBatch } from '@/db/entities/import-batch.entity';
 import { Notification } from '@/db/entities/notification.entity';
@@ -80,6 +81,12 @@ async function insertRun(em: EntityManager, input: RequestEvaluationInput): Prom
   if (!term) throw new AppError('TERM_NOT_FOUND', 'Không tìm thấy học kỳ.');
   if (term.closedAt) {
     throw new AppError('TERM_CLOSED', `${term.termName} đã chốt, không chạy đánh giá được nữa.`);
+  }
+  if (
+    input.courseId &&
+    !(await em.existsBy(Enrollment, { termId: input.termId, courseId: input.courseId }))
+  ) {
+    throw new AppError('COURSE_NOT_IN_TERM', 'Học phần này chưa có dữ liệu trong học kỳ đã chọn.');
   }
   const busy = await em.find(EvaluationRun, {
     select: { id: true, status: true },

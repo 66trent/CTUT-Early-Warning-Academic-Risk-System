@@ -16,11 +16,14 @@ Route `/legal/privacy-policy` MUST trình bày đủ 7 mục:
 6. **Quyền của sinh viên**: quyền truy cập dữ liệu của mình, quyền yêu cầu chỉnh sửa dữ liệu sai (qua phòng đào tạo, không tự sửa trong app), quyền khiếu nại.
 7. **Biện pháp bảo mật áp dụng**: mã hóa lưu trữ/truyền tải, phân quyền theo phạm vi, audit log append-only (xem `06-security.md`).
 
+Thông tin thật của trường (tên đơn vị, bộ phận + liên hệ phụ trách bảo vệ dữ liệu, thời gian lưu trữ) đọc từ biến môi trường tùy chọn `PRIVACY_CONTROLLER_NAME`, `PRIVACY_CONTACT`, `PRIVACY_RETENTION` — thiếu thì hiển thị `[Cần nhà trường xác nhận]`, MUST NOT bịa giá trị (người dùng chốt 2026-10-13).
+
 ## Ràng buộc kỹ thuật bắt buộc
 
 - MUST: mã hóa kết nối app–PostgreSQL bằng TLS; mọi kết nối ra ngoài (SMTP, webhook LMS/SIS) dùng TLS.
 - MUST: khi `Intervention.content` có khả năng chứa thông tin sức khỏe, đặt `Intervention.confidentialityLevel = SENSITIVE` — nội dung chỉ hiển thị cho CVHT phụ trách trực tiếp; ADMIN và mọi trang tổng quan KHÔNG hiển thị `content` của can thiệp `SENSITIVE`.
 - MUST: khi có yêu cầu xóa dữ liệu cá nhân, dùng cơ chế ẩn danh hóa (thay `studentId` bằng mã không thể truy ngược) thay vì xóa cứng — vì Audit Log là append-only, không thể xóa bản ghi log liên quan.
+  Chưa cài đặt — người dùng hoãn (2026-10-13), bổ sung khi cần.
 - MUST NOT: log toàn bộ payload chứa dữ liệu cá nhân ra console/file log không kiểm soát truy cập — dùng logger có redact field nhạy cảm (`email`, `Intervention.content`) trước khi ghi log vận hành thông thường (khác Audit Log nghiệp vụ).
 - MUST NOT: gửi dữ liệu cá nhân sinh viên qua dịch vụ bên thứ ba chưa xác nhận cam kết bảo mật. Ưu tiên SMTP nội bộ của trường thay vì dịch vụ email công cộng.
 - MUST: file gốc các lô nhập (MinIO) chứa dữ liệu cá nhân → chỉ Admin tải được, giữ tối thiểu 1 học kỳ và tối đa theo quy định lưu trữ hồ sơ đào tạo của trường, nêu rõ trong mục "Thời gian lưu trữ" của trang chính sách.
