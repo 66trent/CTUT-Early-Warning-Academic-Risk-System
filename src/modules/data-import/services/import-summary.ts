@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type ImportBatchSummary } from '@/db/entities/import-batch.entity';
+import { type ImportBatchSummary, type ImportWarning } from '@/db/entities/import-batch.entity';
 
 /** Cấu trúc cột jsonb `ImportBatch.summary` — validate bằng Zod trước khi ghi (docs/rules/01). */
 export const importSummarySchema: z.ZodType<ImportBatchSummary> = z.object({
@@ -27,6 +27,31 @@ export function readSummary(value: unknown): ImportSummary {
 
 export function writeSummary(summary: ImportSummary): ImportBatchSummary {
   return importSummarySchema.parse(summary);
+}
+
+/** Tối đa số cảnh báo lưu cho 1 lô (docs/rules/12). */
+export const MAX_WARNINGS = 500;
+
+/** Cột jsonb `ImportBatch.warnings` — validate bằng Zod trước khi ghi (docs/rules/01). */
+export const importWarningsSchema: z.ZodType<ImportWarning[]> = z
+  .array(
+    z.object({
+      row: z.number().int().min(1),
+      code: z.string().max(40),
+      message: z.string().max(255),
+    }),
+  )
+  .max(MAX_WARNINGS);
+
+export function writeWarnings(warnings: ImportWarning[]): ImportWarning[] | null {
+  return warnings.length === 0
+    ? null
+    : importWarningsSchema.parse(warnings.map((w) => ({ ...w, message: w.message.slice(0, 255) })));
+}
+
+export function readWarnings(value: unknown): ImportWarning[] {
+  const parsed = importWarningsSchema.safeParse(value ?? []);
+  return parsed.success ? parsed.data : [];
 }
 
 /** Ngưỡng tỷ lệ lỗi cảnh báo ở màn xem trước (docs/rules/12). */

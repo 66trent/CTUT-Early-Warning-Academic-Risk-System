@@ -1,6 +1,7 @@
 import { In, IsNull, Not } from 'typeorm';
 import { z } from 'zod';
 import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
+import { Enrollment } from '@/db/entities/enrollment.entity';
 import { Student } from '@/db/entities/student.entity';
 import { User } from '@/db/entities/user.entity';
 import { OfficialAcademicStatus, UserAccountStatus, UserRole } from '@/db/enums';
@@ -198,6 +199,10 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
     });
     if (loggedIn > 0) {
       return `${loggedIn} sinh viên trong lô đã đăng nhập hệ thống — không hoàn tác được, hãy nạp file đúng để cập nhật.`;
+    }
+    const withData = await em.count(Enrollment, { where: { studentId: In([...createdKeys]) } });
+    if (withData > 0) {
+      return 'Sinh viên trong lô đã có dữ liệu học tập — không hoàn tác được, hãy nạp file đúng để cập nhật.';
     }
     await em.delete(Student, { studentId: In([...createdKeys]) });
     await em.delete(User, {

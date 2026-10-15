@@ -5,7 +5,7 @@ import { Term } from '@/db/entities/term.entity';
 import { type ImportBatchStatus, IMPORT_DATA_TYPES } from '@/db/enums';
 import { availableImportTypes, getImportDefinition } from '../types/registry';
 import { getRollbackEligibility, isBatchBusy } from './import-batch.service';
-import { HIGH_ERROR_RATE, readSummary } from './import-summary';
+import { HIGH_ERROR_RATE, readSummary, readWarnings } from './import-summary';
 
 export const BATCHES_PAGE_SIZE = 20;
 export const ERROR_ROWS_PAGE_SIZE = 50;
@@ -39,6 +39,8 @@ export interface ImportBatchDetailDto extends ImportBatchListItemDto {
   updated: number | null;
   unchanged: number | null;
   rollback: { allowed: boolean; reason: string | null };
+  /** Cảnh báo không chặn nạp (VD điểm chữ lệch điểm tổng kết). */
+  warnings: { row: number; code: string; message: string }[];
   stagedAt: string | null;
   completedAt: string | null;
 }
@@ -135,6 +137,11 @@ export async function getImportBatchDetail(batchId: string): Promise<ImportBatch
     updated: summary.updated ?? null,
     unchanged: summary.unchanged ?? null,
     rollback: { allowed: rollback.allowed, reason: rollback.allowed ? null : rollback.reason },
+    warnings: readWarnings(batch.warnings).map((w) => ({
+      row: w.row,
+      code: w.code,
+      message: w.message,
+    })),
     stagedAt: batch.stagedAt?.toISOString() ?? null,
     completedAt: batch.completedAt?.toISOString() ?? null,
   };

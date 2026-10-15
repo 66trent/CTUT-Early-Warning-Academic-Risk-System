@@ -78,9 +78,9 @@
 
 ## Phase 3b — Nhập 3 nguồn dữ liệu học tập
 
-- [ ] Entity `Course`, `Enrollment`, `AttendanceSummary`, `LmsQuizAttempt`, `CourseResult` (`09`, `10`: `letterGrade` 2 ký tự, không lưu điểm hệ 4); migration.
-- [ ] 3 loại nhập `ATTENDANCE_SUMMARY`, `LMS_QUIZ`, `COURSE_RESULT` trên khung 3a; upsert theo khóa nghiệp vụ (nạp lại = cập nhật); kiểm tra ngày trong thời gian học kỳ (`TERM_MISMATCH`); chuẩn hóa `8/10`, `12 phút`, `Đã nộp`, `Đạt`/`Không đạt`.
-- [ ] Tự upsert `Course` và tạo `Enrollment` (tính `attemptNumber`) trong cùng transaction; `CourseResult` `PROCESS_ONLY` → `FINAL` cập nhật `attemptOutcome`, `COMPLETED`, `Course.credits`; `RESULT_ALREADY_FINAL`; cảnh báo điểm chữ lệch thang 9 mức; tính lại `attemptNumber` học kỳ sau khi kết quả thay đổi.
+- [x] Entity `Course`, `Enrollment`, `AttendanceSummary`, `LmsQuizAttempt`, `CourseResult` (`09`, `10`: `letterGrade` 2 ký tự, không lưu điểm hệ 4); migration.
+- [x] 3 loại nhập `ATTENDANCE_SUMMARY`, `LMS_QUIZ`, `COURSE_RESULT` trên khung 3a; upsert theo khóa nghiệp vụ (nạp lại = cập nhật); kiểm tra ngày trong thời gian học kỳ (`TERM_MISMATCH`); chuẩn hóa `8/10`, `12 phút`, `Đã nộp`, `Đạt`/`Không đạt`.
+- [x] Tự upsert `Course` và tạo `Enrollment` (tính `attemptNumber`) trong cùng transaction; `CourseResult` `PROCESS_ONLY` → `FINAL` cập nhật `attemptOutcome`, `COMPLETED`, `Course.credits`; `RESULT_ALREADY_FINAL`; cảnh báo điểm chữ lệch thang 9 mức; tính lại `attemptNumber` học kỳ sau khi kết quả thay đổi.
 
 **DoD:** nạp được 5 file `docs/demo-data/` theo đúng thứ tự, 0 dòng lỗi, 0 cảnh báo; số bản ghi khớp file; nạp lại cùng file bị chặn; nạp lại cùng ngày chốt / cùng lượt làm bài cập nhật chứ không nhân đôi; dòng `mssv` lạ → `STUDENT_NOT_FOUND`; KTPM2311009 · KTPM103 · HK1_2026 có `attemptNumber = 2` kể cả khi nạp file HK1 trước file HK2. **Kiểm tra tay:** sửa 1 dòng sai trong file điểm danh, nạp, tải file lỗi thấy lý do dễ hiểu.
 

@@ -184,6 +184,32 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
         </Card>
       )}
 
+      {batch.warnings.length > 0 && (
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Cảnh báo ({batch.warnings.length})</CardTitle>
+            <CardDescription>
+              Các dòng này vẫn được nạp, nhưng nên kiểm tra lại với nơi xuất dữ liệu.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="flex flex-col gap-2 text-sm">
+              {batch.warnings.map((w, i) => (
+                <li key={i} className="flex gap-2">
+                  <AlertTriangle
+                    aria-hidden
+                    className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
+                  />
+                  <span>
+                    <span className="font-medium tabular-nums">Dòng {w.row}:</span> {w.message}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {batch.errorRows > 0 && (
         <Card className="shadow-sm">
           <CardHeader>
