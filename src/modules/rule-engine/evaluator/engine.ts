@@ -29,6 +29,11 @@ export interface StudentEvaluation {
   triggers: TriggerOutput[];
   riskScore: RiskScoreResult;
   warnings: DataWarning[];
+  /**
+   * Học phần đang học có điểm danh QUÁ HẠN (STALE) tại asOf: luật điểm danh không chạy được — dấu
+   * hiệu điểm danh cũ của học phần này được GIỮ, không coi là đã hết (docs/rules/08, chốt 2026-10-15).
+   */
+  staleScopes: string[];
 }
 
 /** Ngoại lệ bước 3: nhóm dữ liệu luật cần phải AVAILABLE. */
@@ -120,5 +125,8 @@ export function evaluateStudent(input: StudentInput, ctx: EvaluationContext): St
       });
     }
   }
-  return { studentId: input.studentId, triggers, riskScore, warnings };
+  const staleScopes = facts
+    .filter((f) => f.state === 'REGISTERED' && f.attendance.status === DataStatus.STALE)
+    .map((f) => f.input.courseId);
+  return { studentId: input.studentId, triggers, riskScore, warnings, staleScopes };
 }

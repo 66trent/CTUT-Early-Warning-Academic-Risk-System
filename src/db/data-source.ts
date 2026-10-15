@@ -31,6 +31,8 @@ import { Phase3bSourceRecords1791810699905 } from './migrations/1791810699905-Ph
 import { Phase4ProcessPublishedAt1791826670549 } from './migrations/1791826670549-Phase4ProcessPublishedAt';
 import { Phase4RuleEngine1791825968315 } from './migrations/1791825968315-Phase4RuleEngine';
 import { Phase5Alerts1791894767461 } from './migrations/1791894767461-Phase5Alerts';
+import { Phase7AlertsSchedule1792054500276 } from './migrations/1792054500276-Phase7AlertsSchedule';
+import { Phase7CurrentSignals1792056820711 } from './migrations/1792056820711-Phase7CurrentSignals';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
@@ -64,6 +66,8 @@ const MIGRATIONS = [
   Phase4RuleEngine1791825968315,
   Phase4ProcessPublishedAt1791826670549,
   Phase5Alerts1791894767461,
+  Phase7AlertsSchedule1792054500276,
+  Phase7CurrentSignals1792056820711,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

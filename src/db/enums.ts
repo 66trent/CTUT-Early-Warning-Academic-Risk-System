@@ -142,6 +142,8 @@ export enum NotificationStatus {
 export enum EvaluationTrigger {
   AUTO_AFTER_IMPORT = 'AUTO_AFTER_IMPORT',
   MANUAL = 'MANUAL',
+  /** Lịch chạy mỗi đêm cho học kỳ hiện tại (docs/rules/05). */
+  SCHEDULED = 'SCHEDULED',
 }
 
 export enum EvaluationRunStatus {

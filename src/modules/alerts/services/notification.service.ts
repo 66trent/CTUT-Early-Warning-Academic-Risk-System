@@ -3,7 +3,6 @@ import { In, IsNull, type EntityManager } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { Alert } from '@/db/entities/alert.entity';
 import { Notification } from '@/db/entities/notification.entity';
-import { RuleTrigger } from '@/db/entities/rule-trigger.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
@@ -19,6 +18,7 @@ import { getEnv } from '@/lib/env';
 import { SEVERITY_LABELS } from '@/lib/labels';
 import { sendMail } from '@/lib/mailer';
 import { type AlertEvent } from './alert-sync.service';
+import { loadCurrentTriggers } from './current-signals';
 
 const EVENT_LABELS: Record<NotificationEvent, string> = {
   CREATED: 'Sinh viên có dấu hiệu cần hỗ trợ',
@@ -83,11 +83,7 @@ async function buildEmail(n: Notification): Promise<{ to: string; subject: strin
     ds.getRepository(Student).findOneByOrFail({ studentId: alert.studentId }),
     ds.getRepository(Term).findOneByOrFail({ termId: alert.termId }),
     ds.getRepository(User).findOneByOrFail({ userId: n.recipientId }),
-    ds.getRepository(RuleTrigger).find({
-      select: { reason: true },
-      where: { alertId: alert.alertId, evaluationRunId: alert.lastEvaluationRunId },
-      take: 5,
-    }),
+    loadCurrentTriggers(ds.manager, [alert]).then((m) => (m.get(alert.alertId) ?? []).slice(0, 5)),
   ]);
   const event = n.event as NotificationEvent;
   const link = `${getEnv().BETTER_AUTH_URL}/advisor?alert=${alert.alertId}`;

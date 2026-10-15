@@ -50,32 +50,41 @@ export interface AdminOverviewDto {
 }
 
 /** Sĩ số theo lớp — COUNT … GROUP BY tường minh (docs/rules/01). */
-async function countStudentsByClass(): Promise<{ classId: string; students: number }[]> {
+async function countStudentsByClass(
+  departmentId: string | null,
+): Promise<{ classId: string; students: number }[]> {
   const ds = await getDataSource();
-  const rows = await ds
+  const qb = ds
     .getRepository(AdministrativeClass)
     .createQueryBuilder('c')
     .leftJoin(Student, 's', 's.classId = c.classId')
     .select('c.classId', 'classId')
     .addSelect('COUNT(s.studentId)', 'students')
     .groupBy('c.classId')
-    .orderBy('c.classId', 'ASC')
-    .getRawMany<{ classId: string; students: string }>();
+    .orderBy('c.classId', 'ASC');
+  if (departmentId) qb.where('c.departmentId = :departmentId', { departmentId });
+  const rows = await qb.getRawMany<{ classId: string; students: string }>();
   return rows.map((r) => ({ classId: r.classId, students: Number(r.students) }));
 }
 
-async function countAlertsBySeverity(termId: string): Promise<Map<Severity, number>> {
-  const rows = await (
-    await getDataSource()
-  )
+async function countAlertsBySeverity(
+  termId: string,
+  departmentId: string | null,
+): Promise<Map<Severity, number>> {
+  const qb = (await getDataSource())
     .getRepository(Alert)
     .createQueryBuilder('a')
     .select('a.severity', 'severity')
     .addSelect('COUNT(*)', 'count')
     .where('a.termId = :termId', { termId })
     .andWhere('a.status IN (:...statuses)', { statuses: ACTIVE_ALERT_STATUSES })
-    .groupBy('a.severity')
-    .getRawMany<{ severity: Severity; count: string }>();
+    .groupBy('a.severity');
+  if (departmentId) {
+    qb.innerJoin(Student, 's', 's.studentId = a.studentId')
+      .innerJoin(AdministrativeClass, 'c', 'c.classId = s.classId')
+      .andWhere('c.departmentId = :departmentId', { departmentId });
+  }
+  const rows = await qb.getRawMany<{ severity: Severity; count: string }>();
   return new Map(rows.map((r) => [r.severity, Number(r.count)]));
 }
 
@@ -105,19 +114,28 @@ async function recentImportQuality(): Promise<AdminOverviewDto['importQuality']>
 }
 
 /** Sinh viên `INSUFFICIENT` ở lần chạy cả học kỳ gần nhất đã xong (docs/rules/07). */
-async function insufficientFromLastRun(termId: string) {
+async function insufficientFromLastRun(termId: string, departmentId: string | null) {
   const ds = await getDataSource();
   const run = await ds.getRepository(EvaluationRun).findOne({
     where: { termId, courseId: IsNull(), status: EvaluationRunStatus.COMPLETED },
     order: { createdAt: 'DESC' },
   });
   if (!run) return { run: null, count: null, students: [] };
-  const [logs, count] = await ds.getRepository(RiskScoreLog).findAndCount({
-    select: { studentId: true },
-    where: { evaluationRunId: run.id, dataCompletenessLevel: DataCompletenessLevel.INSUFFICIENT },
-    order: { studentId: 'ASC' },
-    take: INSUFFICIENT_LIST_LIMIT,
-  });
+  const logQb = ds
+    .getRepository(RiskScoreLog)
+    .createQueryBuilder('l')
+    .select(['l.id', 'l.studentId'])
+    .where('l.evaluationRunId = :runId', { runId: run.id })
+    .andWhere('l.dataCompletenessLevel = :level', { level: DataCompletenessLevel.INSUFFICIENT })
+    .orderBy('l.studentId', 'ASC')
+    .take(INSUFFICIENT_LIST_LIMIT);
+  if (departmentId) {
+    logQb
+      .innerJoin(Student, 's', 's.studentId = l.studentId')
+      .innerJoin(AdministrativeClass, 'c', 'c.classId = s.classId')
+      .andWhere('c.departmentId = :departmentId', { departmentId });
+  }
+  const [logs, count] = await logQb.getManyAndCount();
   const students = await ds.getRepository(Student).find({
     select: { studentId: true, fullName: true, classId: true },
     where: { studentId: In(logs.map((l) => l.studentId)) },
@@ -139,17 +157,21 @@ async function insufficientFromLastRun(termId: string) {
 }
 
 /** Số liệu trang Tổng quan Admin — chỉ số tổng hợp, không trả dữ liệu thô (docs/rules/05). */
-export async function getAdminOverview(): Promise<AdminOverviewDto> {
+export async function getAdminOverview(
+  departmentId: string | null = null,
+): Promise<AdminOverviewDto> {
   const ds = await getDataSource();
   const term = await ds.getRepository(Term).findOneBy({ isCurrent: true });
-  const [studentsByClass, studentCount, importQuality] = await Promise.all([
-    countStudentsByClass(),
-    ds.getRepository(Student).count(),
+  const [studentsByClass, importQuality] = await Promise.all([
+    countStudentsByClass(departmentId),
     recentImportQuality(),
   ]);
-  const severities = term ? await countAlertsBySeverity(term.termId) : new Map<Severity, number>();
+  const studentCount = studentsByClass.reduce((sum, c) => sum + c.students, 0);
+  const severities = term
+    ? await countAlertsBySeverity(term.termId, departmentId)
+    : new Map<Severity, number>();
   const insufficient = term
-    ? await insufficientFromLastRun(term.termId)
+    ? await insufficientFromLastRun(term.termId, departmentId)
     : { run: null, count: null, students: [] };
   return {
     currentTerm: term ? { termId: term.termId, termName: term.termName } : null,

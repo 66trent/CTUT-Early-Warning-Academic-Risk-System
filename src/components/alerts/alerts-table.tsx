@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { formatVnDateTime } from '@/lib/dates';
 import type { AlertListItemDto } from '@/modules/alerts/services/alert-query.service';
 import { AlertSheet } from './alert-sheet';
+import { SignalsClearedNote } from './signals-cleared-note';
 
 interface AlertsTableProps {
   items: AlertListItemDto[];
@@ -61,7 +62,16 @@ export function AlertsTable({
           </span>
         ),
       },
-      { accessorKey: 'summary', header: 'Vì sao' },
+      {
+        accessorKey: 'summary',
+        header: 'Vì sao',
+        cell: ({ row }) => (
+          <span className="flex flex-col gap-1">
+            {row.original.summary}
+            {row.original.signalsClearedAt && <SignalsClearedNote compact />}
+          </span>
+        ),
+      },
       {
         accessorKey: 'status',
         header: 'Trạng thái',

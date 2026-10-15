@@ -1,5 +1,7 @@
 import { In } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
+import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
+import { Department } from '@/db/entities/department.entity';
 import { Enrollment } from '@/db/entities/enrollment.entity';
 import { EvaluationRun } from '@/db/entities/evaluation-run.entity';
 import { RiskScoreLog } from '@/db/entities/risk-score-log.entity';
@@ -71,7 +73,9 @@ export interface EvaluationRunDetailDto extends EvaluationRunListItemDto {
 export interface EvaluationFormOptionsDto {
   terms: { termId: string; termName: string; isCurrent: boolean }[];
   /** Học phần đã có dữ liệu trong từng học kỳ — để chạy đánh giá riêng 1 học phần. */
-  courses: { termId: string; courseId: string; courseName: string }[];
+  courses: { termId: string; courseId: string; courseName: string; departmentIds: string[] }[];
+  /** Khoa để lọc học phần (khoa của lớp sinh hoạt các sinh viên đang học) — docs/rules/07. */
+  departments: { departmentId: string; departmentName: string }[];
   /** Chỉ khi DEMO_MODE=true mới chọn được mốc asOf trong quá khứ (docs/rules/06). */
   canChooseAsOf: boolean;
 }
@@ -128,22 +132,39 @@ export async function getEvaluationFormOptions(): Promise<EvaluationFormOptionsD
           .getRepository(Enrollment)
           .createQueryBuilder('e')
           .innerJoin('e.course', 'c')
+          .innerJoin(Student, 's', 's.studentId = e.studentId')
+          .innerJoin(AdministrativeClass, 'k', 'k.classId = s.classId')
           .select('e.termId', 'termId')
           .addSelect('e.courseId', 'courseId')
           .addSelect('c.courseName', 'courseName')
+          .addSelect('ARRAY_AGG(DISTINCT k.departmentId)', 'departmentIds')
           .where('e.termId IN (:...termIds)', { termIds: open.map((t) => t.termId) })
           .groupBy('e.termId')
           .addGroupBy('e.courseId')
           .addGroupBy('c.courseName')
           .orderBy('e.courseId', 'ASC')
           .limit(2000)
-          .getRawMany<{ termId: string; courseId: string; courseName: string }>();
+          .getRawMany<{
+            termId: string;
+            courseId: string;
+            courseName: string;
+            departmentIds: string[];
+          }>();
+  const departments = await (await getDataSource()).getRepository(Department).find({
+    select: { departmentId: true, departmentName: true },
+    order: { departmentId: 'ASC' },
+  });
   return {
     terms: open.map((t) => ({ termId: t.termId, termName: t.termName, isCurrent: t.isCurrent })),
     courses: courses.map((c) => ({
       termId: c.termId,
       courseId: c.courseId,
       courseName: c.courseName,
+      departmentIds: [...c.departmentIds],
+    })),
+    departments: departments.map((d) => ({
+      departmentId: d.departmentId,
+      departmentName: d.departmentName,
     })),
     canChooseAsOf: getEnv().DEMO_MODE,
   };

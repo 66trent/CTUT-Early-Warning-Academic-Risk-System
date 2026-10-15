@@ -11,6 +11,7 @@ export const RUN_STATUS_LABELS: Record<EvaluationRunStatus, string> = {
 export const RUN_TRIGGER_LABELS: Record<EvaluationTrigger, string> = {
   [EvaluationTrigger.AUTO_AFTER_IMPORT]: 'Tự động sau khi nạp',
   [EvaluationTrigger.MANUAL]: 'Admin chạy',
+  [EvaluationTrigger.SCHEDULED]: 'Tự động theo lịch',
 };
 
 export const RULE_GROUP_LABELS: Record<RuleGroup, string> = {

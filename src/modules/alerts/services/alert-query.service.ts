@@ -22,6 +22,7 @@ import {
   SEVERITY_ORDER,
 } from '@/db/enums';
 import { ADVISOR_TRANSITIONS } from './alert-lifecycle.service';
+import { loadCurrentTriggers } from './current-signals';
 import {
   evidenceRows,
   SOURCE_INLINE_LABELS,
@@ -43,6 +44,8 @@ export interface AlertListItemDto {
   summary: string;
   signalCount: number;
   lastDetectedAt: string;
+  /** Lần đánh giá cả học kỳ gần nhất không còn dấu hiệu (cảnh báo vẫn mở) — docs/rules/08. */
+  signalsClearedAt: string | null;
   advisorName: string | null;
 }
 
@@ -87,22 +90,9 @@ export interface AlertDetailDto extends AlertListItemDto {
 
 const rank = (s: Severity) => SEVERITY_ORDER.indexOf(s);
 
-/** Dấu hiệu hiện tại = trigger của lần chạy gần nhất đã áp dụng cho cảnh báo. */
+/** Dấu hiệu hiện tại của cảnh báo — xem `loadCurrentTriggers`. */
 async function currentTriggers(alerts: Alert[]): Promise<Map<string, RuleTrigger[]>> {
-  if (alerts.length === 0) return new Map();
-  const triggers = await (await getDataSource()).getRepository(RuleTrigger).find({
-    where: {
-      alertId: In(alerts.map((a) => a.alertId)),
-      evaluationRunId: In([...new Set(alerts.map((a) => a.lastEvaluationRunId))]),
-    },
-  });
-  const runOf = new Map(alerts.map((a) => [a.alertId, a.lastEvaluationRunId]));
-  const byAlert = new Map<string, RuleTrigger[]>();
-  for (const t of triggers) {
-    if (!t.alertId || runOf.get(t.alertId) !== t.evaluationRunId) continue;
-    byAlert.set(t.alertId, [...(byAlert.get(t.alertId) ?? []), t]);
-  }
-  return byAlert;
+  return loadCurrentTriggers((await getDataSource()).manager, alerts);
 }
 
 function summarize(triggers: readonly RuleTrigger[]): string {
@@ -145,6 +135,7 @@ async function toListItems(alerts: Alert[]): Promise<AlertListItemDto[]> {
         summary: summarize(ts),
         signalCount: ts.length,
         lastDetectedAt: a.lastDetectedAt.toISOString(),
+        signalsClearedAt: a.signalsClearedAt?.toISOString() ?? null,
         advisorName: advisorName.get(s?.administrativeClass?.advisorId ?? '') ?? null,
       };
     })
@@ -179,10 +170,14 @@ export async function listAdvisorAlerts(
   return toListItems(await qb.take(500).getMany());
 }
 
-/** Admin — chỉ đọc. `NO_ADVISOR`: cảnh báo của lớp chưa có Cố vấn học tập phụ trách. */
+/**
+ * Admin — chỉ đọc. `NO_ADVISOR`: cảnh báo của lớp chưa có Cố vấn học tập phụ trách.
+ * `departmentId`: lọc theo khoa của lớp sinh hoạt (docs/rules/07).
+ */
 export async function listAdminAlerts(
   termId: string,
   filter: 'ALL' | 'NO_ADVISOR',
+  departmentId: string | null = null,
 ): Promise<AlertListItemDto[]> {
   const qb = (await getDataSource())
     .getRepository(Alert)
@@ -190,6 +185,7 @@ export async function listAdminAlerts(
     .innerJoin(Student, 's', 's.studentId = a.studentId')
     .innerJoin(AdministrativeClass, 'c', 'c.classId = s.classId')
     .where('a.termId = :termId', { termId });
+  if (departmentId) qb.andWhere('c.departmentId = :departmentId', { departmentId });
   if (filter === 'NO_ADVISOR') {
     qb.andWhere('c.advisorId IS NULL').andWhere('a.status IN (:...open)', {
       open: OPEN_ALERT_STATUSES,

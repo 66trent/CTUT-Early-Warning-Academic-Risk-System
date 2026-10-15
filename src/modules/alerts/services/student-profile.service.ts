@@ -5,7 +5,6 @@ import { AttendanceSummary } from '@/db/entities/attendance-summary.entity';
 import { CourseResult } from '@/db/entities/course-result.entity';
 import { Enrollment } from '@/db/entities/enrollment.entity';
 import { LmsQuizAttempt } from '@/db/entities/lms-quiz-attempt.entity';
-import { RuleTrigger } from '@/db/entities/rule-trigger.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
@@ -18,6 +17,7 @@ import {
   SEVERITY_ORDER,
 } from '@/db/enums';
 import { type SignalSource, sourceOf, STUDENT_SUGGESTIONS } from './alert-presentation';
+import { loadCurrentTriggers } from './current-signals';
 
 export interface CourseSnapshotDto {
   enrollmentId: string;
@@ -158,9 +158,7 @@ export async function getStudentOverview(
   ]);
   const active = alert && alert.status !== AlertStatus.RESOLVED ? alert : null;
   const triggers = active
-    ? await ds.getRepository(RuleTrigger).find({
-        where: { alertId: active.alertId, evaluationRunId: active.lastEvaluationRunId },
-      })
+    ? ((await loadCurrentTriggers(ds.manager, [active])).get(active.alertId) ?? [])
     : [];
   const courseName = new Map(profile.courses.map((c) => [c.courseId, c.courseName]));
   const advisorId = student?.administrativeClass?.advisorId;

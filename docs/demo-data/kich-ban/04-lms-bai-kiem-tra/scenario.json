@@ -1,0 +1,68 @@
+{
+  "id": "04",
+  "title": "LMS-01 bỏ bài, LMS-02 điểm thấp, bài đến hạn, thiếu điểm tối đa, môn không dùng LMS",
+  "students": [
+    "KTPM2311401",
+    "KTPM2311402",
+    "KTPM2311403",
+    "KTPM2311404",
+    "KTPM2311405",
+    "KTPM2311406",
+    "KTPM2311407",
+    "KTPM2311408",
+    "KTPM2311409"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null
+    },
+    {
+      "file": "02_diem_danh.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026"
+    },
+    {
+      "file": "03_lms_bai_kiem_tra.csv",
+      "dataType": "LMS_QUIZ",
+      "termId": "HK1_2026"
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [
+        "KTPM2311402|KTPM541|LMS-01|MEDIUM",
+        "KTPM2311403|KTPM541|LMS-01|HIGH",
+        "KTPM2311404|KTPM541|LMS-01|MEDIUM",
+        "KTPM2311405|KTPM541|LMS-02|MEDIUM"
+      ],
+      "alerts": [
+        [
+          "KTPM2311402",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311403",
+          "HIGH"
+        ],
+        [
+          "KTPM2311404",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311405",
+          "MEDIUM"
+        ]
+      ],
+      "warnings": [
+        "KTPM2311407|QUIZ_MAX_SCORE_MISSING"
+      ],
+      "riskLevels": {
+        "KTPM2311409": "PARTIAL"
+      }
+    }
+  ]
+}

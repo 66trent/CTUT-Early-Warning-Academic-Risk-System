@@ -56,6 +56,12 @@ const envSchema = z
     /** Bắt buộc khi DEMO_MODE=true (mật khẩu tài khoản CVHT demo do seed:demo tạo). */
     DEMO_ADVISOR_PASSWORD: optionalString,
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+    /** Lịch chạy đánh giá học kỳ hiện tại (cron 5 trường, giờ Việt Nam) — docs/rules/05. */
+    EVALUATION_SCHEDULE: z
+      .string()
+      .trim()
+      .regex(/^(\S+\s+){4}\S+$/, 'Dạng cron 5 trường, VD "0 2 * * *"')
+      .default('0 2 * * *'),
     /** Trang chính sách dữ liệu cá nhân (docs/rules/04) — trống thì hiện "[Cần nhà trường xác nhận]". */
     PRIVACY_CONTROLLER_NAME: optionalString,
     PRIVACY_CONTACT: optionalString,

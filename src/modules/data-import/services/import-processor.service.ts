@@ -7,7 +7,7 @@ import { ImportBatchStatus } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { getStorage } from '@/lib/storage';
-import { requestAutoEvaluation } from '@/modules/rule-engine/services/evaluation-run.service';
+import { requestEvaluationAfterImport } from '@/modules/rule-engine/services/evaluation-run.service';
 import { FileRejectedError } from '../parsing/errors';
 import { type ImportFileKind } from '../parsing/file-sniff';
 import { buildHeaderMap, type HeaderMap, missingColumns } from '../parsing/headers';
@@ -361,7 +361,7 @@ export async function loadImportBatch(
       });
       // Sau commit: lô dữ liệu học tập → EvaluationRun AUTO_AFTER_IMPORT (docs/rules/08).
       if (requireDefinition(batch).requiresTerm) {
-        await (options.afterReconciled ?? requestAutoEvaluation)(batch);
+        await (options.afterReconciled ?? requestEvaluationAfterImport)(batch);
       }
     } catch (error) {
       if (error instanceof FileRejectedError) return rejectBatch(batchId, error.message);

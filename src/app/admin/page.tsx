@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { DepartmentFilter } from '@/components/admin/department-filter';
 import { AlertsBySeverityChart, StudentsByClassChart } from '@/components/admin/overview-charts';
 import { BatchStatusBadge } from '@/components/imports/batch-status-badge';
 import { PageHeader } from '@/components/page-header';
@@ -16,6 +17,7 @@ import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
 import { cn } from '@/lib/utils';
+import { listDepartments } from '@/modules/admin/services/class.service';
 import { getAdminOverview } from '@/modules/admin/services/overview.service';
 
 export const metadata: Metadata = { title: 'Tổng quan' };
@@ -37,16 +39,26 @@ function Kpi({ label, value, hint }: { label: string; value: string | number; hi
   );
 }
 
-export default async function AdminHomePage() {
+export default async function AdminHomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ department?: string }>;
+}) {
   await requireUser([UserRole.ADMIN]);
-  const o = await getAdminOverview();
+  const departments = await listDepartments();
+  const requested = (await searchParams).department;
+  const department = departments.find((d) => d.departmentId === requested) ?? null;
+  const o = await getAdminOverview(department?.departmentId ?? null);
   const termName = o.currentTerm?.termName ?? 'chưa đặt học kỳ hiện tại';
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
         title="Tổng quan"
-        description={`Số liệu học kỳ hiện tại: ${termName}. Admin chỉ giám sát, không xử lý cảnh báo.`}
+        description={`Số liệu học kỳ hiện tại: ${termName}${department ? ` · ${department.departmentName}` : ''}. Admin chỉ giám sát, không xử lý cảnh báo.`}
+        action={
+          <DepartmentFilter departments={departments} value={department?.departmentId ?? null} />
+        }
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -61,7 +73,7 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="shadow-sm">
+        <Card className="min-w-0 shadow-sm">
           <CardHeader>
             <CardTitle>Cảnh báo chưa đóng theo mức</CardTitle>
             <CardDescription>Mới, mở lại, đã xác nhận và đang xử lý · {termName}</CardDescription>
@@ -74,7 +86,7 @@ export default async function AdminHomePage() {
             )}
           </CardContent>
         </Card>
-        <Card className="shadow-sm">
+        <Card className="min-w-0 shadow-sm">
           <CardHeader>
             <CardTitle>Sĩ số theo lớp sinh hoạt</CardTitle>
             <CardDescription>{o.totals.classes} lớp</CardDescription>
@@ -93,7 +105,7 @@ export default async function AdminHomePage() {
         <CardHeader>
           <CardTitle>Chất lượng nhập liệu</CardTitle>
           <CardDescription>
-            {o.importQuality.length} lô nhập gần nhất. Tỷ lệ dòng lỗi trên{' '}
+            {o.importQuality.length} lô nhập gần nhất (toàn trường). Tỷ lệ dòng lỗi trên{' '}
             {percent(HIGH_ERROR_RATE)} được tô đậm — nên kiểm tra lại với nơi xuất dữ liệu.
           </CardDescription>
         </CardHeader>

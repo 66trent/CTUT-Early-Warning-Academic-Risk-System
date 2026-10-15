@@ -80,3 +80,15 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - DoD (Docker, DB rỗng chỉ `seed`, backup `backups/before-phase6-dod-20261013.dump`): làm theo trang "Bắt đầu" trên giao diện — đăng ký GV001/GV002 (xác minh qua MailHog) → duyệt → tạo 2 lớp → 2 học kỳ → nạp 5 file demo (0 lỗi) → chạy HK2 mốc 15/06 (4 dấu hiệu) và HK1 mốc 10/10 (13 dấu hiệu) → GV001 thấy 3 + 8 cảnh báo, GV002 chỉ KHMT2311012. Không sửa DB tay.
 - Còn lại (Phase 7): bảo mật, hiệu năng, backup/restore, responsive/dark mode, kịch bản demo.
 - Tự kiểm tra: Admin → Bắt đầu; Cấu hình luật → ATT-03 → sửa "Số lần đi trễ từ" = 1 → Lưu bản nháp → Chạy thử (mốc 2026-10-10) → xem 3 sinh viên thêm vào → Bỏ bản nháp; Sinh viên → tìm KTPM2311003 → Đánh dấu đã rút; Nhật ký hệ thống → lọc "Đánh dấu rút học phần".
+
+## Phase 7 — Hoàn thiện và demo (2026-10-15)
+
+- Sửa logic (chốt với người dùng): chạy theo 1 học phần không hạ mức; cảnh báo lưu "dấu hiệu hiện tại" (`currentTriggerIds`) — điểm danh quá hạn thì GIỮ dấu hiệu cũ, không hạ mức; hết dấu hiệu → nhãn "Lần đánh giá gần nhất không còn dấu hiệu" (không tự đóng); lịch chạy mỗi đêm `SCHEDULED` (tắt khi demo); demo không tự chạy sau nạp; bộ lọc Khoa (Tổng quan, cảnh báo Admin, chọn học phần). 2 migration (sao lưu trước khi chạy).
+- Bảo mật: rà STRIDE + checklist `06` (`docs/bao-cao/01`), thêm header bảo mật, sinh `AUTH_SECRET` mới, `STAFF_EMAIL_DOMAIN=@ctuet.edu.vn`; `npm audit` 0 high/critical (6 moderate gián tiếp qua exceljs/minio).
+- Hiệu năng (`docs/bao-cao/02`, DB `ewars_perf`): 5.000 SV, đánh giá cả học kỳ ~22 giây; mọi danh sách < 110 ms → giữ phân trang hiện tại. Sao lưu/khôi phục `npm run backup|restore`, diễn tập khớp 100% số dòng, khôi phục 5.000 SV 3,7 giây (`docs/bao-cao/03`).
+- Demo: `README.md` (máy sạch, TLS, Google OAuth, đặt lịch sao lưu), `npm run demo:reset -- --yes [--evaluate]`, 8 kịch bản nhỏ `docs/demo-data/kich-ban/` + `npm run demo:scenario -- <số>`, `docs/demo-script.md` (10 phút + "hội đồng hỏi gì → mở gì"), 40 ảnh `docs/screenshots/` (`npm run screenshots`, 0 trang tràn ngang).
+- Kiểm tra: typecheck, lint, format, migration, test 356 (gồm 8 kịch bản nghiệm thu), độ phủ rule-engine 91,4% / data-import 89,2% / khác ≥ 60%, Playwright 2/2, build — xanh (`docs/bao-cao/04`).
+- Kiểm tay (Docker): `demo:reset --evaluate` → đúng 12 cảnh báo; GV001/GV002/sinh viên; cấu hình luật chạy thử; kịch bản 02 nạp qua worker → đúng 7 cảnh báo.
+- DoD máy sạch: clone mới từ GitHub → làm đúng README (npm ci, docker compose up --build, db:init, migration:run, seed, demo:reset --evaluate) trên stack Docker riêng → đúng 12 cảnh báo, Playwright 2/2, kịch bản 08 nạp 2 đợt đúng kết quả.
+- Còn lại: ẩn danh hóa sinh viên (hoãn); TLS/Google OAuth khi triển khai thật.
+- Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md`; `npm run demo:scenario -- 8 --evaluate` rồi đọc `docs/demo-data/kich-ban/08-vong-doi-canh-bao/README.md`.
