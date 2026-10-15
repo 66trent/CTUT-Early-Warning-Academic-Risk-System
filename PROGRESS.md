@@ -89,5 +89,6 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Demo: `README.md` (máy sạch, TLS, Google OAuth, đặt lịch sao lưu), `npm run demo:reset -- --yes [--evaluate]`, 8 kịch bản nhỏ `docs/demo-data/kich-ban/` + `npm run demo:scenario -- <số>`, `docs/demo-script.md` (10 phút + "hội đồng hỏi gì → mở gì"), 40 ảnh `docs/screenshots/` (`npm run screenshots`, 0 trang tràn ngang).
 - Kiểm tra: typecheck, lint, format, migration, test 356 (gồm 8 kịch bản nghiệm thu), độ phủ rule-engine 91,4% / data-import 89,2% / khác ≥ 60%, Playwright 2/2, build — xanh (`docs/bao-cao/04`).
 - Kiểm tay (Docker): `demo:reset --evaluate` → đúng 12 cảnh báo; GV001/GV002/sinh viên; cấu hình luật chạy thử; kịch bản 02 nạp qua worker → đúng 7 cảnh báo.
+- DoD máy sạch: clone mới từ GitHub → làm đúng README (npm ci, docker compose up --build, db:init, migration:run, seed, demo:reset --evaluate) trên stack Docker riêng → đúng 12 cảnh báo, Playwright 2/2, kịch bản 08 nạp 2 đợt đúng kết quả.
 - Còn lại: ẩn danh hóa sinh viên (hoãn); TLS/Google OAuth khi triển khai thật.
 - Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md`; `npm run demo:scenario -- 8 --evaluate` rồi đọc `docs/demo-data/kich-ban/08-vong-doi-canh-bao/README.md`.
