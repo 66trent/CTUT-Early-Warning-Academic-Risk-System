@@ -364,7 +364,7 @@ describe('Giao diện Admin — dữ liệu trả ra là object thuần, đúng 
   });
 
   it('danh sách lần chạy + lựa chọn form (học kỳ đã chốt bị ẩn)', async () => {
-    const { items, total } = await listEvaluationRuns(1);
+    const { items, total } = await listEvaluationRuns();
     expect(total).toBeGreaterThan(0);
     expect(Object.getPrototypeOf(items[0])).toBe(Object.prototype);
     expect(items.some((r) => r.termId === HK1 && r.triggerCount > 0)).toBe(true);

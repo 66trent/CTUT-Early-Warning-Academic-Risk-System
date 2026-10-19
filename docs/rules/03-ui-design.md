@@ -7,6 +7,7 @@ Xem `00-project-context.md` cho glossary (đặc biệt: enum `Severity`, `DataC
 - MUST: dùng shadcn/ui cho mọi thành phần chuẩn (Form, Table, Dialog, Dropdown, Badge, Tabs, Sheet, Toast).
 - MUST: dùng biểu đồ (Recharts qua shadcn `Chart`) chỉ cho khu vực biểu đồ/KPI (màn hình tổng quan của CVHT và trang tổng quan ADMIN). MUST NOT dùng biểu đồ cho form nhập liệu hoặc bảng có thao tác dòng — dùng shadcn `Table`.
 - MUST NOT: cài thêm UI kit thứ 3 (Ant Design, MUI...). Nhu cầu mới chưa có trong shadcn/ui thì tự dựng bằng Radix primitives + Tailwind.
+- Phase 8b (chốt 2026-10-19) thêm thành phần shadcn: `pagination` (dùng `next/link`), `breadcrumb`, `command` (cmdk — tìm nhanh), `popover`, `progress`, `collapsible`, `scroll-area`. Thành phần tự dựng dùng chung: `EmptyState`, `PageSkeleton`, `RouteError`, `NotFoundView`, `DataPagination`, `PageHeader` (breadcrumb + nút "?"). Toast import từ `@/lib/notify` (lỗi hiện 10 giây), không import thẳng `sonner`.
 
 ## Nhận diện giao diện — trắng và xanh dương (chuẩn hệ thống quản lý trường học)
 
@@ -55,7 +56,9 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 
 ## Bảng dữ liệu
 
-- MUST: dùng `@tanstack/react-table` + shadcn `Table` cho mọi danh sách có lọc/sắp xếp/phân trang.
+- MUST: dùng `@tanstack/react-table` + shadcn `Table` cho mọi danh sách có lọc/sắp xếp/phân trang — qua component `DataTable` dùng chung.
+- MUST (Phase 8b): danh sách có thể dài phân trang PHÍA SERVER: URL `?page=&size=&sort=&dir=` (đọc bằng `parseListParams`, cỡ trang 20/50/100, mặc định 20), service nhận `ListParams` và trả `Paged<T>` (`items, total, page, size`), thanh `DataPagination` ("Hiển thị 21–40 / 135", giữ bộ lọc khi đổi trang). Sắp xếp: cột khai báo `meta.sortKey`, service ánh xạ khóa → cột theo danh sách cho phép (MUST NOT nối chuỗi từ URL vào ORDER BY); thêm cột phụ ổn định bằng `applyOrder`/`findOrder` (QueryBuilder ghi đè khi trùng cột). Offset — keyset chỉ khi > 300ms (`05`). Đang áp: tài khoản, sinh viên, lô nhập, dòng lỗi, lần chạy đánh giá, cảnh báo Admin, nhật ký.
+- MUST (Phase 8b): màn hình < 768px `DataTable` hiển thị mỗi dòng thành 1 thẻ (cột `meta.mobile: 'title'` làm tiêu đề, cột `actions`/`'footer'` ở cuối, còn lại dạng "nhãn: giá trị"), không cuộn ngang. Cột có `header` không phải chuỗi khai báo `meta.label`.
 - MUST: bảng dòng lỗi nhập liệu có cột "Lý do lỗi" (Badge đỏ nhạt) và nút "Tải xuống" ở đầu bảng.
 - MUST: bảng danh sách sinh viên nguy cơ mặc định sắp xếp Severity giảm dần, `CRITICAL` luôn ở trên cùng.
 
@@ -67,6 +70,7 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 ## Responsive & Dark mode
 
 - MUST: responsive tối thiểu 3 breakpoint: mobile (<640px), tablet (640–1024px), desktop (>1024px).
+- Menu bên (Phase 8b): ≥ 1024px đầy đủ, gom nhóm có tiêu đề (Admin: Bắt đầu · Dữ liệu nền · Hằng tuần · Cấu hình và giám sát); 768–1023px thu thành cột biểu tượng có tooltip; < 768px mở bằng nút menu (Sheet).
 - MUST: light mode là mặc định và là giao diện chính; dùng `next-themes` cho dark mode (nền slate-900, `--primary` sáng hơn `#3B82F6`, chữ trên nút primary dùng slate-950 vì chữ trắng trên `#3B82F6` chỉ đạt 3.7:1 < AA) — dùng `useTheme` của `next-themes` cho nút chuyển, không tự viết cơ chế lưu theme riêng.
 
 ## Giao diện Sinh viên — tách biệt khỏi giao diện CVHT/Admin

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
+import { stepAnchor } from '@/lib/help-links';
 import { cn } from '@/lib/utils';
 import { getSetupSteps } from '@/modules/admin/services/getting-started.service';
 import {
@@ -30,8 +31,9 @@ function StepIcon({ step }: { step: SetupStep }) {
 function StepRow({ step, index }: { step: SetupStep; index: number }) {
   return (
     <li
+      id={stepAnchor(step.key)}
       className={cn(
-        'flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:items-center',
+        'flex scroll-mt-20 flex-col gap-3 rounded-md border p-4 target:ring-2 target:ring-primary sm:flex-row sm:items-center',
         step.next && 'border-primary bg-primary-soft',
       )}
     >

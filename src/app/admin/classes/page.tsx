@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
+import { HELP_LINKS } from '@/lib/help-links';
 import {
   listAssignableAdvisors,
   listClasses,
@@ -31,6 +32,7 @@ export default async function ClassesPage() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
+        helpHref={HELP_LINKS.classes}
         title="Khoa và lớp sinh hoạt"
         description="Cố vấn học tập được gán theo lớp sinh hoạt và thấy sinh viên của các lớp mình phụ trách."
         action={<CreateClassButton departments={departments} advisors={advisors} />}

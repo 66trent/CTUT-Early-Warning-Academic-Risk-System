@@ -187,7 +187,7 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
 
 describe('Tài khoản — duyệt, khóa, đổi vai trò', () => {
   it('danh sách tài khoản: chờ duyệt lên đầu, DTO thuần', async () => {
-    const page = await listAccounts({ role: 'STAFF', page: 1, q: 'TSTGV', status: undefined });
+    const page = await listAccounts({ role: 'STAFF', q: 'TSTGV', status: undefined });
     expect(page.items[0]?.accountStatus).toBe(UserAccountStatus.PENDING_APPROVAL);
     expectPlain(page.items);
   });

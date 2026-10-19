@@ -1,12 +1,15 @@
 import type { Metadata } from 'next';
-import { AlertTriangle, ArrowLeft, Download, RotateCw } from 'lucide-react';
+import { AlertTriangle, Download, RotateCw } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
 import { AutoRefresh, RollbackAction, StagedActions } from '@/components/imports/batch-actions';
 import { BatchStatusBadge } from '@/components/imports/batch-status-badge';
+import { DataPagination } from '@/components/data-table/data-pagination';
 import { CourseCards } from '@/components/imports/course-cards';
+import { ErrorRowsTable } from '@/components/imports/error-rows-table';
 import { Button } from '@/components/ui/button';
+import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -19,9 +22,9 @@ import {
 import { ImportBatchStatus, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
 import { errorReasonLabel } from '@/modules/data-import/labels';
 import {
-  ERROR_ROWS_PAGE_SIZE,
   getImportBatchDetail,
   listErrorRows,
 } from '@/modules/data-import/services/import-query.service';
@@ -30,7 +33,7 @@ export const metadata: Metadata = { title: 'Chi tiết lô nhập' };
 
 interface BatchPageProps {
   params: Promise<{ batchId: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<RawSearchParams>;
 }
 
 function Stat({ label, value }: { label: string; value: number | string }) {
@@ -48,24 +51,24 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
   if (!batchId.success) notFound();
   const batch = await getImportBatchDetail(batchId.data);
   if (!batch) notFound();
-  const page = Math.max(1, Number((await searchParams).page) || 1);
-  const errors = batch.errorRows > 0 ? await listErrorRows(batch.id, page) : [];
-  const lastErrorPage = Math.max(1, Math.ceil(batch.errorRows / ERROR_ROWS_PAGE_SIZE));
+  const query = await searchParams;
+  const errors =
+    batch.errorRows > 0
+      ? await listErrorRows(batch.id, parseListParams(query, [], { size: 50 }))
+      : { items: [], total: 0, page: 1, size: 50 };
   const staged = batch.status === ImportBatchStatus.STAGED && !batch.confirmed;
   const loaded =
     batch.status === ImportBatchStatus.RECONCILED || batch.status === ImportBatchStatus.LOADED;
-  const errorHeaders = batch.columns ?? (errors[0] ? Object.keys(errors[0].rawData) : []);
+  const errorHeaders =
+    batch.columns ?? (errors.items[0] ? Object.keys(errors.items[0].rawData) : []);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <AutoRefresh active={batch.busy} />
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link href="/admin/imports">
-            <ArrowLeft aria-hidden />
-            Nhập dữ liệu
-          </Link>
-        </Button>
+        <PageBreadcrumbs
+          items={[{ label: 'Nhập dữ liệu', href: '/admin/imports' }, { label: batch.fileName }]}
+        />
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <h1>{batch.dataTypeLabel}</h1>
           <BatchStatusBadge status={batch.status} />
@@ -244,59 +247,24 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
                 </Link>
               </Button>
             </div>
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Dòng</TableHead>
-                    <TableHead>Lý do lỗi</TableHead>
-                    {errorHeaders.map((h) => (
-                      <TableHead key={h}>{h}</TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {errors.map((row) => (
-                    <TableRow key={row.sourceRowNumber} className="even:bg-muted">
-                      <TableCell className="tabular-nums">{row.sourceRowNumber}</TableCell>
-                      <TableCell>
-                        <span className="inline-flex flex-col">
-                          <span className="w-fit rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-950 dark:text-red-300">
-                            {errorReasonLabel(row.errorReason)}
-                          </span>
-                          {row.errorDetail && (
-                            <span className="mt-1 text-xs text-muted-foreground">
-                              {row.errorDetail}
-                            </span>
-                          )}
-                        </span>
-                      </TableCell>
-                      {errorHeaders.map((h) => (
-                        <TableCell key={h}>{row.rawData[h]}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            {lastErrorPage > 1 && (
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>
-                  Trang {page}/{lastErrorPage}
-                </span>
-                <div className="flex gap-2">
-                  {page > 1 && (
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/admin/imports/${batch.id}?page=${page - 1}`}>Trang trước</Link>
-                    </Button>
-                  )}
-                  {page < lastErrorPage && (
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/admin/imports/${batch.id}?page=${page + 1}`}>Trang sau</Link>
-                    </Button>
-                  )}
-                </div>
-              </div>
+            <ErrorRowsTable
+              headers={errorHeaders}
+              rows={errors.items.map((r) => ({
+                sourceRowNumber: r.sourceRowNumber,
+                reasonLabel: errorReasonLabel(r.errorReason),
+                errorDetail: r.errorDetail,
+                rawData: r.rawData,
+              }))}
+            />
+            {errors.total > errors.size && (
+              <DataPagination
+                basePath={`/admin/imports/${batch.id}`}
+                params={query}
+                total={errors.total}
+                page={errors.page}
+                size={errors.size}
+                unit="dòng lỗi"
+              />
             )}
           </CardContent>
         </Card>

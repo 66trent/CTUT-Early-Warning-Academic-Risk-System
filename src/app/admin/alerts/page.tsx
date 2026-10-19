@@ -1,16 +1,25 @@
 import type { Metadata } from 'next';
+import { ShieldCheck, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { DepartmentFilter } from '@/components/admin/department-filter';
+import { DataPagination } from '@/components/data-table/data-pagination';
 import { AlertsTable } from '@/components/alerts/alerts-table';
 import { TermFilter } from '@/components/alerts/term-filter';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
+import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
+import { HELP_LINKS } from '@/lib/help-links';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
 import { listDepartments } from '@/modules/admin/services/class.service';
-import { listAdminAlerts } from '@/modules/alerts/services/alert-query.service';
+import {
+  ALERT_DEFAULT_SORT,
+  ALERT_SORT_KEYS,
+  listAdminAlerts,
+} from '@/modules/alerts/services/alert-query.service';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 
 export const metadata: Metadata = { title: 'Cảnh báo sớm' };
@@ -19,21 +28,24 @@ export const metadata: Metadata = { title: 'Cảnh báo sớm' };
 export default async function AdminAlertsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ term?: string; filter?: string; department?: string }>;
+  searchParams: Promise<RawSearchParams>;
 }) {
   await requireUser([UserRole.ADMIN]);
   const params = await searchParams;
+  const str = (k: string) => (typeof params[k] === 'string' ? params[k] : undefined);
+  const list = parseListParams(params, ALERT_SORT_KEYS, ALERT_DEFAULT_SORT);
   const [terms, departments] = await Promise.all([listTermOptions(), listDepartments()]);
-  const term = pickTerm(terms, params.term);
-  const department = departments.find((d) => d.departmentId === params.department) ?? null;
-  const noAdvisor = params.filter === 'no-advisor';
-  const items = term
+  const term = pickTerm(terms, str('term'));
+  const department = departments.find((d) => d.departmentId === str('department')) ?? null;
+  const noAdvisor = str('filter') === 'no-advisor';
+  const result = term
     ? await listAdminAlerts(
         term.termId,
         noAdvisor ? 'NO_ADVISOR' : 'ALL',
         department?.departmentId ?? null,
+        list,
       )
-    : [];
+    : { items: [], total: 0, page: 1, size: list.size };
   const link = (filter: string | null) => {
     const query = new URLSearchParams();
     if (term) query.set('term', term.termId);
@@ -44,6 +56,7 @@ export default async function AdminAlertsPage({
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
+        helpHref={HELP_LINKS.alerts}
         title="Cảnh báo sớm"
         description="Xem toàn bộ cảnh báo ở chế độ chỉ đọc. Cố vấn học tập phụ trách lớp là người xử lý."
       />
@@ -61,16 +74,35 @@ export default async function AdminAlertsPage({
         </div>
       </div>
       <Card className="shadow-sm">
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           <AlertsTable
-            items={items}
+            items={result.items}
+            serverSort={{ sort: list.sort, dir: list.dir }}
             profileBase="/admin/students"
             showAdvisor
             emptyMessage={
-              noAdvisor
-                ? 'Mọi cảnh báo đang mở đều đã có Cố vấn học tập phụ trách.'
-                : 'Chưa có cảnh báo nào trong học kỳ này.'
+              noAdvisor ? (
+                <EmptyState
+                  icon={UserCheck}
+                  title="Mọi cảnh báo đang mở đều đã có Cố vấn học tập phụ trách"
+                />
+              ) : (
+                <EmptyState
+                  icon={ShieldCheck}
+                  title="Chưa có cảnh báo nào trong học kỳ này"
+                  description="Cảnh báo xuất hiện sau khi nạp dữ liệu học tập và chạy đánh giá."
+                  action={{ href: '/admin/evaluations', label: 'Chạy đánh giá' }}
+                />
+              )
             }
+          />
+          <DataPagination
+            basePath="/admin/alerts"
+            params={params}
+            total={result.total}
+            page={result.page}
+            size={result.size}
+            unit="cảnh báo"
           />
         </CardContent>
       </Card>

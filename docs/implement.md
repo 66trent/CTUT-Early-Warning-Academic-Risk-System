@@ -175,18 +175,66 @@ Code:
 
 **Kết quả (2026-10-19):** đạt DoD — typecheck, lint, format, migration:check, 365 test, build xanh; `demo:reset --evaluate` ra đúng 10 → 13 → 16 cảnh báo; kiểm tay: cảnh báo sai tên ở lô điểm danh, CVHT thấy LMS-03 của KTPM2411908, hộp thoại chốt học kỳ liệt kê KTPM2411919 → lần chạy cuối 19 dấu hiệu, học kỳ đã chốt. Đổi so với kế hoạch: không thêm cột `khoa` (dùng khóa của lớp sinh hoạt); bộ demo chuyển sang HK1 2025–2026 (chế độ demo không cho chọn mốc tương lai).
 
-## Phase 8b — Giao diện trực quan và nạp nhiều file
+## Phase 8b–8f — Giao diện và trải nghiệm (chốt 2026-10-19)
 
-- [ ] Nạp nhiều file 1 lần (cùng loại, cùng học kỳ) → 1 lô: xem trước tóm tắt từng file (lớp học phần, số sinh viên, ngày chốt / bài), dòng lỗi ghi tên file + số dòng; giới hạn tổng 50.000 dòng / 20MB mỗi file như cũ.
-- [ ] Trang sinh viên: bỏ nhãn "Ổn định"; mỗi học phần thanh tiến độ vắng so với vạch 20%, bài trắc nghiệm / thực hành đã nộp / quá hạn — số liệu thật, cảnh báo vẫn chỉ hiện sau khi CVHT xác nhận (`07`).
-- [ ] Danh sách CVHT: cột lý do = câu nguyên nhân nặng nhất; tìm kiếm; lọc lớp / mức / nguồn; thẻ đếm Cần xử lý / Đang theo dõi / Đã xong; nhãn "quá 7 ngày chưa xử lý".
-- [ ] Ma trận lớp × học phần cho CVHT (ô màu theo mức, bấm ô mở chi tiết).
-- [ ] Hồ sơ sinh viên: dòng thời gian (nạp, cảnh báo, can thiệp), biểu đồ tỷ lệ vắng theo ngày chốt, ĐTB các học kỳ, biểu tượng 3 nguồn theo mức.
-- [ ] Tổng quan Admin: thay "Sĩ số theo lớp" bằng cảnh báo theo nguồn, theo lớp/khoa, xu hướng theo tuần, top học phần nhiều cảnh báo, tỷ lệ đã xử lý.
-- [ ] Trang nhập: bảng "tuần này học phần nào chưa có điểm danh / LMS".
-- [ ] Cập nhật `03`/`07` nếu đổi quy ước giao diện; chụp lại ảnh (`npm run screenshots`); sửa Playwright 2 luồng; `docs/demo-script.md`.
+Căn cứ: 8 góp ý của người dùng (2026-10-19) + 7 mục bổ sung đã đồng ý. Giữ shadcn/ui, chỉ thêm thành phần (không đổi thư viện, không thêm MUI/Ant). Chia 5 phase nhỏ, mỗi phase 1 PR, làm đúng thứ tự (phase sau dùng khung của 8b). Đã có sẵn, chỉ nâng cấp: chuông thông báo CVHT (`notification-bell.tsx`), toast (sonner), trạng thái mục menu đang chọn, `PageHeader`.
 
-**DoD:** toàn bộ test + `build` xanh; Playwright 2 luồng chạy được. **Kiểm tra tay:** 3 kích thước màn hình + dark mode; nạp 3 file điểm danh 1 lần; CVHT tìm được 1 sinh viên bằng ma trận lớp trong ≤ 2 click.
+### Phase 8b — Nền tảng giao diện dùng chung
+
+- [x] Thêm thành phần shadcn: `pagination`, `breadcrumb`, `command`, `popover`, `progress`, `collapsible`, `scroll-area` (kiểm lại import theo bẫy #18).
+- [x] Phân trang + sắp xếp phía server: helper `parseListParams()` (`?page=&size=&sort=&dir=`, mặc định 20 dòng, tối đa 100), service trả `{ items, total }`, component `DataPagination` ("Hiển thị 21–40 / 135", giữ bộ lọc trên URL), tiêu đề cột bấm để sắp xếp. Offset (keyset chỉ khi > 300ms — chốt Phase 7). Áp cho: sinh viên, tài khoản, lô nhập, dòng lỗi, lần chạy đánh giá, cảnh báo Admin, nhật ký hệ thống. Test `expectPlain()` + test trang cuối / trang vượt quá.
+- [x] Bảng trên điện thoại: component `ResponsiveTable` — màn hình < 768px mỗi dòng thành 1 thẻ (cột chính làm tiêu đề, cột còn lại dạng "nhãn: giá trị"), không cuộn ngang; áp cho mọi bảng ở trên.
+- [x] Trạng thái tải / lỗi / trống: `loading.tsx` kèm skeleton đúng bố cục cho mỗi nhóm trang (`admin`, `advisor`, `student`), `error.tsx` (thông báo dễ hiểu + nút thử lại, không lộ lỗi kỹ thuật), `not-found.tsx`; component `EmptyState` (biểu tượng + tiêu đề + 1 câu giải thích + nút việc cần làm tiếp, VD "Chưa có sinh viên → Nhập danh sách sinh viên").
+- [x] `PageHeader` thêm breadcrumb + nút "?" mở đúng mục hướng dẫn (dùng ở 8c).
+- [x] Menu bên trái gom nhóm có tiêu đề — Admin: **Bắt đầu** (Bắt đầu, Tổng quan) · **Dữ liệu nền** (Tài khoản, Học kỳ, Khoa và lớp, Sinh viên) · **Hằng tuần** (Nhập dữ liệu, Chạy đánh giá, Cảnh báo sớm) · **Cấu hình và giám sát** (Cấu hình luật, Nhật ký); CVHT, sinh viên ít mục — không gom. Thu gọn menu thành biểu tượng trên màn hình vừa.
+- [x] Tìm nhanh Ctrl+K (`command`) cho Admin + CVHT: gõ MSSV / họ tên (bỏ dấu) → tối đa 8 sinh viên, Enter mở hồ sơ; CVHT chỉ thấy sinh viên lớp mình (`assertScope`, lọc ở server). Thêm mục điều hướng nhanh tới các trang. Nút kính lúp trên thanh trên cùng cho điện thoại. Rate-limit nhẹ; truy vấn có index.
+- [x] Toast thống nhất: mọi Server Action thành công/thất bại hiện toast cùng kiểu (rà các form còn thiếu), lỗi giữ lâu hơn.
+- [x] Cập nhật `03`/`07`: quy ước phân trang, thẻ trên điện thoại, ô trống, menu nhóm, Ctrl+K.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `test`, `build` xanh. **Kiểm tra tay:** script tạo > 50 tài khoản/lô thử → phân trang, sắp xếp, giữ bộ lọc; điện thoại 375px không cuộn ngang; Ctrl+K tìm sinh viên bằng tên không dấu; CVHT không tìm thấy sinh viên lớp khác; tắt DB thấy trang lỗi thân thiện.
+
+**Kết quả (2026-10-19):** đạt DoD phần tự động — typecheck, lint, format, migration:check, 376 test, build xanh. Kiểm tay trên trình duyệt: phân trang + sắp xếp + giữ bộ lọc ở Nhật ký (134 bản ghi, 7 trang) và Tài khoản; trang vượt quá có nút "Về trang cuối"; 375px không cuộn ngang, bảng thành thẻ; 820px menu thu thành biểu tượng; Ctrl+K gõ "le van cuong" ra Lê Văn Cường → Enter mở hồ sơ (breadcrumb); nút "?" mở đúng bước. Đổi so với kế hoạch: không tạo script > 50 tài khoản (dùng Nhật ký có sẵn 134 dòng); chưa thử tắt DB để xem trang lỗi (DB dùng chung với phiên khác) — trang lỗi chỉ kiểm bằng code; không thêm index cho tìm nhanh (đo 20ms / 5.000 SV).
+
+### Phase 8c — Trang quản trị
+
+- [ ] **Bắt đầu** (`/admin/getting-started`) viết lại như tài liệu hướng dẫn: 3 phần **Thiết lập ban đầu** (khoa → duyệt CVHT → lớp + gán CVHT → nhập sinh viên) · **Mỗi học kỳ** (tạo học kỳ, đặt hiện tại, cấu hình luật) · **Hằng tuần** (nạp 3 nguồn → chạy đánh giá → theo dõi) · **Cuối kỳ** (nạp kết quả → chốt học kỳ). Mỗi bước: "Làm gì" + "Vì sao cần" + số liệu thật (VD "2 lớp, 1 lớp chưa có CVHT") + trạng thái (xong / cần làm / chưa mở vì thiếu bước trước) + nút tới trang. Thanh tiến độ tổng; bước kế tiếp được nhấn mạnh; mục hỏi đáp ngắn (accordion: "Vì sao sinh viên chưa thấy cảnh báo?", "Chưa đủ dữ liệu nghĩa là gì?"...). Nội dung hướng dẫn tách file dữ liệu riêng để nút "?" ở 8b trỏ vào.
+- [ ] **Tài khoản** (`/admin/users`): cột "Phụ trách lớp" cho CVHT (mã lớp + sĩ số, bấm sang lớp; chưa có lớp → nhãn "Chưa gán lớp"; chờ duyệt → "—"); cột "Lớp" cho sinh viên; tìm theo tên/email; lọc vai trò, trạng thái, "CVHT chưa gán lớp"; thẻ đếm trên đầu (chờ duyệt / đang hoạt động / bị khóa).
+- [ ] **Khoa và lớp** (`/admin/classes`): hàng chip chọn Khoa (kèm số lớp, số SV) + bảng phẳng phân trang: mã lớp, khóa, khoa, CVHT, sĩ số, cảnh báo đang mở; tìm theo mã lớp / tên CVHT; lọc khóa, "chưa có CVHT"; gán CVHT bằng ô chọn có tìm kiếm (`command` trong `popover`). Khoa quản lý ở thẻ riêng/hộp thoại, không trộn với bảng lớp.
+- [ ] **Kết quả đánh giá** (`/admin/evaluations/[runId]`): 1 bảng theo sinh viên — mức cao nhất, RiskScore (thanh nhỏ 0–100), mức dữ liệu, số dấu hiệu, lớp; bấm dòng mở rộng xem từng luật + học phần + lý do. Bỏ bảng RiskScore riêng. Lọc "chỉ sinh viên có dấu hiệu" (mặc định bật), mức, lớp, luật; phân trang; thẻ tóm tắt trên đầu (số SV đánh giá, có dấu hiệu, chưa đủ dữ liệu, thời gian chạy).
+- [ ] Các trang Admin còn lại dùng `PageHeader` + `EmptyState` + phân trang của 8b (Học kỳ, Sinh viên, Cảnh báo, Nhật ký, Cấu hình luật).
+
+**DoD:** test + `build` xanh. **Kiểm tra tay:** người chưa dùng hệ thống đọc trang Bắt đầu làm được tới bước nạp dữ liệu; thấy đúng lớp phụ trách của GV001; tìm 1 lớp trong ≤ 2 thao tác khi có > 20 lớp (dữ liệu thử); trang kết quả đánh giá chỉ còn 1 bảng.
+
+### Phase 8d — Hai trang tổng quan (Admin + CVHT)
+
+Dùng chung thành phần `StatCard` (số lớn + chênh lệch so với tuần trước + đường xu hướng nhỏ), `MeterBar`, `SeverityBars`, `TrendChart` (Recharts qua shadcn `Chart`), `AttentionStrip`. Mọi số liệu tính theo học kỳ đang chọn (mặc định hiện tại), truy vấn `COUNT … GROUP BY` (`01`), đo thời gian trên DB `ewars_perf` (≤ 300ms/khối, `05`). Mỗi khối có đường dẫn sang danh sách đã lọc sẵn (bấm "5 cảnh báo nghiêm trọng" → trang cảnh báo lọc mức nghiêm trọng). Phác thảo bố cục: xem bản vẽ trong phiên 2026-10-19.
+
+- [ ] **Tổng quan Admin** (`/admin`), từ trên xuống: (1) tiêu đề + học kỳ + lần đánh giá gần nhất + bộ lọc Khoa; (2) dải **Cần chú ý** — chỉ hiện khi có: cảnh báo nghiêm trọng chưa xác nhận, cảnh báo quá 7 ngày chưa xử lý, học phần chưa có dữ liệu tuần này, lô nhập lỗi > 10%, lớp chưa có CVHT; (3) 4 thẻ số: cảnh báo đang mở (± tuần trước), tỷ lệ đã xử lý (thanh), sinh viên có cảnh báo / tổng, chưa đủ dữ liệu; (4) tiến độ xử lý (thanh chia đoạn Mới → Đã xác nhận → Đang xử lý → Đã xong) + theo mức; (5) xu hướng theo tuần (cột cảnh báo mới + đường đã xử lý, 8 tuần gần nhất, theo `firstDetectedAt` / thời điểm đóng); (6) dấu hiệu theo nguồn (điểm danh / trắc nghiệm / thực hành / kết quả / kết hợp — theo tiền tố mã luật); (7) top 5 học phần nhiều sinh viên có cảnh báo; (8) bảng màu lớp × mức (nhiều lớp → top 10 + "xem tất cả"); (9) độ mới dữ liệu 4 nguồn (ngày nạp gần nhất, số học phần đã có / tổng). Bỏ "Sĩ số theo lớp"; "Chất lượng nhập liệu" thu thành dải cần chú ý + đường dẫn sang trang nhập.
+- [ ] **Tổng quan CVHT** (`/advisor`, trang mới; danh sách cảnh báo chuyển `/advisor/alerts`, giữ chuyển hướng đường dẫn cũ có tham số): dải cần chú ý (cảnh báo mới chưa xem, quá 7 ngày, can thiệp đến hạn theo dõi `FOLLOW_UP`); 4 thẻ: cần xử lý / đang theo dõi / đã xong / sinh viên có cảnh báo; theo mức + theo nguồn; lớp phụ trách (sĩ số, số cảnh báo, thanh tỷ lệ); 5 sinh viên cần chú ý nhất (mức cao nhất rồi RiskScore, bấm mở hồ sơ); xu hướng theo tuần của lớp mình; hoạt động gần đây (can thiệp, đổi trạng thái — của chính mình). Mọi truy vấn qua phạm vi CVHT; test CVHT A không thấy số liệu lớp CVHT B.
+- [ ] Test: số liệu tổng quan khớp danh sách (cùng bộ lọc) trên bộ demo; ô trống khi chưa có học kỳ / chưa chạy đánh giá; `expectPlain()`.
+
+**DoD:** test + `build` xanh; số đo hiệu năng ghi `docs/bao-cao/`. **Kiểm tra tay:** demo `--evaluate` → mọi khối có số, bấm từng khối ra đúng danh sách lọc; dark mode; điện thoại.
+
+### Phase 8e — Màn hình CVHT và sinh viên
+
+- [ ] **Danh sách cảnh báo CVHT** (`/advisor/alerts`): cột lý do = câu nguyên nhân nặng nhất; tìm kiếm; lọc lớp / mức / nguồn / trạng thái; nhãn "quá 7 ngày chưa xử lý"; phân trang; giữ nút xác nhận hàng loạt mức thấp.
+- [ ] **Xuất danh sách cảnh báo** (CSV + `.xlsx`) theo bộ lọc đang chọn: Route Handler GET, `assertScope` (CVHT chỉ lớp mình; Admin toàn bộ, chỉ đọc), chống chèn công thức (`06`), cột tiếng Việt, không có `inputSnapshot` thô / nội dung can thiệp `SENSITIVE`; ghi Audit Log `ALERT_EXPORT`; tên file `canh-bao_<hoc-ky>_<ngay>.xlsx`. Test chèn công thức + phạm vi.
+- [ ] **Thông báo**: chuông hiện sẵn → thêm trang `/advisor/notifications` (tất cả, lọc chưa đọc, phân trang), đánh dấu từng cái / tất cả đã đọc, bấm thông báo mở thẳng cảnh báo.
+- [ ] Ma trận lớp × học phần cho CVHT (ô màu theo mức cao nhất, số sinh viên; bấm ô mở danh sách sinh viên của ô đó).
+- [ ] Hồ sơ sinh viên: dòng thời gian (nạp, cảnh báo, can thiệp), biểu đồ tỷ lệ vắng theo ngày chốt (vạch 20%), ĐTB các học kỳ, biểu tượng 3 nguồn theo mức.
+- [ ] Trang sinh viên: bỏ nhãn "Ổn định"; mỗi học phần thanh tiến độ vắng so với vạch 20%, bài trắc nghiệm / thực hành đã nộp / quá hạn — số liệu thật; cảnh báo vẫn chỉ hiện sau khi CVHT xác nhận (`07`).
+- [ ] Hướng dẫn ngắn cho CVHT và sinh viên (thẻ "Lần đầu dùng?" thu gọn được + nút "?" — cùng nguồn nội dung với 8c).
+
+**DoD:** test + `build` xanh. **Kiểm tra tay:** CVHT tìm 1 sinh viên bằng ma trận ≤ 2 click; xuất `.xlsx` mở Excel đúng tiếng Việt, ô `=1+1` hiện nguyên văn; sinh viên không thấy cảnh báo chưa xác nhận.
+
+### Phase 8f — Nạp nhiều file và chốt giao diện
+
+- [ ] Nạp nhiều file 1 lần (cùng loại, cùng học kỳ) → 1 lô: xem trước tóm tắt từng file (thẻ nhận diện học phần như 8a), dòng lỗi ghi tên file + số dòng; giới hạn 50.000 dòng tổng / 20MB mỗi file; lịch sử nạp lọc theo học phần / khoa.
+- [ ] Trang nhập: bảng "tuần này học phần nào chưa có điểm danh / trắc nghiệm / thực hành" (dùng chung truy vấn độ mới dữ liệu của 8d).
+- [ ] Chụp lại ảnh (`npm run screenshots`, đường dẫn mới); sửa Playwright 2 luồng (`/advisor` → `/advisor/alerts`); cập nhật `docs/demo-script.md`, README mục ảnh.
+- [ ] Rà toàn bộ: 3 kích thước màn hình + dark mode + bàn phím (Tab, Ctrl+K, Esc) cho mọi trang.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` xanh; Playwright 2 luồng chạy được. **Kiểm tra tay:** nạp 3 file điểm danh 1 lần; demo trọn kịch bản 10 phút theo `demo-script.md` không lỗi.
 
 ## Phase 9 — Mở rộng dữ liệu demo (chưa lập chi tiết)
 

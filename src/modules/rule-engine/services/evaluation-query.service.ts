@@ -17,8 +17,11 @@ import {
   SEVERITY_ORDER,
 } from '@/db/enums';
 import { getEnv } from '@/lib/env';
+import { findOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
 
-export const RUNS_PAGE_SIZE = 20;
+export const RUN_SORT_KEYS = ['createdAt', 'asOf', 'status'] as const;
+export type RunSortKey = (typeof RUN_SORT_KEYS)[number];
+export const RUN_DEFAULT_SORT = { sort: 'createdAt', dir: 'desc' } as const;
 /** Giới hạn số dòng hiển thị trên trang chi tiết (giao diện CVHT đầy đủ ở Phase 5). */
 const DETAIL_LIMIT = 500;
 
@@ -171,16 +174,21 @@ export async function getEvaluationFormOptions(): Promise<EvaluationFormOptionsD
 }
 
 export async function listEvaluationRuns(
-  page: number,
-): Promise<{ items: EvaluationRunListItemDto[]; total: number }> {
+  list: ListParams<RunSortKey> = firstPage(RUN_DEFAULT_SORT),
+): Promise<Paged<EvaluationRunListItemDto>> {
   const [runs, total] = await (await getDataSource()).getRepository(EvaluationRun).findAndCount({
     relations: { term: true },
-    order: { createdAt: 'DESC' },
-    skip: (page - 1) * RUNS_PAGE_SIZE,
-    take: RUNS_PAGE_SIZE,
+    order: findOrder(list.sort ?? 'createdAt', list.dir, 'createdAt'),
+    skip: pageOffset(list),
+    take: list.size,
   });
   const counts = await countTriggers(runs.map((r) => r.id));
-  return { items: runs.map((r) => toListItem(r, counts.get(r.id) ?? 0)), total };
+  return {
+    items: runs.map((r) => toListItem(r, counts.get(r.id) ?? 0)),
+    total,
+    page: list.page,
+    size: list.size,
+  };
 }
 
 const rank = (s: Severity) => SEVERITY_ORDER.indexOf(s);

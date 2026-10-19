@@ -13,7 +13,12 @@ import { listAuditLogs, auditFilterSchema } from '@/modules/admin/services/audit
 import { setEnrollmentWithdrawn } from '@/modules/admin/services/enrollment.service';
 import { getSetupCounts } from '@/modules/admin/services/getting-started.service';
 import { getAdminOverview } from '@/modules/admin/services/overview.service';
-import { searchStudents } from '@/modules/admin/services/student-search.service';
+import { firstPage } from '@/lib/list-params';
+import {
+  foldVietnamese,
+  quickSearchStudents,
+  searchStudents,
+} from '@/modules/admin/services/student-search.service';
 import {
   DEFAULT_RISK_SCORE_CONFIG,
   RISK_SCORE_RULE_CODE,
@@ -279,10 +284,28 @@ describe('Nhật ký kiểm toán — lọc, chỉ đọc', () => {
       to: undefined,
       actor: undefined,
       target: undefined,
-      page: 1,
     });
     const wildcard = await listAuditLogs(auditFilterSchema.parse({ target: '%TSTK2411903%' }));
     expect(wildcard.total).toBe(0);
+  });
+});
+
+describe('Tìm nhanh Ctrl+K', () => {
+  it('gõ không dấu tìm được họ tên có dấu; MSSV khớp đầu chuỗi lên trước; tối đa 8', async () => {
+    expect(foldVietnamese('Lê Văn Cường ĐỨC')).toBe('le van cuong duc');
+    const byName = await quickSearchStudents('le van cuong', null);
+    expect(byName.map((s) => s.studentId)).toContain('TSTK2411903');
+    expectPlain(byName);
+    const byId = await quickSearchStudents('tstk24119', null);
+    expect(byId.length).toBeLessThanOrEqual(8);
+    expect(byId.every((s) => s.studentId.startsWith('TSTK24119'))).toBe(true);
+    expect(await quickSearchStudents('a', null)).toEqual([]);
+    expect(await quickSearchStudents('%%', null)).toEqual([]);
+  });
+
+  it('Cố vấn học tập chỉ thấy sinh viên lớp mình phụ trách', async () => {
+    expect((await quickSearchStudents('TSTK2411903', DEMO.advisorA)).length).toBe(1);
+    expect(await quickSearchStudents('TSTK2411903', DEMO.advisorB)).toEqual([]);
   });
 });
 
@@ -358,9 +381,27 @@ describe('Tổng quan Admin, trang "Bắt đầu", tìm sinh viên', () => {
   });
 
   it('tìm sinh viên theo mã hoặc họ tên, % không phải ký tự đại diện', async () => {
-    const byId = await searchStudents('TSTK241190', 1);
+    const byId = await searchStudents('TSTK241190');
     expectPlain(byId.items);
     expect(byId.items.map((s) => s.studentId)).toContain('TSTK2411903');
-    expect((await searchStudents('%', 1)).total).toBe(0);
+    expect((await searchStudents('%')).total).toBe(0);
+  });
+
+  it('phân trang + sắp xếp phía server: trang cuối, trang vượt quá, khóa sắp xếp', async () => {
+    const all = await searchStudents('TSTK', firstPage({ size: 100 }));
+    expect(all.total).toBeGreaterThan(2);
+    const size = 20;
+    const last = Math.ceil(all.total / size);
+    const lastPage = await searchStudents('TSTK', firstPage({ page: last, size }));
+    expect(lastPage.items.length).toBe(all.total - (last - 1) * size);
+    expectPlain(lastPage.items);
+    const beyond = await searchStudents('TSTK', firstPage({ page: last + 1, size }));
+    expect(beyond).toMatchObject({ items: [], total: all.total, page: last + 1 });
+    const desc = await searchStudents(
+      'TSTK',
+      firstPage({ size: 100, sort: 'studentId', dir: 'desc' }),
+    );
+    const ids = desc.items.map((s) => s.studentId);
+    expect(ids).toEqual([...ids].sort().reverse());
   });
 });

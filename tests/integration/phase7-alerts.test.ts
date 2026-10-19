@@ -10,6 +10,7 @@ import { RuleVersion } from '@/db/entities/rule-version.entity';
 import { EvaluationRunStatus, EvaluationTrigger, RuleStatus, Severity } from '@/db/enums';
 import { getAdminOverview } from '@/modules/admin/services/overview.service';
 import { setEnrollmentWithdrawn } from '@/modules/admin/services/enrollment.service';
+import { firstPage } from '@/lib/list-params';
 import { listAdminAlerts } from '@/modules/alerts/services/alert-query.service';
 import { syncAlertsForChunk } from '@/modules/alerts/services/alert-sync.service';
 import { loadCurrentTriggers } from '@/modules/alerts/services/current-signals';
@@ -160,7 +161,7 @@ describe('Hết dấu hiệu → giữ cảnh báo, ghi nhận "không còn dấ
     expect(cleared.signalsClearedAt).not.toBeNull();
     expect(cleared.status).toBe(before.status); // không tự đóng
     expect(cleared.severity).toBe(before.severity);
-    const list = await listAdminAlerts(DEMO.hk1, 'ALL');
+    const list = (await listAdminAlerts(DEMO.hk1, 'ALL', null, firstPage({ size: 100 }))).items;
     expect(list.find((a) => a.studentId === 'TSTK2411904')?.signalsClearedAt).not.toBeNull();
 
     await toggle(false);
@@ -191,9 +192,10 @@ describe('Lịch chạy mỗi đêm', () => {
 
 describe('Lọc theo Khoa', () => {
   it('cảnh báo, tổng quan và danh sách học phần lọc được theo khoa của lớp sinh hoạt', async () => {
-    const cntt = await listAdminAlerts(DEMO.hk1, 'ALL', 'K.CNTT');
+    const cntt = (await listAdminAlerts(DEMO.hk1, 'ALL', 'K.CNTT', firstPage({ size: 100 }))).items;
     expect(cntt.some((a) => a.studentId === 'TSTK2411903')).toBe(true);
-    const other = await listAdminAlerts(DEMO.hk1, 'ALL', 'K.KTCK');
+    const other = (await listAdminAlerts(DEMO.hk1, 'ALL', 'K.KTCK', firstPage({ size: 100 })))
+      .items;
     expect(other.some((a) => a.studentId.startsWith('TST'))).toBe(false);
 
     const overview = await getAdminOverview('K.KTCK');

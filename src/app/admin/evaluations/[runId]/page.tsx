@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { AlertTriangle, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { AlertTriangle } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
 import { DataCompletenessBadge } from '@/components/domain/data-completeness-badge';
@@ -8,7 +7,7 @@ import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { SeverityBadge } from '@/components/domain/severity-badge';
 import { RunStatusBadge } from '@/components/evaluations/run-status-badge';
 import { AutoRefresh } from '@/components/imports/batch-actions';
-import { Button } from '@/components/ui/button';
+import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -54,12 +53,12 @@ export default async function EvaluationRunPage({
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <AutoRefresh active={busy} />
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link href="/admin/evaluations">
-            <ArrowLeft aria-hidden />
-            Chạy đánh giá
-          </Link>
-        </Button>
+        <PageBreadcrumbs
+          items={[
+            { label: 'Chạy đánh giá', href: '/admin/evaluations' },
+            { label: `${run.termName} · ${formatVnDateTime(run.createdAt)}` },
+          ]}
+        />
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <h1>
             Kết quả đánh giá · {run.termName}

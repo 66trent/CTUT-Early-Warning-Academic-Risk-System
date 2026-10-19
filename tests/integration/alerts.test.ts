@@ -317,7 +317,7 @@ describe('Chuyển người phụ trách và hoàn tác lô', () => {
       }),
     ).rejects.toMatchObject({ code: 'FORBIDDEN' });
     await changeClassAdvisor({ classId: 'TSTK2411', advisorId: null }, IMPORT_ACTOR);
-    expect((await listAdminAlerts(DEMO.hk1, 'NO_ADVISOR')).length).toBeGreaterThan(0);
+    expect((await listAdminAlerts(DEMO.hk1, 'NO_ADVISOR')).total).toBeGreaterThan(0);
     await changeClassAdvisor({ classId: 'TSTK2411', advisorId: DEMO.advisorA }, IMPORT_ACTOR);
   });
 

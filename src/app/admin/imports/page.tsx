@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Download } from 'lucide-react';
-import Link from 'next/link';
+import { DataPagination } from '@/components/data-table/data-pagination';
 import { BatchesTable } from '@/components/imports/batches-table';
 import { UploadForm } from '@/components/imports/upload-form';
 import { PageHeader } from '@/components/page-header';
@@ -8,8 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
+import { HELP_LINKS } from '@/lib/help-links';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
 import {
-  BATCHES_PAGE_SIZE,
+  BATCH_DEFAULT_SORT,
+  BATCH_SORT_KEYS,
   getImportBatchDetail,
   getImportFormOptions,
   listImportBatches,
@@ -18,25 +21,24 @@ import {
 export const metadata: Metadata = { title: 'Nhập dữ liệu' };
 
 interface ImportsPageProps {
-  searchParams: Promise<{ page?: string; parent?: string }>;
+  searchParams: Promise<RawSearchParams>;
 }
 
 export default async function ImportsPage({ searchParams }: ImportsPageProps) {
   await requireUser([UserRole.ADMIN]);
   const params = await searchParams;
-  const page = Math.max(1, Number(params.page) || 1);
-  const parentDetail = params.parent
-    ? await getImportBatchDetail(params.parent).catch(() => null)
-    : null;
+  const list = parseListParams(params, BATCH_SORT_KEYS, BATCH_DEFAULT_SORT);
+  const parent = typeof params.parent === 'string' ? params.parent : null;
+  const parentDetail = parent ? await getImportBatchDetail(parent).catch(() => null) : null;
   const [options, history] = await Promise.all([
     getImportFormOptions(),
-    listImportBatches({ page }),
+    listImportBatches({}, list),
   ]);
-  const lastPage = Math.max(1, Math.ceil(history.total / BATCHES_PAGE_SIZE));
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
+        helpHref={HELP_LINKS.imports}
         title="Nhập dữ liệu"
         description="Nạp danh sách sinh viên và dữ liệu học tập từ file CSV hoặc Excel."
       />
@@ -100,24 +102,15 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
           <CardTitle>Lịch sử nạp dữ liệu</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <BatchesTable batches={history.items} />
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
-              {history.total} lần nạp · trang {page}/{lastPage}
-            </span>
-            <div className="flex gap-2">
-              {page > 1 && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href={`/admin/imports?page=${page - 1}`}>Trang trước</Link>
-                </Button>
-              )}
-              {page < lastPage && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href={`/admin/imports?page=${page + 1}`}>Trang sau</Link>
-                </Button>
-              )}
-            </div>
-          </div>
+          <BatchesTable batches={history.items} sort={{ sort: list.sort, dir: list.dir }} />
+          <DataPagination
+            basePath="/admin/imports"
+            params={params}
+            total={history.total}
+            page={history.page}
+            size={history.size}
+            unit="lần nạp"
+          />
         </CardContent>
       </Card>
     </div>

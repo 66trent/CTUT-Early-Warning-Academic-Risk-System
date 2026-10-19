@@ -4,7 +4,7 @@ import { Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { AlertStatusBadge } from '@/components/domain/alert-status-badge';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { SeverityBadge } from '@/components/domain/severity-badge';

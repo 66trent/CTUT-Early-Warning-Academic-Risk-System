@@ -3,7 +3,7 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import { CircleCheck, CircleDashed, Clock, Loader2, Lock, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DataTable } from '@/components/data-table/data-table';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserAccountStatus, UserRole } from '@/db/enums';
 import { ACCOUNT_STATUS_LABELS, ROLE_LABELS } from '@/lib/labels';
+import type { SortDir } from '@/lib/list-params';
 import {
   changeAccountStatusAction,
   changeRoleAction,
@@ -190,13 +191,19 @@ function AccountActions({
 export function AccountsTable({
   accounts,
   currentUserId,
+  sort,
 }: {
   accounts: AccountDto[];
   currentUserId: string;
+  sort: { sort: string | null; dir: SortDir };
 }) {
   const columns: ColumnDef<AccountDto>[] = [
-    { accessorKey: 'userId', header: 'Mã' },
-    { accessorKey: 'fullName', header: 'Họ tên' },
+    { accessorKey: 'userId', header: 'Mã', meta: { sortKey: 'userId' } },
+    {
+      accessorKey: 'fullName',
+      header: 'Họ tên',
+      meta: { sortKey: 'fullName', mobile: 'title' },
+    },
     {
       accessorKey: 'email',
       header: 'Email',
@@ -212,6 +219,7 @@ export function AccountsTable({
     {
       accessorKey: 'role',
       header: 'Vai trò',
+      meta: { sortKey: 'role' },
       cell: ({ row }) => (
         <span className="inline-flex flex-col">
           {ROLE_LABELS[row.original.role]}
@@ -226,6 +234,7 @@ export function AccountsTable({
     {
       accessorKey: 'accountStatus',
       header: 'Trạng thái',
+      meta: { sortKey: 'accountStatus' },
       cell: ({ row }) => <AccountStatusBadge status={row.original.accountStatus} />,
     },
     {
@@ -241,6 +250,7 @@ export function AccountsTable({
       columns={columns}
       data={accounts}
       getRowId={(a) => a.userId}
+      serverSort={sort}
       emptyMessage="Không có tài khoản nào khớp bộ lọc."
     />
   );

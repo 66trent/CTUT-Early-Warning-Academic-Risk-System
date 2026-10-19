@@ -5,9 +5,12 @@ import { AuditLog } from '@/db/entities/audit-log.entity';
 import { User } from '@/db/entities/user.entity';
 import { AUDIT_ACTIONS, type AuditAction } from '@/lib/audit';
 import { vnEndOfDay, vnStartOfDay } from '@/lib/dates';
+import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
 import { escapeLike } from './student-search.service';
 
-export const AUDIT_PAGE_SIZE = 50;
+export const AUDIT_SORT_KEYS = ['createdAt', 'action'] as const;
+export type AuditSortKey = (typeof AUDIT_SORT_KEYS)[number];
+export const AUDIT_DEFAULT_SORT = { sort: 'createdAt', dir: 'desc' } as const;
 
 const isoDate = z
   .string()
@@ -22,7 +25,6 @@ export const auditFilterSchema = z.object({
   action: z.enum(AUDIT_ACTIONS).optional().catch(undefined),
   actor: z.string().trim().max(100).optional().catch(undefined),
   target: z.string().trim().max(100).optional().catch(undefined),
-  page: z.coerce.number().int().min(1).max(10_000).catch(1),
 });
 export type AuditFilter = z.infer<typeof auditFilterSchema>;
 
@@ -58,14 +60,18 @@ function flattenDetail(detail: Record<string, unknown> | null): { key: string; v
  */
 export async function listAuditLogs(
   filter: AuditFilter,
-): Promise<{ items: AuditLogItemDto[]; total: number }> {
+  list: ListParams<AuditSortKey> = firstPage(AUDIT_DEFAULT_SORT),
+): Promise<Paged<AuditLogItemDto>> {
   const ds = await getDataSource();
   const qb = ds
     .getRepository(AuditLog)
     .createQueryBuilder('a')
-    .orderBy('a.createdAt', 'DESC')
-    .skip((filter.page - 1) * AUDIT_PAGE_SIZE)
-    .take(AUDIT_PAGE_SIZE);
+    .skip(pageOffset(list))
+    .take(list.size);
+  applyOrder(qb, list.sort === 'action' ? 'a.action' : 'a.createdAt', list.dir, [
+    'a.createdAt',
+    'DESC',
+  ]);
   if (filter.from) qb.andWhere('a.createdAt >= :from', { from: vnStartOfDay(filter.from) });
   if (filter.to) qb.andWhere('a.createdAt <= :to', { to: vnEndOfDay(filter.to) });
   if (filter.action) qb.andWhere('a.action = :action', { action: filter.action });
@@ -111,6 +117,8 @@ export async function listAuditLogs(
       detail: flattenDetail(l.detail),
     })),
     total,
+    page: list.page,
+    size: list.size,
   };
 }
 
