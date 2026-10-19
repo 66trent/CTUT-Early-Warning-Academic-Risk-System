@@ -31,7 +31,9 @@ export interface CourseSnapshotDto {
   /** Snapshot điểm danh mới nhất, đơn vị tiết. */
   attendance: {
     snapshotDate: string;
+    /** Tổng tiết vắng (có phép + không phép). */
     absences: number;
+    unexcused: number;
     totalPeriods: number;
   } | null;
   /** Bài trắc nghiệm của lớp học phần: tổng số bài / số bài đã nộp. */
@@ -136,6 +138,7 @@ export async function getStudentProfile(
           ? {
               snapshotDate: latest.snapshotDate.toISOString(),
               absences: latest.excusedAbsence + latest.unexcusedAbsence,
+              unexcused: latest.unexcusedAbsence,
               totalPeriods: latest.totalPeriods,
             }
           : null,

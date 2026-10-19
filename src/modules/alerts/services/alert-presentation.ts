@@ -1,6 +1,9 @@
 /** Lời văn hiển thị cho dấu hiệu cảnh báo — dùng được ở client (không import DB). */
 export type SignalSource = 'ATTENDANCE' | 'LMS' | 'ACADEMIC' | 'COMBINED';
 
+/** Ngưỡng "quá hạn chưa xác nhận" (giờ thật) — người dùng chốt 7 ngày (docs/implement.md 8b–8d). */
+export const OVERDUE_DAYS = 7;
+
 export const SOURCE_LABELS: Record<SignalSource, string> = {
   ATTENDANCE: 'Điểm danh',
   LMS: 'Bài LMS (trắc nghiệm, thực hành)',

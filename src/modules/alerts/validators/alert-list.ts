@@ -7,4 +7,6 @@ export const alertExtraFilterSchema = z.object({
   severity: z.enum(Severity).optional().catch(undefined),
   status: z.enum(ALERT_STATUS_GROUPS).optional().catch(undefined),
   classId: z.string().trim().max(20).optional().catch(undefined),
+  source: z.enum(['ATTENDANCE', 'LMS', 'ACADEMIC', 'COMBINED']).optional().catch(undefined),
+  q: z.string().trim().max(100).optional().catch(undefined),
 });

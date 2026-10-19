@@ -3,6 +3,8 @@ import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 import { getStudentProfile } from '@/modules/alerts/services/student-profile.service';
+import { getStudentInsights } from '@/modules/alerts/services/student-insights.service';
+import { StudentInsightsPanel } from './student-insights';
 import { CourseSnapshotTable } from './student-profile-view';
 import { TermFilter } from './term-filter';
 
@@ -23,8 +25,13 @@ export async function StudentProfilePage({
 }) {
   const terms = await listTermOptions();
   const term = pickTerm(terms, requestedTerm);
-  const profile = term ? await getStudentProfile(studentId, term.termId) : null;
-  if (!profile || !term) notFound();
+  const [profile, insights] = term
+    ? await Promise.all([
+        getStudentProfile(studentId, term.termId),
+        getStudentInsights(studentId, term.termId),
+      ])
+    : [null, null];
+  if (!profile || !term || !insights) notFound();
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div>
@@ -37,6 +44,7 @@ export async function StudentProfilePage({
         <p className="mt-1 text-muted-foreground">Lớp {profile.classId}</p>
       </div>
       <TermFilter terms={terms} value={term.termId} />
+      <StudentInsightsPanel insights={insights} />
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Học tập theo học phần · {profile.termName}</CardTitle>

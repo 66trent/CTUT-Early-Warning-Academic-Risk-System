@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { formatVnDateTime } from '@/lib/dates';
 import type { SortDir } from '@/lib/list-params';
 import type { AlertListItemDto } from '@/modules/alerts/services/alert-query.service';
+import { OVERDUE_DAYS } from '@/modules/alerts/services/alert-presentation';
 import { AlertSheet } from './alert-sheet';
 import { SignalsClearedNote } from './signals-cleared-note';
 
@@ -73,7 +74,14 @@ export function AlertsTable({
         header: 'Vì sao',
         cell: ({ row }) => (
           <span className="flex flex-col gap-1">
-            {row.original.summary}
+            <span className="line-clamp-2 whitespace-normal md:min-w-64">
+              {row.original.summary}
+            </span>
+            {row.original.overdue && (
+              <span className="w-fit rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-950 dark:text-red-300">
+                Quá {OVERDUE_DAYS} ngày chưa xác nhận
+              </span>
+            )}
             {row.original.signalsClearedAt && <SignalsClearedNote compact />}
           </span>
         ),

@@ -131,3 +131,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Hiệu năng: tạo lại `ewars_perf` theo cấu trúc 8a, đo lại toàn bộ (`docs/bao-cao/02`): tổng quan ≤ 76 ms.
 - Kiểm tra: typecheck, lint, format, migration:check, 385 test, build — xanh; kiểm tay Admin + GV001, điện thoại, chế độ tối.
 - Tự kiểm tra: Admin → Tổng quan → bấm mục trong "Cần chú ý" / ô bảng lớp × mức; đăng nhập GV001 → Tổng quan → bấm "Cần xử lý".
+
+## Phase 8e — Màn hình CVHT và sinh viên (2026-10-19)
+
+- Rà trước khi code, người dùng chốt: ma trận sinh viên × học phần; dòng thời gian = cảnh báo + can thiệp (chỉ loại) + ngày chốt dữ liệu. Vạch vắng đọc từ ATT-01 đang áp dụng.
+- Danh sách cảnh báo (CVHT + Admin): phân trang server, lý do = dấu hiệu nặng nhất, nhãn quá 7 ngày, lọc từ khóa / lớp / mức / nguồn / trạng thái; xuất `.xlsx` + CSV (`/api/alerts/export`, `src/lib/spreadsheet.ts`, Audit Log `ALERT_EXPORT`).
+- Thông báo: trang `/advisor/notifications` (tất cả / chưa đọc, đánh dấu từng cái / tất cả), chuông không tự đánh dấu hết, có "Xem tất cả".
+- Ma trận `/advisor/matrix` (`class-matrix.service.ts`); hồ sơ sinh viên thêm mức theo nguồn, biểu đồ vắng, ĐTB các học kỳ, dòng thời gian (`student-insights.service.ts`, `rule-engine/services/student-academic.service.ts`).
+- Trang sinh viên: thẻ từng học phần với thanh vắng so với vạch, bỏ nhãn "Ổn định"; thẻ "Lần đầu dùng?" cho CVHT và sinh viên.
+- Rules `06`, `07`. Kiểm tra: typecheck, lint, format, migration:check, 395 test, build — xanh; kiểm tay GV001 + sinh viên, điện thoại.
+- Tự kiểm tra: GV001 → Cảnh báo cần xử lý → lọc + Xuất Excel; Ma trận lớp → bấm 1 ô; mở 1 sinh viên → biểu đồ vắng; đăng nhập sinh viên KTPM2411903 → thẻ học phần.

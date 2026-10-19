@@ -1,6 +1,8 @@
 import { getDataSource } from '@/db/data-source';
 import { AlertStatus, Severity, SEVERITY_ORDER } from '@/db/enums';
-import { type SignalSource } from './alert-presentation';
+import { OVERDUE_DAYS, type SignalSource } from './alert-presentation';
+
+export { OVERDUE_DAYS };
 
 /**
  * Số liệu 2 trang tổng quan (Admin, Cố vấn học tập) — docs/rules/07. Mọi số tổng hợp bằng
@@ -14,8 +16,6 @@ export interface DashboardScope {
   advisorId?: string | null;
 }
 
-/** Ngưỡng "quá hạn chưa xử lý" (giờ thật) — người dùng chốt 7 ngày (docs/implement.md 8b–8d). */
-export const OVERDUE_DAYS = 7;
 const WAITING: AlertStatus[] = [AlertStatus.OPEN, AlertStatus.REOPENED];
 const FOLLOWING: AlertStatus[] = [AlertStatus.ACKNOWLEDGED, AlertStatus.IN_PROGRESS];
 const DONE: AlertStatus[] = [AlertStatus.RESOLVED, AlertStatus.DISMISSED];

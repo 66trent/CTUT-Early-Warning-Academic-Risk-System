@@ -1,5 +1,6 @@
 'use server';
 
+import { z } from 'zod';
 import { UserRole } from '@/db/enums';
 import { runAction } from '@/lib/action';
 import { writeAuditLog } from '@/lib/audit';
@@ -20,6 +21,7 @@ import {
 import {
   type InAppNotificationDto,
   listInAppNotifications,
+  markInAppNotificationRead,
   markInAppNotificationsRead,
 } from '../services/notification.service';
 import {
@@ -32,6 +34,8 @@ import {
 
 const VIEWERS = [UserRole.ADVISOR, UserRole.ADMIN] as const;
 const ADVISOR = [UserRole.ADVISOR] as const;
+const notificationIdSchema = z.object({ notificationId: z.uuid() });
+
 const REVALIDATE = ['/advisor', '/admin/alerts', '/student'];
 
 /** Phạm vi qua lớp sinh hoạt (docs/rules/06) — "không có quyền" và "không tồn tại" cùng 1 lỗi. */
@@ -142,6 +146,17 @@ export async function listMyNotificationsAction(): Promise<
       run: (_, user) => listInAppNotifications(user.userId),
     },
   );
+}
+
+export async function markNotificationReadAction(raw: unknown): Promise<ActionResult<null>> {
+  return runAction(raw, {
+    roles: ADVISOR,
+    schema: notificationIdSchema,
+    run: async ({ notificationId }, user) => {
+      await markInAppNotificationRead(user.userId, notificationId);
+      return null;
+    },
+  });
 }
 
 export async function markNotificationsReadAction(): Promise<ActionResult<null>> {
