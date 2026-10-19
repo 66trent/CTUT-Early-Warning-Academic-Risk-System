@@ -111,3 +111,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Rules: `03` (thành phần, phân trang, thẻ điện thoại, menu), `07` (tải/lỗi/trống, Ctrl+K, breadcrumb, nút "?").
 - Kiểm tra: typecheck, lint, format, migration:check, 376 test, build — xanh. Kiểm tay trên trình duyệt đạt (xem `implement.md`); chưa thử tắt DB để xem trang lỗi.
 - Tự kiểm tra: Admin → Nhật ký hệ thống → đổi trang / số dòng / bấm tiêu đề cột; Ctrl+K gõ "le van cuong"; thu nhỏ cửa sổ < 768px xem bảng thành thẻ.
+
+## Phase 8c — Trang quản trị (2026-10-19)
+
+- Rà trước khi code, người dùng chốt: họ tên sắp theo tên rồi họ; RiskScore giữ 0–1 + thanh; danh mục khoa = chip lọc + mục thu gọn.
+- Bắt đầu: tài liệu hướng dẫn 4 phần, mỗi bước "Làm gì / Vì sao cần / Cần chuẩn bị (file mẫu)", thanh tiến độ, bước tiếp theo, mục lục, hỏi đáp; thêm bước "Xem lại luật cảnh báo" (nội dung `getting-started-content.ts`).
+- Tài khoản: cột Lớp (CVHT: lớp phụ trách + sĩ số, "Chưa gán lớp"; sinh viên: lớp), lọc "CVHT chưa gán lớp", thẻ đếm chờ duyệt / hoạt động / bị khóa bấm để lọc.
+- Khoa và lớp: chip khoa (số lớp, SV), bảng phẳng phân trang (khóa mới trước, cột cảnh báo đang mở), tìm + lọc khóa / chưa có CVHT, ô chọn CVHT có tìm kiếm; danh mục khoa thu gọn.
+- Kết quả đánh giá: 1 bảng theo sinh viên (SQL tổng hợp, phân trang DB, bỏ giới hạn 500), mở dấu hiệu trong dòng, lọc có dấu hiệu / mức / lớp / luật. Bảng luật dạng thẻ trên điện thoại.
+- Rules `03`, `07`. Kiểm tra: typecheck, lint, format, migration:check, 378 test, build — xanh; kiểm tay đạt (xem `implement.md`).
+- Tự kiểm tra: Admin → Bắt đầu; Tài khoản → lọc Cố vấn học tập; Khoa và lớp → bấm chip khoa, "Đổi Cố vấn" gõ tìm; Chạy đánh giá → mở 1 lần chạy → bấm "N dấu hiệu".

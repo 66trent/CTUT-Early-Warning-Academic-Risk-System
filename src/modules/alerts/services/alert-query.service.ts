@@ -21,7 +21,14 @@ import {
   type Severity,
   SEVERITY_ORDER,
 } from '@/db/enums';
-import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
+import {
+  applyOrder,
+  firstPage,
+  type ListParams,
+  type Paged,
+  pageOffset,
+  resolveSort,
+} from '@/lib/list-params';
 import { ADVISOR_TRANSITIONS } from './alert-lifecycle.service';
 import { loadCurrentTriggers } from './current-signals';
 import {
@@ -214,8 +221,8 @@ export async function listAdminAlerts(
   // Enum `severity` của Postgres sắp theo thứ tự khai báo LOW < … < CRITICAL.
   applyOrder(
     qb,
-    ALERT_SORT_COLUMNS[list.sort ?? 'severity'],
-    list.dir,
+    ALERT_SORT_COLUMNS[resolveSort(list, ALERT_DEFAULT_SORT).sort],
+    resolveSort(list, ALERT_DEFAULT_SORT).dir,
     ['a.lastDetectedAt', 'DESC'],
     ['a.studentId', 'ASC'],
   );

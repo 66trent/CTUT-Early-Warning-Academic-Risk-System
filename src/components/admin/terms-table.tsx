@@ -1,8 +1,9 @@
 'use client';
 
 import { type ColumnDef } from '@tanstack/react-table';
-import { CalendarCheck, Lock } from 'lucide-react';
+import { CalendarCheck, CalendarRange, Lock } from 'lucide-react';
 import { CloseTermDialog } from '@/components/admin/close-term-dialog';
+import { EmptyState } from '@/components/empty-state';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DataTable } from '@/components/data-table/data-table';
 import { Badge } from '@/components/ui/badge';
@@ -84,7 +85,13 @@ export function TermsTable({ terms, canChooseAsOf }: { terms: TermDto[]; canChoo
       columns={buildColumns(canChooseAsOf)}
       data={terms}
       getRowId={(t) => t.termId}
-      emptyMessage="Chưa có học kỳ nào. Tạo học kỳ đầu tiên rồi đặt làm học kỳ hiện tại."
+      emptyMessage={
+        <EmptyState
+          icon={CalendarRange}
+          title="Chưa có học kỳ nào"
+          description="Bấm Tạo học kỳ ở góc trên, rồi đặt học kỳ đó làm học kỳ hiện tại để bắt đầu nạp dữ liệu."
+        />
+      }
     />
   );
 }

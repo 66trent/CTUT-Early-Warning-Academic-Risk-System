@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { AdvisorCombobox } from './advisor-combobox';
 import {
   Select,
   SelectContent,
@@ -163,24 +164,13 @@ export function ClassFormDialog({ trigger, departments, advisors, editing }: Cla
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cố vấn học tập</FormLabel>
-                    <Select
-                      value={field.value ? field.value : NO_ADVISOR}
-                      onValueChange={(v) => field.onChange(v === NO_ADVISOR ? '' : v)}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={NO_ADVISOR}>Chưa gán</SelectItem>
-                        {advisors.map((a) => (
-                          <SelectItem key={a.userId} value={a.userId}>
-                            {a.fullName} ({a.userId})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <AdvisorCombobox
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        advisors={advisors}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

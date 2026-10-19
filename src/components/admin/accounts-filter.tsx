@@ -29,6 +29,8 @@ export function AccountsFilter() {
   const pathname = usePathname();
   const params = useSearchParams();
   const [q, setQ] = useState(params.get('q') ?? '');
+  const noClass = params.get('noClass') === '1';
+  const role = params.get('role') ?? 'STAFF';
 
   const update = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(params.toString());
@@ -42,8 +44,11 @@ export function AccountsFilter() {
 
   return (
     <div className="flex flex-wrap items-end gap-3">
-      <Select value={params.get('role') ?? 'STAFF'} onValueChange={(v) => update({ role: v })}>
-        <SelectTrigger className="w-72" aria-label="Lọc theo vai trò">
+      <Select
+        value={params.get('role') ?? 'STAFF'}
+        onValueChange={(v) => update({ role: v, noClass: null })}
+      >
+        <SelectTrigger className="w-full sm:w-72" aria-label="Lọc theo vai trò">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -55,7 +60,7 @@ export function AccountsFilter() {
         </SelectContent>
       </Select>
       <Select value={params.get('status') ?? ALL} onValueChange={(v) => update({ status: v })}>
-        <SelectTrigger className="w-48" aria-label="Lọc theo trạng thái">
+        <SelectTrigger className="w-full sm:w-48" aria-label="Lọc theo trạng thái">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -68,7 +73,7 @@ export function AccountsFilter() {
         </SelectContent>
       </Select>
       <form
-        className="flex gap-2"
+        className="flex w-full gap-2 sm:w-auto"
         onSubmit={(e) => {
           e.preventDefault();
           update({ q: q.trim() });
@@ -78,7 +83,7 @@ export function AccountsFilter() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Tìm mã, họ tên, email"
-          className="w-64"
+          className="w-full sm:w-64"
           aria-label="Tìm tài khoản"
         />
         <Button type="submit" variant="outline">
@@ -86,6 +91,15 @@ export function AccountsFilter() {
           Tìm
         </Button>
       </form>
+      {(role === 'STAFF' || role === 'ADVISOR') && (
+        <Button
+          variant={noClass ? 'default' : 'outline'}
+          aria-pressed={noClass}
+          onClick={() => update({ noClass: noClass ? null : '1' })}
+        >
+          Cố vấn học tập chưa gán lớp
+        </Button>
+      )}
     </div>
   );
 }

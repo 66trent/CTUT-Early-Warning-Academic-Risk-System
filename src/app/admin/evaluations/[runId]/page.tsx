@@ -1,27 +1,30 @@
 import type { Metadata } from 'next';
 import { AlertTriangle } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { z } from 'zod';
-import { DataCompletenessBadge } from '@/components/domain/data-completeness-badge';
+import { DataPagination } from '@/components/data-table/data-pagination';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { SeverityBadge } from '@/components/domain/severity-badge';
 import { RunStatusBadge } from '@/components/evaluations/run-status-badge';
+import { RunStudentsFilter } from '@/components/evaluations/run-students-filter';
+import { RunStudentsTable } from '@/components/evaluations/run-students-table';
 import { AutoRefresh } from '@/components/imports/batch-actions';
 import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { EvaluationRunStatus, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
 import { DATA_WARNING_LABELS, RUN_TRIGGER_LABELS } from '@/modules/rule-engine/labels';
-import { getEvaluationRunDetail } from '@/modules/rule-engine/services/evaluation-query.service';
+import {
+  getEvaluationRunDetail,
+  listRunFilterOptions,
+  listRunStudents,
+  RUN_STUDENT_DEFAULT_SORT,
+  RUN_STUDENT_SORT_KEYS,
+} from '@/modules/rule-engine/services/evaluation-query.service';
+import { runStudentFilterSchema } from '@/modules/rule-engine/validators/evaluation';
 
 export const metadata: Metadata = { title: 'Kết quả chạy đánh giá' };
 
@@ -36,14 +39,23 @@ function Stat({ label, value }: { label: string; value: number | string }) {
 
 export default async function EvaluationRunPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ runId: string }>;
+  searchParams: Promise<RawSearchParams>;
 }) {
   await requireUser([UserRole.ADMIN]);
   const runId = z.uuid().safeParse((await params).runId);
   if (!runId.success) notFound();
   const run = await getEvaluationRunDetail(runId.data);
   if (!run) notFound();
+  const query = await searchParams;
+  const filter = runStudentFilterSchema.parse(query);
+  const list = parseListParams(query, RUN_STUDENT_SORT_KEYS, RUN_STUDENT_DEFAULT_SORT);
+  const [result, options] =
+    run.status === EvaluationRunStatus.COMPLETED
+      ? await Promise.all([listRunStudents(run.id, filter, list), listRunFilterOptions(run.id)])
+      : [null, { classes: [], rules: [] }];
   const busy =
     run.status === EvaluationRunStatus.QUEUED || run.status === EvaluationRunStatus.RUNNING;
   const progress =
@@ -75,7 +87,7 @@ export default async function EvaluationRunPage({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <Stat label="Sinh viên đã xét" value={`${run.processedStudents}/${run.totalStudents}`} />
-        <Stat label="Dấu hiệu phát hiện" value={run.triggerCount} />
+        <Stat label="Sinh viên có dấu hiệu" value={run.studentsWithSignals} />
         <Stat
           label="Cảnh báo mới / cập nhật"
           value={`${run.alertsCreated} / ${run.alertsUpdated}`}
@@ -117,11 +129,15 @@ export default async function EvaluationRunPage({
         </Card>
       )}
 
-      {run.status === EvaluationRunStatus.COMPLETED && (
+      {run.status === EvaluationRunStatus.COMPLETED && result && (
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Dấu hiệu rủi ro theo luật ({run.triggerCount})</CardTitle>
+            <CardTitle>Kết quả theo sinh viên</CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-2">
+              <span>
+                {run.studentsWithSignals}/{run.processedStudents} sinh viên có dấu hiệu ·{' '}
+                {run.triggerCount} dấu hiệu:
+              </span>
               {run.bySeverity.map((s) => (
                 <span key={s.severity} className="inline-flex items-center gap-1">
                   <SeverityBadge severity={s.severity} />
@@ -132,49 +148,31 @@ export default async function EvaluationRunPage({
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <ReferenceOnlyNotice />
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Mức</TableHead>
-                    <TableHead>Sinh viên</TableHead>
-                    <TableHead>Học phần</TableHead>
-                    <TableHead>Luật</TableHead>
-                    <TableHead>Lý do</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {run.triggers.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground">
-                        Không phát hiện dấu hiệu rủi ro nào.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {run.triggers.map((t, i) => (
-                    <TableRow key={i} className="even:bg-muted">
-                      <TableCell>
-                        <SeverityBadge severity={t.severity} />
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-medium">{t.studentName}</span>
-                        <span className="block text-xs text-muted-foreground tabular-nums">
-                          {t.studentId} · {t.classId}
-                        </span>
-                      </TableCell>
-                      <TableCell className="tabular-nums">
-                        {t.scopeId === t.studentId ? 'Cả học kỳ' : t.scopeId}
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-medium tabular-nums">{t.ruleCode}</span>
-                        <span className="block text-xs text-muted-foreground">{t.ruleName}</span>
-                      </TableCell>
-                      <TableCell className="min-w-72 whitespace-normal">{t.reason}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Điểm rủi ro từ 0 (ổn định) đến 1 (rủi ro cao), có trọng số trên các nguồn đủ dữ liệu —
+              chỉ dùng để sắp xếp ưu tiên, không tạo cảnh báo. Bấm &ldquo;N dấu hiệu&rdquo; để xem
+              từng luật.
+            </p>
+            <Suspense>
+              <RunStudentsFilter classes={options.classes} rules={options.rules} />
+            </Suspense>
+            <RunStudentsTable
+              rows={result.items}
+              sort={{ sort: list.sort, dir: list.dir }}
+              emptyMessage={
+                filter.all
+                  ? 'Không có sinh viên nào khớp bộ lọc.'
+                  : 'Không có sinh viên nào có dấu hiệu khớp bộ lọc — chọn "Tất cả sinh viên" để xem điểm rủi ro của mọi sinh viên.'
+              }
+            />
+            <DataPagination
+              basePath={`/admin/evaluations/${run.id}`}
+              params={query}
+              total={result.total}
+              page={result.page}
+              size={result.size}
+              unit="sinh viên"
+            />
           </CardContent>
         </Card>
       )}
@@ -212,49 +210,6 @@ export default async function EvaluationRunPage({
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
-      )}
-
-      {run.status === EvaluationRunStatus.COMPLETED && run.risks.length > 0 && (
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle>Điểm rủi ro tổng hợp</CardTitle>
-            <CardDescription>
-              Từ 0 (ổn định) đến 1 (rủi ro cao), có trọng số trên các nguồn đủ dữ liệu. Chỉ dùng để
-              sắp xếp ưu tiên, không tạo cảnh báo.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Sinh viên</TableHead>
-                    <TableHead>Điểm rủi ro</TableHead>
-                    <TableHead>Mức dữ liệu</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {run.risks.map((r) => (
-                    <TableRow key={r.studentId} className="even:bg-muted">
-                      <TableCell>
-                        <span className="font-medium">{r.studentName}</span>
-                        <span className="block text-xs text-muted-foreground tabular-nums">
-                          {r.studentId}
-                        </span>
-                      </TableCell>
-                      <TableCell className="tabular-nums">
-                        {r.value === null ? 'Chưa đủ dữ liệu' : r.value.toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        <DataCompletenessBadge level={r.level} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
           </CardContent>
         </Card>
       )}

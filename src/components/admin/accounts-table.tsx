@@ -2,6 +2,7 @@
 
 import { type ColumnDef } from '@tanstack/react-table';
 import { CircleCheck, CircleDashed, Clock, Loader2, Lock, MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from '@/lib/notify';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
@@ -188,6 +189,40 @@ function AccountActions({
   return <MoreHorizontal aria-hidden className="ml-auto size-4 text-muted-foreground" />;
 }
 
+/** Cố vấn học tập: các lớp phụ trách (bấm sang trang lớp); sinh viên: lớp sinh hoạt. */
+function AccountClasses({ account }: { account: AccountDto }) {
+  if (account.role === UserRole.STUDENT) {
+    return <span className="tabular-nums">{account.classId ?? '—'}</span>;
+  }
+  if (
+    account.role !== UserRole.ADVISOR ||
+    account.accountStatus === UserAccountStatus.PENDING_APPROVAL
+  ) {
+    return <span className="text-muted-foreground">—</span>;
+  }
+  if (account.advisedClasses.length === 0) {
+    return (
+      <Badge variant="outline" className="text-amber-700 dark:text-amber-400">
+        Chưa gán lớp
+      </Badge>
+    );
+  }
+  return (
+    <span className="flex flex-wrap gap-1">
+      {account.advisedClasses.map((c) => (
+        <Link
+          key={c.classId}
+          href={`/admin/classes?q=${encodeURIComponent(c.classId)}`}
+          className="rounded-md border px-1.5 py-0.5 text-xs tabular-nums hover:bg-secondary"
+          title={`Lớp ${c.classId} · ${c.studentCount} sinh viên`}
+        >
+          {c.classId} · {c.studentCount} SV
+        </Link>
+      ))}
+    </span>
+  );
+}
+
 export function AccountsTable({
   accounts,
   currentUserId,
@@ -220,16 +255,13 @@ export function AccountsTable({
       accessorKey: 'role',
       header: 'Vai trò',
       meta: { sortKey: 'role' },
-      cell: ({ row }) => (
-        <span className="inline-flex flex-col">
-          {ROLE_LABELS[row.original.role]}
-          {row.original.advisedClassCount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              Phụ trách {row.original.advisedClassCount} lớp
-            </span>
-          )}
-        </span>
-      ),
+      cell: ({ row }) => ROLE_LABELS[row.original.role],
+    },
+    {
+      id: 'classes',
+      header: 'Lớp',
+      meta: { label: 'Lớp' },
+      cell: ({ row }) => <AccountClasses account={row.original} />,
     },
     {
       accessorKey: 'accountStatus',

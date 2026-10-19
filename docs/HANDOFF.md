@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-19 (sau Phase 8b).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-19 (sau Phase 8c).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -17,7 +17,8 @@
 | 6 Quản trị và vận hành | Xong | `phase-6` | #8 → `phase-5` | xanh |
 | 7 Hoàn thiện và demo | Xong | `phase-7` | #9 → `main` | — |
 | 8a Điều chỉnh theo dữ liệu thật (12 luật, demo v2) | Xong | `phase-8a` | #10 → `phase-7` | — |
-| 8b Nền tảng giao diện (phân trang, thẻ điện thoại, Ctrl+K, menu nhóm) | Xong | `phase-8b` (đang checkout) | → `phase-8a` | — |
+| 8b Nền tảng giao diện (phân trang, thẻ điện thoại, Ctrl+K, menu nhóm) | Xong | `phase-8b` | #11 → `phase-8a` | — |
+| 8c Trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá) | Xong | `phase-8c` (đang checkout) | → `phase-8b` | — |
 
 - Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **đã merge #1–#8 vào `main` (merge commit, 2026-10-15)**. Từ Phase 7 PR đi thẳng vào `main`.
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
@@ -52,6 +53,7 @@
 - Nhập dữ liệu: 2 bước (xem trước → xác nhận), nhận CSV + `.xlsx`, chia Phase 3 thành 3a/3b, hoàn tác lô **có điều kiện**, kiểm tra lại khi xác nhận, tự hủy lô chờ > 7 ngày, cảnh báo lỗi > 10%, khóa nạp theo (loại, học kỳ), ≤ 50.000 dòng, chống zip bomb, chống chèn công thức (`06`, `12`).
 - Đăng nhập nhanh demo = endpoint Better Auth `POST /api/auth/demo/quick-login` (403 khi tắt). Mã lỗi đăng nhập thứ 5 `EMAIL_NOT_VERIFIED`. Admin seed có mã `ADMIN`.
 - Phiên bản: TypeScript 5.9, TypeORM 0.3.x (chưa lên TS 7 / TypeORM 1.x).
+- Giao diện (chốt 2026-10-19, ghi `03`): họ tên sắp theo tên rồi họ; RiskScore hiển thị 0–1 (dấu phẩy) + thanh; danh mục khoa = chip lọc + mục thu gọn; giữ shadcn, chỉ thêm thành phần; kế hoạch giao diện chia 8b–8f.
 
 ## 4. Câu hỏi còn mở (hỏi người dùng đúng lúc)
 
@@ -93,11 +95,13 @@ un\dockerInference` → tắt Docker, xóa file, `wsl --shutdown`, mở lại (K
 
 23. `npx shadcn add` nhiều thành phần cùng lúc treo ở câu hỏi ghi đè thứ 2 (stdin `n` chỉ trả lời câu đầu) → thành phần chưa sinh viết tay theo mẫu shadcn; luôn sửa `from "cn"` → `@/lib/utils`.
 24. TypeORM QueryBuilder lưu ORDER BY theo tên cột: `orderBy(x).addOrderBy(x)` GHI ĐÈ hướng của x (sắp giảm thành tăng); `find({ order })` cũng vậy. Dùng `applyOrder`/`findOrder` (`src/lib/list-params.ts`). Join 1–1 + sắp theo cột bảng join → dùng `offset/limit` thay `skip/take`.
+26. `listX(filter, firstPage({ size }))` trong test/script truyền `sort: null, dir: asc` → service phải dùng `resolveSort` để lấy cả hướng mặc định (VD mức cao nhất giảm dần), nếu không sẽ ra tăng dần.
+27. Python `io.open(..., "w")` trên Windows đôi khi lỗi `OSError [Errno 22]` khi dev server/prettier đang giữ file → ghi lại bằng tool Edit.
 25. Next 16 tách thư mục dev (`.next/dev`) — `next build` chạy song song dev server không còn làm hỏng cache (bẫy #0 cũ). Dev server của phiên khác chiếm cổng 3000 → Browser pane mở thẳng `http://localhost:3000` dùng chung.
 
 ## 6. Việc tiếp theo
 
-Phase 8a, 8b xong (chờ merge PR). Tiếp: Phase 8c–8f (8b đã làm) (chốt 2026-10-19, chi tiết `docs/implement.md`; giữ shadcn + thêm thành phần): 8b nền tảng giao diện (phân trang, thẻ trên điện thoại, tải/lỗi/trống, menu nhóm, Ctrl+K), 8c trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá), 8d hai trang tổng quan Admin + CVHT (`/advisor` thành tổng quan, cảnh báo sang `/advisor/alerts`), 8e CVHT + sinh viên (xuất Excel, trang thông báo, ma trận, hồ sơ), 8f nạp nhiều file + Playwright/ảnh/demo-script, Phase 9 (mở rộng dữ liệu demo, kịch bản nhỏ). Image Docker app/worker CHƯA build lại theo code 8a. Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/`), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
+Phase 8a, 8b, 8c xong (chờ merge PR). Tiếp: Phase 8d–8f (8b, 8c đã làm) (chốt 2026-10-19, chi tiết `docs/implement.md`; giữ shadcn + thêm thành phần): 8b nền tảng giao diện (phân trang, thẻ trên điện thoại, tải/lỗi/trống, menu nhóm, Ctrl+K), 8c trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá), 8d hai trang tổng quan Admin + CVHT (`/advisor` thành tổng quan, cảnh báo sang `/advisor/alerts`), 8e CVHT + sinh viên (xuất Excel, trang thông báo, ma trận, hồ sơ), 8f nạp nhiều file + Playwright/ảnh/demo-script, Phase 9 (mở rộng dữ liệu demo, kịch bản nhỏ). Image Docker app/worker CHƯA build lại theo code 8a. Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/`), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
 
 **Báo cáo tiến độ với giảng viên:** `docs/BAO_CAO_TIEN_DO.md` (checklist A–G + nhật ký báo cáo). Mỗi khi người dùng hỏi "báo cáo tiến độ" hoặc xong một việc trong danh sách: tick `[x]` kèm ngày, cập nhật bảng Tổng hợp (đếm lại), thêm 1 dòng Nhật ký báo cáo — không xóa mục cũ. Báo cáo Word cho hội đồng: `docs/bao-cao/Bao-cao-do-an-CTUT-EWARS.docx` (bìa "Đồ án Kỹ thuật phần mềm 3" — người dùng chốt), bản kỹ thuật: `docs/bao-cao/CTUT-EWARS_Bao-cao-yeu-cau-va-thiet-ke-ky-thuat.docx` (cả 2 chưa commit).
 

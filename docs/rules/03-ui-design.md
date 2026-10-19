@@ -60,7 +60,11 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 - MUST (Phase 8b): danh sách có thể dài phân trang PHÍA SERVER: URL `?page=&size=&sort=&dir=` (đọc bằng `parseListParams`, cỡ trang 20/50/100, mặc định 20), service nhận `ListParams` và trả `Paged<T>` (`items, total, page, size`), thanh `DataPagination` ("Hiển thị 21–40 / 135", giữ bộ lọc khi đổi trang). Sắp xếp: cột khai báo `meta.sortKey`, service ánh xạ khóa → cột theo danh sách cho phép (MUST NOT nối chuỗi từ URL vào ORDER BY); thêm cột phụ ổn định bằng `applyOrder`/`findOrder` (QueryBuilder ghi đè khi trùng cột). Offset — keyset chỉ khi > 300ms (`05`). Đang áp: tài khoản, sinh viên, lô nhập, dòng lỗi, lần chạy đánh giá, cảnh báo Admin, nhật ký.
 - MUST (Phase 8b): màn hình < 768px `DataTable` hiển thị mỗi dòng thành 1 thẻ (cột `meta.mobile: 'title'` làm tiêu đề, cột `actions`/`'footer'` ở cuối, còn lại dạng "nhãn: giá trị"), không cuộn ngang. Cột có `header` không phải chuỗi khai báo `meta.label`.
 - MUST: bảng dòng lỗi nhập liệu có cột "Lý do lỗi" (Badge đỏ nhạt) và nút "Tải xuống" ở đầu bảng.
-- MUST: bảng danh sách sinh viên nguy cơ mặc định sắp xếp Severity giảm dần, `CRITICAL` luôn ở trên cùng.
+- MUST: bảng danh sách sinh viên nguy cơ mặc định sắp xếp Severity giảm dần, `CRITICAL` luôn ở trên cùng. Service phân trang nhận `ListParams` không có cột (`sort: null`) thì dùng cột + hướng mặc định của danh sách (`resolveSort`), không lấy hướng `asc` mặc định.
+- MUST (Phase 8c, người dùng chốt 2026-10-19): cột "Họ tên" sắp theo TÊN rồi họ (chữ cuối của họ tên — `givenNameSql`), áp ở danh sách sinh viên và tài khoản.
+- MUST (Phase 8c, người dùng chốt 2026-10-19): RiskScore hiển thị thang 0–1, 2 chữ số lẻ, dấu phẩy (VD 0,62) kèm thanh ngang nhỏ; chưa tính được → "Chưa tính được", KHÔNG hiện 0.
+- Trang kết quả lần chạy (Phase 8c): 1 bảng theo sinh viên (mức cao nhất, RiskScore, mức dữ liệu, số dấu hiệu — bấm mở từng luật ngay trong dòng), phân trang ở DB, mặc định chỉ sinh viên có dấu hiệu.
+- Chọn Cố vấn học tập (tạo lớp, đổi Cố vấn) dùng ô chọn có tìm kiếm `AdvisorCombobox` (Popover + Command), gõ không dấu được.
 
 ## Form
 

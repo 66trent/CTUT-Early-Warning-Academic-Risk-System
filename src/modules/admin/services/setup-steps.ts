@@ -11,6 +11,8 @@ export interface SetupCounts {
   classesWithoutAdvisor: number;
   students: number;
   currentTerm: { termId: string; termName: string; closed: boolean } | null;
+  /** Luật cảnh báo đang có phiên bản áp dụng (không tính cấu hình RiskScore). */
+  activeRules: number;
   /** Các số dưới đây tính trong học kỳ hiện tại. */
   attendanceRows: number;
   lmsRows: number;
@@ -42,10 +44,10 @@ export interface SetupStep {
 }
 
 export const SETUP_PHASE_LABELS: Record<SetupPhase, string> = {
-  FOUNDATION: 'Dữ liệu nền (đầu khóa)',
+  FOUNDATION: 'Thiết lập ban đầu (đầu khóa)',
   TERM: 'Mỗi học kỳ',
-  DURING_TERM: 'Trong học kỳ',
-  END_OF_TERM: 'Cuối học kỳ',
+  DURING_TERM: 'Hằng tuần',
+  END_OF_TERM: 'Cuối kỳ',
 };
 
 type StepDraft = Omit<SetupStep, 'next'>;
@@ -56,9 +58,12 @@ function foundationSteps(c: SetupCounts): StepDraft[] {
       key: 'departments',
       phase: 'FOUNDATION',
       title: 'Danh mục khoa',
-      description: 'Khoa được tạo sẵn khi cài đặt (npm run seed).',
+      description: 'Danh mục khoa chính thức của trường, có sẵn khi cài đặt hệ thống.',
       done: c.departments > 0,
-      status: c.departments > 0 ? `${c.departments} khoa` : 'Chưa có khoa — chạy npm run seed',
+      status:
+        c.departments > 0
+          ? `${c.departments} khoa`
+          : 'Chưa có khoa — báo người cài đặt hệ thống nạp danh mục khoa',
       href: '/admin/classes',
       actionLabel: 'Xem khoa',
       blockedReason: null,
@@ -128,6 +133,19 @@ function termSteps(c: SetupCounts): StepDraft[] {
       status: c.currentTerm ? `Hiện tại: ${c.currentTerm.termName}` : 'Chưa đặt học kỳ hiện tại',
       href: '/admin/terms',
       actionLabel: 'Quản lý học kỳ',
+      blockedReason: null,
+    },
+    {
+      key: 'rules',
+      phase: 'TERM',
+      title: 'Xem lại luật cảnh báo',
+      description:
+        'Luật có sẵn ngưỡng mặc định; chỉnh nếu nhà trường muốn báo sớm hơn hoặc muộn hơn.',
+      done: c.activeRules > 0,
+      status:
+        c.activeRules > 0 ? `${c.activeRules} luật đang áp dụng` : 'Chưa có luật nào đang áp dụng',
+      href: '/admin/rules',
+      actionLabel: 'Cấu hình luật',
       blockedReason: null,
     },
     {

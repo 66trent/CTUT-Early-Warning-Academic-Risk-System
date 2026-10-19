@@ -1,4 +1,4 @@
-import { type EntityTarget, In, IsNull, type ObjectLiteral } from 'typeorm';
+import { type EntityTarget, In, IsNull, Not, type ObjectLiteral } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
 import { Alert } from '@/db/entities/alert.entity';
@@ -11,7 +11,15 @@ import { LmsQuizAttempt } from '@/db/entities/lms-quiz-attempt.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
-import { AlertStatus, EvaluationRunStatus, UserAccountStatus, UserRole } from '@/db/enums';
+import { RuleVersion } from '@/db/entities/rule-version.entity';
+import {
+  AlertStatus,
+  EvaluationRunStatus,
+  RuleStatus,
+  UserAccountStatus,
+  UserRole,
+} from '@/db/enums';
+import { RISK_SCORE_RULE_CODE } from '@/modules/rule-engine/evaluator/config';
 import { buildSetupSteps, type SetupCounts, type SetupStep } from './setup-steps';
 
 /** Đếm dòng dữ liệu nguồn của học kỳ (qua Enrollment — mọi dữ liệu nguồn trỏ qua đây). */
@@ -57,16 +65,28 @@ export async function getSetupCounts(): Promise<SetupCounts> {
   const ds = await getDataSource();
   const advisors = (status: UserAccountStatus) =>
     ds.getRepository(User).countBy({ role: UserRole.ADVISOR, accountStatus: status });
-  const [departments, activeAdvisors, pendingAdvisors, classes, withoutAdvisor, students, term] =
-    await Promise.all([
-      ds.getRepository(Department).count(),
-      advisors(UserAccountStatus.ACTIVE),
-      advisors(UserAccountStatus.PENDING_APPROVAL),
-      ds.getRepository(AdministrativeClass).count(),
-      ds.getRepository(AdministrativeClass).countBy({ advisorId: IsNull() }),
-      ds.getRepository(Student).count(),
-      ds.getRepository(Term).findOneBy({ isCurrent: true }),
-    ]);
+  const [
+    departments,
+    activeAdvisors,
+    pendingAdvisors,
+    classes,
+    withoutAdvisor,
+    students,
+    term,
+    activeRules,
+  ] = await Promise.all([
+    ds.getRepository(Department).count(),
+    advisors(UserAccountStatus.ACTIVE),
+    advisors(UserAccountStatus.PENDING_APPROVAL),
+    ds.getRepository(AdministrativeClass).count(),
+    ds.getRepository(AdministrativeClass).countBy({ advisorId: IsNull() }),
+    ds.getRepository(Student).count(),
+    ds.getRepository(Term).findOneBy({ isCurrent: true }),
+    ds.getRepository(RuleVersion).countBy({
+      status: RuleStatus.ACTIVE,
+      ruleCode: Not(RISK_SCORE_RULE_CODE),
+    }),
+  ]);
   const perTerm = term
     ? await termCounts(term.termId)
     : {
@@ -85,6 +105,7 @@ export async function getSetupCounts(): Promise<SetupCounts> {
     classes,
     classesWithoutAdvisor: withoutAdvisor,
     students,
+    activeRules,
     currentTerm: term
       ? { termId: term.termId, termName: term.termName, closed: term.closedAt !== null }
       : null,
