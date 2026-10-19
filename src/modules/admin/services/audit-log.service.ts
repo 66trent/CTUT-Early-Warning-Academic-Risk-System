@@ -5,7 +5,14 @@ import { AuditLog } from '@/db/entities/audit-log.entity';
 import { User } from '@/db/entities/user.entity';
 import { AUDIT_ACTIONS, type AuditAction } from '@/lib/audit';
 import { vnEndOfDay, vnStartOfDay } from '@/lib/dates';
-import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
+import {
+  applyOrder,
+  firstPage,
+  type ListParams,
+  type Paged,
+  pageOffset,
+  resolveSort,
+} from '@/lib/list-params';
 import { escapeLike } from './student-search.service';
 
 export const AUDIT_SORT_KEYS = ['createdAt', 'action'] as const;
@@ -68,7 +75,8 @@ export async function listAuditLogs(
     .createQueryBuilder('a')
     .skip(pageOffset(list))
     .take(list.size);
-  applyOrder(qb, list.sort === 'action' ? 'a.action' : 'a.createdAt', list.dir, [
+  const order = resolveSort(list, AUDIT_DEFAULT_SORT);
+  applyOrder(qb, order.sort === 'action' ? 'a.action' : 'a.createdAt', order.dir, [
     'a.createdAt',
     'DESC',
   ]);

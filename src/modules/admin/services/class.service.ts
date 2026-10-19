@@ -1,13 +1,30 @@
 import { type EntityManager } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
+import { Alert } from '@/db/entities/alert.entity';
 import { Department } from '@/db/entities/department.entity';
 import { Student } from '@/db/entities/student.entity';
+import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
 import { UserAccountStatus, UserRole } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
-import { type ChangeAdvisor, type CreateClass, type UpdateClass } from '../validators/class';
+import {
+  applyOrder,
+  firstPage,
+  type ListParams,
+  type Paged,
+  pageOffset,
+  resolveSort,
+} from '@/lib/list-params';
+import {
+  type ChangeAdvisor,
+  type ClassFilter,
+  type CreateClass,
+  type UpdateClass,
+} from '../validators/class';
+import { ACTIVE_ALERT_STATUSES } from './overview.service';
+import { escapeLike } from './student-search.service';
 import {
   studentIdsOfClass,
   transferOpenAlerts,
@@ -29,6 +46,25 @@ export interface ClassDto {
   advisorName: string | null;
   studentCount: number;
 }
+
+export interface DepartmentSummaryDto extends DepartmentDto {
+  studentCount: number;
+}
+
+export interface ClassListItemDto extends ClassDto {
+  /** Cảnh báo chưa đóng của học kỳ hiện tại; null khi chưa đặt học kỳ hiện tại. */
+  openAlerts: number | null;
+}
+
+export const CLASS_SORT_KEYS = ['classId', 'cohortYear', 'departmentId', 'advisorName'] as const;
+export type ClassSortKey = (typeof CLASS_SORT_KEYS)[number];
+export const CLASS_DEFAULT_SORT = { sort: 'cohortYear', dir: 'desc' } as const;
+const CLASS_SORT_COLUMNS: Record<ClassSortKey, string> = {
+  classId: 'c.classId',
+  cohortYear: 'c.cohortYear',
+  departmentId: 'c.departmentId',
+  advisorName: 'u.fullName',
+};
 
 export interface AdvisorOptionDto {
   userId: string;
@@ -196,4 +232,123 @@ export async function changeClassAdvisor(input: ChangeAdvisor, actorId: string):
       actorId,
     );
   });
+}
+
+/** Khoa kèm số lớp + số sinh viên — hàng chip lọc trên trang Khoa và lớp. */
+export async function listDepartmentSummaries(): Promise<DepartmentSummaryDto[]> {
+  const { manager } = await getDataSource();
+  const [departments, studentRows] = await Promise.all([
+    listDepartments(),
+    manager
+      .getRepository(Student)
+      .createQueryBuilder('s')
+      .innerJoin(AdministrativeClass, 'c', 'c.classId = s.classId')
+      .select('c.departmentId', 'departmentId')
+      .addSelect('COUNT(*)', 'total')
+      .groupBy('c.departmentId')
+      .getRawMany<{ departmentId: string; total: string }>(),
+  ]);
+  const students = new Map(studentRows.map((r) => [r.departmentId, Number(r.total)]));
+  return departments.map((d) => ({ ...d, studentCount: students.get(d.departmentId) ?? 0 }));
+}
+
+/** Các khóa (năm nhập học) đang có lớp — ô lọc khóa. Mới nhất trước. */
+export async function listCohortYears(): Promise<string[]> {
+  const rows = await (
+    await getDataSource()
+  )
+    .getRepository(AdministrativeClass)
+    .createQueryBuilder('c')
+    .select('DISTINCT c.cohortYear', 'cohortYear')
+    .orderBy('c.cohortYear', 'DESC')
+    .getRawMany<{ cohortYear: string }>();
+  return rows.map((r) => r.cohortYear);
+}
+
+/** Cảnh báo chưa đóng của học kỳ hiện tại theo lớp — COUNT … GROUP BY (docs/rules/01). */
+async function countOpenAlertsByClass(
+  em: EntityManager,
+  classIds: string[],
+): Promise<Map<string, number> | null> {
+  const term = await em.getRepository(Term).findOneBy({ isCurrent: true });
+  if (!term) return null;
+  if (classIds.length === 0) return new Map();
+  const rows = await em
+    .getRepository(Alert)
+    .createQueryBuilder('a')
+    .innerJoin(Student, 's', 's.studentId = a.studentId')
+    .select('s.classId', 'classId')
+    .addSelect('COUNT(*)', 'total')
+    .where('a.termId = :termId', { termId: term.termId })
+    .andWhere('a.status IN (:...statuses)', { statuses: ACTIVE_ALERT_STATUSES })
+    .andWhere('s.classId IN (:...classIds)', { classIds })
+    .groupBy('s.classId')
+    .getRawMany<{ classId: string; total: string }>();
+  return new Map(rows.map((r) => [r.classId, Number(r.total)]));
+}
+
+/**
+ * Lớp sinh hoạt có lọc (khoa, khóa, "chưa có CVHT", tìm mã lớp / tên lớp / tên CVHT) + phân trang.
+ * Mặc định khóa mới trước.
+ */
+export async function searchClasses(
+  filter: ClassFilter,
+  list: ListParams<ClassSortKey> = firstPage(CLASS_DEFAULT_SORT),
+): Promise<Paged<ClassListItemDto>> {
+  const { manager } = await getDataSource();
+  const qb = manager
+    .getRepository(AdministrativeClass)
+    .createQueryBuilder('c')
+    .leftJoinAndSelect('c.department', 'd')
+    .leftJoinAndSelect('c.advisor', 'u');
+  if (filter.department) qb.andWhere('c.departmentId = :dep', { dep: filter.department });
+  if (filter.cohort) qb.andWhere('c.cohortYear = :cohort', { cohort: filter.cohort });
+  if (filter.noAdvisor) qb.andWhere('c.advisorId IS NULL');
+  if (filter.q) {
+    qb.andWhere('(c.classId ILIKE :q OR c.className ILIKE :q OR u.fullName ILIKE :q)', {
+      q: `%${escapeLike(filter.q)}%`,
+    });
+  }
+  const order = resolveSort(list, CLASS_DEFAULT_SORT);
+  applyOrder(qb, CLASS_SORT_COLUMNS[order.sort], order.dir, ['c.classId', 'ASC']);
+  // Join nhiều–1 (khoa, CVHT) không nhân dòng → offset/limit thẳng (bẫy #24).
+  qb.offset(pageOffset(list)).limit(list.size);
+  const [classes, total] = await qb.getManyAndCount();
+  const ids = classes.map((c) => c.classId);
+  const [studentCounts, alerts] = await Promise.all([
+    countStudentsOfClasses(manager, ids),
+    countOpenAlertsByClass(manager, ids),
+  ]);
+  return {
+    items: classes.map((c) => ({
+      classId: c.classId,
+      className: c.className,
+      departmentId: c.departmentId,
+      departmentName: c.department?.departmentName ?? c.departmentId,
+      cohortYear: c.cohortYear,
+      advisorId: c.advisorId,
+      advisorName: c.advisor?.fullName ?? null,
+      studentCount: studentCounts.get(c.classId) ?? 0,
+      openAlerts: alerts ? (alerts.get(c.classId) ?? 0) : null,
+    })),
+    total,
+    page: list.page,
+    size: list.size,
+  };
+}
+
+async function countStudentsOfClasses(
+  em: EntityManager,
+  classIds: string[],
+): Promise<Map<string, number>> {
+  if (classIds.length === 0) return new Map();
+  const rows = await em
+    .getRepository(Student)
+    .createQueryBuilder('s')
+    .select('s.classId', 'classId')
+    .addSelect('COUNT(*)', 'total')
+    .where('s.classId IN (:...classIds)', { classIds })
+    .groupBy('s.classId')
+    .getRawMany<{ classId: string; total: string }>();
+  return new Map(rows.map((r) => [r.classId, Number(r.total)]));
 }

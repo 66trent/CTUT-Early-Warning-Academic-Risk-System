@@ -2,13 +2,22 @@ import { Brackets } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { Student } from '@/db/entities/student.entity';
 import { type OfficialAcademicStatus } from '@/db/enums';
-import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
+import {
+  applyOrder,
+  firstPage,
+  givenNameSql,
+  type ListParams,
+  type Paged,
+  pageOffset,
+  sqlDir,
+} from '@/lib/list-params';
 
 export const STUDENT_SORT_KEYS = ['studentId', 'fullName', 'classId'] as const;
 export type StudentSortKey = (typeof STUDENT_SORT_KEYS)[number];
 const STUDENT_SORT_COLUMNS: Record<StudentSortKey, string> = {
   studentId: 's.studentId',
-  fullName: 's.fullName',
+  // Tên rồi họ (người dùng chốt 2026-10-19).
+  fullName: givenNameSql('s.full_name'),
   classId: 's.classId',
 };
 
@@ -32,7 +41,12 @@ export async function searchStudents(
     .createQueryBuilder('s')
     .skip(pageOffset(list))
     .take(list.size);
-  applyOrder(qb, STUDENT_SORT_COLUMNS[list.sort ?? 'classId'], list.dir, ['s.studentId', 'ASC']);
+  const ties: [string, 'ASC' | 'DESC'][] =
+    list.sort === 'fullName' ? [['s.fullName', sqlDir(list.dir)]] : [];
+  applyOrder(qb, STUDENT_SORT_COLUMNS[list.sort ?? 'classId'], list.dir, ...ties, [
+    's.studentId',
+    'ASC',
+  ]);
   const q = query.trim();
   if (q) {
     qb.where(

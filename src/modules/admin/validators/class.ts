@@ -34,3 +34,20 @@ export const changeAdvisorSchema = z.object({
   advisorId: optionalAdvisor,
 });
 export type ChangeAdvisor = z.output<typeof changeAdvisorSchema>;
+
+/** Bộ lọc trang Khoa và lớp — đọc từ URL; giá trị sai bị bỏ qua (trang chỉ đọc). */
+export const classFilterSchema = z.object({
+  department: z.string().trim().max(10).optional().catch(undefined),
+  cohort: z
+    .string()
+    .regex(/^\d{4}$/)
+    .optional()
+    .catch(undefined),
+  q: z.string().trim().max(100).optional().catch(undefined),
+  noAdvisor: z
+    .literal('1')
+    .optional()
+    .catch(undefined)
+    .transform((v) => v === '1'),
+});
+export type ClassFilter = z.output<typeof classFilterSchema>;

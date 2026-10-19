@@ -4,7 +4,14 @@ import { ImportBatch, type ImportCourseCard } from '@/db/entities/import-batch.e
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
 import { type ImportBatchStatus, IMPORT_DATA_TYPES } from '@/db/enums';
-import { findOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
+import {
+  findOrder,
+  firstPage,
+  type ListParams,
+  type Paged,
+  pageOffset,
+  resolveSort,
+} from '@/lib/list-params';
 import { availableImportTypes, getImportDefinition } from '../types/registry';
 import { getRollbackEligibility, isBatchBusy } from './import-batch.service';
 import { HIGH_ERROR_RATE, readSummary, readWarnings } from './import-summary';
@@ -133,7 +140,11 @@ export async function listImportBatches(
   const [batches, total] = await repo.findAndCount({
     where: dataType ? { dataType } : {},
     relations: { term: true },
-    order: findOrder(list.sort ?? 'createdAt', list.dir, 'createdAt'),
+    order: findOrder(
+      resolveSort(list, BATCH_DEFAULT_SORT).sort,
+      resolveSort(list, BATCH_DEFAULT_SORT).dir,
+      'createdAt',
+    ),
     skip: pageOffset(list),
     take: list.size,
   });

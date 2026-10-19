@@ -125,3 +125,18 @@ export function findOrder<K extends string>(
   if (tie !== primary) order[tie] = 'DESC';
   return order;
 }
+
+/**
+ * Biểu thức SQL lấy TÊN (chữ cuối của họ tên) — danh sách người Việt sắp theo tên rồi họ
+ * (người dùng chốt 2026-10-19). `column` là cột thô dạng `alias.snake_case`.
+ */
+export const givenNameSql = (column: string) =>
+  `regexp_replace(btrim(${column}), '^.*[[:space:]]', '')`;
+
+/** Cột + hướng sắp xếp thực dùng: URL không chọn cột → mặc định của danh sách (cả hướng). */
+export function resolveSort<S extends string>(
+  list: ListParams<S>,
+  defaults: { sort: S; dir: SortDir },
+): { sort: S; dir: SortDir } {
+  return list.sort ? { sort: list.sort, dir: list.dir } : defaults;
+}

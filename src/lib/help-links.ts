@@ -7,6 +7,7 @@ const step = (key: string) => `/admin/getting-started#buoc-${key}`;
 export const HELP_LINKS = {
   users: step('advisors'),
   terms: step('term'),
+  rules: step('rules'),
   classes: step('classes'),
   students: step('students'),
   imports: step('attendance'),

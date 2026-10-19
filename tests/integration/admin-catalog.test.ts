@@ -10,6 +10,7 @@ import {
   changeAccountStatus,
   changeRole,
   changeStaffCode,
+  countAccountsByStatus,
   listAccounts,
 } from '@/modules/admin/services/account.service';
 import {
@@ -17,6 +18,9 @@ import {
   createClass,
   listAssignableAdvisors,
   listClasses,
+  listCohortYears,
+  listDepartmentSummaries,
+  searchClasses,
   listDepartments,
 } from '@/modules/admin/services/class.service';
 import { createTerm, listTerms, setCurrentTerm } from '@/modules/admin/services/term.service';
@@ -24,6 +28,7 @@ import {
   processEvaluationRun,
   requestTermClosing,
 } from '@/modules/rule-engine/services/evaluation-run.service';
+import { firstPage } from '@/lib/list-params';
 import { cleanupIdentityFixtures, createIdentityFixtures, FX } from '../helpers/identity-fixtures';
 
 /** Học kỳ thử dùng năm 2091–2093 để không đụng dữ liệu thật/demo. */
@@ -158,6 +163,25 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
     expectPlain(await listAssignableAdvisors());
   });
 
+  it('tìm lớp: lọc khoa / khóa / chưa có CVHT / từ khóa, phân trang, thẻ khoa có số SV', async () => {
+    const base = { q: 'TSTCLS', department: undefined, cohort: undefined, noAdvisor: false };
+    const all = await searchClasses(base, firstPage({ size: 100 }));
+    expect(all.items.map((c) => c.classId).sort()).toEqual([FX.classA, FX.classB]);
+    expectPlain(all.items);
+    expect(all.items.find((c) => c.classId === FX.classA)).toMatchObject({
+      studentCount: 1,
+      advisorId: FX.advisorA,
+    });
+    expect((await searchClasses({ ...base, department: FX.departmentId })).total).toBe(2);
+    expect((await searchClasses({ ...base, cohort: '1999' })).total).toBe(0);
+    expect((await searchClasses({ ...base, noAdvisor: true })).total).toBe(0);
+    const paged = await searchClasses(base, firstPage({ size: 20, page: 2 }));
+    expect(paged).toMatchObject({ items: [], total: 2 });
+    const dept = (await listDepartmentSummaries()).find((d) => d.departmentId === FX.departmentId);
+    expect(dept?.studentCount).toBeGreaterThanOrEqual(2);
+    expect(await listCohortYears()).toContain('2023');
+  });
+
   it('chỉ gán được Cố vấn học tập đang hoạt động', async () => {
     await expect(
       createClass(
@@ -187,9 +211,37 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
 
 describe('Tài khoản — duyệt, khóa, đổi vai trò', () => {
   it('danh sách tài khoản: chờ duyệt lên đầu, DTO thuần', async () => {
-    const page = await listAccounts({ role: 'STAFF', q: 'TSTGV', status: undefined });
+    const page = await listAccounts({
+      role: 'STAFF',
+      q: 'TSTGV',
+      status: undefined,
+      noClass: false,
+    });
     expect(page.items[0]?.accountStatus).toBe(UserAccountStatus.PENDING_APPROVAL);
     expectPlain(page.items);
+  });
+
+  it('cột Lớp: CVHT kèm lớp phụ trách + sĩ số, sinh viên kèm lớp sinh hoạt; lọc CVHT chưa gán lớp; thẻ đếm', async () => {
+    const base = { q: 'TSTGV', status: undefined, noClass: false } as const;
+    const advisors = await listAccounts({ ...base, role: UserRole.ADVISOR });
+    expect(advisors.items.find((a) => a.userId === FX.advisorA)?.advisedClasses).toEqual([
+      { classId: FX.classA, studentCount: 1 },
+    ]);
+    const noClass = await listAccounts({ ...base, role: 'STAFF', noClass: true });
+    expect(noClass.items.map((a) => a.userId)).toContain(FX.advisorPending);
+    expect(noClass.items.map((a) => a.userId)).not.toContain(FX.advisorA);
+    const counts = await countAccountsByStatus({ ...base, role: UserRole.ADVISOR });
+    expect(counts.PENDING_APPROVAL).toBeGreaterThanOrEqual(1);
+    expect(counts.ACTIVE).toBeGreaterThanOrEqual(2);
+
+    const students = await listAccounts(
+      { q: 'TSTSV', status: undefined, noClass: false, role: UserRole.STUDENT },
+      firstPage({ sort: 'fullName', dir: 'desc' }),
+    );
+    expect(students.items.map((s) => [s.userId, s.classId])).toEqual([
+      [FX.studentB, FX.classB],
+      [FX.studentA, FX.classA],
+    ]);
   });
 
   it('không được tự thay đổi tài khoản của chính mình', async () => {

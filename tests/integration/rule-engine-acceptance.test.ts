@@ -16,9 +16,12 @@ import {
 } from '@/db/enums';
 import { att01 } from '@/modules/rule-engine/evaluator/rules/att-01';
 import { dryRunRuleVersion } from '@/modules/rule-engine/services/dry-run.service';
+import { firstPage } from '@/lib/list-params';
 import {
   getEvaluationFormOptions,
   getEvaluationRunDetail,
+  listRunFilterOptions,
+  listRunStudents,
   listEvaluationRuns,
 } from '@/modules/rule-engine/services/evaluation-query.service';
 import {
@@ -339,27 +342,44 @@ describe('Cấu hình luật — phiên bản mới, chạy thử chỉ đọc, 
 });
 
 describe('Giao diện Admin — dữ liệu trả ra là object thuần, đúng thứ tự', () => {
-  it('chi tiết lần chạy: trigger sắp theo mức giảm dần, RiskScore kèm mức dữ liệu', async () => {
+  it('kết quả lần chạy theo sinh viên: mức cao nhất trước, kèm dấu hiệu, RiskScore, mức dữ liệu', async () => {
     const runId = await evaluate(HK1, endOf('2025-10-10'));
     const detail = await getEvaluationRunDetail(runId);
     expect(detail).not.toBeNull();
     expect(Object.getPrototypeOf(detail)).toBe(Object.prototype);
-    expect(Object.getPrototypeOf(detail?.triggers[0])).toBe(Object.prototype);
-    expect(detail?.triggers[0]?.severity).toBe('CRITICAL');
-    expect(detail?.triggers.at(-1)?.severity).toBe('LOW');
-    expect(
-      detail?.triggers.find((t) => t.ruleCode === 'LMS-03' && t.studentId === sv(908)),
-    ).toMatchObject({
-      ruleName: 'Không nộp bài thực hành',
-      classId: 'TSTK2411',
-    });
     expect(detail?.bySeverity.map((s) => s.severity)).toEqual([
       'CRITICAL',
       'HIGH',
       'MEDIUM',
       'LOW',
     ]);
-    expect(detail?.risks).toHaveLength(20);
+    expect(detail?.triggerCount).toBe(detail?.bySeverity.reduce((sum, s) => sum + s.count, 0));
+
+    const withSignals = await listRunStudents(runId, { all: false }, firstPage({ size: 100 }));
+    expect(withSignals.total).toBe(detail?.studentsWithSignals);
+    const first = withSignals.items[0];
+    expect(Object.getPrototypeOf(first)).toBe(Object.prototype);
+    expect(first?.maxSeverity).toBe('CRITICAL');
+    expect(withSignals.items.every((r) => r.signalCount > 0)).toBe(true);
+    expect(withSignals.items.reduce((sum, r) => sum + r.signals.length, 0)).toBe(
+      detail?.triggerCount,
+    );
+    const s908 = withSignals.items.find((r) => r.studentId === sv(908));
+    expect(s908).toMatchObject({ classId: 'TSTK2411' });
+    expect(s908?.signals.find((t) => t.ruleCode === 'LMS-03')).toMatchObject({
+      ruleName: 'Không nộp bài thực hành',
+    });
+
+    const all = await listRunStudents(runId, { all: true }, firstPage({ size: 100 }));
+    expect(all.total).toBe(20);
+    expect(all.items.every((r) => r.level !== undefined)).toBe(true);
+    const lms03 = await listRunStudents(runId, { all: false, ruleCode: 'LMS-03' });
+    expect(lms03.items.map((r) => r.studentId)).toContain(sv(908));
+    const page2 = await listRunStudents(runId, { all: true }, firstPage({ size: 20, page: 2 }));
+    expect(page2).toMatchObject({ items: [], total: 20 });
+    const options = await listRunFilterOptions(runId);
+    expect(options.classes).toEqual(['TSTK2411']);
+    expect(options.rules.map((r) => r.ruleCode)).toContain('LMS-03');
     expect(await getEvaluationRunDetail('00000000-0000-0000-0000-000000000000')).toBeNull();
   });
 

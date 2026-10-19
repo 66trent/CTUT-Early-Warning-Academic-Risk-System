@@ -1,12 +1,22 @@
-import { type EntityManager, In } from 'typeorm';
+import { type EntityManager, In, type Repository } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
+import { Student } from '@/db/entities/student.entity';
 import { User } from '@/db/entities/user.entity';
 import { UserAccountStatus, UserRole } from '@/db/enums';
 import { type AuditAction, writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
-import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
+import {
+  applyOrder,
+  firstPage,
+  givenNameSql,
+  type ListParams,
+  type Paged,
+  pageOffset,
+  sqlDir,
+} from '@/lib/list-params';
 import { type AccountFilter, type AccountStatusAction } from '../validators/account';
+import { escapeLike } from './student-search.service';
 
 export interface AccountDto {
   userId: string;
@@ -16,7 +26,17 @@ export interface AccountDto {
   accountStatus: UserAccountStatus;
   /** null = chưa có tài khoản đăng nhập (VD sinh viên chưa đăng nhập lần nào). */
   emailVerified: boolean | null;
-  advisedClassCount: number;
+  /** Lớp sinh hoạt Cố vấn học tập đang phụ trách (kèm sĩ số). */
+  advisedClasses: { classId: string; studentCount: number }[];
+  /** Lớp sinh hoạt của sinh viên; null với cán bộ. */
+  classId: string | null;
+}
+
+export interface AccountStatusCountsDto {
+  PENDING_APPROVAL: number;
+  ACTIVE: number;
+  SUSPENDED: number;
+  REJECTED: number;
 }
 
 export type AccountPageDto = Paged<AccountDto>;
@@ -25,7 +45,7 @@ export const ACCOUNT_SORT_KEYS = ['userId', 'fullName', 'role', 'accountStatus']
 export type AccountSortKey = (typeof ACCOUNT_SORT_KEYS)[number];
 const ACCOUNT_SORT_COLUMNS: Record<AccountSortKey, string> = {
   userId: 'u.userId',
-  fullName: 'u.fullName',
+  fullName: givenNameSql('u.full_name'),
   role: 'u.role',
   accountStatus: 'u.accountStatus',
 };
@@ -72,20 +92,85 @@ async function loadEmailVerified(
   return new Map(rows.map((r) => [r.id, r.emailVerified]));
 }
 
-async function countAdvisedClasses(
+/** Lớp phụ trách + sĩ số theo CVHT — COUNT … GROUP BY tường minh (docs/rules/01). */
+async function loadAdvisedClasses(
   em: EntityManager,
   userIds: string[],
-): Promise<Map<string, number>> {
+): Promise<Map<string, { classId: string; studentCount: number }[]>> {
   if (userIds.length === 0) return new Map();
   const rows = await em
     .getRepository(AdministrativeClass)
     .createQueryBuilder('c')
+    .leftJoin(Student, 's', 's.classId = c.classId')
     .select('c.advisorId', 'advisorId')
-    .addSelect('COUNT(*)', 'total')
+    .addSelect('c.classId', 'classId')
+    .addSelect('COUNT(s.studentId)', 'total')
     .where('c.advisorId IN (:...userIds)', { userIds })
     .groupBy('c.advisorId')
-    .getRawMany<{ advisorId: string; total: string }>();
-  return new Map(rows.map((r) => [r.advisorId, Number(r.total)]));
+    .addGroupBy('c.classId')
+    .orderBy('c.classId', 'ASC')
+    .getRawMany<{ advisorId: string; classId: string; total: string }>();
+  const out = new Map<string, { classId: string; studentCount: number }[]>();
+  for (const r of rows) {
+    const list = out.get(r.advisorId) ?? [];
+    list.push({ classId: r.classId, studentCount: Number(r.total) });
+    out.set(r.advisorId, list);
+  }
+  return out;
+}
+
+/** Lớp sinh hoạt của sinh viên (userId = MSSV). */
+async function loadStudentClasses(
+  em: EntityManager,
+  userIds: string[],
+): Promise<Map<string, string>> {
+  if (userIds.length === 0) return new Map();
+  const students = await em.getRepository(Student).find({
+    select: { studentId: true, classId: true },
+    where: { studentId: In(userIds) },
+  });
+  return new Map(students.map((s) => [s.studentId, s.classId]));
+}
+
+/** Điều kiện lọc dùng chung cho danh sách và thẻ đếm (không gồm trạng thái). */
+function applyAccountFilter(
+  qb: ReturnType<Repository<User>['createQueryBuilder']>,
+  filter: AccountFilter,
+): void {
+  if (filter.role === 'STAFF') qb.where('u.role IN (:...roles)', { roles: STAFF_ROLES });
+  else qb.where('u.role = :role', { role: filter.role });
+  if (filter.q) {
+    qb.andWhere('(u.userId ILIKE :q OR u.fullName ILIKE :q OR u.email ILIKE :q)', {
+      q: `%${escapeLike(filter.q)}%`,
+    });
+  }
+  if (filter.noClass) {
+    qb.andWhere('u.role = :advisorRole', { advisorRole: UserRole.ADVISOR }).andWhere(
+      'NOT EXISTS (SELECT 1 FROM administrative_classes c WHERE c.advisor_id = u.user_id)',
+    );
+  }
+}
+
+/** Số tài khoản theo trạng thái với cùng bộ lọc (vai trò, tìm kiếm) — thẻ đếm đầu trang. */
+export async function countAccountsByStatus(
+  filter: AccountFilter,
+): Promise<AccountStatusCountsDto> {
+  const { manager } = await getDataSource();
+  const qb = manager.getRepository(User).createQueryBuilder('u');
+  applyAccountFilter(qb, filter);
+  const rows = await qb
+    .select('u.accountStatus', 'status')
+    .addSelect('COUNT(*)', 'total')
+    .groupBy('u.accountStatus')
+    .getRawMany<{ status: UserAccountStatus; total: string }>();
+  const counts: AccountStatusCountsDto = {
+    PENDING_APPROVAL: 0,
+    ACTIVE: 0,
+    SUSPENDED: 0,
+    REJECTED: 0,
+  };
+  for (const r of rows) counts[r.status] = Number(r.total);
+  return counts;
 }
 
 /** Danh sách tài khoản có lọc + phân trang. Mặc định tài khoản chờ duyệt lên đầu. */
@@ -95,30 +180,34 @@ export async function listAccounts(
 ): Promise<AccountPageDto> {
   const { manager } = await getDataSource();
   const qb = manager.getRepository(User).createQueryBuilder('u');
-  if (filter.role === 'STAFF') qb.where('u.role IN (:...roles)', { roles: STAFF_ROLES });
-  else qb.where('u.role = :role', { role: filter.role });
+  applyAccountFilter(qb, filter);
   if (filter.status) qb.andWhere('u.accountStatus = :status', { status: filter.status });
-  if (filter.q) {
-    qb.andWhere('(u.userId ILIKE :q OR u.fullName ILIKE :q OR u.email ILIKE :q)', {
-      q: `%${filter.q.replace(/[%_\\]/g, '\\$&')}%`,
-    });
-  }
-  if (list.sort) applyOrder(qb, ACCOUNT_SORT_COLUMNS[list.sort], list.dir, ['u.userId', 'ASC']);
-  else {
+  if (list.sort === 'fullName') {
+    // Tên rồi họ: "Nguyễn Minh An" xếp theo "An".
+    qb.orderBy(ACCOUNT_SORT_COLUMNS.fullName, sqlDir(list.dir))
+      .addOrderBy('u.fullName', sqlDir(list.dir))
+      .addOrderBy('u.userId', 'ASC');
+  } else if (list.sort) {
+    applyOrder(qb, ACCOUNT_SORT_COLUMNS[list.sort], list.dir, ['u.userId', 'ASC']);
+  } else {
     qb.orderBy(`CASE WHEN u.account_status = 'PENDING_APPROVAL' THEN 0 ELSE 1 END`, 'ASC');
     qb.addOrderBy('u.userId', 'ASC');
   }
   qb.skip(pageOffset(list)).take(list.size);
 
   const [users, total] = await qb.getManyAndCount();
-  const [verified, classCounts] = await Promise.all([
+  const [verified, advised, studentClasses] = await Promise.all([
     loadEmailVerified(
       manager,
       users.flatMap((u) => (u.authUserId ? [u.authUserId] : [])),
     ),
-    countAdvisedClasses(
+    loadAdvisedClasses(
       manager,
-      users.map((u) => u.userId),
+      users.filter((u) => u.role === UserRole.ADVISOR).map((u) => u.userId),
+    ),
+    loadStudentClasses(
+      manager,
+      users.filter((u) => u.role === UserRole.STUDENT).map((u) => u.userId),
     ),
   ]);
 
@@ -130,7 +219,8 @@ export async function listAccounts(
       role: u.role,
       accountStatus: u.accountStatus,
       emailVerified: u.authUserId ? (verified.get(u.authUserId) ?? false) : null,
-      advisedClassCount: classCounts.get(u.userId) ?? 0,
+      advisedClasses: advised.get(u.userId) ?? [],
+      classId: studentClasses.get(u.userId) ?? null,
     })),
     total,
     page: list.page,

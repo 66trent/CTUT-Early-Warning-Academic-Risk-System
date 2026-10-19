@@ -14,15 +14,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { changeClassAdvisorAction } from '@/modules/admin/actions/class.actions';
 import type { AdvisorOptionDto, ClassDto } from '@/modules/admin/services/class.service';
+import { AdvisorCombobox } from './advisor-combobox';
 import { NO_ADVISOR } from './class-form-dialog';
 
 export function ChangeAdvisorDialog({
@@ -75,19 +69,12 @@ export function ChangeAdvisorDialog({
         </DialogHeader>
         <div className="grid gap-2">
           <Label htmlFor="advisor-select">Cố vấn học tập</Label>
-          <Select value={value} onValueChange={setValue}>
-            <SelectTrigger id="advisor-select" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={NO_ADVISOR}>Chưa gán</SelectItem>
-              {advisors.map((a) => (
-                <SelectItem key={a.userId} value={a.userId}>
-                  {a.fullName} ({a.userId})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <AdvisorCombobox
+            id="advisor-select"
+            value={value === NO_ADVISOR ? '' : value}
+            onChange={(v) => setValue(v === '' ? NO_ADVISOR : v)}
+            advisors={advisors}
+          />
         </div>
         <DialogFooter>
           <Button disabled={pending || unchanged} onClick={() => void save()}>
