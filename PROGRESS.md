@@ -121,3 +121,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kết quả đánh giá: 1 bảng theo sinh viên (SQL tổng hợp, phân trang DB, bỏ giới hạn 500), mở dấu hiệu trong dòng, lọc có dấu hiệu / mức / lớp / luật. Bảng luật dạng thẻ trên điện thoại.
 - Rules `03`, `07`. Kiểm tra: typecheck, lint, format, migration:check, 378 test, build — xanh; kiểm tay đạt (xem `implement.md`).
 - Tự kiểm tra: Admin → Bắt đầu; Tài khoản → lọc Cố vấn học tập; Khoa và lớp → bấm chip khoa, "Đổi Cố vấn" gõ tìm; Chạy đánh giá → mở 1 lần chạy → bấm "N dấu hiệu".
+
+## Phase 8d — Hai trang tổng quan (2026-10-19)
+
+- Rà trước khi code, người dùng chốt: xu hướng theo các lần đánh giá (mốc dữ liệu), học phần chậm dữ liệu so với ngày dữ liệu mới nhất của học kỳ.
+- Service dùng chung `alerts/services/dashboard.service.ts` (+ `advisor-dashboard.service.ts`): tóm tắt cảnh báo, diễn biến, nguồn, học phần, lớp × mức; Admin thêm độ mới dữ liệu, lô lỗi, lớp chưa có CVHT, nhắc thiết lập (`overview.service.ts` viết lại).
+- Tổng quan Admin: dải Cần chú ý, 4 thẻ số, tiến độ xử lý + theo mức, biểu đồ diễn biến, nguồn, top học phần, bảng lớp × mức, độ mới dữ liệu; chọn học kỳ + khoa. Mọi khối bấm sang danh sách đã lọc.
+- Tổng quan CVHT (`/advisor`): cần chú ý (chờ xác nhận, quá 7 ngày, hẹn theo dõi), 4 thẻ, theo mức / nguồn, lớp phụ trách, 5 SV cần chú ý, diễn biến, hẹn đến hạn, hoạt động gần đây. Danh sách cảnh báo chuyển `/advisor/alerts` (email, chuông, link cũ chuyển hướng).
+- Hiệu năng: tạo lại `ewars_perf` theo cấu trúc 8a, đo lại toàn bộ (`docs/bao-cao/02`): tổng quan ≤ 76 ms.
+- Kiểm tra: typecheck, lint, format, migration:check, 385 test, build — xanh; kiểm tay Admin + GV001, điện thoại, chế độ tối.
+- Tự kiểm tra: Admin → Tổng quan → bấm mục trong "Cần chú ý" / ô bảng lớp × mức; đăng nhập GV001 → Tổng quan → bấm "Cần xử lý".

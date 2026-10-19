@@ -71,7 +71,7 @@ export function NotificationBell() {
           <DropdownMenuItem
             key={n.notificationId}
             className="flex flex-col items-start gap-1"
-            onSelect={() => router.push(`/advisor?alert=${n.alertId}`)}
+            onSelect={() => router.push(`/advisor/alerts?alert=${n.alertId}`)}
           >
             <span className="flex items-center gap-2 text-sm font-medium">
               <SeverityBadge severity={n.severity} />

@@ -67,7 +67,8 @@ export const NAV_GROUPS: Record<UserRole, NavGroup[]> = {
     {
       title: null,
       items: [
-        { title: 'Cảnh báo cần xử lý', href: '/advisor', icon: ShieldAlert },
+        { title: 'Tổng quan', href: '/advisor', icon: LayoutDashboard },
+        { title: 'Cảnh báo cần xử lý', href: '/advisor/alerts', icon: ShieldAlert },
         { title: 'Sinh viên phụ trách', href: '/advisor/students', icon: GraduationCap },
       ],
     },

@@ -86,7 +86,7 @@ async function buildEmail(n: Notification): Promise<{ to: string; subject: strin
     loadCurrentTriggers(ds.manager, [alert]).then((m) => (m.get(alert.alertId) ?? []).slice(0, 5)),
   ]);
   const event = n.event as NotificationEvent;
-  const link = `${getEnv().BETTER_AUTH_URL}/advisor?alert=${alert.alertId}`;
+  const link = `${getEnv().BETTER_AUTH_URL}/advisor/alerts?alert=${alert.alertId}`;
   return {
     to: recipient.email,
     subject: `[${APP_NAME}] ${EVENT_LABELS[event]}: ${student.fullName} (${SEVERITY_LABELS[alert.severity]})`,

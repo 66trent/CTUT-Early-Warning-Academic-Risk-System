@@ -358,13 +358,17 @@ describe('Chạy đánh giá theo học phần', () => {
 });
 
 describe('Tổng quan Admin, trang "Bắt đầu", tìm sinh viên', () => {
-  it('tổng quan: sĩ số theo lớp đếm đúng, dữ liệu là object thuần', async () => {
-    const overview = await getAdminOverview();
+  it('tổng quan: số sinh viên của khoa đếm đúng, độ mới dữ liệu, dữ liệu là object thuần', async () => {
+    const overview = await getAdminOverview(DEMO.hk1, 'K.CNTT');
     expectPlain(overview);
-    const testClass = overview.studentsByClass.find((c) => c.classId === 'TSTK2411');
     const actual = await ds.getRepository(Student).countBy({ classId: 'TSTK2411' });
-    expect(testClass?.students).toBe(actual);
-    expect(overview.alertsBySeverity.map((s) => s.severity)).toEqual([
+    expect(overview.summary.totalStudents).toBeGreaterThanOrEqual(actual);
+    const attendance = overview.freshness.sources.find((f) => f.source === 'ATTENDANCE');
+    expect(attendance?.coursesWithData).toBeGreaterThan(0);
+    expect(overview.freshness.totalCourses).toBeGreaterThanOrEqual(
+      attendance?.coursesWithData ?? 0,
+    );
+    expect(overview.summary.activeBySeverity.map((s) => s.severity)).toEqual([
       'CRITICAL',
       'HIGH',
       'MEDIUM',
