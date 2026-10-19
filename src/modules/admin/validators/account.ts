@@ -37,6 +37,5 @@ export const accountFilterSchema = z.object({
   role: z.enum(ACCOUNT_ROLE_FILTERS).catch('STAFF'),
   status: z.enum(UserAccountStatus).optional().catch(undefined),
   q: z.string().trim().max(100).optional().catch(undefined),
-  page: z.coerce.number().int().min(1).max(10_000).catch(1),
 });
 export type AccountFilter = z.output<typeof accountFilterSchema>;

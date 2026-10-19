@@ -2,7 +2,7 @@
 
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

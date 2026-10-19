@@ -21,6 +21,7 @@ import {
   type Severity,
   SEVERITY_ORDER,
 } from '@/db/enums';
+import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
 import { ADVISOR_TRANSITIONS } from './alert-lifecycle.service';
 import { loadCurrentTriggers } from './current-signals';
 import {
@@ -101,7 +102,8 @@ function summarize(triggers: readonly RuleTrigger[]): string {
   return `${triggers.length} nguyên nhân: ${sources.map((s) => SOURCE_INLINE_LABELS[s]).join(', ')}`;
 }
 
-async function toListItems(alerts: Alert[]): Promise<AlertListItemDto[]> {
+/** `keepOrder`: giữ thứ tự truy vấn (đã sắp xếp + phân trang ở DB). */
+async function toListItems(alerts: Alert[], keepOrder = false): Promise<AlertListItemDto[]> {
   if (alerts.length === 0) return [];
   const ds = await getDataSource();
   const [students, terms, triggers] = await Promise.all([
@@ -119,33 +121,50 @@ async function toListItems(alerts: Alert[]): Promise<AlertListItemDto[]> {
   const studentOf = new Map(students.map((s) => [s.studentId, s]));
   const termName = new Map(terms.map((t) => [t.termId, t.termName]));
   const advisorName = new Map(advisors.map((a) => [a.userId, a.fullName]));
-  return alerts
-    .map((a) => {
-      const s = studentOf.get(a.studentId);
-      const ts = triggers.get(a.alertId) ?? [];
-      return {
-        alertId: a.alertId,
-        studentId: a.studentId,
-        studentName: s?.fullName ?? a.studentId,
-        classId: s?.classId ?? '',
-        termId: a.termId,
-        termName: termName.get(a.termId) ?? a.termId,
-        severity: a.severity,
-        status: a.status,
-        summary: summarize(ts),
-        signalCount: ts.length,
-        lastDetectedAt: a.lastDetectedAt.toISOString(),
-        signalsClearedAt: a.signalsClearedAt?.toISOString() ?? null,
-        advisorName: advisorName.get(s?.administrativeClass?.advisorId ?? '') ?? null,
-      };
-    })
-    .sort(
-      (x, y) =>
-        rank(y.severity) - rank(x.severity) ||
-        y.lastDetectedAt.localeCompare(x.lastDetectedAt) ||
-        x.studentId.localeCompare(y.studentId),
-    );
+  const items = alerts.map((a): AlertListItemDto => {
+    const s = studentOf.get(a.studentId);
+    const ts = triggers.get(a.alertId) ?? [];
+    return {
+      alertId: a.alertId,
+      studentId: a.studentId,
+      studentName: s?.fullName ?? a.studentId,
+      classId: s?.classId ?? '',
+      termId: a.termId,
+      termName: termName.get(a.termId) ?? a.termId,
+      severity: a.severity,
+      status: a.status,
+      summary: summarize(ts),
+      signalCount: ts.length,
+      lastDetectedAt: a.lastDetectedAt.toISOString(),
+      signalsClearedAt: a.signalsClearedAt?.toISOString() ?? null,
+      advisorName: advisorName.get(s?.administrativeClass?.advisorId ?? '') ?? null,
+    };
+  });
+  if (keepOrder) return items;
+  return items.sort(
+    (x, y) =>
+      rank(y.severity) - rank(x.severity) ||
+      y.lastDetectedAt.localeCompare(x.lastDetectedAt) ||
+      x.studentId.localeCompare(y.studentId),
+  );
 }
+
+export const ALERT_SORT_KEYS = [
+  'severity',
+  'studentId',
+  'classId',
+  'status',
+  'lastDetectedAt',
+] as const;
+export type AlertSortKey = (typeof ALERT_SORT_KEYS)[number];
+export const ALERT_DEFAULT_SORT = { sort: 'severity', dir: 'desc' } as const;
+const ALERT_SORT_COLUMNS: Record<AlertSortKey, string> = {
+  severity: 'a.severity',
+  studentId: 'a.studentId',
+  classId: 's.classId',
+  status: 'a.status',
+  lastDetectedAt: 'a.lastDetectedAt',
+};
 
 export type AlertListScope = 'TODO' | 'ALL';
 
@@ -178,7 +197,8 @@ export async function listAdminAlerts(
   termId: string,
   filter: 'ALL' | 'NO_ADVISOR',
   departmentId: string | null = null,
-): Promise<AlertListItemDto[]> {
+  list: ListParams<AlertSortKey> = firstPage(ALERT_DEFAULT_SORT),
+): Promise<Paged<AlertListItemDto>> {
   const qb = (await getDataSource())
     .getRepository(Alert)
     .createQueryBuilder('a')
@@ -191,7 +211,20 @@ export async function listAdminAlerts(
       open: OPEN_ALERT_STATUSES,
     });
   }
-  return toListItems(await qb.take(500).getMany());
+  // Enum `severity` của Postgres sắp theo thứ tự khai báo LOW < … < CRITICAL.
+  applyOrder(
+    qb,
+    ALERT_SORT_COLUMNS[list.sort ?? 'severity'],
+    list.dir,
+    ['a.lastDetectedAt', 'DESC'],
+    ['a.studentId', 'ASC'],
+  );
+  qb
+    // Join 1–1 (sinh viên, lớp) không nhân dòng → offset/limit thẳng, tránh truy vấn con của skip/take.
+    .offset(pageOffset(list))
+    .limit(list.size);
+  const [alerts, total] = await qb.getManyAndCount();
+  return { items: await toListItems(alerts, true), total, page: list.page, size: list.size };
 }
 
 /** Nhóm dấu hiệu theo 3 nguồn kèm số liệu và ngày dữ liệu (docs/rules/07). */

@@ -1,7 +1,5 @@
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 import { getStudentProfile } from '@/modules/alerts/services/student-profile.service';
@@ -30,12 +28,9 @@ export async function StudentProfilePage({
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link href={backHref}>
-            <ArrowLeft aria-hidden />
-            {backLabel}
-          </Link>
-        </Button>
+        <PageBreadcrumbs
+          items={[{ label: backLabel, href: backHref }, { label: profile.fullName }]}
+        />
         <h1 className="mt-2">
           {profile.fullName} · {profile.studentId}
         </h1>

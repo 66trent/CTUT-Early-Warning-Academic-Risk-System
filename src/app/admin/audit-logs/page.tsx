@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Filter } from 'lucide-react';
 import Link from 'next/link';
+import { AuditLogsTable } from '@/components/admin/audit-logs-table';
+import { DataPagination } from '@/components/data-table/data-pagination';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,23 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { UserRole } from '@/db/enums';
 import { AUDIT_ACTIONS } from '@/lib/audit';
 import { AUDIT_ACTION_LABELS } from '@/lib/audit-labels';
 import { requireUser } from '@/lib/auth-server';
-import { formatVnDateTime } from '@/lib/dates';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
 import {
-  AUDIT_PAGE_SIZE,
+  AUDIT_DEFAULT_SORT,
+  AUDIT_SORT_KEYS,
   auditFilterSchema,
-  isAuditAction,
   listAuditLogs,
 } from '@/modules/admin/services/audit-log.service';
 
@@ -41,22 +35,13 @@ const ALL = 'ALL';
 export default async function AuditLogsPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | undefined>>;
+  searchParams: Promise<RawSearchParams>;
 }) {
   await requireUser([UserRole.ADMIN]);
   const raw = await searchParams;
   const filter = auditFilterSchema.parse(raw);
-  const { items, total } = await listAuditLogs(filter);
-  const lastPage = Math.max(1, Math.ceil(total / AUDIT_PAGE_SIZE));
-  const pageHref = (p: number) => {
-    const next = new URLSearchParams();
-    for (const key of ['from', 'to', 'action', 'actor', 'target'] as const) {
-      const value = filter[key];
-      if (value) next.set(key, value);
-    }
-    next.set('page', String(p));
-    return `/admin/audit-logs?${next.toString()}`;
-  };
+  const list = parseListParams(raw, AUDIT_SORT_KEYS, AUDIT_DEFAULT_SORT);
+  const result = await listAuditLogs(filter, list);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -124,84 +109,15 @@ export default async function AuditLogsPage({
 
       <Card className="shadow-sm">
         <CardContent className="flex flex-col gap-4">
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Thời điểm</TableHead>
-                  <TableHead>Hành động</TableHead>
-                  <TableHead>Người thực hiện</TableHead>
-                  <TableHead>Đối tượng</TableHead>
-                  <TableHead>Chi tiết</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
-                      Không có bản ghi phù hợp.
-                    </TableCell>
-                  </TableRow>
-                )}
-                {items.map((log) => (
-                  <TableRow key={log.id} className="align-top even:bg-muted">
-                    <TableCell className="whitespace-nowrap tabular-nums">
-                      {formatVnDateTime(log.createdAt)}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {isAuditAction(log.action) ? AUDIT_ACTION_LABELS[log.action] : log.action}
-                    </TableCell>
-                    <TableCell>
-                      {log.actorId ? (
-                        <>
-                          {log.actorName ?? log.actorId}
-                          <span className="block text-xs text-muted-foreground tabular-nums">
-                            {log.actorId}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">Không xác định</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      {log.targetType}
-                      {log.targetId && (
-                        <span className="block max-w-48 truncate text-xs text-muted-foreground">
-                          {log.targetId}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="min-w-64 text-xs whitespace-normal">
-                      {log.detail.length === 0
-                        ? '—'
-                        : log.detail.map((d) => (
-                            <span key={d.key} className="block break-all">
-                              <span className="text-muted-foreground">{d.key}:</span> {d.value}
-                            </span>
-                          ))}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
-              {total} bản ghi · trang {filter.page}/{lastPage}
-            </span>
-            <div className="flex gap-2">
-              {filter.page > 1 && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href={pageHref(filter.page - 1)}>Trang trước</Link>
-                </Button>
-              )}
-              {filter.page < lastPage && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href={pageHref(filter.page + 1)}>Trang sau</Link>
-                </Button>
-              )}
-            </div>
-          </div>
+          <AuditLogsTable items={result.items} sort={{ sort: list.sort, dir: list.dir }} />
+          <DataPagination
+            basePath="/admin/audit-logs"
+            params={raw}
+            total={result.total}
+            page={result.page}
+            size={result.size}
+            unit="bản ghi"
+          />
         </CardContent>
       </Card>
     </div>

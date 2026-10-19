@@ -15,7 +15,10 @@ import { getEnv } from '../src/lib/env';
 import { auditFilterSchema, listAuditLogs } from '../src/modules/admin/services/audit-log.service';
 import { getSetupCounts } from '../src/modules/admin/services/getting-started.service';
 import { getAdminOverview } from '../src/modules/admin/services/overview.service';
-import { searchStudents } from '../src/modules/admin/services/student-search.service';
+import {
+  quickSearchStudents,
+  searchStudents,
+} from '../src/modules/admin/services/student-search.service';
 import {
   getAlertDetail,
   listAdminAlerts,
@@ -133,7 +136,7 @@ async function main() {
   const anAlert = await ds.getRepository(Alert).findOneByOrFail({ termId: PERF.currentTerm });
   const student = await ds.getRepository(Student).findOneByOrFail({ studentId: 'P000001' });
   const queries: [string, () => Promise<unknown>][] = [
-    ['Danh sách cảnh báo Admin (tối đa 500)', () => listAdminAlerts(PERF.currentTerm, 'ALL')],
+    ['Danh sách cảnh báo Admin (trang 1, 20 dòng)', () => listAdminAlerts(PERF.currentTerm, 'ALL')],
     [
       'Danh sách cảnh báo Admin, lọc 1 khoa',
       () => listAdminAlerts(PERF.currentTerm, 'ALL', 'K.CNTT'),
@@ -148,7 +151,15 @@ async function main() {
     ['Tổng quan Admin (1 khoa)', () => getAdminOverview('K.CNTT')],
     ['Trang "Bắt đầu" (đếm dữ liệu)', () => getSetupCounts()],
     ['Form chạy đánh giá (học phần theo khoa)', () => getEvaluationFormOptions()],
-    ['Tìm sinh viên (trang 1)', () => searchStudents('P0049', 1)],
+    ['Tìm sinh viên (trang 1)', () => searchStudents('P0049')],
+    [
+      'Tìm nhanh Ctrl+K theo họ tên không dấu (Admin)',
+      () => quickSearchStudents('nguyen van', null),
+    ],
+    [
+      'Tìm nhanh Ctrl+K (Cố vấn học tập, 1 lớp)',
+      () => quickSearchStudents('nguyen', advisor.advisorId ?? ''),
+    ],
     ['Nhật ký hệ thống (trang 1, không lọc)', () => listAuditLogs(auditFilterSchema.parse({}))],
   ];
   line();

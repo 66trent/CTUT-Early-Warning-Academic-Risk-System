@@ -4,12 +4,14 @@ import { ImportBatch, type ImportCourseCard } from '@/db/entities/import-batch.e
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
 import { type ImportBatchStatus, IMPORT_DATA_TYPES } from '@/db/enums';
+import { findOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
 import { availableImportTypes, getImportDefinition } from '../types/registry';
 import { getRollbackEligibility, isBatchBusy } from './import-batch.service';
 import { HIGH_ERROR_RATE, readSummary, readWarnings } from './import-summary';
 
-export const BATCHES_PAGE_SIZE = 20;
-export const ERROR_ROWS_PAGE_SIZE = 50;
+export const BATCH_SORT_KEYS = ['createdAt', 'dataType', 'status', 'fileName'] as const;
+export type BatchSortKey = (typeof BATCH_SORT_KEYS)[number];
+export const BATCH_DEFAULT_SORT = { sort: 'createdAt', dir: 'desc' } as const;
 
 export interface ImportBatchListItemDto {
   id: string;
@@ -120,22 +122,22 @@ export async function getImportFormOptions(): Promise<ImportFormOptionsDto> {
 
 export interface BatchFilter {
   dataType?: string;
-  page: number;
 }
 
 export async function listImportBatches(
-  filter: BatchFilter,
-): Promise<{ items: ImportBatchListItemDto[]; total: number }> {
+  filter: BatchFilter = {},
+  list: ListParams<BatchSortKey> = firstPage(BATCH_DEFAULT_SORT),
+): Promise<Paged<ImportBatchListItemDto>> {
   const repo = (await getDataSource()).getRepository(ImportBatch);
   const dataType = IMPORT_DATA_TYPES.find((t) => t === filter.dataType);
   const [batches, total] = await repo.findAndCount({
     where: dataType ? { dataType } : {},
     relations: { term: true },
-    order: { createdAt: 'DESC' },
-    skip: (filter.page - 1) * BATCHES_PAGE_SIZE,
-    take: BATCHES_PAGE_SIZE,
+    order: findOrder(list.sort ?? 'createdAt', list.dir, 'createdAt'),
+    skip: pageOffset(list),
+    take: list.size,
   });
-  return { items: batches.map(toListItem), total };
+  return { items: batches.map(toListItem), total, page: list.page, size: list.size };
 }
 
 export async function getImportBatchDetail(batchId: string): Promise<ImportBatchDetailDto | null> {
@@ -182,18 +184,27 @@ export async function getImportBatchDetail(batchId: string): Promise<ImportBatch
   };
 }
 
-export async function listErrorRows(batchId: string, page: number): Promise<ImportErrorRowDto[]> {
-  const rows = await (await getDataSource()).getRepository(ImportErrorRow).find({
+/** Dòng lỗi của 1 lô theo thứ tự dòng trong file. */
+export async function listErrorRows(
+  batchId: string,
+  list: ListParams = firstPage({ size: 50 }),
+): Promise<Paged<ImportErrorRowDto>> {
+  const [rows, total] = await (await getDataSource()).getRepository(ImportErrorRow).findAndCount({
     select: { sourceRowNumber: true, errorReason: true, errorDetail: true, rawData: true },
     where: { importBatchId: batchId },
     order: { sourceRowNumber: 'ASC' },
-    skip: (page - 1) * ERROR_ROWS_PAGE_SIZE,
-    take: ERROR_ROWS_PAGE_SIZE,
+    skip: pageOffset(list),
+    take: list.size,
   });
-  return rows.map((r) => ({
-    sourceRowNumber: r.sourceRowNumber,
-    errorReason: r.errorReason,
-    errorDetail: r.errorDetail,
-    rawData: { ...r.rawData },
-  }));
+  return {
+    items: rows.map((r) => ({
+      sourceRowNumber: r.sourceRowNumber,
+      errorReason: r.errorReason,
+      errorDetail: r.errorDetail,
+      rawData: { ...r.rawData },
+    })),
+    total,
+    page: list.page,
+    size: list.size,
+  };
 }

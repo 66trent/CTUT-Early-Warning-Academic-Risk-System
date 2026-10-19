@@ -3,7 +3,7 @@
 import { CheckCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { Button } from '@/components/ui/button';
 import { acknowledgeLowAlertsAction } from '@/modules/alerts/actions/alert.actions';
 

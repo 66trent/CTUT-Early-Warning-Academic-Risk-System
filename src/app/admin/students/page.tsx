@@ -1,25 +1,17 @@
 import type { Metadata } from 'next';
-import { Search } from 'lucide-react';
-import Link from 'next/link';
+import { GraduationCap, Search, SearchX } from 'lucide-react';
+import { StudentsTable } from '@/components/admin/students-table';
+import { DataPagination } from '@/components/data-table/data-pagination';
+import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
-import { OFFICIAL_STATUS_LABELS } from '@/lib/labels';
-import {
-  searchStudents,
-  STUDENTS_PAGE_SIZE,
-} from '@/modules/admin/services/student-search.service';
+import { HELP_LINKS } from '@/lib/help-links';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
+import { searchStudents, STUDENT_SORT_KEYS } from '@/modules/admin/services/student-search.service';
 
 export const metadata: Metadata = { title: 'Sinh viên' };
 
@@ -27,20 +19,18 @@ export const metadata: Metadata = { title: 'Sinh viên' };
 export default async function AdminStudentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<RawSearchParams>;
 }) {
   await requireUser([UserRole.ADMIN]);
   const params = await searchParams;
-  const q = (params.q ?? '').slice(0, 100);
-  const page = Math.max(1, Number(params.page) || 1);
-  const { items, total } = await searchStudents(q, page);
-  const lastPage = Math.max(1, Math.ceil(total / STUDENTS_PAGE_SIZE));
-  const pageHref = (p: number) =>
-    `/admin/students?${new URLSearchParams({ ...(q ? { q } : {}), page: String(p) }).toString()}`;
+  const q = (typeof params.q === 'string' ? params.q : '').slice(0, 100);
+  const list = parseListParams(params, STUDENT_SORT_KEYS);
+  const result = await searchStudents(q, list);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <PageHeader
+        helpHref={HELP_LINKS.students}
         title="Sinh viên"
         description="Tìm sinh viên để xem hồ sơ học tập (chỉ đọc) và đánh dấu rút học phần. Mỗi lần xem hồ sơ được ghi vào nhật ký hệ thống."
       />
@@ -59,62 +49,34 @@ export default async function AdminStudentsPage({
       </form>
       <Card className="shadow-sm">
         <CardContent className="flex flex-col gap-4">
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Sinh viên</TableHead>
-                  <TableHead>Lớp</TableHead>
-                  <TableHead>Tình trạng học vụ (từ phòng đào tạo)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground">
-                      {q
-                        ? 'Không tìm thấy sinh viên phù hợp.'
-                        : 'Chưa có sinh viên — hãy nhập danh sách sinh viên.'}
-                    </TableCell>
-                  </TableRow>
-                )}
-                {items.map((s) => (
-                  <TableRow key={s.studentId} className="even:bg-muted">
-                    <TableCell>
-                      <Link
-                        href={`/admin/students/${s.studentId}`}
-                        className="font-medium text-primary hover:underline"
-                      >
-                        {s.fullName}
-                      </Link>
-                      <span className="block text-xs text-muted-foreground tabular-nums">
-                        {s.studentId}
-                      </span>
-                    </TableCell>
-                    <TableCell className="tabular-nums">{s.classId}</TableCell>
-                    <TableCell>{OFFICIAL_STATUS_LABELS[s.officialAcademicStatus]}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
-              {total} sinh viên · trang {page}/{lastPage}
-            </span>
-            <div className="flex gap-2">
-              {page > 1 && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href={pageHref(page - 1)}>Trang trước</Link>
-                </Button>
-              )}
-              {page < lastPage && (
-                <Button asChild size="sm" variant="outline">
-                  <Link href={pageHref(page + 1)}>Trang sau</Link>
-                </Button>
-              )}
-            </div>
-          </div>
+          <StudentsTable
+            items={result.items}
+            sort={{ sort: list.sort, dir: list.dir }}
+            emptyMessage={
+              q ? (
+                <EmptyState
+                  icon={SearchX}
+                  title="Không tìm thấy sinh viên phù hợp"
+                  description="Thử gõ một phần mã số hoặc họ tên."
+                />
+              ) : (
+                <EmptyState
+                  icon={GraduationCap}
+                  title="Chưa có sinh viên"
+                  description="Nhập danh sách sinh viên từ file của phòng đào tạo để bắt đầu."
+                  action={{ href: '/admin/imports', label: 'Nhập danh sách sinh viên' }}
+                />
+              )
+            }
+          />
+          <DataPagination
+            basePath="/admin/students"
+            params={params}
+            total={result.total}
+            page={result.page}
+            size={result.size}
+            unit="sinh viên"
+          />
         </CardContent>
       </Card>
     </div>

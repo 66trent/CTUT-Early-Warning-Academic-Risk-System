@@ -5,9 +5,8 @@ import { User } from '@/db/entities/user.entity';
 import { UserAccountStatus, UserRole } from '@/db/enums';
 import { type AuditAction, writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
+import { applyOrder, firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
 import { type AccountFilter, type AccountStatusAction } from '../validators/account';
-
-export const ACCOUNTS_PAGE_SIZE = 20;
 
 export interface AccountDto {
   userId: string;
@@ -20,12 +19,16 @@ export interface AccountDto {
   advisedClassCount: number;
 }
 
-export interface AccountPageDto {
-  items: AccountDto[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+export type AccountPageDto = Paged<AccountDto>;
+
+export const ACCOUNT_SORT_KEYS = ['userId', 'fullName', 'role', 'accountStatus'] as const;
+export type AccountSortKey = (typeof ACCOUNT_SORT_KEYS)[number];
+const ACCOUNT_SORT_COLUMNS: Record<AccountSortKey, string> = {
+  userId: 'u.userId',
+  fullName: 'u.fullName',
+  role: 'u.role',
+  accountStatus: 'u.accountStatus',
+};
 
 /** Chuyển trạng thái hợp lệ (docs/rules/00, 06). */
 const STATUS_TRANSITIONS: Record<
@@ -85,8 +88,11 @@ async function countAdvisedClasses(
   return new Map(rows.map((r) => [r.advisorId, Number(r.total)]));
 }
 
-/** Danh sách tài khoản có lọc + phân trang. Tài khoản chờ duyệt lên đầu. */
-export async function listAccounts(filter: AccountFilter): Promise<AccountPageDto> {
+/** Danh sách tài khoản có lọc + phân trang. Mặc định tài khoản chờ duyệt lên đầu. */
+export async function listAccounts(
+  filter: AccountFilter,
+  list: ListParams<AccountSortKey> = firstPage(),
+): Promise<AccountPageDto> {
   const { manager } = await getDataSource();
   const qb = manager.getRepository(User).createQueryBuilder('u');
   if (filter.role === 'STAFF') qb.where('u.role IN (:...roles)', { roles: STAFF_ROLES });
@@ -97,10 +103,12 @@ export async function listAccounts(filter: AccountFilter): Promise<AccountPageDt
       q: `%${filter.q.replace(/[%_\\]/g, '\\$&')}%`,
     });
   }
-  qb.orderBy(`CASE WHEN u.account_status = 'PENDING_APPROVAL' THEN 0 ELSE 1 END`, 'ASC')
-    .addOrderBy('u.userId', 'ASC')
-    .skip((filter.page - 1) * ACCOUNTS_PAGE_SIZE)
-    .take(ACCOUNTS_PAGE_SIZE);
+  if (list.sort) applyOrder(qb, ACCOUNT_SORT_COLUMNS[list.sort], list.dir, ['u.userId', 'ASC']);
+  else {
+    qb.orderBy(`CASE WHEN u.account_status = 'PENDING_APPROVAL' THEN 0 ELSE 1 END`, 'ASC');
+    qb.addOrderBy('u.userId', 'ASC');
+  }
+  qb.skip(pageOffset(list)).take(list.size);
 
   const [users, total] = await qb.getManyAndCount();
   const [verified, classCounts] = await Promise.all([
@@ -125,8 +133,8 @@ export async function listAccounts(filter: AccountFilter): Promise<AccountPageDt
       advisedClassCount: classCounts.get(u.userId) ?? 0,
     })),
     total,
-    page: filter.page,
-    pageSize: ACCOUNTS_PAGE_SIZE,
+    page: list.page,
+    size: list.size,
   };
 }
 

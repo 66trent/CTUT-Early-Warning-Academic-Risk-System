@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-19 (sau Phase 8a).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-19 (sau Phase 8b).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -16,7 +16,8 @@
 | 5 Cảnh báo, CVHT, sinh viên | Xong | `phase-5` | #7 → `phase-4` | xanh |
 | 6 Quản trị và vận hành | Xong | `phase-6` | #8 → `phase-5` | xanh |
 | 7 Hoàn thiện và demo | Xong | `phase-7` | #9 → `main` | — |
-| 8a Điều chỉnh theo dữ liệu thật (12 luật, demo v2) | Xong | `phase-8a` (đang checkout) | → `phase-7` | — |
+| 8a Điều chỉnh theo dữ liệu thật (12 luật, demo v2) | Xong | `phase-8a` | #10 → `phase-7` | — |
+| 8b Nền tảng giao diện (phân trang, thẻ điện thoại, Ctrl+K, menu nhóm) | Xong | `phase-8b` (đang checkout) | → `phase-8a` | — |
 
 - Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **đã merge #1–#8 vào `main` (merge commit, 2026-10-15)**. Từ Phase 7 PR đi thẳng vào `main`.
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
@@ -64,7 +65,8 @@
 
 ## 5. Bẫy đã gặp — đừng lặp lại
 
-0. **Docker Desktop tự khởi động lại container `app`/`worker` image CŨ** (cổng 3000 bị chiếm, worker cũ tranh job): khi chạy app ở máy luôn `docker compose stop app worker` trước. `next build` khi dev server đang chạy làm hỏng cache dev → khởi động lại dev server. Docker lỗi "Inference manager" = file kẹt `%LOCALAPPDATA%\Dockerun\dockerInference` → tắt Docker, xóa file, `wsl --shutdown`, mở lại (KHÔNG bấm Reset to factory defaults).
+0. **Docker Desktop tự khởi động lại container `app`/`worker` image CŨ** (cổng 3000 bị chiếm, worker cũ tranh job): khi chạy app ở máy luôn `docker compose stop app worker` trước. `next build` khi dev server đang chạy làm hỏng cache dev → khởi động lại dev server. Docker lỗi "Inference manager" = file kẹt `%LOCALAPPDATA%\Docker
+un\dockerInference` → tắt Docker, xóa file, `wsl --shutdown`, mở lại (KHÔNG bấm Reset to factory defaults).
 
 1. **Viết file qua heredoc/`node -e` trong Git Bash**: chuỗi `\r\n`, `\uFEFF` trong template literal bị biến thành ký tự thật → hỏng regex/test. Dùng tool Write/Edit để tạo file có ký tự escape.
 2. **Next.js production nhân bản module** giữa route handler và trang → 1 `DataSource` dùng chung gây `EntityMetadataNotFoundError`; đã sửa bằng cache theo class `User` của từng bản sao (`src/db/data-source.ts`). Lỗi chỉ lộ ra khi `next build`/Docker — luôn thử trong container.
@@ -89,9 +91,13 @@
 21. Đăng nhập nhanh lặp nhiều lần (Playwright/script) chạm giới hạn tần suất → đăng nhập 1 lần / tài khoản rồi dùng lại `storageState` (`scripts/screenshots.ts`).
 22. Biểu đồ Recharts trong lưới CSS tràn ngang trên điện thoại nếu ô lưới thiếu `min-w-0`.
 
+23. `npx shadcn add` nhiều thành phần cùng lúc treo ở câu hỏi ghi đè thứ 2 (stdin `n` chỉ trả lời câu đầu) → thành phần chưa sinh viết tay theo mẫu shadcn; luôn sửa `from "cn"` → `@/lib/utils`.
+24. TypeORM QueryBuilder lưu ORDER BY theo tên cột: `orderBy(x).addOrderBy(x)` GHI ĐÈ hướng của x (sắp giảm thành tăng); `find({ order })` cũng vậy. Dùng `applyOrder`/`findOrder` (`src/lib/list-params.ts`). Join 1–1 + sắp theo cột bảng join → dùng `offset/limit` thay `skip/take`.
+25. Next 16 tách thư mục dev (`.next/dev`) — `next build` chạy song song dev server không còn làm hỏng cache (bẫy #0 cũ). Dev server của phiên khác chiếm cổng 3000 → Browser pane mở thẳng `http://localhost:3000` dùng chung.
+
 ## 6. Việc tiếp theo
 
-Phase 8a xong (chờ PR). Tiếp: Phase 8b (giao diện + nạp nhiều file + sửa Playwright), Phase 9 (mở rộng dữ liệu demo, kịch bản nhỏ). Image Docker app/worker CHƯA build lại theo code 8a. Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/`), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
+Phase 8a, 8b xong (chờ merge PR). Tiếp: Phase 8c–8f (8b đã làm) (chốt 2026-10-19, chi tiết `docs/implement.md`; giữ shadcn + thêm thành phần): 8b nền tảng giao diện (phân trang, thẻ trên điện thoại, tải/lỗi/trống, menu nhóm, Ctrl+K), 8c trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá), 8d hai trang tổng quan Admin + CVHT (`/advisor` thành tổng quan, cảnh báo sang `/advisor/alerts`), 8e CVHT + sinh viên (xuất Excel, trang thông báo, ma trận, hồ sơ), 8f nạp nhiều file + Playwright/ảnh/demo-script, Phase 9 (mở rộng dữ liệu demo, kịch bản nhỏ). Image Docker app/worker CHƯA build lại theo code 8a. Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/`), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
 
 **Báo cáo tiến độ với giảng viên:** `docs/BAO_CAO_TIEN_DO.md` (checklist A–G + nhật ký báo cáo). Mỗi khi người dùng hỏi "báo cáo tiến độ" hoặc xong một việc trong danh sách: tick `[x]` kèm ngày, cập nhật bảng Tổng hợp (đếm lại), thêm 1 dòng Nhật ký báo cáo — không xóa mục cũ. Báo cáo Word cho hội đồng: `docs/bao-cao/Bao-cao-do-an-CTUT-EWARS.docx` (bìa "Đồ án Kỹ thuật phần mềm 3" — người dùng chốt), bản kỹ thuật: `docs/bao-cao/CTUT-EWARS_Bao-cao-yeu-cau-va-thiet-ke-ky-thuat.docx` (cả 2 chưa commit).
 

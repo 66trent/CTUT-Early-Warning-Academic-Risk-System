@@ -101,3 +101,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Demo v2: lớp KTPM2411, 20 SV giả, 3 môn, HK1 2025–2026, 3 mốc → 10/13/16 cảnh báo (`KET_QUA_MONG_DOI.md`). Demo cũ + 8 kịch bản lưu ở `_luu-tru-v1/` (viết lại Phase 9).
 - Kiểm tra: typecheck, lint, format, migration:check, 365 test, build — xanh. Kiểm tay 3 mục DoD đạt. Playwright chưa sửa (8b).
 - Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → Admin → Nhập dữ liệu → mở lô điểm danh (thẻ học phần, cảnh báo sai tên) → GV001 xem KTPM2411908 (LMS-03) → Admin → Học kỳ → Chốt học kỳ (mốc 2025-12-31).
+
+## Phase 8b — Nền tảng giao diện dùng chung (2026-10-19)
+
+- Kế hoạch giao diện chia 8b–8f (`docs/implement.md`); giữ shadcn, thêm `pagination`, `breadcrumb`, `command` (cmdk), `popover`, `progress`, `collapsible`, `scroll-area`.
+- Phân trang + sắp xếp phía server (`src/lib/list-params.ts`, `DataPagination`, cột `meta.sortKey`): tài khoản, sinh viên, lô nhập, dòng lỗi, lần chạy đánh giá, cảnh báo Admin (trước giới hạn 500), nhật ký. Cỡ trang 20/50/100, giữ bộ lọc, trang vượt quá có nút về trang cuối.
+- `DataTable`: < 768px mỗi dòng thành thẻ. Menu gom 4 nhóm (Admin), 768–1023px thu thành biểu tượng. `loading.tsx`/`error.tsx`/`not-found.tsx` cho 3 khu vực + gốc; `EmptyState`; breadcrumb thay nút "Quay lại"; nút "?" mở đúng bước trang Bắt đầu.
+- Tìm nhanh Ctrl+K (Admin, CVHT): MSSV/họ tên gõ không dấu, CVHT chỉ lớp mình, 60 lần/phút; đo 20 ms / 5.000 SV (`ewars_perf`, không cần index). Toast lỗi giữ 10 giây (`@/lib/notify`).
+- Rules: `03` (thành phần, phân trang, thẻ điện thoại, menu), `07` (tải/lỗi/trống, Ctrl+K, breadcrumb, nút "?").
+- Kiểm tra: typecheck, lint, format, migration:check, 376 test, build — xanh. Kiểm tay trên trình duyệt đạt (xem `implement.md`); chưa thử tắt DB để xem trang lỗi.
+- Tự kiểm tra: Admin → Nhật ký hệ thống → đổi trang / số dòng / bấm tiêu đề cột; Ctrl+K gõ "le van cuong"; thu nhỏ cửa sổ < 768px xem bảng thành thẻ.

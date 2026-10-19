@@ -38,7 +38,10 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 ## Trạng thái rỗng, lỗi, đang tải
 
-- MUST: mọi danh sách có thể rỗng có empty state có ý nghĩa (không chỉ "Không có dữ liệu") — ví dụ danh sách `Alert` rỗng: "Chưa có sinh viên nào cần chú ý trong học kỳ này".
+- MUST: mọi danh sách có thể rỗng có empty state có ý nghĩa (không chỉ "Không có dữ liệu") — ví dụ danh sách `Alert` rỗng: "Chưa có sinh viên nào cần chú ý trong học kỳ này". Dùng `EmptyState` (biểu tượng + tiêu đề + 1 câu giải thích + nút việc làm tiếp) khi có việc cụ thể để làm.
+- MUST (Phase 8b): mỗi khu vực vai trò có `loading.tsx` (khung chờ cùng bố cục trang), `error.tsx` (câu dễ hiểu + "Thử lại" + mã tra cứu `digest`, MUST NOT hiện nội dung lỗi kỹ thuật) và `not-found.tsx`.
+- MUST (Phase 8b): tìm nhanh Ctrl+K / ⌘K (Admin, CVHT): sinh viên theo MSSV hoặc họ tên, gõ không dấu được (bỏ dấu cả 2 phía bằng `translate`, không cần extension), tối đa 8 kết quả, MSSV khớp đầu chuỗi lên trước; CVHT chỉ thấy sinh viên lớp mình (lọc ở server); 60 lần/phút/người; kèm mục "Đi tới trang". Không có index trigram — đo trên `ewars_perf` (ghi `PROGRESS.md`).
+- MUST (Phase 8b): trang chi tiết có breadcrumb thay nút "Quay lại"; trang Admin có nút "?" mở đúng bước trên trang Bắt đầu (`src/lib/help-links.ts`, neo `#buoc-<key>`).
 - MUST: lỗi nhập file hiển thị có thể hành động — chỉ rõ dòng, cột, lý do, và nút "Tải file lỗi để sửa" ngay tại chỗ báo lỗi, MUST NOT chỉ báo "Lỗi" chung chung.
 - SHOULD: loading state cho thao tác chạy lâu (nhập file lớn, tính RiskScore) hiển thị tiến độ có ý nghĩa (VD: "Đang xử lý 340/1200 sinh viên") thay vì spinner vô nghĩa, nếu API hỗ trợ trả tiến độ.
 
