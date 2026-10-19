@@ -29,11 +29,13 @@ import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { SeverityBadge } from '@/components/domain/severity-badge';
 import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
+import { QuickGuide } from '@/components/quick-guide';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDate, formatVnDateTime } from '@/lib/dates';
 import { ALERT_STATUS_LABELS } from '@/lib/labels';
 import { type RawSearchParams, withParams } from '@/lib/list-params';
+import { ADVISOR_GUIDE } from '@/modules/alerts/guide-content';
 import { INTERVENTION_TYPE_LABELS } from '@/modules/alerts/labels';
 import {
   getAdvisorClasses,
@@ -166,6 +168,7 @@ export default async function AdvisorHomePage({
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       {header}
+      <QuickGuide guide={ADVISOR_GUIDE} storageKey="ewars:guide:advisor" />
       <ReferenceOnlyNotice />
       <AttentionStrip items={attention} />
 

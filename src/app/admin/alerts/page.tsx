@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import { ShieldCheck, UserCheck } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { DepartmentFilter } from '@/components/admin/department-filter';
 import { DataPagination } from '@/components/data-table/data-pagination';
 import { ActiveAlertFilters } from '@/components/alerts/active-alert-filters';
+import { AlertListFilter } from '@/components/alerts/alert-list-filter';
 import { AlertsTable } from '@/components/alerts/alerts-table';
+import { ExportAlertsButton } from '@/components/alerts/export-alerts-button';
 import { TermFilter } from '@/components/alerts/term-filter';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { EmptyState } from '@/components/empty-state';
@@ -63,6 +66,7 @@ export default async function AdminAlertsPage({
         helpHref={HELP_LINKS.alerts}
         title="Cảnh báo sớm"
         description="Xem toàn bộ cảnh báo ở chế độ chỉ đọc. Cố vấn học tập phụ trách lớp là người xử lý."
+        action={term ? <ExportAlertsButton basePath="/api/alerts/export" params={params} /> : null}
       />
       <ReferenceOnlyNotice />
       <div className="flex flex-wrap items-center gap-3">
@@ -77,6 +81,9 @@ export default async function AdminAlertsPage({
           </Button>
         </div>
       </div>
+      <Suspense>
+        <AlertListFilter classes={[]} />
+      </Suspense>
       <ActiveAlertFilters basePath="/admin/alerts" params={params} extra={extra} />
       <Card className="shadow-sm">
         <CardContent className="flex flex-col gap-4">

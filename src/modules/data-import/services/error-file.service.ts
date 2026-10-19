@@ -1,23 +1,10 @@
 import { getDataSource } from '@/db/data-source';
 import { ImportBatch } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
+import { BOM, csvCell, neutralizeFormula } from '@/lib/spreadsheet';
 import { errorReasonLabel } from '../labels';
 
-/**
- * Chống chèn công thức (CSV/formula injection, OWASP — docs/rules/06): ô bắt đầu bằng
- * `=`, `+`, `-`, `@`, tab, CR được thêm tiền tố `'` để Excel coi là văn bản.
- */
-export function neutralizeFormula(value: string): string {
-  return /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
-}
-
-/** Ô CSV theo RFC 4180: bọc ngoặc kép khi có dấu phẩy, ngoặc kép hoặc xuống dòng. */
-function csvCell(value: string): string {
-  const safe = neutralizeFormula(value);
-  return /[",\r\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
-}
-
-const BOM = '﻿';
+export { neutralizeFormula };
 
 /**
  * File dòng lỗi để tải về sửa (docs/rules/12): UTF-8 có BOM, cột `dong`, `ly_do`, `ma_loi`

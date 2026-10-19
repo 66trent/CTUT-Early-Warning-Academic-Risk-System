@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Severity } from '@/db/enums';
 import { SEVERITY_LABELS } from '@/lib/labels';
 import { type RawSearchParams, withParams } from '@/lib/list-params';
+import { SOURCE_LABELS, type SignalSource } from '@/modules/alerts/services/alert-presentation';
 import type { AlertStatusGroup } from '@/modules/alerts/services/alert-query.service';
 import { OVERDUE_DAYS } from '@/modules/alerts/services/dashboard.service';
 
@@ -21,12 +22,20 @@ export function ActiveAlertFilters({
 }: {
   basePath: string;
   params: RawSearchParams;
-  extra: { severity?: Severity; status?: AlertStatusGroup; classId?: string };
+  extra: {
+    severity?: Severity;
+    status?: AlertStatusGroup;
+    classId?: string;
+    source?: SignalSource;
+    q?: string;
+  };
 }) {
   const chips = [
     extra.severity && { key: 'severity', label: `Mức: ${SEVERITY_LABELS[extra.severity]}` },
     extra.status && { key: 'status', label: STATUS_GROUP_LABELS[extra.status] },
     extra.classId && { key: 'classId', label: `Lớp ${extra.classId}` },
+    extra.source && { key: 'source', label: `Nguồn: ${SOURCE_LABELS[extra.source]}` },
+    extra.q && { key: 'q', label: `Tìm: ${extra.q}` },
   ].filter((c): c is { key: string; label: string } => !!c);
   if (chips.length === 0) return null;
   return (
@@ -44,7 +53,14 @@ export function ActiveAlertFilters({
         </Link>
       ))}
       <Link
-        href={`${basePath}${withParams(params, { severity: null, status: null, classId: null, page: null })}`}
+        href={`${basePath}${withParams(params, {
+          severity: null,
+          status: null,
+          classId: null,
+          source: null,
+          q: null,
+          page: null,
+        })}`}
         className="text-primary hover:underline"
       >
         Bỏ tất cả

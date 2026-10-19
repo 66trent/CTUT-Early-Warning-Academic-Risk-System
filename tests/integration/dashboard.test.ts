@@ -123,7 +123,7 @@ describe('Tổng quan Cố vấn học tập — phạm vi lớp mình', () => {
   it('CVHT A thấy số liệu lớp mình, khớp danh sách; CVHT B (lớp không có sinh viên) toàn 0', async () => {
     const a = await getAlertSummary({ termId: DEMO.hk1, advisorId: DEMO.advisorA });
     const todo = await listAdvisorAlerts(DEMO.advisorA, DEMO.hk1, 'TODO');
-    expect(a.waiting + a.following).toBe(todo.length);
+    expect(a.waiting + a.following).toBe(todo.total);
     expect(a.studentsWithAlerts).toBeGreaterThan(0);
     expect(a.totalStudents).toBe(20);
 

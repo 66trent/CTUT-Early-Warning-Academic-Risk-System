@@ -35,7 +35,7 @@ Xem `00-project-context.md` cho glossary và bảng phạm vi role.
 ## Audit Logging — append-only, bắt buộc
 
 - MUST NOT: expose bất kỳ Server Action nào `UPDATE`/`DELETE` bảng `AuditLog`. Nếu cần "xóa" theo yêu cầu pháp lý, dùng ẩn danh hóa (xem `04-legal-compliance.md`).
-- MUST: ghi Audit Log cho: cấu hình luật, mỗi lần tạo `EvaluationRun` thủ công (ai, phạm vi), duyệt/từ chối/khóa tài khoản, gán hoặc đổi CVHT của lớp sinh hoạt, tạo học kỳ/đổi học kỳ hiện tại/chốt học kỳ, đổi trạng thái `Alert`, truy cập hồ sơ chi tiết 1 sinh viên bởi người không phải CVHT phụ trách trực tiếp, mọi thao tác `ImportBatch` (tạo/hủy/nhập lại), đăng nhập thất bại, thay đổi vai trò tài khoản.
+- MUST: ghi Audit Log cho: cấu hình luật, mỗi lần tạo `EvaluationRun` thủ công (ai, phạm vi), duyệt/từ chối/khóa tài khoản, gán hoặc đổi CVHT của lớp sinh hoạt, tạo học kỳ/đổi học kỳ hiện tại/chốt học kỳ, đổi trạng thái `Alert`, truy cập hồ sơ chi tiết 1 sinh viên bởi người không phải CVHT phụ trách trực tiếp, mọi thao tác `ImportBatch` (tạo/hủy/nhập lại), đăng nhập thất bại, thay đổi vai trò tài khoản, xuất danh sách cảnh báo ra file (`ALERT_EXPORT`, ghi định dạng, số dòng, bộ lọc — Phase 8e).
 - MUST: dùng đúng 1 hàm `writeAuditLog()` trong `lib/audit.ts`, gọi từ mọi nơi liên quan — MUST NOT copy-paste logic ghi log ở nhiều chỗ.
 
 ## Bảo vệ dữ liệu khi lưu trữ và truyền tải

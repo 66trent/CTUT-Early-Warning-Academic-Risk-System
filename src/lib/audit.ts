@@ -43,6 +43,7 @@ export const AUDIT_ACTIONS = [
   'ALERTS_REASSIGNED',
   'INTERVENTION_RECORDED',
   'STUDENT_PROFILE_VIEWED',
+  'ALERT_EXPORT',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 

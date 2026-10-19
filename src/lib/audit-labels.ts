@@ -37,4 +37,5 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   ALERTS_REASSIGNED: 'Chuyển cảnh báo sang Cố vấn học tập khác',
   INTERVENTION_RECORDED: 'Ghi can thiệp',
   STUDENT_PROFILE_VIEWED: 'Xem hồ sơ sinh viên',
+  ALERT_EXPORT: 'Xuất danh sách cảnh báo',
 };

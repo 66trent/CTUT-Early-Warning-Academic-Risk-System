@@ -226,15 +226,19 @@ Dùng chung: service số liệu tổng quan theo phạm vi (học kỳ + khoa /
 
 ### Phase 8e — Màn hình CVHT và sinh viên
 
-- [ ] **Danh sách cảnh báo CVHT** (`/advisor/alerts`): cột lý do = câu nguyên nhân nặng nhất; tìm kiếm; lọc lớp / mức / nguồn / trạng thái; nhãn "quá 7 ngày chưa xử lý"; phân trang; giữ nút xác nhận hàng loạt mức thấp.
-- [ ] **Xuất danh sách cảnh báo** (CSV + `.xlsx`) theo bộ lọc đang chọn: Route Handler GET, `assertScope` (CVHT chỉ lớp mình; Admin toàn bộ, chỉ đọc), chống chèn công thức (`06`), cột tiếng Việt, không có `inputSnapshot` thô / nội dung can thiệp `SENSITIVE`; ghi Audit Log `ALERT_EXPORT`; tên file `canh-bao_<hoc-ky>_<ngay>.xlsx`. Test chèn công thức + phạm vi.
-- [ ] **Thông báo**: chuông hiện sẵn → thêm trang `/advisor/notifications` (tất cả, lọc chưa đọc, phân trang), đánh dấu từng cái / tất cả đã đọc, bấm thông báo mở thẳng cảnh báo.
-- [ ] Ma trận lớp × học phần cho CVHT (ô màu theo mức cao nhất, số sinh viên; bấm ô mở danh sách sinh viên của ô đó).
-- [ ] Hồ sơ sinh viên: dòng thời gian (nạp, cảnh báo, can thiệp), biểu đồ tỷ lệ vắng theo ngày chốt (vạch 20%), ĐTB các học kỳ, biểu tượng 3 nguồn theo mức.
-- [ ] Trang sinh viên: bỏ nhãn "Ổn định"; mỗi học phần thanh tiến độ vắng so với vạch 20%, bài trắc nghiệm / thực hành đã nộp / quá hạn — số liệu thật; cảnh báo vẫn chỉ hiện sau khi CVHT xác nhận (`07`).
-- [ ] Hướng dẫn ngắn cho CVHT và sinh viên (thẻ "Lần đầu dùng?" thu gọn được + nút "?" — cùng nguồn nội dung với 8c).
+Rà trước khi code (2026-10-19, người dùng chốt): ma trận = **sinh viên × học phần** của 1 lớp (+ cột "Cả học kỳ"), ô màu theo mức dấu hiệu nặng nhất, bấm ô mở cảnh báo — 1 click; dòng thời gian hồ sơ = **cảnh báo + can thiệp (chỉ loại) + ngày chốt dữ liệu** (không liệt kê từng lô nạp). Vạch vắng KHÔNG ghi cứng 20%: đọc dải cao nhất của `ATT-01` đang áp dụng (`02`). Cột lý do = câu lý do của dấu hiệu nặng nhất + "và N dấu hiệu khác" (dùng chung bảng Admin). Xuất file thêm hành động nhật ký `ALERT_EXPORT` (`06`).
+
+- [x] **Danh sách cảnh báo CVHT** (`/advisor/alerts`): phân trang + sắp xếp ở server (bỏ giới hạn 500); cột lý do mới; tìm MSSV / họ tên; lọc lớp / mức / nguồn / nhóm trạng thái; nhãn "quá 7 ngày chưa xác nhận"; giữ nút xác nhận hàng loạt mức thấp.
+- [x] **Xuất danh sách cảnh báo** (`.xlsx` + CSV) theo bộ lọc đang chọn: Route Handler GET, phạm vi ở server (CVHT chỉ lớp mình; Admin toàn bộ, chỉ đọc), chống chèn công thức (`06`), cột tiếng Việt, không có `inputSnapshot` / nội dung can thiệp; Audit Log `ALERT_EXPORT`; tên file `canh-bao_<hoc-ky>_<ngay>.xlsx`. Test chèn công thức + phạm vi.
+- [x] **Thông báo**: trang `/advisor/notifications` (tất cả / chưa đọc, phân trang), đánh dấu từng cái / tất cả đã đọc, bấm mở thẳng cảnh báo; chuông có đường dẫn "Xem tất cả".
+- [x] **Ma trận sinh viên × học phần** (`/advisor/matrix`): chọn lớp phụ trách + học kỳ; ô = mức dấu hiệu nặng nhất của sinh viên ở học phần (cảnh báo chưa đóng), cột "Cả học kỳ" cho luật học lực / kết hợp; bấm ô mở cảnh báo; chú thích màu kèm chữ; điện thoại cuộn ngang trong khung bảng (ngoại lệ có chủ đích của quy tắc thẻ).
+- [x] **Hồ sơ sinh viên** (CVHT, Admin): 3 biểu tượng nguồn theo mức hiện tại; biểu đồ tỷ lệ vắng theo ngày chốt từng học phần + vạch ngưỡng `ATT-01`; ĐTB hệ 4 các học kỳ; dòng thời gian (cảnh báo, can thiệp chỉ loại, ngày chốt điểm danh / công bố điểm).
+- [x] **Trang sinh viên**: bỏ nhãn "Ổn định"; mỗi học phần thẻ riêng — thanh vắng so với vạch ngưỡng, bài trắc nghiệm / thực hành đã nộp / quá hạn, kết quả; cảnh báo vẫn chỉ hiện sau khi CVHT xác nhận (`07`).
+- [x] **Hướng dẫn ngắn** cho CVHT và sinh viên: thẻ "Lần đầu dùng?" thu gọn được (nhớ trên trình duyệt) — nội dung tách file như 8c.
 
 **DoD:** test + `build` xanh. **Kiểm tra tay:** CVHT tìm 1 sinh viên bằng ma trận ≤ 2 click; xuất `.xlsx` mở Excel đúng tiếng Việt, ô `=1+1` hiện nguyên văn; sinh viên không thấy cảnh báo chưa xác nhận.
+
+**Kết quả (2026-10-19):** đạt DoD — typecheck, lint, format, migration:check, 395 test (thêm `advisor-screens.test.ts`, `spreadsheet.test.ts`), build xanh. Kiểm tay (GV001, KTPM2411903): lọc nguồn LMS ra đúng danh sách + chip; xuất Excel / CSV tải được (tên `canh-bao_HK1_2025_<ngày>.xlsx`); ma trận 15/20 SV có dấu hiệu, bấm ô mở đúng cảnh báo (1 click); hồ sơ có biểu đồ vắng + vạch > 20%, ĐTB, dòng thời gian; trang thông báo; sinh viên KHÔNG thấy cảnh báo chưa xác nhận, thanh vắng 22,2% vượt vạch hiện đỏ; 375px không cuộn ngang (ma trận cuộn trong khung bảng). Chưa mở file `.xlsx` bằng Excel thật trên máy (đã kiểm nội dung bằng thư viện đọc file trong test).
 
 ### Phase 8f — Nạp nhiều file và chốt giao diện
 

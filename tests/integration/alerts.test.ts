@@ -171,15 +171,16 @@ describe('Phân quyền (DoD): Admin chỉ đọc, CVHT khác và sinh viên kh�
   });
 
   it('danh sách CVHT suy ra qua lớp: A thấy 10, B (lớp không có sinh viên) không thấy gì; sắp mức giảm dần', async () => {
-    const a = await listAdvisorAlerts(DEMO.advisorA, DEMO.hk1, 'TODO');
+    const page = await listAdvisorAlerts(DEMO.advisorA, DEMO.hk1, 'TODO');
+    const a = page.items;
+    expect(page.total).toBe(10);
     expect(a).toHaveLength(10);
     expect(a[0]?.severity).toBe('CRITICAL');
     expect(a.at(-1)?.severity).toBe('LOW');
     expect(Object.getPrototypeOf(a[0])).toBe(Object.prototype);
-    expect(await listAdvisorAlerts(DEMO.advisorB, DEMO.hk1, 'TODO')).toEqual([]);
-    expect(a.find((x) => x.studentId === 'TSTK2411910')?.summary).toBe(
-      '3 nguyên nhân: điểm danh, bài LMS, kết hợp nhiều nguồn',
-    );
+    expect((await listAdvisorAlerts(DEMO.advisorB, DEMO.hk1, 'TODO')).items).toEqual([]);
+    // Cột lý do = câu lý do của dấu hiệu nặng nhất + số dấu hiệu còn lại (Phase 8e).
+    expect(a.find((x) => x.studentId === 'TSTK2411910')?.summary).toMatch(/· và 2 dấu hiệu khác$/);
   });
 });
 
@@ -308,8 +309,8 @@ describe('Chuyển người phụ trách và hoàn tác lô', () => {
       .getRepository(Alert)
       .findBy({ termId: DEMO.hk1, status: AlertStatus.IN_PROGRESS });
     expect(moved.every((a) => a.assignedAdvisorId === DEMO.advisorB)).toBe(true);
-    expect(await listAdvisorAlerts(DEMO.advisorA, DEMO.hk1, 'ALL')).toEqual([]);
-    expect((await listAdvisorAlerts(DEMO.advisorB, DEMO.hk1, 'TODO')).length).toBeGreaterThan(1);
+    expect((await listAdvisorAlerts(DEMO.advisorA, DEMO.hk1, 'ALL')).items).toEqual([]);
+    expect((await listAdvisorAlerts(DEMO.advisorB, DEMO.hk1, 'TODO')).total).toBeGreaterThan(1);
     await expect(
       assertScope(user(DEMO.advisorA, UserRole.ADVISOR), {
         studentId: 'TSTK2411903',
@@ -327,7 +328,7 @@ describe('Chuyển người phụ trách và hoàn tác lô', () => {
     await loadCsv(ds, 'tst-p5-doi-lop.csv', moved, 'STUDENT', null);
     expect((await alertOf('TSTK2411905')).assignedAdvisorId).toBe(DEMO.advisorB);
     expect(
-      (await listAdvisorAlerts(DEMO.advisorB, DEMO.hk1, 'TODO')).map((a) => a.studentId),
+      (await listAdvisorAlerts(DEMO.advisorB, DEMO.hk1, 'TODO')).items.map((a) => a.studentId),
     ).toContain('TSTK2411905');
   });
 

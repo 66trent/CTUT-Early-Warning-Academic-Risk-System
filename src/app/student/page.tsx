@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { CircleCheck, Lightbulb, Mail } from 'lucide-react';
-import { CourseSnapshotTable } from '@/components/alerts/student-profile-view';
+import { Lightbulb, Mail } from 'lucide-react';
+import { StudentCourseCards } from '@/components/alerts/student-course-cards';
+import { QuickGuide } from '@/components/quick-guide';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,9 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { assertScope } from '@/lib/authz';
+import { STUDENT_GUIDE } from '@/modules/alerts/guide-content';
 import { SOURCE_LABELS } from '@/modules/alerts/services/alert-presentation';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 import { getStudentOverview } from '@/modules/alerts/services/student-profile.service';
+import { getAttendanceThreshold } from '@/modules/rule-engine/services/student-academic.service';
 
 export const metadata: Metadata = { title: 'Tình hình học tập của bạn' };
 
@@ -22,7 +25,10 @@ export default async function StudentHomePage() {
   const user = await requireUser([UserRole.STUDENT]);
   await assertScope(user, { studentId: user.userId, resourceType: 'Student' });
   const term = pickTerm(await listTermOptions());
-  const overview = term ? await getStudentOverview(user.userId, term.termId) : null;
+  const [overview, threshold] = await Promise.all([
+    term ? getStudentOverview(user.userId, term.termId) : null,
+    getAttendanceThreshold(),
+  ]);
   const attention = overview?.level === 'NEEDS_ATTENTION';
 
   return (
@@ -35,21 +41,25 @@ export default async function StudentHomePage() {
         </p>
       </div>
 
+      <QuickGuide guide={STUDENT_GUIDE} storageKey="ewars:guide:student" />
+
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="flex flex-wrap items-center gap-2">
             Tổng quan
-            <Badge variant="outline" className="gap-1">
-              {attention ? <Lightbulb aria-hidden /> : <CircleCheck aria-hidden />}
-              {attention ? 'Cần chú ý' : 'Ổn định'}
-            </Badge>
+            {attention && (
+              <Badge variant="outline" className="gap-1">
+                <Lightbulb aria-hidden />
+                Điều nên chú ý
+              </Badge>
+            )}
           </CardTitle>
           <CardDescription>
             {attention
               ? 'Cố vấn học tập của bạn đã ghi nhận vài điểm nên cải thiện. Các gợi ý bên dưới có thể giúp bạn.'
               : overview?.resolved
                 ? 'Cố vấn học tập đã cùng bạn trao đổi các điểm cần chú ý. Hãy tiếp tục theo kế hoạch đã thống nhất nhé!'
-                : 'Bạn đang theo kịp học kỳ. Hãy tiếp tục duy trì nhé!'}
+                : 'Theo dõi số liệu từng học phần bên dưới để chủ động trong học tập.'}
           </CardDescription>
         </CardHeader>
         {overview && overview.focus.length > 0 && (
@@ -74,9 +84,12 @@ export default async function StudentHomePage() {
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Các học phần trong học kỳ</CardTitle>
+          <CardDescription>
+            Số liệu lấy theo lần nạp dữ liệu gần nhất của nhà trường.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <CourseSnapshotTable courses={overview?.profile.courses ?? []} />
+          <StudentCourseCards courses={overview?.profile.courses ?? []} threshold={threshold} />
         </CardContent>
       </Card>
 

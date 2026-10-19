@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { In, IsNull, type EntityManager } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
+import { firstPage, type ListParams, type Paged, pageOffset } from '@/lib/list-params';
 import { Alert } from '@/db/entities/alert.entity';
 import { Notification } from '@/db/entities/notification.entity';
 import { Student } from '@/db/entities/student.entity';
@@ -130,33 +131,64 @@ export interface InAppNotificationDto {
   read: boolean;
 }
 
+function toInAppDto(n: Notification): InAppNotificationDto {
+  return {
+    notificationId: n.notificationId,
+    alertId: n.alertId,
+    title: EVENT_LABELS[n.event as NotificationEvent] ?? 'Thông báo',
+    studentName: n.alert?.student?.fullName ?? '',
+    severity: n.alert?.severity ?? Severity.LOW,
+    createdAt: n.createdAt.toISOString(),
+    read: n.readAt !== null,
+  };
+}
+
 /** Chuông thông báo: 20 thông báo trong ứng dụng gần nhất + số chưa đọc. */
 export async function listInAppNotifications(
   userId: string,
 ): Promise<{ items: InAppNotificationDto[]; unread: number }> {
-  const ds = await getDataSource();
-  const repo = ds.getRepository(Notification);
-  const [rows, unread] = await Promise.all([
-    repo.find({
-      where: { recipientId: userId, channel: NotificationChannel.IN_APP },
+  const page = await listInAppNotificationsPaged(userId, false, firstPage({ size: 20 }));
+  return { items: page.items, unread: page.unread };
+}
+
+/**
+ * Trang thông báo (docs/rules/07): thông báo trong ứng dụng của CHÍNH người dùng, mới nhất trước,
+ * phân trang; `unreadOnly` chỉ lấy thông báo chưa đọc.
+ */
+export async function listInAppNotificationsPaged(
+  userId: string,
+  unreadOnly: boolean,
+  list: ListParams = firstPage(),
+): Promise<Paged<InAppNotificationDto> & { unread: number }> {
+  const repo = (await getDataSource()).getRepository(Notification);
+  const mine = { recipientId: userId, channel: NotificationChannel.IN_APP };
+  const [[rows, total], unread] = await Promise.all([
+    repo.findAndCount({
+      where: unreadOnly ? { ...mine, readAt: IsNull() } : mine,
       relations: { alert: { student: true } },
       order: { createdAt: 'DESC' },
-      take: 20,
+      skip: pageOffset(list),
+      take: list.size,
     }),
-    repo.countBy({ recipientId: userId, channel: NotificationChannel.IN_APP, readAt: IsNull() }),
+    repo.countBy({ ...mine, readAt: IsNull() }),
   ]);
-  return {
-    unread,
-    items: rows.map((n) => ({
-      notificationId: n.notificationId,
-      alertId: n.alertId,
-      title: EVENT_LABELS[n.event as NotificationEvent] ?? 'Thông báo',
-      studentName: n.alert?.student?.fullName ?? '',
-      severity: n.alert?.severity ?? Severity.LOW,
-      createdAt: n.createdAt.toISOString(),
-      read: n.readAt !== null,
-    })),
-  };
+  return { items: rows.map(toInAppDto), total, page: list.page, size: list.size, unread };
+}
+
+/** Đánh dấu đã đọc 1 thông báo — chỉ của chính người nhận (không đọc được thông báo người khác). */
+export async function markInAppNotificationRead(
+  userId: string,
+  notificationId: string,
+): Promise<void> {
+  await (await getDataSource()).getRepository(Notification).update(
+    {
+      notificationId,
+      recipientId: userId,
+      channel: NotificationChannel.IN_APP,
+      readAt: IsNull(),
+    },
+    { readAt: new Date() },
+  );
 }
 
 /** Đánh dấu đã đọc mọi thông báo trong ứng dụng của chính người dùng. */
