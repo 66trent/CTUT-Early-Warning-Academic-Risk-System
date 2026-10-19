@@ -95,9 +95,9 @@ un\dockerInference` → tắt Docker, xóa file, `wsl --shutdown`, mở lại (K
 
 23. `npx shadcn add` nhiều thành phần cùng lúc treo ở câu hỏi ghi đè thứ 2 (stdin `n` chỉ trả lời câu đầu) → thành phần chưa sinh viết tay theo mẫu shadcn; luôn sửa `from "cn"` → `@/lib/utils`.
 24. TypeORM QueryBuilder lưu ORDER BY theo tên cột: `orderBy(x).addOrderBy(x)` GHI ĐÈ hướng của x (sắp giảm thành tăng); `find({ order })` cũng vậy. Dùng `applyOrder`/`findOrder` (`src/lib/list-params.ts`). Join 1–1 + sắp theo cột bảng join → dùng `offset/limit` thay `skip/take`.
+25. Next 16 tách thư mục dev (`.next/dev`) — `next build` chạy song song dev server không còn làm hỏng cache (bẫy #0 cũ). Dev server của phiên khác chiếm cổng 3000 → Browser pane mở thẳng `http://localhost:3000` dùng chung.
 26. `listX(filter, firstPage({ size }))` trong test/script truyền `sort: null, dir: asc` → service phải dùng `resolveSort` để lấy cả hướng mặc định (VD mức cao nhất giảm dần), nếu không sẽ ra tăng dần.
 27. Python `io.open(..., "w")` trên Windows đôi khi lỗi `OSError [Errno 22]` khi dev server/prettier đang giữ file → ghi lại bằng tool Edit.
-25. Next 16 tách thư mục dev (`.next/dev`) — `next build` chạy song song dev server không còn làm hỏng cache (bẫy #0 cũ). Dev server của phiên khác chiếm cổng 3000 → Browser pane mở thẳng `http://localhost:3000` dùng chung.
 
 ## 6. Việc tiếp theo
 
