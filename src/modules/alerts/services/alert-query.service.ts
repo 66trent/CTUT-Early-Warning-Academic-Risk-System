@@ -1,4 +1,4 @@
-import { In } from 'typeorm';
+import { In, type SelectQueryBuilder } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
 import { AlertStateHistory } from '@/db/entities/alert-state-history.entity';
@@ -31,6 +31,7 @@ import {
 } from '@/lib/list-params';
 import { ADVISOR_TRANSITIONS } from './alert-lifecycle.service';
 import { loadCurrentTriggers } from './current-signals';
+import { OVERDUE_DAYS } from './dashboard.service';
 import {
   evidenceRows,
   SOURCE_INLINE_LABELS,
@@ -175,6 +176,34 @@ const ALERT_SORT_COLUMNS: Record<AlertSortKey, string> = {
 
 export type AlertListScope = 'TODO' | 'ALL';
 
+/** Nhóm trạng thái lọc từ trang tổng quan (docs/rules/07). */
+export const ALERT_STATUS_GROUPS = ['waiting', 'following', 'done', 'overdue'] as const;
+export type AlertStatusGroup = (typeof ALERT_STATUS_GROUPS)[number];
+const GROUP_STATUSES: Record<Exclude<AlertStatusGroup, 'overdue'>, AlertStatus[]> = {
+  waiting: [AlertStatus.OPEN, AlertStatus.REOPENED],
+  following: [AlertStatus.ACKNOWLEDGED, AlertStatus.IN_PROGRESS],
+  done: [AlertStatus.RESOLVED, AlertStatus.DISMISSED],
+};
+
+/** Lọc thêm cho danh sách cảnh báo: mức, nhóm trạng thái, lớp sinh hoạt. */
+export interface AlertExtraFilter {
+  severity?: Severity;
+  status?: AlertStatusGroup;
+  classId?: string;
+}
+
+function applyExtraFilter(qb: SelectQueryBuilder<Alert>, extra: AlertExtraFilter): void {
+  if (extra.severity) qb.andWhere('a.severity = :severity', { severity: extra.severity });
+  if (extra.classId) qb.andWhere('s.classId = :classId', { classId: extra.classId });
+  if (extra.status === 'overdue') {
+    qb.andWhere('a.status IN (:...waiting)', { waiting: GROUP_STATUSES.waiting }).andWhere(
+      `a.firstDetectedAt < now() - make_interval(days => ${OVERDUE_DAYS})`,
+    );
+  } else if (extra.status) {
+    qb.andWhere('a.status IN (:...grouped)', { grouped: GROUP_STATUSES[extra.status] });
+  }
+}
+
 /**
  * Danh sách cảnh báo của Cố vấn học tập — phạm vi SUY RA QUA LỚP (`advisorId` của lớp hiện tại,
  * docs/rules/06), không dựa vào `assignedAdvisorId`. Sắp Severity giảm dần (CRITICAL trên cùng).
@@ -183,6 +212,7 @@ export async function listAdvisorAlerts(
   advisorId: string,
   termId: string,
   scope: AlertListScope,
+  extra: AlertExtraFilter = {},
 ): Promise<AlertListItemDto[]> {
   const qb = (await getDataSource())
     .getRepository(Alert)
@@ -191,8 +221,10 @@ export async function listAdvisorAlerts(
     .innerJoin(AdministrativeClass, 'c', 'c.classId = s.classId')
     .where('c.advisorId = :advisorId', { advisorId })
     .andWhere('a.termId = :termId', { termId });
-  if (scope === 'TODO') qb.andWhere('a.status IN (:...open)', { open: OPEN_ALERT_STATUSES });
-  else qb.andWhere('a.status <> :invalid', { invalid: AlertStatus.INVALIDATED });
+  if (scope === 'TODO' && !extra.status) {
+    qb.andWhere('a.status IN (:...open)', { open: OPEN_ALERT_STATUSES });
+  } else qb.andWhere('a.status <> :invalid', { invalid: AlertStatus.INVALIDATED });
+  applyExtraFilter(qb, extra);
   return toListItems(await qb.take(500).getMany());
 }
 
@@ -205,6 +237,7 @@ export async function listAdminAlerts(
   filter: 'ALL' | 'NO_ADVISOR',
   departmentId: string | null = null,
   list: ListParams<AlertSortKey> = firstPage(ALERT_DEFAULT_SORT),
+  extra: AlertExtraFilter = {},
 ): Promise<Paged<AlertListItemDto>> {
   const qb = (await getDataSource())
     .getRepository(Alert)
@@ -218,6 +251,7 @@ export async function listAdminAlerts(
       open: OPEN_ALERT_STATUSES,
     });
   }
+  applyExtraFilter(qb, extra);
   // Enum `severity` của Postgres sắp theo thứ tự khai báo LOW < … < CRITICAL.
   applyOrder(
     qb,

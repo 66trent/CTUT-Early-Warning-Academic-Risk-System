@@ -61,11 +61,16 @@ const SHOTS: Shot[] = [
   { name: '09-canh-bao-admin', account: 'Quản trị viên', url: '/admin/alerts' },
   { name: '10-ho-so-sinh-vien', account: 'Quản trị viên', url: '/admin/students/KTPM2311003' },
   { name: '11-nhat-ky', account: 'Quản trị viên', url: '/admin/audit-logs' },
-  { name: '12-cvht-danh-sach', account: 'Cố vấn học tập GV001', url: '/advisor', viewports: ALL },
+  {
+    name: '12-cvht-danh-sach',
+    account: 'Cố vấn học tập GV001',
+    url: '/advisor/alerts',
+    viewports: ALL,
+  },
   {
     name: '13-cvht-chi-tiet',
     account: 'Cố vấn học tập GV001',
-    url: '/advisor',
+    url: '/advisor/alerts',
     before: openAlert('KTPM2311003'),
     viewports: ALL,
   },

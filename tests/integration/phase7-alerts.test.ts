@@ -198,8 +198,9 @@ describe('Lọc theo Khoa', () => {
       .items;
     expect(other.some((a) => a.studentId.startsWith('TST'))).toBe(false);
 
-    const overview = await getAdminOverview('K.KTCK');
-    expect(overview.studentsByClass.some((c) => c.classId.startsWith('TST'))).toBe(false);
+    const overview = await getAdminOverview(DEMO.hk1, 'K.KTCK');
+    expect(overview.classSeverity.rows.some((c) => c.classId.startsWith('TST'))).toBe(false);
+    expect(overview.summary.studentsWithAlerts).toBe(0);
 
     const options = await getEvaluationFormOptions();
     const course = options.courses.find(

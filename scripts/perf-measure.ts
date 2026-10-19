@@ -30,6 +30,17 @@ import {
   processEvaluationRun,
   requestEvaluation,
 } from '../src/modules/rule-engine/services/evaluation-run.service';
+import {
+  getAdvisorClasses,
+  getAttentionStudents,
+  getDueFollowUps,
+  getRecentActivity,
+} from '../src/modules/alerts/services/advisor-dashboard.service';
+import {
+  getAlertSummary,
+  getRunTrend,
+  getSourceBreakdown,
+} from '../src/modules/alerts/services/dashboard.service';
 import { PERF } from './perf-config';
 
 const asOf = new Date('2026-10-10T23:59:59+07:00');
@@ -147,8 +158,27 @@ async function main() {
     ],
     ['Chi tiết 1 cảnh báo', () => getAlertDetail(anAlert.alertId, { canProcess: true })],
     ['Hồ sơ học tập 1 sinh viên', () => getStudentProfile(student.studentId, PERF.currentTerm)],
-    ['Tổng quan Admin (toàn trường)', () => getAdminOverview()],
-    ['Tổng quan Admin (1 khoa)', () => getAdminOverview('K.CNTT')],
+    ['Tổng quan Admin (toàn trường)', () => getAdminOverview(PERF.currentTerm)],
+    ['Tổng quan Admin (1 khoa)', () => getAdminOverview(PERF.currentTerm, 'K.CNTT')],
+    [
+      'Tổng quan Cố vấn học tập (số liệu chung)',
+      () =>
+        Promise.all([
+          getAlertSummary({ termId: PERF.currentTerm, advisorId: advisor.advisorId }),
+          getRunTrend({ termId: PERF.currentTerm, advisorId: advisor.advisorId }),
+          getSourceBreakdown({ termId: PERF.currentTerm, advisorId: advisor.advisorId }),
+        ]),
+    ],
+    [
+      'Tổng quan Cố vấn học tập (lớp, sinh viên cần chú ý, hẹn, hoạt động)',
+      () =>
+        Promise.all([
+          getAdvisorClasses(advisor.advisorId ?? '', PERF.currentTerm),
+          getAttentionStudents(advisor.advisorId ?? '', PERF.currentTerm),
+          getDueFollowUps(advisor.advisorId ?? '', PERF.currentTerm),
+          getRecentActivity(advisor.advisorId ?? ''),
+        ]),
+    ],
     ['Trang "Bắt đầu" (đếm dữ liệu)', () => getSetupCounts()],
     ['Form chạy đánh giá (học phần theo khoa)', () => getEvaluationFormOptions()],
     ['Tìm sinh viên (trang 1)', () => searchStudents('P0049')],

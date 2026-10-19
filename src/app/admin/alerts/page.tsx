@@ -3,6 +3,7 @@ import { ShieldCheck, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { DepartmentFilter } from '@/components/admin/department-filter';
 import { DataPagination } from '@/components/data-table/data-pagination';
+import { ActiveAlertFilters } from '@/components/alerts/active-alert-filters';
 import { AlertsTable } from '@/components/alerts/alerts-table';
 import { TermFilter } from '@/components/alerts/term-filter';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
@@ -20,6 +21,7 @@ import {
   ALERT_SORT_KEYS,
   listAdminAlerts,
 } from '@/modules/alerts/services/alert-query.service';
+import { alertExtraFilterSchema } from '@/modules/alerts/validators/alert-list';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 
 export const metadata: Metadata = { title: 'Cảnh báo sớm' };
@@ -38,12 +40,14 @@ export default async function AdminAlertsPage({
   const term = pickTerm(terms, str('term'));
   const department = departments.find((d) => d.departmentId === str('department')) ?? null;
   const noAdvisor = str('filter') === 'no-advisor';
+  const extra = alertExtraFilterSchema.parse(params);
   const result = term
     ? await listAdminAlerts(
         term.termId,
         noAdvisor ? 'NO_ADVISOR' : 'ALL',
         department?.departmentId ?? null,
         list,
+        extra,
       )
     : { items: [], total: 0, page: 1, size: list.size };
   const link = (filter: string | null) => {
@@ -73,6 +77,7 @@ export default async function AdminAlertsPage({
           </Button>
         </div>
       </div>
+      <ActiveAlertFilters basePath="/admin/alerts" params={params} extra={extra} />
       <Card className="shadow-sm">
         <CardContent className="flex flex-col gap-4">
           <AlertsTable

@@ -9,6 +9,7 @@ import { quickLogin } from './helpers';
 test('Cố vấn học tập xác nhận cảnh báo và ghi can thiệp', async ({ page }) => {
   await quickLogin(page, 'Cố vấn học tập GV001');
   await expect(page).toHaveURL(/\/advisor/);
+  await page.goto('/advisor/alerts');
 
   const row = page.getByRole('row', { name: /KTPM2311002/ });
   await expect(row).toBeVisible();

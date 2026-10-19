@@ -1,4 +1,6 @@
-# Đo hiệu năng (Phase 7, 2026-10-15)
+# Đo hiệu năng (Phase 7, 2026-10-15; đo lại Phase 8d, 2026-10-19)
+
+> Phase 8d: tạo lại `ewars_perf` theo cấu trúc dữ liệu Phase 8a (12 luật, điểm danh theo tiết, LMS 2 loại) rồi đo lại toàn bộ. Danh sách cảnh báo Admin nay phân trang 20 dòng (trước: tối đa 500 dòng). Thêm 2 trang tổng quan mới (Admin, Cố vấn học tập) và tìm nhanh Ctrl+K — mọi khối ≤ 76 ms, dưới ngưỡng 300 ms (`05`) nên không cần thêm index.
 
 Đối chiếu `docs/rules/05-performance.md`. Dữ liệu GIẢ trên DB riêng `ewars_perf` (không đụng DB demo).
 
@@ -21,24 +23,28 @@ DATABASE_URL=… npm run perf:measure   # in các bảng dưới đây
 
 | Lần chạy | Sinh viên | Dấu hiệu | Cảnh báo mới / cập nhật | Thời gian | Bộ nhớ heap cao nhất |
 |---|---|---|---|---|---|
-| Cả học kỳ — lần đầu (tạo cảnh báo) | 5000 | 19379 | 3855 / 0 | 22.3 giây | 180 MB |
-| Cả học kỳ — chạy lại (cập nhật) | 5000 | 19379 | 0 / 3855 | 16.1 giây | 198 MB |
-| Theo 1 học phần | 650 | 518 | 0 / 220 | 2.4 giây | 206 MB |
+| Cả học kỳ — lần đầu (tạo cảnh báo) | 5000 | 21835 | 4621 / 0 | 27.1 giây | 204 MB |
+| Cả học kỳ — chạy lại (cập nhật) | 5000 | 21835 | 0 / 4621 | 14.4 giây | 214 MB |
+| Theo 1 học phần | 650 | 531 | 0 / 305 | 2.3 giây | 210 MB |
 
 ## Truy vấn màn hình (trung vị 5 lần, sau 1 lần làm nóng)
 
 | Màn hình / truy vấn | Thời gian |
 |---|---|
-| Danh sách cảnh báo Admin (tối đa 500) | 106 ms |
-| Danh sách cảnh báo Admin, lọc 1 khoa | 105 ms |
-| Cảnh báo cần xử lý của 1 Cố vấn học tập | 21 ms |
-| Chi tiết 1 cảnh báo | 8 ms |
-| Hồ sơ học tập 1 sinh viên | 5 ms |
-| Tổng quan Admin (toàn trường) | 10 ms |
-| Tổng quan Admin (1 khoa) | 11 ms |
+| Danh sách cảnh báo Admin (trang 1, 20 dòng) | 20 ms |
+| Danh sách cảnh báo Admin, lọc 1 khoa | 13 ms |
+| Cảnh báo cần xử lý của 1 Cố vấn học tập | 14 ms |
+| Chi tiết 1 cảnh báo | 6 ms |
+| Hồ sơ học tập 1 sinh viên | 7 ms |
+| Tổng quan Admin (toàn trường) | 76 ms |
+| Tổng quan Admin (1 khoa) | 55 ms |
+| Tổng quan Cố vấn học tập (số liệu chung) | 43 ms |
+| Tổng quan Cố vấn học tập (lớp, sinh viên cần chú ý, hẹn, hoạt động) | 2 ms |
 | Trang "Bắt đầu" (đếm dữ liệu) | 42 ms |
-| Form chạy đánh giá (học phần theo khoa) | 47 ms |
-| Tìm sinh viên (trang 1) | 7 ms |
+| Form chạy đánh giá (học phần theo khoa) | 50 ms |
+| Tìm sinh viên (trang 1) | 8 ms |
+| Tìm nhanh Ctrl+K theo họ tên không dấu (Admin) | 21 ms |
+| Tìm nhanh Ctrl+K (Cố vấn học tập, 1 lớp) | 2 ms |
 | Nhật ký hệ thống (trang 1, không lọc) | 4 ms |
 
 ## EXPLAIN ANALYZE — danh sách cảnh báo của 1 Cố vấn học tập
