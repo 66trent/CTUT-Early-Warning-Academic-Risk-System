@@ -15,16 +15,17 @@ import { CourseResult } from '../src/db/entities/course-result.entity';
 import { Course } from '../src/db/entities/course.entity';
 import { Enrollment } from '../src/db/entities/enrollment.entity';
 import { ImportBatch } from '../src/db/entities/import-batch.entity';
+import { LmsActivity } from '../src/db/entities/lms-activity.entity';
 import { LmsQuizAttempt } from '../src/db/entities/lms-quiz-attempt.entity';
 import { Student } from '../src/db/entities/student.entity';
 import { Term } from '../src/db/entities/term.entity';
 import { User } from '../src/db/entities/user.entity';
 import {
   AttemptOutcome,
-  CourseResultStatus,
   EnrollmentStatus,
   ImportBatchStatus,
   ImportSource,
+  LmsActivityType,
   OfficialAcademicStatus,
   QuizAttemptStatus,
   UserAccountStatus,
@@ -232,14 +233,11 @@ async function seedPreviousTerm(
           enrollmentId,
           processScore: round1(score + normal(0, 0.5)),
           examScore: round1(score + normal(0, 0.8)),
-          finalScore: score,
           letterGrade: letter,
           passed,
-          resultStatus: CourseResultStatus.FINAL,
           importBatchId: b.id,
           publishedAt: vn('2026-06-10'),
           importedAt: new Date(),
-          processPublishedAt: vn('2026-04-01'),
         }),
       );
     }
@@ -248,24 +246,43 @@ async function seedPreviousTerm(
   await insertChunked(em, CourseResult, results);
 }
 
-/** Học kỳ hiện tại: 5 học phần / sinh viên (theo lớp), điểm danh 2 lần chốt, 4 bài LMS, điểm quá trình. */
+/** Học kỳ hiện tại: 5 học phần / sinh viên (theo lớp), điểm danh 2 lần chốt (tiết), 4 bài trắc nghiệm. */
 async function seedCurrentTerm(
   em: EntityManager,
   students: { studentId: string; classId: string }[],
   courseIds: string[],
   failed: Set<string>,
 ) {
-  const [attBatch, lmsBatch, resBatch] = [
+  const [attBatch, lmsBatch] = [
     batch(em, 'ATTENDANCE_SUMMARY', PERF.currentTerm),
     batch(em, 'LMS_QUIZ', PERF.currentTerm),
-    batch(em, 'COURSE_RESULT', PERF.currentTerm),
   ];
-  await em.insert(ImportBatch, [attBatch, lmsBatch, resBatch]);
+  await em.insert(ImportBatch, [attBatch, lmsBatch]);
   const enrollments: Enrollment[] = [];
   const attendance: AttendanceSummary[] = [];
   const attempts: LmsQuizAttempt[] = [];
-  const results: CourseResult[] = [];
+  const activities = new Map<string, LmsActivity>();
   const quizDays = ['2026-09-14', '2026-09-21', '2026-09-28', '2026-10-05'];
+  /** 1 bài trắc nghiệm / (học phần, lớp học phần = lớp sinh hoạt), hạn nộp 2 ngày sau ngày mở. */
+  const activityOf = (courseId: string, section: string, q: number, day: string) => {
+    const key = `${courseId}|${section}|${q}`;
+    let activity = activities.get(key);
+    if (!activity) {
+      activity = em.create(LmsActivity, {
+        id: randomUUID(),
+        courseId,
+        termId: PERF.currentTerm,
+        sectionCode: section,
+        activityType: LmsActivityType.QUIZ,
+        activityKey: `Q${q + 1}`,
+        activityName: `Kiểm tra ${q + 1}`,
+        dueAt: new Date(vn(day, '23:59:00').getTime() + 2 * 86_400_000),
+        importBatchId: lmsBatch.id,
+      });
+      activities.set(key, activity);
+    }
+    return activity.id;
+  };
   for (const [i, s] of students.entries()) {
     const classIndex = Math.floor(i / PERF.classSize);
     const risky = rand() < 0.15; // ~15% sinh viên có xu hướng rủi ro
@@ -281,24 +298,22 @@ async function seedCurrentTerm(
           enrollmentStatus: EnrollmentStatus.REGISTERED,
           attemptNumber: failed.has(`${s.studentId}|${courseId}`) ? 2 : 1,
           attemptOutcome: AttemptOutcome.PENDING,
+          sectionCode: s.classId,
           firstSeenBatchId: attBatch.id,
         }),
       );
-      const absent1 = Math.floor(rand() * (risky ? 4 : 2));
-      const absent2 = absent1 + Math.floor(rand() * (risky ? 5 : 2));
-      for (const [date, total, unexcused] of [
-        ['2026-10-02', 14, absent1],
-        ['2026-10-09', 16, absent2],
+      // Đơn vị tiết (3 tiết / buổi), học phần 45 tiết.
+      const absent1 = 3 * Math.floor(rand() * (risky ? 4 : 2));
+      const absent2 = absent1 + 3 * Math.floor(rand() * (risky ? 5 : 2));
+      for (const [date, unexcused] of [
+        ['2026-10-02', absent1],
+        ['2026-10-09', absent2],
       ] as const) {
-        const late = Math.floor(rand() * (risky ? 4 : 2));
         attendance.push(
           em.create(AttendanceSummary, {
             enrollmentId,
             snapshotDate: vn(date, '00:00:00'),
-            totalSessions: total,
-            plannedSessions: 30,
-            present: total - unexcused - late,
-            late,
+            totalPeriods: 45,
             excusedAbsence: 0,
             unexcusedAbsence: unexcused,
             sectionCode: s.classId,
@@ -312,8 +327,7 @@ async function seedCurrentTerm(
           attempts.push(
             em.create(LmsQuizAttempt, {
               enrollmentId,
-              quizKey: `Q${q + 1}`,
-              quizName: `Kiểm tra ${q + 1}`,
+              activityId: activityOf(courseId, s.classId, q, day),
               attemptNumber: 1,
               startedAt,
               submittedAt: new Date(startedAt.getTime() + 20 * 60_000),
@@ -321,38 +335,22 @@ async function seedCurrentTerm(
               score: round1(normal(risky ? 5 : 7.5, 1.5)),
               maxScore: 10,
               status: QuizAttemptStatus.SUBMITTED,
-              sectionCode: s.classId,
               importBatchId: lmsBatch.id,
             }),
           );
         }
       }
-      results.push(
-        em.create(CourseResult, {
-          enrollmentId,
-          processScore: round1(normal(risky ? 5 : 7.2, 1.4)),
-          examScore: null,
-          finalScore: null,
-          letterGrade: null,
-          passed: null,
-          resultStatus: CourseResultStatus.PROCESS_ONLY,
-          importBatchId: resBatch.id,
-          publishedAt: vn('2026-10-05'),
-          importedAt: new Date(),
-          processPublishedAt: vn('2026-10-05'),
-        }),
-      );
     }
   }
   await insertChunked(em, Enrollment, enrollments);
   await insertChunked(em, AttendanceSummary, attendance);
+  await insertChunked(em, LmsActivity, [...activities.values()]);
   await insertChunked(em, LmsQuizAttempt, attempts);
-  await insertChunked(em, CourseResult, results);
   return {
     enrollments: enrollments.length,
     attendance: attendance.length,
     attempts: attempts.length,
-    results: results.length,
+    results: 0,
   };
 }
 

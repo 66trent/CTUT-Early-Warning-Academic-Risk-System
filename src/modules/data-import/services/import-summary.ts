@@ -1,5 +1,34 @@
 import { z } from 'zod';
-import { type ImportBatchSummary, type ImportWarning } from '@/db/entities/import-batch.entity';
+import {
+  type ImportBatchSummary,
+  type ImportCourseCard,
+  type ImportWarning,
+} from '@/db/entities/import-batch.entity';
+
+/** Thẻ nhận diện học phần ở màn xem trước (docs/rules/12). */
+const courseCardSchema: z.ZodType<ImportCourseCard> = z.object({
+  courseId: z.string().max(20),
+  courseName: z.string().max(150),
+  derivedCode: z.boolean(),
+  isNew: z.boolean(),
+  sectionCodes: z.array(z.string().max(30)).max(50),
+  validRows: z.number().int().min(0),
+  errorRows: z.number().int().min(0),
+  warningRows: z.number().int().min(0),
+  studentCount: z.number().int().min(0),
+  classes: z
+    .array(z.object({ classId: z.string(), departmentId: z.string(), count: z.number().int() }))
+    .max(200),
+  totalPeriods: z.number().int().nullable().optional(),
+  snapshotDates: z.array(z.string()).max(50).optional(),
+  previousSnapshotDate: z.string().nullable().optional(),
+  activities: z
+    .array(z.object({ key: z.string(), name: z.string(), dueAt: z.string().nullable() }))
+    .max(200)
+    .optional(),
+  credits: z.number().int().nullable().optional(),
+  publishedDates: z.array(z.string()).max(50).optional(),
+});
 
 /** Cấu trúc cột jsonb `ImportBatch.summary` — validate bằng Zod trước khi ghi (docs/rules/01). */
 export const importSummarySchema: z.ZodType<ImportBatchSummary> = z.object({
@@ -16,6 +45,7 @@ export const importSummarySchema: z.ZodType<ImportBatchSummary> = z.object({
   updated: z.number().int().min(0).optional(),
   unchanged: z.number().int().min(0).optional(),
   createdKeys: z.array(z.string()).optional(),
+  courses: z.array(courseCardSchema).max(200).optional(),
 });
 
 export type ImportSummary = ImportBatchSummary;

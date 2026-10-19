@@ -50,6 +50,10 @@ export class Enrollment {
   })
   attemptOutcome!: AttemptOutcome;
 
+  /** Lớp học phần hiện tại (`ma_lop_hoc_phan` của dòng nguồn gần nhất) — bài LMS chỉ xét cùng lớp. */
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  sectionCode!: string | null;
+
   @Column({ type: 'uuid' })
   firstSeenBatchId!: string;
 

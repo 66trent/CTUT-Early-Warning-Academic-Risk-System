@@ -30,7 +30,7 @@ import {
 /** DoD Phase 3a — chạy với PostgreSQL thật, file lưu trong bộ nhớ (không cần MinIO). */
 let ds: DataSource;
 const HEADER = 'mssv,ho_ten,email,ma_lop_sinh_hoat,trang_thai_hoc_vu';
-const line = (id: string, cls = 'TSTK2311', name = 'Sinh viên thử') =>
+const line = (id: string, cls = 'TSTK2411', name = 'Sinh viên thử') =>
   `${id},${name},${id.toLowerCase()}@student.ctuet.edu.vn,${cls},Đang học`;
 
 async function cleanup() {
@@ -62,29 +62,29 @@ afterAll(async () => {
 describe('Nạp danh sách sinh viên demo — 2 bước', () => {
   let batchId: string;
 
-  it('kiểm tra file demo CSV: 13 dòng hợp lệ, 0 lỗi, CHƯA ghi dữ liệu', async () => {
+  it('kiểm tra file demo CSV: 20 dòng hợp lệ, 0 lỗi, CHƯA ghi dữ liệu', async () => {
     const batch = await uploadAndValidate(ds, 'tst-01_sinh_vien.csv', demoStudentsCsv());
     batchId = batch.id;
     expect(batch).toMatchObject({
       status: ImportBatchStatus.STAGED,
-      totalRows: 13,
-      successRows: 13,
+      totalRows: 20,
+      successRows: 20,
       errorRows: 0,
     });
-    expect(await ds.getRepository(Student).countBy({ classId: 'TSTK2311' })).toBe(0);
+    expect(await ds.getRepository(Student).countBy({ classId: 'TSTK2411' })).toBe(0);
     const detail = await getImportBatchDetail(batchId);
     expect(detail?.preview).toHaveLength(5);
     expect(Object.getPrototypeOf(detail)).toBe(Object.prototype);
   });
 
-  it('xác nhận → nạp 13 sinh viên, sĩ số lớp đúng (12 và 1)', async () => {
+  it('xác nhận → nạp 20 sinh viên, sĩ số lớp đúng (20 và 0)', async () => {
     const batch = await confirmAndLoad(ds, batchId);
     expect(batch.status).toBe(ImportBatchStatus.RECONCILED);
-    expect(batch.summary).toMatchObject({ inserted: 13, updated: 0, unchanged: 0 });
+    expect(batch.summary).toMatchObject({ inserted: 20, updated: 0, unchanged: 0 });
     const classes = await listClasses();
-    expect(classes.find((c) => c.classId === 'TSTK2311')?.studentCount).toBe(12);
-    expect(classes.find((c) => c.classId === 'TSTH2311')?.studentCount).toBe(1);
-    const student = await ds.getRepository(Student).findOneByOrFail({ studentId: 'TSTK2311001' });
+    expect(classes.find((c) => c.classId === 'TSTK2411')?.studentCount).toBe(20);
+    expect(classes.find((c) => c.classId === 'TSTH2411')?.studentCount).toBe(0);
+    const student = await ds.getRepository(Student).findOneByOrFail({ studentId: 'TSTK2411901' });
     expect(student).toMatchObject({
       fullName: 'Nguyễn Minh An',
       officialAcademicStatus: OfficialAcademicStatus.ACTIVE,
@@ -99,7 +99,7 @@ describe('Nạp danh sách sinh viên demo — 2 bước', () => {
     });
   });
 
-  it('cùng dữ liệu lưu bằng Excel .xlsx → đọc đủ 13 dòng, nạp lại không nhân đôi', async () => {
+  it('cùng dữ liệu lưu bằng Excel .xlsx → đọc đủ 20 dòng, nạp lại không nhân đôi', async () => {
     const batch = await uploadAndValidate(
       ds,
       'tst-01_sinh_vien.xlsx',
@@ -107,19 +107,19 @@ describe('Nạp danh sách sinh viên demo — 2 bước', () => {
     );
     expect(batch).toMatchObject({
       status: ImportBatchStatus.STAGED,
-      successRows: 13,
+      successRows: 20,
       errorRows: 0,
     });
     const loaded = await confirmAndLoad(ds, batch.id);
-    expect(loaded.summary).toMatchObject({ inserted: 0, updated: 0, unchanged: 13 });
-    expect(await ds.getRepository(Student).countBy({ classId: 'TSTK2311' })).toBe(12);
+    expect(loaded.summary).toMatchObject({ inserted: 0, updated: 0, unchanged: 20 });
+    expect(await ds.getRepository(Student).countBy({ classId: 'TSTK2411' })).toBe(20);
   });
 
   it('lô đã cập nhật dòng có sẵn → không cho hoàn tác, kèm lý do', async () => {
     const batch = await uploadAndValidate(
       ds,
       'tst-update.csv',
-      `${HEADER}\n${line('TSTK2311001', 'TSTK2311', 'Tên Đã Đổi')}\n`,
+      `${HEADER}\n${line('TSTK2411901', 'TSTK2411', 'Tên Đã Đổi')}\n`,
     );
     const loaded = await confirmAndLoad(ds, batch.id);
     expect(loaded.summary).toMatchObject({ updated: 1 });
@@ -135,8 +135,8 @@ describe('Dòng lỗi và lỗi cả file', () => {
       line('TSTERR01', 'TSTX9999'),
       line('TSTERR02'),
       line('TSTERR02'),
-      '=1+1,Ai đó,a@student.ctuet.edu.vn,TSTK2311,ACTIVE',
-      'TSTERR03,Người Ngoài,x@gmail.com,TSTK2311,ACTIVE',
+      '=1+1,Ai đó,a@student.ctuet.edu.vn,TSTK2411,ACTIVE',
+      'TSTERR03,Người Ngoài,x@gmail.com,TSTK2411,ACTIVE',
     ].join('\n');
     const batch = await uploadAndValidate(ds, 'tst-loi.csv', csv);
     expect(batch).toMatchObject({ status: ImportBatchStatus.STAGED, successRows: 1, errorRows: 4 });
@@ -228,7 +228,7 @@ describe('Hủy, kiểm tra lại khi xác nhận, hoàn tác, tự hủy', () =
       ImportBatchStatus.ROLLED_BACK,
     );
     expect(await ds.getRepository(Student).existsBy({ studentId: 'TSTRB01' })).toBe(false);
-    expect(await ds.getRepository(Student).existsBy({ studentId: 'TSTK2311001' })).toBe(true);
+    expect(await ds.getRepository(Student).existsBy({ studentId: 'TSTK2411901' })).toBe(true);
     // File đã hoàn tác được nạp lại.
     const again = await uploadAndValidate(
       ds,

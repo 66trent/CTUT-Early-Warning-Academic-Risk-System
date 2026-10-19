@@ -15,6 +15,7 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   TERM_CREATED: 'Tạo học kỳ',
   TERM_SET_CURRENT: 'Đặt học kỳ hiện tại',
   TERM_CLOSED: 'Chốt học kỳ',
+  TERM_CLOSE_REQUESTED: 'Yêu cầu chốt học kỳ (chạy đánh giá cuối)',
   CLASS_CREATED: 'Tạo lớp sinh hoạt',
   CLASS_UPDATED: 'Sửa lớp sinh hoạt',
   CLASS_ADVISOR_CHANGED: 'Đổi Cố vấn học tập của lớp',

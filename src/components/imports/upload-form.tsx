@@ -23,11 +23,15 @@ interface UploadFormProps {
   parent: { batchId: string; dataType: string; termId: string | null } | null;
 }
 
+/** Giá trị Select cho "tự nhận diện từ file" (Radix Select không nhận chuỗi rỗng). */
+const AUTO_COURSE = '__auto__';
+
 export function UploadForm({ options, parent }: UploadFormProps) {
   const router = useRouter();
   const currentTerm = options.terms.find((t) => t.isCurrent) ?? options.terms[0];
   const [dataType, setDataType] = useState(parent?.dataType ?? options.types[0]?.dataType ?? '');
   const [termId, setTermId] = useState(parent?.termId ?? currentTerm?.termId ?? '');
+  const [courseId, setCourseId] = useState(AUTO_COURSE);
   const [file, setFile] = useState<File | null>(null);
   const [pending, setPending] = useState(false);
   const selectedType = options.types.find((t) => t.dataType === dataType);
@@ -42,6 +46,7 @@ export function UploadForm({ options, parent }: UploadFormProps) {
     const formData = new FormData();
     formData.set('dataType', dataType);
     formData.set('termId', needsTerm ? termId : '');
+    formData.set('courseId', needsTerm && courseId !== AUTO_COURSE ? courseId : '');
     formData.set('parentBatchId', parent?.batchId ?? '');
     formData.set('file', file);
     const result = await uploadImportAction(formData);
@@ -94,6 +99,31 @@ export function UploadForm({ options, parent }: UploadFormProps) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        )}
+        {needsTerm && (
+          <div className="grid gap-2 sm:col-span-2">
+            <Label htmlFor="import-course">Học phần (tùy chọn)</Label>
+            <Select value={courseId} onValueChange={setCourseId} disabled={Boolean(parent)}>
+              <SelectTrigger id="import-course" className="w-full">
+                <SelectValue placeholder="Tự nhận diện từ file" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={AUTO_COURSE}>
+                  Tự nhận diện từ file (1 hoặc nhiều học phần)
+                </SelectItem>
+                {options.courses.map((c) => (
+                  <SelectItem key={c.courseId} value={c.courseId}>
+                    {c.courseName} · {c.courseId}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Chọn khi file chỉ của 1 học phần: dòng thuộc học phần khác sẽ bị báo lỗi. Không cần
+              chọn khoa hay lớp — hệ thống tự đọc lớp sinh hoạt, khoa của từng sinh viên và hiện ở
+              bước xem trước.
+            </p>
           </div>
         )}
       </div>

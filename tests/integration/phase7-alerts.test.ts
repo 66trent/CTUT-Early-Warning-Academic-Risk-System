@@ -46,7 +46,7 @@ async function insertCourseRun(em: EntityManager, courseId: string): Promise<Eva
     termId: DEMO.hk1,
     courseId,
     trigger: EvaluationTrigger.MANUAL,
-    asOf: endOf('2026-10-10'),
+    asOf: endOf('2025-10-10'),
     triggeredBy: IMPORT_ACTOR,
     importBatchId: null,
     status: EvaluationRunStatus.COMPLETED,
@@ -58,8 +58,8 @@ async function insertCourseRun(em: EntityManager, courseId: string): Promise<Eva
 beforeAll(async () => {
   ds = await getDataSource();
   useMemoryStorage();
-  await setupDemo(ds);
-  await evaluate(DEMO.hk1, endOf('2026-10-10'));
+  await setupDemo(ds, { withResults: false });
+  await evaluate(DEMO.hk1, endOf('2025-10-10'));
 });
 
 afterAll(async () => {
@@ -68,19 +68,19 @@ afterAll(async () => {
 });
 
 describe('Chạy theo 1 học phần không hạ mức cảnh báo', () => {
-  it('cảnh báo Rất cao (KTPM201) + lần chạy học phần khác chỉ có mức Thấp → giữ Rất cao và lần chạy hiện tại', async () => {
-    const before = await alertOf('TSTK2311003');
+  it('cảnh báo Rất cao (NNLT 1) + lần chạy học phần khác chỉ có mức Thấp → giữ Rất cao và lần chạy hiện tại', async () => {
+    const before = await alertOf('TSTK2411903');
     expect(before.severity).toBe(Severity.CRITICAL);
     await inRollback(async (em) => {
-      const run = await insertCourseRun(em, 'TSTC202');
+      const run = await insertCourseRun(em, 'TST0102408');
       const result = await syncAlertsForChunk(em, run, [
         {
-          studentId: 'TSTK2311003',
+          studentId: 'TSTK2411903',
           riskScoreLogId: null,
           signals: [
             {
-              ruleCode: 'ATT-03',
-              scopeId: 'TSTC202',
+              ruleCode: 'LMS-04',
+              scopeId: 'TST0102408',
               severity: Severity.LOW,
               triggerId: randomUUID(),
             },
@@ -95,15 +95,15 @@ describe('Chạy theo 1 học phần không hạ mức cảnh báo', () => {
   });
 
   it('dấu hiệu hiện tại = lần chạy cả học kỳ, học phần chạy riêng sau đó thay đúng học phần đó', async () => {
-    const alert = await alertOf('TSTK2311003');
+    const alert = await alertOf('TSTK2411903');
     await inRollback(async (em) => {
       const base = await loadCurrentTriggers(em, [alert]);
       const baseRules = (base.get(alert.alertId) ?? []).map((t) => t.ruleCode).sort();
       expect(baseRules).toEqual(['ATT-01', 'ATT-02']);
 
-      const run = await insertCourseRun(em, 'TSTC201');
+      const run = await insertCourseRun(em, 'TST0102394');
       const version = await em.findOneByOrFail(RuleVersion, {
-        ruleCode: 'ATT-03',
+        ruleCode: 'LMS-04',
         status: RuleStatus.ACTIVE,
       });
       const triggerId = randomUUID();
@@ -111,10 +111,10 @@ describe('Chạy theo 1 học phần không hạ mức cảnh báo', () => {
         id: triggerId,
         alertId: alert.alertId,
         evaluationRunId: run.id,
-        ruleCode: 'ATT-03',
+        ruleCode: 'LMS-04',
         ruleVersionId: version.id,
         studentId: alert.studentId,
-        scopeId: 'TSTC201',
+        scopeId: 'TST0102394',
         termId: DEMO.hk1,
         triggeredAt: new Date(),
         inputSnapshot: {},
@@ -125,12 +125,14 @@ describe('Chạy theo 1 học phần không hạ mức cảnh báo', () => {
         {
           studentId: alert.studentId,
           riskScoreLogId: null,
-          signals: [{ ruleCode: 'ATT-03', scopeId: 'TSTC201', severity: Severity.LOW, triggerId }],
+          signals: [
+            { ruleCode: 'LMS-04', scopeId: 'TST0102394', severity: Severity.LOW, triggerId },
+          ],
         },
       ]);
       const after = await em.findOneByOrFail(Alert, { alertId: alert.alertId });
       const merged = await loadCurrentTriggers(em, [after]);
-      expect((merged.get(alert.alertId) ?? []).map((t) => t.ruleCode)).toEqual(['ATT-03']);
+      expect((merged.get(alert.alertId) ?? []).map((t) => t.ruleCode)).toEqual(['LMS-04']);
       expect(after.severity).toBe(Severity.CRITICAL); // không hạ mức
     });
   });
@@ -138,32 +140,32 @@ describe('Chạy theo 1 học phần không hạ mức cảnh báo', () => {
 
 describe('Hết dấu hiệu → giữ cảnh báo, ghi nhận "không còn dấu hiệu"', () => {
   it('rút học phần duy nhất có dấu hiệu → lần chạy cả học kỳ đánh dấu; có lại dấu hiệu → bỏ đánh dấu', async () => {
-    const before = await alertOf('TSTK2311004'); // chỉ ATT-03 ở TSTC201
+    const before = await alertOf('TSTK2411904'); // chỉ ATT-01 ở NNLT 1
     expect(before.signalsClearedAt).toBeNull();
     const e = await ds
       .getRepository(Enrollment)
-      .findOneByOrFail({ studentId: 'TSTK2311004', courseId: 'TSTC201', termId: DEMO.hk1 });
+      .findOneByOrFail({ studentId: 'TSTK2411904', courseId: 'TST0102394', termId: DEMO.hk1 });
     const toggle = (withdrawn: boolean) =>
       ds.transaction((em) =>
         setEnrollmentWithdrawn(
           em,
-          { studentId: 'TSTK2311004', enrollmentId: e.enrollmentId, withdrawn },
+          { studentId: 'TSTK2411904', enrollmentId: e.enrollmentId, withdrawn },
           IMPORT_ACTOR,
         ),
       );
 
     await toggle(true);
-    await evaluate(DEMO.hk1, endOf('2026-10-10'));
-    const cleared = await alertOf('TSTK2311004');
+    await evaluate(DEMO.hk1, endOf('2025-10-10'));
+    const cleared = await alertOf('TSTK2411904');
     expect(cleared.signalsClearedAt).not.toBeNull();
     expect(cleared.status).toBe(before.status); // không tự đóng
     expect(cleared.severity).toBe(before.severity);
     const list = await listAdminAlerts(DEMO.hk1, 'ALL');
-    expect(list.find((a) => a.studentId === 'TSTK2311004')?.signalsClearedAt).not.toBeNull();
+    expect(list.find((a) => a.studentId === 'TSTK2411904')?.signalsClearedAt).not.toBeNull();
 
     await toggle(false);
-    await evaluate(DEMO.hk1, endOf('2026-10-10'));
-    expect((await alertOf('TSTK2311004')).signalsClearedAt).toBeNull();
+    await evaluate(DEMO.hk1, endOf('2025-10-10'));
+    expect((await alertOf('TSTK2411904')).signalsClearedAt).toBeNull();
   });
 });
 
@@ -190,7 +192,7 @@ describe('Lịch chạy mỗi đêm', () => {
 describe('Lọc theo Khoa', () => {
   it('cảnh báo, tổng quan và danh sách học phần lọc được theo khoa của lớp sinh hoạt', async () => {
     const cntt = await listAdminAlerts(DEMO.hk1, 'ALL', 'K.CNTT');
-    expect(cntt.some((a) => a.studentId === 'TSTK2311003')).toBe(true);
+    expect(cntt.some((a) => a.studentId === 'TSTK2411903')).toBe(true);
     const other = await listAdminAlerts(DEMO.hk1, 'ALL', 'K.KTCK');
     expect(other.some((a) => a.studentId.startsWith('TST'))).toBe(false);
 
@@ -198,7 +200,9 @@ describe('Lọc theo Khoa', () => {
     expect(overview.studentsByClass.some((c) => c.classId.startsWith('TST'))).toBe(false);
 
     const options = await getEvaluationFormOptions();
-    const course = options.courses.find((c) => c.termId === DEMO.hk1 && c.courseId === 'TSTC201');
+    const course = options.courses.find(
+      (c) => c.termId === DEMO.hk1 && c.courseId === 'TST0102394',
+    );
     expect(course?.departmentIds).toContain('K.CNTT');
     expect(options.departments.length).toBeGreaterThan(0);
   });
@@ -207,9 +211,9 @@ describe('Lọc theo Khoa', () => {
 // Chạy SAU CÙNG: mốc 30/10 làm `lastAsOf` của cảnh báo mới hơn các lần chạy mốc 10/10 ở trên.
 describe('Điểm danh quá hạn → giữ dấu hiệu điểm danh, không hạ mức, không gắn "không còn dấu hiệu"', () => {
   it('mốc 30/10 (điểm danh chốt 09/10 đã quá 14 ngày): cảnh báo dựa trên điểm danh giữ nguyên', async () => {
-    const before = await alertOf('TSTK2311003'); // ATT-01 CRITICAL + ATT-02 HIGH ở TSTC201
-    await evaluate(DEMO.hk1, endOf('2026-10-30'));
-    const after = await alertOf('TSTK2311003');
+    const before = await alertOf('TSTK2411903'); // ATT-01 CRITICAL + ATT-02 HIGH ở NNLT 1
+    await evaluate(DEMO.hk1, endOf('2025-10-30'));
+    const after = await alertOf('TSTK2411903');
     expect(after.severity).toBe(before.severity);
     expect(after.signalsClearedAt).toBeNull();
     const current = await loadCurrentTriggers(ds.manager, [after]);
@@ -217,6 +221,6 @@ describe('Điểm danh quá hạn → giữ dấu hiệu điểm danh, không h�
       'ATT-01',
       'ATT-02',
     ]);
-    expect(after.lastAsOf.getTime()).toBe(endOf('2026-10-30').getTime());
+    expect(after.lastAsOf.getTime()).toBe(endOf('2025-10-30').getTime());
   });
 });

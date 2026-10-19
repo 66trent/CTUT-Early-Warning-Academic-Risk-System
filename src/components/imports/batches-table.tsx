@@ -20,6 +20,11 @@ const columns: ColumnDef<ImportBatchListItemDto>[] = [
     cell: ({ row }) => row.original.termName ?? '—',
   },
   {
+    accessorKey: 'courseLabel',
+    header: 'Học phần',
+    cell: ({ row }) => row.original.courseLabel ?? '—',
+  },
+  {
     accessorKey: 'fileName',
     header: 'File',
     cell: ({ row }) => (

@@ -44,10 +44,8 @@ describe('Form cấu hình luật tự sinh từ condition', () => {
   );
 
   it('nhãn riêng theo luật ghi đè nhãn chung', () => {
-    expect(conditionFieldLabel('ACA-03', 'threshold')).toBe(
-      CONDITION_FIELD_LABELS['ACA-03:threshold'],
-    );
-    expect(conditionFieldLabel('ATT-01', 'threshold')).toBe(CONDITION_FIELD_LABELS.threshold);
+    expect(conditionFieldLabel('ACA-02', 'percent')).toBe(CONDITION_FIELD_LABELS['ACA-02:percent']);
+    expect(conditionFieldLabel('COMB-01', 'percent')).toBe(CONDITION_FIELD_LABELS.percent);
   });
 
   it('dòng mới thêm vào dải ngưỡng hợp lệ với Zod của luật sau khi chọn giá trị mặc định', () => {

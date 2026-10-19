@@ -1,75 +1,102 @@
 # 10 — Data Schema Reference: Source Records (Data-Import Module)
 
-Xem `00-project-context.md` và `09-data-schema-identity.md` trước (đặc biệt `Enrollment`). File này đặc tả 3 bảng dữ liệu nguồn — đầu vào duy nhất của `rule-engine`. Cả 3 bảng trỏ qua `enrollmentId`, KHÔNG trỏ thẳng `studentId` + `courseId`.
+Xem `00-project-context.md` và `09-data-schema-identity.md` trước (đặc biệt `Enrollment`). File này đặc tả các bảng dữ liệu nguồn — đầu vào duy nhất của `rule-engine`. Bảng theo sinh viên trỏ qua `enrollmentId`, KHÔNG trỏ thẳng `studentId` + `courseId`.
 
-Ba nguồn tương ứng định dạng xuất phổ biến của hệ thống e-learning (VD: Moodle — báo cáo bài kiểm tra, báo cáo điểm danh) và cổng đào tạo (bảng điểm học phần). Cột file từng loại: xem `12-data-schema-ops.md`.
+Phiên bản 2 (Phase 8a, chốt 2026-10-18): cột theo ảnh hệ thống của trường (điểm danh theo TIẾT; Moodle bài trắc nghiệm và bài nộp; bảng điểm học phần đã khóa). Cột file: xem `12-data-schema-ops.md`.
 
-**Thời gian trong file nguồn** không ghi múi giờ → MUST hiểu là giờ Việt Nam (UTC+7). Cột chỉ có ngày (`ngay_chot`, `ngay_cong_bo`) → 00:00 giờ Việt Nam của ngày đó. Lưu `timestamptz` (UTC) trong DB.
+**Thời gian trong file nguồn** không ghi múi giờ → MUST hiểu là giờ Việt Nam (UTC+7). Cột chỉ có ngày (`ngay_chot`, `ngay_cong_bo`) → 00:00 giờ Việt Nam; `han_nop` chỉ có ngày → 23:59 giờ Việt Nam của ngày đó. Lưu `timestamptz` (UTC).
 
-**Nạp lại là cập nhật, không nhân đôi**: cả 3 bảng upsert theo khóa nghiệp vụ (UNIQUE bên dưới). Audit Log ghi ở cấp lô nhập (số dòng thêm mới / cập nhật), không ghi từng dòng.
+**Nạp lại là cập nhật, không nhân đôi**: mọi bảng upsert theo khóa nghiệp vụ (UNIQUE bên dưới). Audit Log ghi ở cấp lô nhập.
 
-## AttendanceSummary — số liệu điểm danh tổng hợp tại 1 ngày chốt
+**Họ tên trong file** (`ho_dem`, `ten`) chỉ để đối chiếu, KHÔNG lưu vào các bảng này (tên lấy từ `Student`).
+
+## AttendanceSummary — số liệu điểm danh tổng hợp tại 1 ngày chốt (đơn vị TIẾT)
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
 | id | String (uuid) | NOT NULL | PK | |
 | enrollmentId | String (uuid) | NOT NULL | FK → Enrollment | |
-| snapshotDate | DateTime (date) | NOT NULL | | Ngày chốt số liệu (`ngay_chot`) |
-| totalSessions | Int | NOT NULL | | Số buổi ĐÃ học tính đến `snapshotDate` |
-| plannedSessions | Int | NULL | | Tổng số buổi theo kế hoạch (nếu nguồn có) — dùng khi `ATT-01` chọn mẫu số `PLANNED` |
-| present | Int | NOT NULL | | Có mặt |
-| late | Int | NOT NULL | | Đi trễ |
-| excusedAbsence | Int | NOT NULL | | Vắng có phép |
-| unexcusedAbsence | Int | NOT NULL | | Vắng không phép |
-| sectionCode | String(30) | NULL | | Mã lớp học phần nếu nguồn có — dùng để tách nhóm |
+| snapshotDate | DateTime | NOT NULL | | Ngày chốt (`ngay_chot`) |
+| totalPeriods | Int | NOT NULL | | Tổng số tiết của học phần (`tong_so_tiet`, VD 45) — mẫu số `ATT-01` |
+| excusedAbsence | Int | NOT NULL | | Số tiết vắng có phép, cộng dồn đến ngày chốt |
+| unexcusedAbsence | Int | NOT NULL | | Số tiết vắng không phép, cộng dồn đến ngày chốt |
+| sectionCode | String(30) | NOT NULL | | Mã lớp học phần của dòng (`ma_lop_hoc_phan`) |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 | createdAt | DateTime | NOT NULL | | |
 
-RÀNG BUỘC: UNIQUE `(enrollmentId, snapshotDate)`. Nhập lại cùng ngày chốt → cập nhật bản ghi đó; ngày chốt khác → bản ghi mới. MUST NOT xóa/ghi đè snapshot của ngày khác (`ATT-02` cần lịch sử). Validate: các số nguyên ≥ 0, `present + late + excusedAbsence + unexcusedAbsence ≤ totalSessions`, `plannedSessions ≥ totalSessions` khi có, sai → `OUT_OF_RANGE`. `snapshotDate` phải nằm trong `[Term.startDate, Term.endDate]` của học kỳ đã chọn, sai → `TERM_MISMATCH`.
+RÀNG BUỘC: UNIQUE `(enrollmentId, snapshotDate)`. Nhập lại cùng ngày chốt → cập nhật; ngày khác → bản ghi mới; MUST NOT xóa snapshot ngày khác (`ATT-02` cần lịch sử). Validate: số nguyên ≥ 0, `totalPeriods` 1–500, `excusedAbsence + unexcusedAbsence ≤ totalPeriods`, sai → `OUT_OF_RANGE`. `snapshotDate` ngoài `[Term.startDate, Term.endDate]` → `TERM_MISMATCH`. Cột `ty_le_vang` (nếu có) chỉ đối chiếu: lệch quá 0,5 điểm % so với số tính lại → cảnh báo `ABSENCE_RATE_MISMATCH`.
 
-## LmsQuizAttempt — 1 lượt làm bài kiểm tra trên LMS
+## LmsActivity — 1 bài trên LMS của 1 lớp học phần
+
+| Field | Kiểu | Null? | Khóa | Ghi chú |
+|---|---|---|---|---|
+| id | String (uuid) | NOT NULL | PK | |
+| courseId | String(20) | NOT NULL | FK → Course | |
+| termId | String(10) | NOT NULL | FK → Term | |
+| sectionCode | String(30) | NOT NULL | | Lớp học phần (`ma_lop_hoc_phan`) |
+| activityType | LmsActivityType (enum) | NOT NULL | | `QUIZ` (trắc nghiệm) / `ASSIGNMENT` (bài thực hành nộp file) |
+| activityKey | String(100) | NOT NULL | | `ma_bai`; trống → tên bài chuẩn hóa (bỏ dấu, chữ thường, gộp khoảng trắng) |
+| activityName | String(200) | NOT NULL | | `ten_bai` |
+| dueAt | DateTime | NULL | | Hạn nộp (`han_nop`). BẮT BUỘC với `ASSIGNMENT`; tùy chọn với `QUIZ` |
+| importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Lô cập nhật gần nhất |
+
+RÀNG BUỘC: UNIQUE `(courseId, termId, sectionCode, activityType, activityKey)`. Mọi dòng của cùng 1 bài trong 1 file MUST có cùng `han_nop` (lệch → lỗi dòng `INVALID_FORMAT` "hạn nộp khác các dòng trước của cùng bài"). Nạp lại với hạn nộp khác (giảng viên gia hạn) → cập nhật + cảnh báo `DUE_DATE_CHANGED`.
+
+## LmsQuizAttempt — 1 lượt làm bài trắc nghiệm
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
 | id | String (uuid) | NOT NULL | PK | |
 | enrollmentId | String (uuid) | NOT NULL | FK → Enrollment | |
-| quizKey | String(100) | NOT NULL | | `ma_bai`; nếu nguồn không có mã, dùng tên bài đã chuẩn hóa (bỏ dấu, chữ thường, gộp khoảng trắng) |
-| quizName | String(200) | NOT NULL | | Tên bài hiển thị |
-| attemptNumber | Int | NOT NULL | | Lần làm thứ mấy (`lan_lam`) |
+| activityId | String (uuid) | NOT NULL | FK → LmsActivity | Bài `QUIZ` |
+| attemptNumber | Int | NOT NULL | | `lan_lam`; trống → thứ tự theo `startedAt` của sinh viên với bài đó TRONG file |
 | startedAt | DateTime | NOT NULL | | |
-| submittedAt | DateTime | NULL | | NULL nếu chưa nộp |
-| durationMinutes | Float | NULL | | Thời gian làm bài |
+| submittedAt | DateTime | NULL | | |
+| durationMinutes | Float | NULL | | |
 | score | Float | NULL | | |
-| maxScore | Float | NULL | | Thang điểm của bài. `score`/`maxScore` tách từ dạng `8/10` nếu nguồn ghi gộp |
+| maxScore | Float | NULL | | `8/10` tách được |
+| correctCount | Int | NULL | | Số câu làm đúng — chỉ hiển thị |
+| totalQuestions | Int | NULL | | Tổng số câu — chỉ hiển thị |
 | status | QuizAttemptStatus (enum) | NOT NULL | | `SUBMITTED`/`IN_PROGRESS`/`ABANDONED` |
-| sectionCode | String(30) | NULL | | Như `AttendanceSummary.sectionCode` |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 
-RÀNG BUỘC: UNIQUE `(enrollmentId, quizKey, attemptNumber)`. File LMS thường xuất lũy kế (chứa cả lượt cũ) → nạp lại cùng lượt thì cập nhật (VD `IN_PROGRESS` → `SUBMITTED`). Chỉ lưu lượt có thật — MUST NOT tạo bản ghi "chưa làm" (bài bị bỏ được suy ra ở `rule-engine`, xem `LMS-01` trong `08`). Validate: `0 ≤ score ≤ maxScore`, `submittedAt ≥ startedAt`; `SUBMITTED` MUST có `submittedAt` và `score`. `startedAt` phải nằm trong thời gian học kỳ, sai → `TERM_MISMATCH`.
+RÀNG BUỘC: UNIQUE `(enrollmentId, activityId, attemptNumber)`. Dòng `trang_thai = Chưa làm` KHÔNG tạo lượt làm (chỉ tạo `Enrollment` + `LmsActivity`) — bài bị bỏ được suy ra ở `rule-engine`. Validate: `0 ≤ score ≤ maxScore`, `submittedAt ≥ startedAt`, `0 ≤ correctCount ≤ totalQuestions`; `SUBMITTED` MUST có `submittedAt` và `score`. `startedAt` ngoài học kỳ → `TERM_MISMATCH`.
 
-## CourseResult — kết quả 1 học phần của 1 sinh viên trong 1 học kỳ
+## LmsAssignmentSubmission — trạng thái nộp 1 bài thực hành của 1 sinh viên
+
+| Field | Kiểu | Null? | Khóa | Ghi chú |
+|---|---|---|---|---|
+| id | String (uuid) | NOT NULL | PK | |
+| enrollmentId | String (uuid) | NOT NULL | FK → Enrollment | |
+| activityId | String (uuid) | NOT NULL | FK → LmsActivity | Bài `ASSIGNMENT` |
+| status | SubmissionStatus (enum) | NOT NULL | | `ON_TIME` (Đã nộp) / `LATE` (Nộp trễ) / `NOT_SUBMITTED` (Chưa nộp) — theo file |
+| submittedAt | DateTime | NULL | | BẮT BUỘC khi `ON_TIME`/`LATE` (chống rò rỉ thời gian: biết đã nộp TẠI `asOf`) |
+| importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
+
+RÀNG BUỘC: UNIQUE `(enrollmentId, activityId)` — nạp lại cập nhật trạng thái (Chưa nộp → Nộp trễ). `ON_TIME` mà `submittedAt > dueAt`, hoặc `LATE` mà `submittedAt ≤ dueAt` → cảnh báo `SUBMISSION_STATUS_MISMATCH` (nạp theo thời điểm nộp). KHÔNG lưu điểm (giảng viên có thể chưa chấm).
+
+## CourseResult — kết quả 1 học phần đã khóa điểm
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
 | id | String (uuid) | NOT NULL | PK | |
 | enrollmentId | String (uuid) | NOT NULL | FK → Enrollment, UNIQUE | 1 kết quả / `Enrollment` |
-| processScore | Float | NULL | | Điểm quá trình, thang 10 |
-| examScore | Float | NULL | | Điểm thi, thang 10 |
-| finalScore | Float | NULL | | Điểm tổng kết, thang 10 |
-| letterGrade | String(2) | NULL | | Thang 9 mức theo quy chế trường (người dùng xác nhận): 9,5–10 = `A+` · 8,5–9,4 = `A` · 8,0–8,4 = `B+` · 7,0–7,9 = `B` · 6,5–6,9 = `C+` · 5,5–6,4 = `C` · 5,0–5,4 = `D+` · 4,0–4,9 = `D` (đạt) · 0,0–3,9 = `F` (không đạt). Trống mà có `finalScore` → quy đổi theo thang này |
-| passed | Boolean | NULL | | Từ cột `ket_qua`; nếu trống thì `letterGrade != 'F'` (F = không đạt, phải học lại); NULL khi chưa có kết quả cuối |
-| resultStatus | CourseResultStatus (enum) | NOT NULL | | `PROCESS_ONLY` (mới có điểm quá trình) / `FINAL` |
-| importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Batch cập nhật gần nhất |
-| publishedAt | DateTime | NOT NULL | | Ngày công bố điểm (`ngay_cong_bo`); trống thì = `importedAt`. Dùng cho mốc `asOf` |
-| importedAt | DateTime | NOT NULL | | Thời điểm nạp |
-| processPublishedAt | DateTime | NULL | | Ngày công bố điểm quá trình (lần nạp `PROCESS_ONLY`), GIỮ LẠI khi chuyển `FINAL` — để chạy lại đánh giá ở mốc giữa kỳ không mất `ACA-01` (chống rò rỉ thời gian, xem `08`) |
+| processScore | Float | NULL | | Điểm thường xuyên, thang 10 — chỉ hiển thị |
+| examScore | Float | NULL | | Điểm cuối kỳ, thang 10 — chỉ hiển thị |
+| letterGrade | String(2) | NOT NULL | | Thang 9 mức (Quy chế 336): 9,5–10 `A+` · 8,5–9,4 `A` · 8,0–8,4 `B+` · 7,0–7,9 `B` · 6,5–6,9 `C+` · 5,5–6,4 `C` · 5,0–5,4 `D+` · 4,0–4,9 `D` · < 4 `F` |
+| passed | Boolean | NOT NULL | | `letterGrade != 'F'` |
+| eligibleForExam | Boolean | NULL | | `duoc_du_thi` (Không = bị cấm thi) |
+| absentFromExam | Boolean | NULL | | `vang_thi` |
+| importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Lô cập nhật gần nhất |
+| publishedAt | DateTime | NOT NULL | | `ngay_cong_bo`; trống thì = lúc nạp. Dùng cho mốc `asOf` |
+| importedAt | DateTime | NOT NULL | | |
 
-Không lưu điểm hệ 4: `rule-engine` quy đổi từ `letterGrade` theo `gradeScale` của `ACA-03` lúc đánh giá (xem `08`).
+KHÔNG lưu điểm hệ 4 — `rule-engine` quy đổi từ `letterGrade` theo `gradeScale` (`08`). Cột `thang_diem_4` của file chỉ đối chiếu: lệch quy đổi → cảnh báo `GRADE_POINT_MISMATCH`. `diem_chu` ∉ thang 9 mức → `INVALID_FORMAT`.
 
-RÀNG BUỘC: nhập lần đầu chỉ có điểm quá trình → `PROCESS_ONLY`; nhập lại khi có `finalScore` hoặc `ket_qua` → cập nhật thành `FINAL`. Khi `FINAL`: cập nhật `Enrollment.attemptOutcome` (`PASSED`/`FAILED`) và `enrollmentStatus = COMPLETED`. MUST NOT chuyển `FINAL` về `PROCESS_ONLY`: dòng chỉ có điểm quá trình cho kết quả đã `FINAL` → lỗi `RESULT_ALREADY_FINAL`. Nhập lại `FINAL` với điểm khác (đính chính) → cập nhật. Điểm thang 10 phải trong `[0, 10]`, sai → `OUT_OF_RANGE`. `diem_chu` lệch với `diem_tong_ket` theo thang trên → vẫn nạp theo `diem_chu` của nguồn, ghi cảnh báo vào `ImportBatch.warnings`. `ngay_cong_bo` có thể sau ngày kết thúc học kỳ (không kiểm tra). MUST NOT ghi `Student.officialAcademicStatus`.
+RÀNG BUỘC: chỉ nạp khi học phần đã khóa điểm (người dùng chốt 2026-10-18 — không còn điểm giữa kỳ). Có kết quả → cập nhật `Enrollment.attemptOutcome` (`PASSED`/`FAILED`) và `enrollmentStatus = COMPLETED`. Nạp lại với điểm khác (đính chính) → cập nhật. Điểm thang 10 trong `[0, 10]`, sai → `OUT_OF_RANGE`. `ngay_cong_bo` có thể sau ngày kết thúc học kỳ. MUST NOT ghi `Student.officialAcademicStatus`.
 
-**Tính lại lần học**: khi `attemptOutcome` của 1 `Enrollment` thay đổi (có/đính chính kết quả `FINAL`), MUST tính lại `attemptNumber` của các `Enrollment` cùng `(studentId, courseId)` ở học kỳ SAU (theo `Term.startDate`) trong cùng transaction — để thứ tự nạp file không làm sai `COMB-02`.
+**Tính lại lần học**: khi `attemptOutcome` của 1 `Enrollment` thay đổi, MUST tính lại `attemptNumber` của các `Enrollment` cùng `(studentId, courseId)` ở học kỳ SAU (theo `Term.startDate`) trong cùng transaction.
 
 ## Quan hệ tóm tắt
 
-`Enrollment 1—n AttendanceSummary` · `Enrollment 1—n LmsQuizAttempt` · `Enrollment 1—0..1 CourseResult` · cả 3 `n—1 ImportBatch`.
+`Enrollment 1—n AttendanceSummary, LmsQuizAttempt, LmsAssignmentSubmission` · `Enrollment 1—0..1 CourseResult` · `LmsActivity 1—n LmsQuizAttempt, LmsAssignmentSubmission` · `Course, Term 1—n LmsActivity` · tất cả `n—1 ImportBatch`.

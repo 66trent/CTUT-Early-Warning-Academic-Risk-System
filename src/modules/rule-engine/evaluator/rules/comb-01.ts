@@ -2,32 +2,33 @@ import { z } from 'zod';
 import { RuleGroup, Severity } from '@/db/enums';
 import { severityRank, severitySchema } from '../helpers';
 import { SEVERITY_LABELS } from '@/lib/labels';
-import { type CourseRule } from '../types';
+import { type CourseRule, type SignalSource } from '../types';
 
 const conditionSchema = z.object({
-  /** Số nhóm nguồn (điểm danh, LMS, học lực) cùng có trigger ≥ `minSeverity`. */
+  /** Số nguồn (điểm danh, trắc nghiệm, thực hành) cùng có trigger ≥ `minSeverity`. */
   minGroups: z.number().int().min(2).max(3),
   minSeverity: severitySchema,
   severity: severitySchema,
 });
 export type Comb01Condition = z.infer<typeof conditionSchema>;
 
-const SOURCE_GROUPS: readonly RuleGroup[] = [
-  RuleGroup.ATTENDANCE,
-  RuleGroup.LMS,
-  RuleGroup.ACADEMIC,
-];
+const SOURCES: readonly SignalSource[] = ['ATTENDANCE', 'QUIZ', 'ASSIGNMENT'];
 
-/** COMB-01 — Nhiều nguồn cùng xấu (docs/rules/08). Chạy sau các luật BASE, cùng Enrollment. */
+/**
+ * COMB-01 — Nhiều nguồn cùng xấu (docs/rules/08): điểm danh · trắc nghiệm · thực hành. Chạy sau
+ * các luật BASE, cùng Enrollment.
+ */
 export const comb01: CourseRule<Comb01Condition> = {
   kind: 'PER_COURSE',
   stage: 'COMBINED',
+  appliesTo: 'REGISTERED',
   meta: {
     ruleCode: 'COMB-01',
     ruleName: 'Nhiều nguồn cùng xấu',
     ruleGroup: RuleGroup.COMBINED,
     scope: 'PER_COURSE',
     priority: 90,
+    signal: null,
     requires: null,
   },
   conditionSchema,
@@ -37,10 +38,11 @@ export const comb01: CourseRule<Comb01Condition> = {
   evaluate({ priorHits }, c) {
     const strong = priorHits.filter(
       (h) =>
-        SOURCE_GROUPS.includes(h.ruleGroup) &&
+        h.signal !== null &&
+        SOURCES.includes(h.signal) &&
         severityRank(h.severity) >= severityRank(c.minSeverity),
     );
-    const groups = [...new Set(strong.map((h) => h.ruleGroup))];
+    const groups = [...new Set(strong.map((h) => h.signal))];
     if (groups.length < c.minGroups) return { hit: null };
     return {
       hit: {

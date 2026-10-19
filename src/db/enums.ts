@@ -47,9 +47,17 @@ export enum QuizAttemptStatus {
   ABANDONED = 'ABANDONED',
 }
 
-export enum CourseResultStatus {
-  PROCESS_ONLY = 'PROCESS_ONLY',
-  FINAL = 'FINAL',
+/** Loại bài trên LMS (docs/rules/10): trắc nghiệm / bài thực hành nộp file. */
+export enum LmsActivityType {
+  QUIZ = 'QUIZ',
+  ASSIGNMENT = 'ASSIGNMENT',
+}
+
+/** Trạng thái nộp 1 bài thực hành theo file (docs/rules/10). */
+export enum SubmissionStatus {
+  ON_TIME = 'ON_TIME',
+  LATE = 'LATE',
+  NOT_SUBMITTED = 'NOT_SUBMITTED',
 }
 
 // ── Trạng thái dữ liệu 2 tầng (00) ────────────────────────────────
@@ -144,6 +152,8 @@ export enum EvaluationTrigger {
   MANUAL = 'MANUAL',
   /** Lịch chạy mỗi đêm cho học kỳ hiện tại (docs/rules/05). */
   SCHEDULED = 'SCHEDULED',
+  /** Lần chạy cuối khi chốt học kỳ — xong thì đặt `Term.closedAt` (docs/rules/08). */
+  TERM_CLOSING = 'TERM_CLOSING',
 }
 
 export enum EvaluationRunStatus {
@@ -174,6 +184,7 @@ export const IMPORT_DATA_TYPES = [
   'STUDENT',
   'ATTENDANCE_SUMMARY',
   'LMS_QUIZ',
+  'LMS_ASSIGNMENT',
   'COURSE_RESULT',
 ] as const;
 export type ImportDataType = (typeof IMPORT_DATA_TYPES)[number];
@@ -185,7 +196,7 @@ export const IMPORT_ERROR_REASONS = [
   'DUPLICATE',
   'OUT_OF_RANGE',
   'TERM_MISMATCH',
-  'RESULT_ALREADY_FINAL',
+  'COURSE_MISMATCH',
 ] as const;
 export type ImportErrorReason = (typeof IMPORT_ERROR_REASONS)[number];
 

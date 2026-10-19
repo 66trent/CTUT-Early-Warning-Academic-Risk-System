@@ -34,7 +34,7 @@ export function StagedActions({
   return (
     <div className="flex flex-wrap gap-2">
       <ConfirmActionButton
-        trigger="Xác nhận nạp"
+        trigger={`Xác nhận nạp ${successRows} dòng`}
         triggerVariant="default"
         title={`Nạp ${successRows} dòng hợp lệ?`}
         description={

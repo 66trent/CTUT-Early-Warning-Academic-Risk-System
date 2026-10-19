@@ -4,7 +4,7 @@ Nguồn sự thật duy nhất về nghiệp vụ và mô hình dữ liệu củ
 
 ## Hệ thống là gì
 
-CTUT-EWARS (Early Warning Academic Risk System): hệ thống phát hiện dấu hiệu rủi ro học tập của sinh viên dựa trên luật nghiệp vụ có thể cấu hình, tổng hợp từ 3 nguồn dữ liệu: điểm danh tổng hợp, kết quả bài kiểm tra LMS, kết quả học phần (bảng điểm). Bộ luật: `08-business-rules-catalog.md`.
+CTUT-EWARS (Early Warning Academic Risk System): hệ thống phát hiện dấu hiệu rủi ro học tập của sinh viên dựa trên luật nghiệp vụ có thể cấu hình, tổng hợp từ các nguồn: điểm danh tổng hợp (theo tiết), LMS (bài trắc nghiệm + trạng thái nộp bài thực hành), kết quả học phần đã khóa điểm. 12 luật (Phase 8a, chốt 2026-10-18 theo ảnh hệ thống trường + Quy chế 336/QĐ-ĐHKTCN). Bộ luật: `08-business-rules-catalog.md`.
 
 Tên hiển thị của hệ thống (giao diện, email, tiêu đề trang) đọc từ biến môi trường `NEXT_PUBLIC_APP_NAME` — MUST NOT ghi cứng ở nhiều nơi.
 
@@ -33,9 +33,9 @@ Cách có tài khoản: `STUDENT` chỉ đăng nhập Google OAuth bằng email 
 ## Quy trình vận hành — thứ tự dữ liệu bắt buộc
 
 1. Dữ liệu nền (đầu khóa): Khoa (seed) → duyệt CVHT → Lớp sinh hoạt + gán CVHT → nhập Sinh viên.
-2. Mỗi học kỳ: tạo `Term` + đặt `isCurrent`. KHÔNG nhập lớp học phần hay đăng ký học phần riêng — `Course` và `Enrollment` tự sinh từ dữ liệu nguồn.
-3. Trong học kỳ (hằng tuần): nhập điểm danh tổng hợp + kết quả bài kiểm tra LMS; giữa kỳ nhập điểm quá trình → chạy đánh giá → `Alert` → CVHT xử lý → sinh viên xem.
-4. Cuối kỳ: nhập kết quả học phần đầy đủ (`FINAL`) → chạy đánh giá (`ACA-02`, `ACA-03`) → chốt học kỳ (`closedAt`). Kết quả `FAILED` là căn cứ nhận diện học lại ở học kỳ sau (`COMB-02`).
+2. Mỗi học kỳ (1 năm học = 3 học kỳ chính HK1–HK3, không có hè): tạo `Term` + đặt `isCurrent`. KHÔNG nhập lớp học phần hay đăng ký học phần riêng — `Course` và `Enrollment` tự sinh từ dữ liệu nguồn.
+3. Trong học kỳ (hằng tuần): nhập điểm danh tổng hợp + bài trắc nghiệm + trạng thái nộp bài thực hành → chạy đánh giá → `Alert` → CVHT xử lý → sinh viên xem. Học phần nào khóa điểm thì nhập kết quả học phần đó ngay (`ACA-01` báo không đạt).
+4. Cuối kỳ: đủ kết quả các học phần → đánh giá (`ACA-02/03/04`) → chốt học kỳ (lần chạy cuối `TERM_CLOSING` rồi `closedAt`). Kết quả không đạt là căn cứ nhận diện học lại ở học kỳ sau (`COMB-02`).
 
 Mỗi bước MUST từ chối dữ liệu tham chiếu tới thứ chưa tồn tại ở bước trước (VD: `mssv` chưa có trong danh sách sinh viên), ghi vào `ImportErrorRow`. Ngoại lệ duy nhất được tự tạo: `Course` và `Enrollment` (xem `09`).
 
@@ -47,9 +47,9 @@ Mỗi bước MUST từ chối dữ liệu tham chiếu tới thứ chưa tồn 
 | `Student`                            | Hồ sơ sinh viên, thuộc 1 lớp sinh hoạt. `officialAcademicStatus` là bản sao chỉ-đọc từ SIS.                                                                                                                                                                                         |
 | `Enrollment`                         | Sinh viên × học phần × học kỳ, tự sinh khi dữ liệu nguồn đầu tiên của cặp `(mssv, ma_hoc_phan)` được nạp. Có `attemptNumber` (lần học thứ mấy, tính từ các lần rớt trước) và `enrollmentStatus` (`REGISTERED`/`WITHDRAWN`/`COMPLETED`). **Mọi dữ liệu nguồn trỏ qua `Enrollment`.** |
 | `Course`                             | Học phần (mã, tên, số tín chỉ). Không quản lý lớp học phần hay lịch học.                                                                                                                                                                                                            |
-| `AttendanceSummary`                  | Số liệu điểm danh tổng hợp của 1 `Enrollment` tại 1 ngày chốt: tổng buổi đã học, có mặt, trễ, vắng có phép, vắng không phép. Giữ mọi ngày chốt để so sánh.                                                                                                                          |
-| `LmsQuizAttempt`                     | 1 lượt làm bài kiểm tra trên LMS: bài, lần làm, thời điểm, thời lượng, điểm, trạng thái. Bài bị bỏ được suy ra, không lưu.                                                                                                                                                          |
-| `CourseResult`                       | Kết quả 1 học phần: điểm quá trình, điểm thi, tổng kết, điểm chữ, đạt/không đạt. `PROCESS_ONLY` (giữa kỳ) hoặc `FINAL`.                                                                                                                                                             |
+| `AttendanceSummary`                  | Số liệu điểm danh tổng hợp của 1 `Enrollment` tại 1 ngày chốt, đơn vị TIẾT: tổng số tiết học phần, tiết vắng có phép, tiết vắng không phép. Giữ mọi ngày chốt để so sánh. |
+| `LmsActivity` / `LmsQuizAttempt` / `LmsAssignmentSubmission` | 1 bài LMS (trắc nghiệm hoặc thực hành, có hạn nộp) / 1 lượt làm bài trắc nghiệm / trạng thái nộp 1 bài thực hành. Bài bị bỏ được suy ra, không lưu. |
+| `CourseResult`                       | Kết quả 1 học phần đã khóa điểm: điểm thường xuyên, điểm cuối kỳ, điểm chữ, đạt/không đạt, được dự thi, vắng thi. |
 | `Rule`                               | Định danh 1 luật nghiệp vụ (VD: `ATT-01`), không chứa ngưỡng cụ thể.                                                                                                                                                                                                                |
 | `RuleVersion`                        | Phiên bản cụ thể của 1 `Rule`: ngưỡng, trọng số, `severity`, `status` (`DRAFT`/`ACTIVE`/`INACTIVE`/`ARCHIVED`). Sửa ngưỡng luôn tạo phiên bản mới, không ghi đè.                                                                                                                    |
 | `RuleTrigger`                        | 1 bằng chứng: 1 lần 1 `RuleVersion` đúng với dữ liệu của 1 sinh viên. Không hiển thị trực tiếp cho người dùng — là input để tạo `Alert`.                                                                                                                                            |
@@ -67,7 +67,7 @@ Có 2 TẦNG enum trạng thái dữ liệu, KHÔNG được gộp làm một:
 - **Tầng 1 — `DataStatus`** (trạng thái của TỪNG chỉ số đầu vào riêng lẻ — điểm danh/GPA/LMS — trước khi tính toán): `AVAILABLE` (có dữ liệu, dùng được) / `MISSING` (chưa có dữ liệu) / `NOT_APPLICABLE` (không áp dụng, VD: môn không dùng LMS) / `STALE` (dữ liệu cũ, quá hạn đồng bộ) / `INVALID` (dữ liệu sai định dạng/xung đột). Dùng enum này khi viết logic đọc dữ liệu đầu vào cho 1 chỉ số cụ thể trong `rule-engine`.
 - **Tầng 2 — `DataCompletenessLevel`** (mức tổng hợp của TOÀN BỘ RiskScore 1 sinh viên, suy ra TỪ tầng 1): `FULL` (mọi nhóm ÁP DỤNG ĐƯỢC đều `AVAILABLE` — nhóm `NOT_APPLICABLE`, VD môn không dùng LMS, không bị tính là thiếu) / `PARTIAL` (≥1 nhóm `AVAILABLE` nhưng có nhóm áp dụng được không `AVAILABLE`, đã renormalize trọng số trên các nhóm còn `AVAILABLE`) / `INSUFFICIENT` (KHÔNG có nhóm nào `AVAILABLE` — `RiskScoreLog.riskScoreValue = NULL`, KHÔNG được hiển thị như "rủi ro thấp"). Người dùng chốt: thiếu 1 hoặc 2 nhóm → `PARTIAL`; thiếu cả 3 → `INSUFFICIENT`. Dùng enum này khi ghi kết quả vào `RiskScoreLog`.
 - **Severity**: `LOW` < `MEDIUM` < `HIGH` < `CRITICAL`. Khi nhiều luật cùng kích hoạt cho 1 sinh viên, severity cuối cùng của `Alert` = giá trị lớn nhất trong số đó (không cộng dồn, không trung bình).
-- **AttemptOutcome**: `PENDING` / `PASSED` / `FAILED` — cập nhật từ `CourseResult` `FINAL`, là nguồn tính `attemptNumber` cho `Enrollment` của cùng học phần ở học kỳ sau.
+- **AttemptOutcome**: `PENDING` / `PASSED` / `FAILED` — cập nhật từ `CourseResult`, là nguồn tính `attemptNumber` cho `Enrollment` của cùng học phần ở học kỳ sau.
 - **ImportBatch.status**: `UPLOADING` → `VALIDATING` → `STAGED` → `LOADED` → `RECONCILED` (thành công) hoặc `REJECTED` (lỗi nghiêm trọng) hoặc `DISCARDED` (bị hủy khi còn `STAGED`, chưa dùng để tính RiskScore) hoặc `ROLLED_BACK` (lô đã nạp được hoàn tác có điều kiện — xem `12`).
 
 ## Nguyên tắc tính điểm rủi ro (RiskScore) — cần biết trước khi đụng vào `modules/rule-engine`

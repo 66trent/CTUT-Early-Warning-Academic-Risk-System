@@ -29,6 +29,21 @@ export interface LoadResult {
   createdKeys: string[];
 }
 
+/** Đóng góp của 1 dòng hợp lệ vào thẻ nhận diện học phần ở màn xem trước (docs/rules/12). */
+export interface CardInput {
+  courseId: string;
+  courseName: string | null;
+  derivedCode: boolean;
+  sectionCode: string;
+  studentId: string;
+  totalPeriods?: number;
+  /** `YYYY-MM-DD`. */
+  snapshotDate?: string;
+  activity?: { key: string; name: string; dueAt: string | null };
+  credits?: number;
+  publishedDate?: string | null;
+}
+
 /**
  * Định nghĩa 1 loại nhập (docs/rules/12). Mỗi loại 1 file, đăng ký vào registry — khung nhập
  * (đọc file, chia lô 500 dòng, ghi lỗi, trạng thái lô) dùng chung, không if/else theo loại.
@@ -46,12 +61,23 @@ export interface ImportTypeDefinition<T> {
   parseRow(record: Readonly<Record<string, string>>, options: ParseOptions): ParsedRow<T>;
   /** Khóa chống trùng trong CÙNG file (VD mssv, email). */
   uniqueKeys(row: T): string[];
-  /** Đối chiếu dữ liệu nền theo lô dòng; trả lỗi theo vị trí trong mảng. */
+  /**
+   * Đối chiếu dữ liệu nền theo lô dòng; trả lỗi theo vị trí trong mảng. Cảnh báo không chặn
+   * (VD họ tên lệch) báo qua `warn`.
+   */
   checkReferences(
     rows: readonly T[],
     em: EntityManager,
     batch: ImportBatch,
+    warn: (index: number, warning: RowWarning) => void,
   ): Promise<Map<number, RowError>>;
+  /**
+   * Giá trị phải giống nhau giữa các dòng cùng `key` trong CẢ file (VD hạn nộp của 1 bài);
+   * dòng lệch dòng đầu → lỗi `INVALID_FORMAT` với `message`.
+   */
+  consistency?(row: T): { key: string; value: string; message: string };
+  /** Thông tin cho thẻ nhận diện học phần (chỉ loại học tập). */
+  describe?(row: T): CardInput;
   /** Ghi các dòng hợp lệ (upsert theo khóa nghiệp vụ) trong transaction `em`. */
   load(rows: readonly T[], em: EntityManager, batch: ImportBatch): Promise<LoadResult>;
   /**

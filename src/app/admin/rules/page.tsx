@@ -27,7 +27,7 @@ export default async function RulesPage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
         title="Cấu hình luật"
-        description="10 luật cảnh báo và cấu hình điểm rủi ro. Sửa ngưỡng tạo phiên bản mới, phải chạy thử rồi mới kích hoạt."
+        description="12 luật cảnh báo và cấu hình điểm rủi ro. Sửa ngưỡng tạo phiên bản mới, phải chạy thử rồi mới kích hoạt."
       />
       <Card className="shadow-sm">
         <CardContent>

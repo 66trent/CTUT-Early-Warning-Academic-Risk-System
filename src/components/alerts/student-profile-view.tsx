@@ -7,12 +7,31 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { CourseResultStatus, EnrollmentStatus } from '@/db/enums';
+import { EnrollmentStatus } from '@/db/enums';
 import { formatVnDate } from '@/lib/dates';
 import type { CourseSnapshotDto } from '@/modules/alerts/services/student-profile.service';
 import { WithdrawToggle } from './withdraw-toggle';
 
 const score = (v: number | null) => (v === null ? '—' : v.toLocaleString('vi-VN'));
+
+function resultLabel(result: NonNullable<CourseSnapshotDto['result']>): string {
+  const scores = `thường xuyên ${score(result.processScore)} · cuối kỳ ${score(result.examScore)}`;
+  const note =
+    result.eligibleForExam === false
+      ? ' · không được dự thi'
+      : result.absentFromExam
+        ? ' · vắng thi'
+        : '';
+  return `${scores}${note}`;
+}
+
+function assignmentLabel(a: CourseSnapshotDto['assignments']): string {
+  if (a.total === 0) return '';
+  const parts = [`thực hành ${a.submitted}/${a.total}`];
+  if (a.late > 0) parts.push(`trễ ${a.late}`);
+  if (a.overdue > 0) parts.push(`quá hạn ${a.overdue}`);
+  return parts.join(' · ');
+}
 
 const percent = (a: number, b: number) =>
   b > 0 ? `${(Math.round((a / b) * 1000) / 10).toLocaleString('vi-VN')}%` : '—';
@@ -36,7 +55,7 @@ export function CourseSnapshotTable({
           <TableRow>
             <TableHead>Học phần</TableHead>
             <TableHead>Điểm danh</TableHead>
-            <TableHead>Bài kiểm tra đã nộp</TableHead>
+            <TableHead>Bài LMS đã nộp</TableHead>
             <TableHead>Kết quả</TableHead>
             {manageStudentId && <TableHead>Đăng ký</TableHead>}
           </TableRow>
@@ -67,9 +86,8 @@ export function CourseSnapshotTable({
               <TableCell className="tabular-nums">
                 {c.attendance ? (
                   <>
-                    Vắng {c.attendance.absences}/{c.attendance.denominator} (
-                    {percent(c.attendance.absences, c.attendance.denominator)})
-                    {c.attendance.late > 0 ? ` · trễ ${c.attendance.late}` : ''}
+                    Vắng {c.attendance.absences}/{c.attendance.totalPeriods} tiết (
+                    {percent(c.attendance.absences, c.attendance.totalPeriods)})
                     <span className="block text-xs text-muted-foreground">
                       chốt ngày {formatVnDate(c.attendance.snapshotDate)}
                     </span>
@@ -79,19 +97,46 @@ export function CourseSnapshotTable({
                 )}
               </TableCell>
               <TableCell className="tabular-nums">
-                {c.quizzesAttempted > 0 ? `${c.quizzesSubmitted}/${c.quizzesAttempted} bài` : '—'}
+                {c.quizzes.total + c.assignments.total === 0 ? (
+                  '—'
+                ) : (
+                  <>
+                    {c.quizzes.total > 0 && (
+                      <span className="block">
+                        Trắc nghiệm {c.quizzes.submitted}/{c.quizzes.total}
+                      </span>
+                    )}
+                    {c.assignments.total > 0 && (
+                      <span
+                        className={c.assignments.overdue > 0 ? 'block text-destructive' : 'block'}
+                      >
+                        {assignmentLabel(c.assignments)}
+                      </span>
+                    )}
+                  </>
+                )}
               </TableCell>
               <TableCell className="tabular-nums">
-                {!c.result
-                  ? '—'
-                  : c.result.status === CourseResultStatus.PROCESS_ONLY
-                    ? `Điểm quá trình ${score(c.result.processScore)}`
-                    : `Tổng kết ${score(c.result.finalScore)}${c.result.letterGrade ? ` (${c.result.letterGrade})` : ''}`}
+                {!c.result ? (
+                  <span className="text-muted-foreground">Chưa khóa điểm</span>
+                ) : (
+                  <>
+                    <span
+                      className={c.result.passed ? 'font-medium' : 'font-medium text-destructive'}
+                    >
+                      {c.result.letterGrade}
+                      {c.result.passed ? '' : ' — không đạt'}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {resultLabel(c.result)}
+                    </span>
+                  </>
+                )}
               </TableCell>
               {manageStudentId && (
                 <TableCell>
                   {c.enrollmentStatus === EnrollmentStatus.COMPLETED ? (
-                    <span className="text-xs text-muted-foreground">Đã có điểm cuối kỳ</span>
+                    <span className="text-xs text-muted-foreground">Đã khóa điểm</span>
                   ) : (
                     <WithdrawToggle
                       studentId={manageStudentId}

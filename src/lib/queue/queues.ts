@@ -4,7 +4,7 @@ import { createRedisConnection } from './connection';
 /** 3 queue bắt buộc (docs/rules/01). Job dùng khóa nghiệp vụ làm `jobId` để chống trùng. */
 export const QUEUE_NAMES = {
   importBatchProcess: 'import-batch-process',
-  /** 1 job / EvaluationRun: RiskScore + 10 luật (2 đường kích hoạt dùng chung — docs/rules/08). */
+  /** 1 job / EvaluationRun: RiskScore + 12 luật (2 đường kích hoạt dùng chung — docs/rules/08). */
   evaluationRun: 'evaluation-run',
   sendNotifications: 'send-notifications',
 } as const;

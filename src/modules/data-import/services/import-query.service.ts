@@ -1,5 +1,6 @@
 import { getDataSource } from '@/db/data-source';
-import { ImportBatch } from '@/db/entities/import-batch.entity';
+import { Course } from '@/db/entities/course.entity';
+import { ImportBatch, type ImportCourseCard } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
 import { type ImportBatchStatus, IMPORT_DATA_TYPES } from '@/db/enums';
@@ -16,6 +17,8 @@ export interface ImportBatchListItemDto {
   dataTypeLabel: string;
   termName: string | null;
   fileName: string;
+  /** Học phần của lô (1 học phần → tên; nhiều → "N học phần"; chưa đọc → null). */
+  courseLabel: string | null;
   status: ImportBatchStatus;
   totalRows: number;
   successRows: number;
@@ -39,6 +42,10 @@ export interface ImportBatchDetailDto extends ImportBatchListItemDto {
   updated: number | null;
   unchanged: number | null;
   rollback: { allowed: boolean; reason: string | null };
+  /** Học phần Admin chọn khi nạp (null = tự nhận diện từ file). */
+  selectedCourseId: string | null;
+  /** Thẻ nhận diện từng học phần trong file (docs/rules/12). */
+  courses: ImportCourseCard[];
   /** Cảnh báo không chặn nạp (VD điểm chữ lệch điểm tổng kết). */
   warnings: { row: number; code: string; message: string }[];
   stagedAt: string | null;
@@ -55,10 +62,19 @@ export interface ImportErrorRowDto {
 export interface ImportFormOptionsDto {
   types: { dataType: string; label: string; requiresTerm: boolean; templatePath: string }[];
   terms: { termId: string; termName: string; isCurrent: boolean }[];
+  /** Học phần đã có trong hệ thống — chọn (tùy chọn) khi nạp file của 1 học phần. */
+  courses: { courseId: string; courseName: string }[];
 }
 
 function labelOf(dataType: string): string {
   return getImportDefinition(dataType)?.label ?? dataType;
+}
+
+function courseLabelOf(batch: ImportBatch): string | null {
+  const cards = readSummary(batch.summary).courses ?? [];
+  if (cards.length === 1) return cards[0]?.courseName ?? null;
+  if (cards.length > 1) return `${cards.length} học phần`;
+  return batch.courseId;
 }
 
 function toListItem(batch: ImportBatch): ImportBatchListItemDto {
@@ -68,6 +84,7 @@ function toListItem(batch: ImportBatch): ImportBatchListItemDto {
     dataTypeLabel: labelOf(batch.dataType),
     termName: batch.term?.termName ?? null,
     fileName: batch.fileName,
+    courseLabel: courseLabelOf(batch),
     status: batch.status,
     totalRows: batch.totalRows,
     successRows: batch.successRows,
@@ -79,16 +96,25 @@ function toListItem(batch: ImportBatch): ImportBatchListItemDto {
 
 /** Lựa chọn cho form nhập: loại dữ liệu + học kỳ CHƯA chốt (hiện tại lên đầu). */
 export async function getImportFormOptions(): Promise<ImportFormOptionsDto> {
-  const terms = await (await getDataSource()).getRepository(Term).find({
-    select: { termId: true, termName: true, isCurrent: true, closedAt: true, startDate: true },
-    order: { isCurrent: 'DESC', startDate: 'DESC' },
-    take: 50,
-  });
+  const ds = await getDataSource();
+  const [terms, courses] = await Promise.all([
+    ds.getRepository(Term).find({
+      select: { termId: true, termName: true, isCurrent: true, closedAt: true, startDate: true },
+      order: { isCurrent: 'DESC', startDate: 'DESC' },
+      take: 50,
+    }),
+    ds.getRepository(Course).find({
+      select: { courseId: true, courseName: true },
+      order: { courseName: 'ASC' },
+      take: 1000,
+    }),
+  ]);
   return {
     types: availableImportTypes(),
     terms: terms
       .filter((t) => !t.closedAt)
       .map((t) => ({ termId: t.termId, termName: t.termName, isCurrent: t.isCurrent })),
+    courses: courses.map((c) => ({ courseId: c.courseId, courseName: c.courseName })),
   };
 }
 
@@ -137,6 +163,15 @@ export async function getImportBatchDetail(batchId: string): Promise<ImportBatch
     updated: summary.updated ?? null,
     unchanged: summary.unchanged ?? null,
     rollback: { allowed: rollback.allowed, reason: rollback.allowed ? null : rollback.reason },
+    selectedCourseId: batch.courseId,
+    courses: (summary.courses ?? []).map((c) => ({
+      ...c,
+      sectionCodes: [...c.sectionCodes],
+      classes: c.classes.map((x) => ({ ...x })),
+      ...(c.snapshotDates ? { snapshotDates: [...c.snapshotDates] } : {}),
+      ...(c.activities ? { activities: c.activities.map((a) => ({ ...a })) } : {}),
+      ...(c.publishedDates ? { publishedDates: [...c.publishedDates] } : {}),
+    })),
     warnings: readWarnings(batch.warnings).map((w) => ({
       row: w.row,
       code: w.code,

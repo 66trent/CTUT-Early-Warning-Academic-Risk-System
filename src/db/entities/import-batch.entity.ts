@@ -9,6 +9,7 @@ import {
   type Relation,
 } from 'typeorm';
 import { ImportBatchStatus, ImportSource } from '../enums';
+import { Course } from './course.entity';
 import { Term } from './term.entity';
 import { User } from './user.entity';
 
@@ -17,6 +18,31 @@ export interface ImportWarning {
   row: number;
   code: string;
   message: string;
+}
+
+/** Thẻ nhận diện 1 học phần trong file (docs/rules/12 — màn xem trước). */
+export interface ImportCourseCard {
+  courseId: string;
+  courseName: string;
+  /** Mã học phần suy từ mã lớp học phần (file để trống `ma_hoc_phan`). */
+  derivedCode: boolean;
+  /** Học phần chưa có trong hệ thống — sẽ được tạo khi nạp. */
+  isNew: boolean;
+  sectionCodes: string[];
+  validRows: number;
+  errorRows: number;
+  warningRows: number;
+  studentCount: number;
+  classes: { classId: string; departmentId: string; count: number }[];
+  /** Điểm danh: tổng số tiết, các ngày chốt trong file, ngày chốt gần nhất đã có trước đó. */
+  totalPeriods?: number | null;
+  snapshotDates?: string[];
+  previousSnapshotDate?: string | null;
+  /** LMS: các bài trong file. */
+  activities?: { key: string; name: string; dueAt: string | null }[];
+  /** Kết quả: số tín chỉ, ngày công bố. */
+  credits?: number | null;
+  publishedDates?: string[];
 }
 
 /** Cột `summary` — validate bằng Zod (`importSummarySchema`) trước khi ghi. */
@@ -32,6 +58,7 @@ export interface ImportBatchSummary {
   updated?: number;
   unchanged?: number;
   createdKeys?: string[];
+  courses?: ImportCourseCard[];
 }
 
 /**
@@ -53,6 +80,10 @@ export class ImportBatch {
 
   @Column({ type: 'varchar', length: 10, nullable: true })
   termId!: string | null;
+
+  /** Học phần Admin chọn trên form (tùy chọn) — dòng thuộc học phần khác → `COURSE_MISMATCH`. */
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  courseId!: string | null;
 
   @Column({ type: 'enum', enum: ImportSource, enumName: 'import_source' })
   source!: ImportSource;
@@ -114,6 +145,10 @@ export class ImportBatch {
   @ManyToOne(() => Term, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'term_id' })
   term?: Relation<Term> | null;
+
+  @ManyToOne(() => Course, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'course_id' })
+  course?: Relation<Course> | null;
 
   @ManyToOne(() => User, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'performed_by' })

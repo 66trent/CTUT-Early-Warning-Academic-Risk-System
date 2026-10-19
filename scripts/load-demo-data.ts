@@ -1,7 +1,7 @@
 /**
  * npm run demo:load — nạp file của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md, qua
  * ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
- * Mặc định nạp 02–05 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
+ * Mặc định nạp 02–06 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
  * nạp cả 01 trước (dùng trong `demo:reset`).
  */
 import 'dotenv/config';
@@ -19,10 +19,11 @@ import {
 
 const STUDENTS_FILE = ['01_sinh_vien.csv', 'STUDENT', null] as const;
 const FILES = [
-  ['02_HK2_2025_ket_qua_hoc_phan.csv', 'COURSE_RESULT', 'HK2_2025'],
-  ['03_HK1_2026_diem_danh_tong_hop.csv', 'ATTENDANCE_SUMMARY', 'HK1_2026'],
-  ['04_HK1_2026_lms_bai_kiem_tra.csv', 'LMS_QUIZ', 'HK1_2026'],
-  ['05_HK1_2026_ket_qua_giua_ky.csv', 'COURSE_RESULT', 'HK1_2026'],
+  ['02_HK1_2025_diem_danh.csv', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
+  ['03_HK1_2025_lms_trac_nghiem.csv', 'LMS_QUIZ', 'HK1_2025'],
+  ['04_HK1_2025_lms_thuc_hanh.csv', 'LMS_ASSIGNMENT', 'HK1_2025'],
+  ['05_HK1_2025_ket_qua_logic_hoc.csv', 'COURSE_RESULT', 'HK1_2025'],
+  ['06_HK1_2025_ket_qua_cuoi_ky.csv', 'COURSE_RESULT', 'HK1_2025'],
 ] as const;
 
 /** Chờ worker xử lý lô tới trạng thái mong muốn (tối đa 60 giây). */

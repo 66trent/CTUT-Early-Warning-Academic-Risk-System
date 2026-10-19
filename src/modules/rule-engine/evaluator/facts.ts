@@ -1,9 +1,8 @@
-import { CourseResultStatus, DataStatus } from '@/db/enums';
+import { DataStatus } from '@/db/enums';
 import { type RiskScoreConfig } from './config';
 import { DAY_MS } from './helpers';
 import {
   type AttendanceSnapshotInput,
-  type CourseResultInput,
   type EnrollmentFacts,
   type EnrollmentInput,
   type EnrollmentState,
@@ -12,12 +11,13 @@ import {
 const byDate = (a: AttendanceSnapshotInput, b: AttendanceSnapshotInput) =>
   a.snapshotDate.getTime() - b.snapshotDate.getTime();
 
-/** Bước 1: snapshot mâu thuẫn (tổng các cột trạng thái > số buổi đã học) → INVALID. */
+/** Bước 1: snapshot mâu thuẫn (tiết vắng vượt tổng số tiết, tổng tiết ≤ 0) → INVALID. */
 export function isInvalidSnapshot(s: AttendanceSnapshotInput): boolean {
-  const counts = [s.present, s.late, s.excusedAbsence, s.unexcusedAbsence, s.totalSessions];
   return (
-    counts.some((n) => n < 0) ||
-    s.present + s.late + s.excusedAbsence + s.unexcusedAbsence > s.totalSessions
+    s.totalPeriods <= 0 ||
+    s.excusedAbsence < 0 ||
+    s.unexcusedAbsence < 0 ||
+    s.excusedAbsence + s.unexcusedAbsence > s.totalPeriods
   );
 }
 
@@ -40,49 +40,32 @@ function attendanceFacts(
   };
 }
 
-/**
- * Kết quả học phần TẠI asOf: công bố sau asOf thì không thấy; riêng kết quả đã FINAL nhưng điểm
- * quá trình công bố trước asOf → thấy như PROCESS_ONLY (mỗi học phần chỉ 1 dòng kết quả, dòng
- * FINAL ghi đè dòng giữa kỳ — chống rò rỉ thời gian khi chạy lại mốc giữa kỳ).
- */
-export function asOfResult(result: CourseResultInput | null, asOf: Date): CourseResultInput | null {
-  if (!result) return null;
-  if (result.publishedAt <= asOf) return result;
-  if (result.processScore === null || !result.processPublishedAt) return null;
-  if (result.processPublishedAt > asOf) return null;
-  return {
-    processScore: result.processScore,
-    finalScore: null,
-    letterGrade: null,
-    passed: null,
-    resultStatus: CourseResultStatus.PROCESS_ONLY,
-    publishedAt: result.processPublishedAt,
-    processPublishedAt: result.processPublishedAt,
-  };
+/** Bài thực hành đã nộp TẠI asOf (`submittedAt ≤ asOf`) → thời điểm nộp. */
+function submittedByAsOf(input: EnrollmentInput, asOf: Date): Map<string, Date> {
+  const submitted = new Map<string, Date>();
+  for (const s of input.submissions) {
+    if (s.submittedAt && s.submittedAt <= asOf) submitted.set(s.activityId, s.submittedAt);
+  }
+  return submitted;
 }
 
 /**
- * Bước 1–4 cho 1 Enrollment: chỉ dùng dữ liệu phát sinh đến `asOf` (lọc lại ở đây dù nguồn
- * đã lọc — chống rò rỉ thời gian), suy ra trạng thái, lần học và DataStatus TẠI asOf.
+ * Bước 1–4 cho 1 Enrollment: chỉ dùng dữ liệu phát sinh đến `asOf` (lọc lại ở đây dù nguồn đã
+ * lọc — chống rò rỉ thời gian), suy ra trạng thái, lần học và DataStatus TẠI asOf.
  */
 export function buildEnrollmentFacts(
   input: EnrollmentInput,
   asOf: Date,
   config: RiskScoreConfig,
 ): EnrollmentFacts {
-  const result = asOfResult(input.result, asOf);
+  const result = input.result && input.result.publishedAt <= asOf ? input.result : null;
   const state: EnrollmentState = input.withdrawn
     ? 'WITHDRAWN'
-    : result?.resultStatus === CourseResultStatus.FINAL
+    : result
       ? 'COMPLETED'
       : 'REGISTERED';
   const failedTerms = input.priorAttempts
-    .filter(
-      (p) =>
-        p.result?.resultStatus === CourseResultStatus.FINAL &&
-        p.result.passed === false &&
-        p.result.publishedAt <= asOf,
-    )
+    .filter((p) => p.result?.passed === false && p.result.publishedAt <= asOf)
     .map((p) => ({ termId: p.termId, termName: p.termName }));
 
   return {
@@ -91,10 +74,16 @@ export function buildEnrollmentFacts(
     attemptNumber: 1 + failedTerms.length,
     failedTerms,
     attendance: attendanceFacts(input.attendance, asOf, config.attendance.freshnessDays),
-    lms: {
-      status: input.lmsGroup.applicable ? DataStatus.AVAILABLE : DataStatus.NOT_APPLICABLE,
-      dueQuizzes: input.lmsGroup.dueQuizzes,
+    quiz: {
+      status: input.lms.quizApplicable ? DataStatus.AVAILABLE : DataStatus.NOT_APPLICABLE,
+      dueQuizzes: input.lms.dueQuizzes,
       attempts: input.quizAttempts.filter((a) => a.startedAt <= asOf),
+    },
+    assignment: {
+      status: input.lms.assignmentApplicable ? DataStatus.AVAILABLE : DataStatus.NOT_APPLICABLE,
+      dueAssignments: input.lms.dueAssignments,
+      submittedAt: submittedByAsOf(input, asOf),
+      dueAt: input.lms.assignmentDueAt,
     },
     result,
   };

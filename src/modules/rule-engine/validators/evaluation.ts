@@ -14,6 +14,16 @@ export const requestEvaluationSchema = z.object({
 });
 export type RequestEvaluationInput = z.infer<typeof requestEvaluationSchema>;
 
+export const termOnlySchema = z.object({
+  termId: z.string().trim().min(1, 'Chọn học kỳ.').max(10),
+});
+
+/** Chốt học kỳ: (chỉ DEMO_MODE) mốc asOf của lần chạy cuối. */
+export const closeTermSchema = z.object({
+  termId: z.string().trim().min(1, 'Chọn học kỳ.').max(10),
+  asOfDate,
+});
+
 /** Tạo phiên bản nháp — `condition` được kiểm tra bằng Zod của chính luật ở service. */
 export const createRuleVersionSchema = z.object({
   ruleCode: z.string().trim().min(1).max(20),

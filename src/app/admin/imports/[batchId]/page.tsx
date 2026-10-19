@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { z } from 'zod';
 import { AutoRefresh, RollbackAction, StagedActions } from '@/components/imports/batch-actions';
 import { BatchStatusBadge } from '@/components/imports/batch-status-badge';
+import { CourseCards } from '@/components/imports/course-cards';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -71,7 +72,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
         </div>
         <p className="mt-1 text-muted-foreground">
           {batch.fileName}
-          {batch.termName ? ` · ${batch.termName}` : ''} · tải lên{' '}
+          {batch.termName ? ` · ${batch.termName}` : ''}
+          {batch.selectedCourseId ? ` · chỉ học phần ${batch.selectedCourseId}` : ''} · tải lên{' '}
           {formatVnDateTime(batch.createdAt)} bởi {batch.performedBy}
         </p>
       </div>
@@ -132,6 +134,14 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
                 </p>
               </div>
             )}
+            {batch.courses.length > 0 && (
+              <section className="flex flex-col gap-2" aria-label="Hệ thống đọc được">
+                <h3 className="text-sm font-semibold">
+                  Hệ thống đọc được {batch.courses.length} học phần trong file
+                </h3>
+                <CourseCards cards={batch.courses} staged />
+              </section>
+            )}
             {batch.preview.length > 0 && (
               <div className="overflow-x-auto rounded-md border">
                 <Table>
@@ -174,7 +184,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
               nhầm file thì có thể hoàn tác khi lô chỉ thêm mới dữ liệu.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
+            <CourseCards cards={batch.courses} staged={false} />
             <RollbackAction
               batchId={batch.id}
               allowed={batch.rollback.allowed}

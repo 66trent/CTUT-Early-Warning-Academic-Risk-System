@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { In, LessThan, MoreThan, IsNull, Not } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
+import { Course } from '@/db/entities/course.entity';
 import { ImportBatch } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
@@ -27,6 +28,8 @@ const LIVE_STATUSES = [
 export interface CreateImportInput {
   dataType: string;
   termId: string | null;
+  /** Học phần Admin chọn (tùy chọn) — dòng thuộc học phần khác → `COURSE_MISMATCH`. */
+  courseId?: string | null;
   parentBatchId: string | null;
   fileName: string;
   data: Buffer;
@@ -67,6 +70,11 @@ export async function createImportBatch(
       throw new AppError('TERM_CLOSED', `${term.termName} đã chốt, không nhận thêm dữ liệu.`);
   }
 
+  const courseId = def.requiresTerm ? (input.courseId ?? null) : null;
+  if (courseId && !(await dataSource.getRepository(Course).existsBy({ courseId }))) {
+    throw new AppError('COURSE_NOT_FOUND', `Chưa có học phần ${courseId} trong hệ thống.`);
+  }
+
   const checksum = createHash('sha256').update(input.data).digest('hex');
   const duplicate = await dataSource.getRepository(ImportBatch).findOne({
     select: { id: true, createdAt: true },
@@ -92,6 +100,7 @@ export async function createImportBatch(
       id,
       dataType: input.dataType,
       termId,
+      courseId,
       source: ImportSource.FILE,
       fileName: input.fileName.slice(0, 255),
       sourceChecksum: checksum,

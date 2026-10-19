@@ -16,6 +16,8 @@ import { EvaluationRun } from './entities/evaluation-run.entity';
 import { ImportBatch } from './entities/import-batch.entity';
 import { ImportErrorRow } from './entities/import-error-row.entity';
 import { Intervention } from './entities/intervention.entity';
+import { LmsActivity } from './entities/lms-activity.entity';
+import { LmsAssignmentSubmission } from './entities/lms-assignment-submission.entity';
 import { LmsQuizAttempt } from './entities/lms-quiz-attempt.entity';
 import { Notification } from './entities/notification.entity';
 import { RiskScoreLog } from './entities/risk-score-log.entity';
@@ -33,6 +35,7 @@ import { Phase4RuleEngine1791825968315 } from './migrations/1791825968315-Phase4
 import { Phase5Alerts1791894767461 } from './migrations/1791894767461-Phase5Alerts';
 import { Phase7AlertsSchedule1792054500276 } from './migrations/1792054500276-Phase7AlertsSchedule';
 import { Phase7CurrentSignals1792056820711 } from './migrations/1792056820711-Phase7CurrentSignals';
+import { Phase8aSourceRecordsV21792338213883 } from './migrations/1792338213883-Phase8aSourceRecordsV2';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
@@ -47,7 +50,9 @@ export const ENTITIES = [
   Course,
   Enrollment,
   AttendanceSummary,
+  LmsActivity,
   LmsQuizAttempt,
+  LmsAssignmentSubmission,
   CourseResult,
   Rule,
   RuleVersion,
@@ -68,6 +73,7 @@ const MIGRATIONS = [
   Phase5Alerts1791894767461,
   Phase7AlertsSchedule1792054500276,
   Phase7CurrentSignals1792056820711,
+  Phase8aSourceRecordsV21792338213883,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

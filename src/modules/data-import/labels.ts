@@ -8,7 +8,7 @@ export const ERROR_REASON_LABELS: Record<ImportErrorReason, string> = {
   DUPLICATE: 'Trùng dữ liệu',
   OUT_OF_RANGE: 'Giá trị ngoài phạm vi cho phép',
   TERM_MISMATCH: 'Không khớp học kỳ đã chọn',
-  RESULT_ALREADY_FINAL: 'Kết quả đã có điểm cuối kỳ',
+  COURSE_MISMATCH: 'Không khớp học phần đã chọn',
 };
 
 export function errorReasonLabel(reason: string): string {

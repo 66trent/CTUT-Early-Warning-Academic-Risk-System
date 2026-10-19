@@ -12,7 +12,12 @@ import {
   type StudentEvaluation,
 } from '../evaluator/engine';
 import { maxSeverity } from '../evaluator/helpers';
-import { listTermStudents, loadLmsContexts, loadStudentInputs } from './evaluation-loader';
+import {
+  findPreviousTerm,
+  listTermStudents,
+  loadLmsContexts,
+  loadStudentInputs,
+} from './evaluation-loader';
 import { EVALUATION_CHUNK_SIZE } from './evaluation-run.service';
 import { loadActiveRuleSet, parseCondition } from './rule-config.service';
 
@@ -156,6 +161,7 @@ export async function dryRunRuleVersion(
   const contexts = await buildContexts(em, version, asOf);
   const ruleFilter = version.ruleCode === RISK_SCORE_RULE_CODE ? null : version.ruleCode;
   const tallies = [new SideTally(ruleFilter), new SideTally(ruleFilter)] as const;
+  const previousTerm = await findPreviousTerm(em, term);
   const students = await listTermStudents(em, termId, null);
   const lms = [
     await loadLmsContexts(em, termId, asOf, contexts[0].config.lms),
@@ -164,7 +170,7 @@ export async function dryRunRuleVersion(
   for (let i = 0; i < students.length; i += EVALUATION_CHUNK_SIZE) {
     const ids = students.slice(i, i + EVALUATION_CHUNK_SIZE);
     for (const side of [0, 1] as const) {
-      const inputs = await loadStudentInputs(em, term, ids, asOf, lms[side]);
+      const inputs = await loadStudentInputs(em, { term, previousTerm }, ids, asOf, lms[side]);
       for (const input of inputs) tallies[side].add(evaluateStudent(input, contexts[side]));
     }
   }

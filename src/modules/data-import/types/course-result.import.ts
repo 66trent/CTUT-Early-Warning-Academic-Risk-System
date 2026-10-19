@@ -4,18 +4,14 @@ import { type EntityManager } from 'typeorm';
 import { Course } from '@/db/entities/course.entity';
 import { CourseResult } from '@/db/entities/course-result.entity';
 import { Enrollment } from '@/db/entities/enrollment.entity';
-import { AttemptOutcome, CourseResultStatus, EnrollmentStatus } from '@/db/enums';
+import { AttemptOutcome, EnrollmentStatus } from '@/db/enums';
 import { ensureEnrollments, recomputeAttemptNumbers } from '../services/enrollment-sync';
 import { rollbackSourceRows } from '../services/source-rollback';
-import {
-  isLetterGrade,
-  isPassingLetter,
-  type LetterGrade,
-  letterFromScore,
-} from '../parsing/grade-scale';
+import { isLetterGrade, isPassingLetter, type LetterGrade } from '../parsing/grade-scale';
 import { labelKey, parseDate, parseDecimal, parseInteger } from '../parsing/values';
 import {
   ACADEMIC_OPTIONAL_COLUMNS,
+  ACADEMIC_REQUIRED_COLUMNS,
   type AcademicRowBase,
   checkAcademicReferences,
   pairKey,
@@ -29,29 +25,49 @@ import {
 } from './definition';
 
 export interface CourseResultRow extends AcademicRowBase {
-  credits: number | null;
+  credits: number;
   processScore: number | null;
   examScore: number | null;
-  finalScore: number | null;
-  letterGrade: LetterGrade | null;
-  passed: boolean | null;
-  resultStatus: CourseResultStatus;
+  letterGrade: LetterGrade;
+  passed: boolean;
+  eligibleForExam: boolean | null;
+  absentFromExam: boolean | null;
   /** `YYYY-MM-DD` hoặc null (= lúc nạp). */
   publishedAt: string | null;
 }
 
-const PASS_ALIASES: Record<string, boolean> = {
-  dat: true,
-  khong_dat: false,
+/** Quy đổi điểm chữ → hệ 4 (× 10) để đối chiếu cột `thang_diem_4` (Quy chế 336 — docs/rules/08). */
+const GRADE_POINT_TENTHS: Record<LetterGrade, number> = {
+  'A+': 40,
+  A: 38,
+  'B+': 35,
+  B: 30,
+  'C+': 25,
+  C: 20,
+  'D+': 15,
+  D: 10,
+  F: 0,
+};
+
+/** Ô có/không: `Có`, `x`, `1`, `TRUE` / `Không`, `0`, `FALSE`; trống → null. */
+const YES_NO: Record<string, boolean> = {
+  co: true,
+  x: true,
+  '1': true,
+  true: true,
+  yes: true,
+  khong: false,
+  '0': false,
+  false: false,
+  no: false,
 };
 
 type Failure = ParsedRow<CourseResultRow> & { ok: false };
 const invalid = (detail: string): Failure => ({ ok: false, reason: 'INVALID_FORMAT', detail });
 
 const SCORE_COLUMNS = [
-  ['diem_qua_trinh', 'Điểm quá trình', 'processScore'],
-  ['diem_thi', 'Điểm thi', 'examScore'],
-  ['diem_tong_ket', 'Điểm tổng kết', 'finalScore'],
+  ['diem_thuong_xuyen', 'Điểm thường xuyên', 'processScore'],
+  ['diem_cuoi_ky', 'Điểm cuối kỳ', 'examScore'],
 ] as const;
 type ScoreField = (typeof SCORE_COLUMNS)[number][2];
 
@@ -76,61 +92,45 @@ function parseScores(
   return { ok: true, value };
 }
 
-/** Phần cuối kỳ: điểm chữ (từ nguồn, hoặc quy đổi từ điểm tổng kết), đạt/không đạt, cảnh báo lệch. */
-function parseFinalPart(
-  record: Readonly<Record<string, string>>,
-  finalScore: number | null,
-):
-  | { ok: true; letter: LetterGrade | null; passed: boolean | null; warnings: RowWarning[] }
-  | Failure {
-  const letterText = (record.diem_chu ?? '').trim().toUpperCase();
-  if (letterText && !isLetterGrade(letterText)) {
-    return invalid(
-      `Điểm chữ "${record.diem_chu}" không thuộc thang A+, A, B+, B, C+, C, D+, D, F.`,
-    );
-  }
-  const resultText = labelKey(record.ket_qua ?? '');
-  const passedFromFile = resultText ? PASS_ALIASES[resultText] : null;
-  if (passedFromFile === undefined) return invalid('Kết quả phải là Đạt hoặc Không đạt.');
+function parseYesNo(
+  raw: string | undefined,
+  label: string,
+): { ok: true; value: boolean | null } | Failure {
+  const text = labelKey(raw ?? '');
+  if (!text) return { ok: true, value: null };
+  const value = YES_NO[text];
+  return value === undefined ? invalid(`${label}: ghi Có hoặc Không.`) : { ok: true, value };
+}
 
-  const warnings: RowWarning[] = [];
-  const derived = finalScore !== null ? letterFromScore(finalScore) : null;
-  const letter = (letterText || null) as LetterGrade | null;
-  if (letter && derived && letter !== derived) {
-    warnings.push({
-      code: 'LETTER_GRADE_MISMATCH',
-      message: `Điểm chữ ${letter} lệch điểm tổng kết ${finalScore} (theo thang là ${derived}) — đã nạp theo điểm chữ của file.`,
-    });
-  }
-  const finalLetter = letter ?? derived;
-  const passedFromLetter = finalLetter ? isPassingLetter(finalLetter) : null;
-  if (passedFromFile !== null && passedFromLetter !== null && passedFromFile !== passedFromLetter) {
-    warnings.push({
-      code: 'RESULT_MISMATCH',
-      message: `Kết quả "${record.ket_qua}" lệch điểm chữ ${finalLetter} — đã nạp theo cột kết quả.`,
-    });
-  }
+/** Cột `thang_diem_4` (tùy chọn) chỉ để đối chiếu — lệch quy đổi → cảnh báo, dùng điểm chữ. */
+function gradePointWarning(
+  raw: string | undefined,
+  letter: LetterGrade,
+  decimalComma: boolean,
+): RowWarning | null {
+  const text = (raw ?? '').trim();
+  if (!text) return null;
+  const given = parseDecimal(text, decimalComma || text.includes(','));
+  if (given.ok && Math.round(given.value * 10) === GRADE_POINT_TENTHS[letter]) return null;
   return {
-    ok: true,
-    letter: finalLetter,
-    passed: passedFromFile ?? passedFromLetter,
-    warnings,
+    code: 'GRADE_POINT_MISMATCH',
+    message: `Thang điểm 4 "${text}" khác quy đổi của điểm chữ ${letter} (${GRADE_POINT_TENTHS[letter] / 10}) — hệ thống dùng điểm chữ.`,
   };
 }
+
+const vnMidnight = (date: string) => new Date(`${date}T00:00:00+07:00`);
 
 function sameValues(a: CourseResult, row: CourseResultRow): boolean {
   return (
     a.processScore === row.processScore &&
     a.examScore === row.examScore &&
-    a.finalScore === row.finalScore &&
     a.letterGrade === row.letterGrade &&
     a.passed === row.passed &&
-    a.resultStatus === row.resultStatus &&
+    a.eligibleForExam === row.eligibleForExam &&
+    a.absentFromExam === row.absentFromExam &&
     (row.publishedAt === null || a.publishedAt.getTime() === vnMidnight(row.publishedAt).getTime())
   );
 }
-
-const vnMidnight = (date: string) => new Date(`${date}T00:00:00+07:00`);
 
 /** Kết quả hiện có của các dòng trong học kỳ của lô, theo `mssv|mã học phần`. */
 async function findExistingResults(
@@ -154,7 +154,7 @@ async function findExistingResults(
 /** Cập nhật số tín chỉ học phần từ file (docs/rules/09). */
 async function updateCredits(em: EntityManager, rows: readonly CourseResultRow[]): Promise<void> {
   const credits = new Map<string, number>();
-  for (const row of rows) if (row.credits !== null) credits.set(row.courseId, row.credits);
+  for (const row of rows) credits.set(row.courseId, row.credits);
   if (credits.size === 0) return;
   const courses = await em.find(Course, {
     select: { courseId: true, credits: true },
@@ -169,8 +169,8 @@ async function updateCredits(em: EntityManager, rows: readonly CourseResultRow[]
 }
 
 /**
- * Kết quả FINAL → `attemptOutcome` + `COMPLETED`; outcome đổi → tính lại lần học các học kỳ sau
- * trong CÙNG transaction để thứ tự nạp file không làm sai COMB-02 (docs/rules/10).
+ * Kết quả học phần → `attemptOutcome` + `COMPLETED`; outcome đổi → tính lại lần học các học kỳ
+ * sau trong CÙNG transaction để thứ tự nạp file không làm sai COMB-02 (docs/rules/10).
  */
 async function applyOutcomes(
   em: EntityManager,
@@ -203,80 +203,80 @@ async function applyOutcomes(
 }
 
 /**
- * Kết quả học phần (docs/rules/10, 12): giữa kỳ chỉ có điểm quá trình → PROCESS_ONLY; có điểm
- * tổng kết / điểm chữ / kết quả → FINAL. KHÔNG chuyển FINAL về PROCESS_ONLY. KHÔNG ghi
- * `Student.officialAcademicStatus`.
+ * Kết quả học phần ĐÃ KHÓA ĐIỂM (docs/rules/10, 12 — không còn điểm giữa kỳ, chốt 2026-10-18).
+ * Có kết quả → `attemptOutcome` + `COMPLETED`. KHÔNG ghi `Student.officialAcademicStatus`.
  */
 export const courseResultImport: ImportTypeDefinition<CourseResultRow> = {
   dataType: 'COURSE_RESULT',
   label: 'Kết quả học phần',
   requiresTerm: true,
-  requiredColumns: [
-    'mssv',
-    'ma_hoc_phan',
-    'ten_hoc_phan',
-    'so_tin_chi',
-    'diem_qua_trinh',
-    'diem_thi',
-    'diem_tong_ket',
-    'diem_chu',
-    'ket_qua',
+  requiredColumns: [...ACADEMIC_REQUIRED_COLUMNS, 'ten_hoc_phan', 'so_tin_chi', 'diem_chu'],
+  optionalColumns: [
+    ...ACADEMIC_OPTIONAL_COLUMNS,
+    'diem_thuong_xuyen',
+    'duoc_du_thi',
+    'diem_cuoi_ky',
+    'vang_thi',
+    'thang_diem_4',
+    'ngay_cong_bo',
   ],
-  optionalColumns: ['ngay_cong_bo', ...ACADEMIC_OPTIONAL_COLUMNS],
   templatePath: '/templates/mau_ket_qua_hoc_phan.csv',
 
   parseRow(record, { decimalComma }) {
     const base = parseAcademicBase(record);
     if (!base.ok) return invalid(base.detail);
-    const creditsText = (record.so_tin_chi ?? '').trim();
-    const credits = creditsText ? parseInteger(creditsText) : null;
-    if (credits && !credits.ok) return invalid(`Số tín chỉ: ${credits.message}`);
-    if (credits?.ok && (credits.value < 1 || credits.value > 30)) {
+    const credits = parseInteger(record.so_tin_chi ?? '');
+    if (!credits.ok) return invalid(`Số tín chỉ: ${credits.message}`);
+    if (credits.value < 1 || credits.value > 30) {
       return { ok: false, reason: 'OUT_OF_RANGE', detail: 'Số tín chỉ phải từ 1 đến 30.' };
+    }
+    const letterText = (record.diem_chu ?? '').trim().toUpperCase();
+    if (!isLetterGrade(letterText)) {
+      return invalid(
+        `Điểm chữ "${record.diem_chu ?? ''}" không thuộc thang A+, A, B+, B, C+, C, D+, D, F.`,
+      );
     }
     const scores = parseScores(record, decimalComma);
     if (!scores.ok) return scores;
-    const final = parseFinalPart(record, scores.value.finalScore);
-    if (!final.ok) return final;
+    const eligible = parseYesNo(record.duoc_du_thi, 'Được dự thi');
+    if (!eligible.ok) return eligible;
+    const absent = parseYesNo(record.vang_thi, 'Vắng thi');
+    if (!absent.ok) return absent;
     const publishedText = (record.ngay_cong_bo ?? '').trim();
     const published = publishedText ? parseDate(publishedText) : null;
     if (published && !published.ok) return invalid(`Ngày công bố: ${published.message}`);
-
-    const isFinal = scores.value.finalScore !== null || final.passed !== null;
-    if (!isFinal && scores.value.processScore === null) {
-      return invalid('Dòng chưa có điểm nào (cần điểm quá trình, hoặc điểm tổng kết/kết quả).');
-    }
+    const warning = gradePointWarning(record.thang_diem_4, letterText, decimalComma);
     return {
       ok: true,
       value: {
         ...base.value,
         ...scores.value,
-        credits: credits?.ok ? credits.value : null,
-        letterGrade: final.letter,
-        passed: isFinal ? final.passed : null,
-        resultStatus: isFinal ? CourseResultStatus.FINAL : CourseResultStatus.PROCESS_ONLY,
+        credits: credits.value,
+        letterGrade: letterText,
+        passed: isPassingLetter(letterText),
+        eligibleForExam: eligible.value,
+        absentFromExam: absent.value,
         publishedAt: published?.ok ? published.value : null,
       },
-      warnings: final.warnings,
+      warnings: warning ? [warning] : [],
     };
   },
 
   uniqueKeys: (row) => [pairKey(row)],
 
-  async checkReferences(rows, em, batch) {
-    const errors = await checkAcademicReferences(rows, em, batch);
-    const existing = await findExistingResults(em, batch.termId ?? '', rows);
-    rows.forEach((row, i) => {
-      if (errors.has(i) || row.resultStatus !== CourseResultStatus.PROCESS_ONLY) return;
-      if (existing.get(pairKey(row))?.resultStatus === CourseResultStatus.FINAL) {
-        errors.set(i, {
-          reason: 'RESULT_ALREADY_FINAL',
-          detail: `${row.studentId} · ${row.courseId} đã có kết quả cuối kỳ — không nhận lại điểm giữa kỳ.`,
-        });
-      }
-    });
-    return errors;
+  checkReferences(rows, em, batch, warn) {
+    return checkAcademicReferences(rows, em, batch, warn);
   },
+
+  describe: (row) => ({
+    courseId: row.courseId,
+    courseName: row.courseName,
+    derivedCode: row.derivedCode,
+    sectionCode: row.sectionCode,
+    studentId: row.studentId,
+    credits: row.credits,
+    publishedDate: row.publishedAt,
+  }),
 
   async load(rows, em, batch) {
     const enrollments = await ensureEnrollments(em, batch, rows);
@@ -292,25 +292,22 @@ export const courseResultImport: ImportTypeDefinition<CourseResultRow> = {
       const values = {
         processScore: row.processScore,
         examScore: row.examScore,
-        finalScore: row.finalScore,
         letterGrade: row.letterGrade,
         passed: row.passed,
-        resultStatus: row.resultStatus,
+        eligibleForExam: row.eligibleForExam,
+        absentFromExam: row.absentFromExam,
       };
-      if (row.resultStatus === CourseResultStatus.FINAL) finals.push({ enrollmentId, row });
+      finals.push({ enrollmentId, row });
       const current = existing.get(pairKey(row));
       if (!current) {
         const id = randomUUID();
-        const publishedAt = row.publishedAt ? vnMidnight(row.publishedAt) : now;
         inserts.push({
           id,
           enrollmentId,
           ...values,
           importBatchId: batch.id,
-          publishedAt,
+          publishedAt: row.publishedAt ? vnMidnight(row.publishedAt) : now,
           importedAt: now,
-          processPublishedAt:
-            row.resultStatus === CourseResultStatus.PROCESS_ONLY ? publishedAt : null,
         });
         result.createdKeys.push(id);
       } else if (sameValues(current, row)) {
@@ -324,10 +321,6 @@ export const courseResultImport: ImportTypeDefinition<CourseResultRow> = {
             importBatchId: batch.id,
             importedAt: now,
             ...(row.publishedAt ? { publishedAt: vnMidnight(row.publishedAt) } : {}),
-            // Nạp lại điểm giữa kỳ → cập nhật ngày công bố điểm quá trình; chuyển FINAL → giữ nguyên.
-            ...(row.resultStatus === CourseResultStatus.PROCESS_ONLY
-              ? { processPublishedAt: row.publishedAt ? vnMidnight(row.publishedAt) : now }
-              : {}),
           },
         );
         result.updated += 1;

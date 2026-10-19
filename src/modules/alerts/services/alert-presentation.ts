@@ -3,7 +3,7 @@ export type SignalSource = 'ATTENDANCE' | 'LMS' | 'ACADEMIC' | 'COMBINED';
 
 export const SOURCE_LABELS: Record<SignalSource, string> = {
   ATTENDANCE: 'Điểm danh',
-  LMS: 'Bài kiểm tra LMS',
+  LMS: 'Bài LMS (trắc nghiệm, thực hành)',
   ACADEMIC: 'Kết quả học tập',
   COMBINED: 'Kết hợp nhiều nguồn',
 };
@@ -11,7 +11,7 @@ export const SOURCE_LABELS: Record<SignalSource, string> = {
 /** Nhãn trong câu tóm tắt (giữa câu, chữ thường — giữ nguyên "LMS"). */
 export const SOURCE_INLINE_LABELS: Record<SignalSource, string> = {
   ATTENDANCE: 'điểm danh',
-  LMS: 'bài kiểm tra LMS',
+  LMS: 'bài LMS',
   ACADEMIC: 'kết quả học tập',
   COMBINED: 'kết hợp nhiều nguồn',
 };
@@ -28,38 +28,46 @@ export function sourceOf(ruleCode: string): SignalSource {
 export const STUDENT_SUGGESTIONS: Record<SignalSource, string> = {
   ATTENDANCE:
     'Tham gia đầy đủ các buổi học còn lại; nếu có lý do vắng, hãy trao đổi sớm với giảng viên học phần.',
-  LMS: 'Hoàn thành các bài kiểm tra còn thiếu trên hệ thống học trực tuyến và xem lại phần chưa vững.',
+  LMS: 'Hoàn thành các bài trắc nghiệm, bài thực hành còn thiếu trên hệ thống học trực tuyến và nộp đúng hạn.',
   ACADEMIC: 'Trao đổi với giảng viên học phần hoặc Cố vấn học tập để có kế hoạch ôn tập phù hợp.',
   COMBINED: 'Hẹn gặp Cố vấn học tập để cùng lập kế hoạch học tập cho học kỳ này.',
 };
 
 const EVIDENCE_LABELS: Record<string, string> = {
   snapshotDate: 'Ngày chốt số liệu',
-  absences: 'Số buổi vắng (tính cảnh báo)',
-  excusedAbsence: 'Vắng có phép',
-  unexcusedAbsence: 'Vắng không phép',
-  late: 'Đi trễ',
-  denominator: 'Mẫu số (buổi)',
-  denominatorType: 'Loại mẫu số',
-  totalSessions: 'Số buổi đã học',
+  absences: 'Số tiết vắng (tính cảnh báo)',
+  excusedAbsence: 'Vắng có phép (tiết)',
+  unexcusedAbsence: 'Vắng không phép (tiết)',
+  totalPeriods: 'Tổng số tiết học phần',
   rate: 'Tỷ lệ vắng',
   previousDate: 'Ngày chốt trước',
   previousUnexcused: 'Vắng không phép (lần trước)',
   latestDate: 'Ngày chốt gần nhất',
   latestUnexcused: 'Vắng không phép (gần nhất)',
-  increase: 'Mức tăng',
+  increase: 'Mức tăng (tiết)',
   days: 'Số ngày giữa 2 lần chốt',
-  missedCount: 'Số bài đến hạn bị bỏ',
+  missedCount: 'Số bài trắc nghiệm bị bỏ',
   dueCount: 'Số bài đã đến hạn',
-  missedQuizzes: 'Mã bài bị bỏ',
-  processScore: 'Điểm quá trình',
-  threshold: 'Ngưỡng',
+  missedQuizzes: 'Bài bị bỏ',
+  missingCount: 'Số bài thực hành không nộp',
+  missingAssignments: 'Bài không nộp',
+  lateCount: 'Số bài nộp trễ',
+  letterGrade: 'Điểm chữ',
+  eligibleForExam: 'Được dự thi',
+  absentFromExam: 'Vắng thi',
   publishedAt: 'Ngày công bố',
-  failedCount: 'Số học phần không đạt',
+  failedCredits: 'Tín chỉ không đạt',
   failedCourses: 'Học phần không đạt',
   gpa4: 'Điểm trung bình hệ 4',
   credits: 'Số tín chỉ',
-  groups: 'Nhóm nguồn',
+  threshold: 'Ngưỡng',
+  firstTerm: 'Học kỳ đầu khóa',
+  missingResults: 'Học phần chưa có kết quả',
+  previousTermId: 'Học kỳ trước',
+  previousGpa4: 'Điểm trung bình học kỳ trước',
+  previousLevel: 'Mức học kỳ trước',
+  level: 'Mức học kỳ này',
+  groups: 'Nguồn',
   rules: 'Luật liên quan',
   attemptNumber: 'Lần học',
   failedTerms: 'Học kỳ đã không đạt',
@@ -73,7 +81,7 @@ function formatValue(key: string, value: string | number | boolean | null): stri
   if (value === null) return '—';
   if (key === 'rate' && typeof value === 'number')
     return `${(Math.round(value * 1000) / 10).toLocaleString('vi-VN')}%`;
-  if (key === 'denominatorType') return value === 'PLANNED' ? 'Buổi theo kế hoạch' : 'Buổi đã học';
+  if (typeof value === 'boolean') return value ? 'Có' : 'Không';
   if (typeof value === 'number') return (Math.round(value * 100) / 100).toLocaleString('vi-VN');
   return String(value);
 }

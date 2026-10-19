@@ -47,7 +47,7 @@ function severityOf(ruleCode: string, condition: unknown): Severity {
   return def ? def.maxSeverity(condition) : Severity.LOW;
 }
 
-/** Nạp phiên bản ACTIVE của 10 luật + RISK-SCORE. Chỉ đọc RuleVersion ACTIVE (docs/rules/11). */
+/** Nạp phiên bản ACTIVE của 12 luật + RISK-SCORE. Chỉ đọc RuleVersion ACTIVE (docs/rules/11). */
 export async function loadActiveRuleSet(em: EntityManager): Promise<ActiveRuleSet> {
   const versions = await em.find(RuleVersion, { where: { status: RuleStatus.ACTIVE } });
   const activeRules = new Map<string, ActiveRule>();
@@ -69,7 +69,7 @@ export async function loadActiveRuleSet(em: EntityManager): Promise<ActiveRuleSe
 }
 
 /**
- * Seed 10 luật + RISK-SCORE với ngưỡng mặc định của docs/rules/08 (idempotent: luật đã có
+ * Seed 12 luật + RISK-SCORE với ngưỡng mặc định của docs/rules/08 (idempotent: luật đã có
  * phiên bản thì giữ nguyên). Phiên bản 1 ACTIVE, `lastDryRunAt` = lúc seed (docs/rules/11).
  */
 export async function seedRules(em: EntityManager, actorId: string): Promise<number> {
