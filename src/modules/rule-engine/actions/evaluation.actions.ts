@@ -3,8 +3,13 @@
 import { EvaluationTrigger, UserRole } from '@/db/enums';
 import { runAction } from '@/lib/action';
 import { AppError, type ActionResult } from '@/lib/errors';
-import { requestEvaluation } from '../services/evaluation-run.service';
-import { requestEvaluationSchema } from '../validators/evaluation';
+import {
+  listTermMissingResults,
+  type MissingResultDto,
+  requestEvaluation,
+  requestTermClosing,
+} from '../services/evaluation-run.service';
+import { closeTermSchema, requestEvaluationSchema, termOnlySchema } from '../validators/evaluation';
 import { resolveAsOf } from './as-of';
 
 /**
@@ -30,5 +35,37 @@ export async function requestEvaluationAction(
       if (!runId) throw new AppError('RUN_IN_PROGRESS', 'Đang có lần chạy cho học kỳ này.');
       return { runId };
     },
+  });
+}
+
+/** Hộp thoại "Chốt học kỳ": sinh viên còn học phần chưa có kết quả (docs/rules/08). */
+export async function termMissingResultsAction(
+  raw: unknown,
+): Promise<ActionResult<MissingResultDto[]>> {
+  return runAction(raw, {
+    roles: [UserRole.ADMIN],
+    schema: termOnlySchema,
+    run: ({ termId }) => listTermMissingResults(termId),
+  });
+}
+
+/**
+ * Chốt học kỳ = lần chạy đánh giá cuối `TERM_CLOSING`; chạy xong hệ thống đặt `closedAt`.
+ * Mốc trong quá khứ chỉ khi DEMO_MODE (`resolveAsOf`). Audit Log ghi trong service.
+ */
+export async function requestTermClosingAction(
+  raw: unknown,
+): Promise<ActionResult<{ runId: string }>> {
+  return runAction(raw, {
+    roles: [UserRole.ADMIN],
+    schema: closeTermSchema,
+    revalidate: ['/'],
+    run: async (input, user) => ({
+      runId: await requestTermClosing({
+        termId: input.termId,
+        asOf: resolveAsOf(input.asOfDate || undefined),
+        actorId: user.userId,
+      }),
+    }),
   });
 }

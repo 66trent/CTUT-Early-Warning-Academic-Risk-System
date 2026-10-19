@@ -1,47 +1,45 @@
 import { z } from 'zod';
-import { CourseResultStatus, RuleGroup, Severity } from '@/db/enums';
-import { formatNumber, severitySchema, tenths, vnDateKey } from '../helpers';
+import { RuleGroup, Severity } from '@/db/enums';
+import { formatVnDate, severitySchema, vnDateKey } from '../helpers';
 import { type CourseRule } from '../types';
 
-const conditionSchema = z.object({
-  /** Điểm quá trình (thang 10) dưới mức này thì kích hoạt — `< threshold`. */
-  threshold: z.number().gt(0).max(10),
-  severity: severitySchema,
-});
+const conditionSchema = z.object({ severity: severitySchema });
 export type Aca01Condition = z.infer<typeof conditionSchema>;
 
 /**
- * ACA-01 — Điểm quá trình thấp, trước kỳ thi (docs/rules/08). Chỉ xét `PROCESS_ONLY`;
- * khi kết quả chuyển FINAL, luật không xét nữa. So sánh theo phần mười (số nguyên).
+ * ACA-01 — Không đạt học phần (docs/rules/08): xét Enrollment đã có kết quả (`COMPLETED`) — báo
+ * ngay khi học phần khóa điểm, không chờ hết học kỳ. Lý do nêu "không được dự thi" / "vắng thi".
  */
 export const aca01: CourseRule<Aca01Condition> = {
   kind: 'PER_COURSE',
   stage: 'BASE',
+  appliesTo: 'COMPLETED',
   meta: {
     ruleCode: 'ACA-01',
-    ruleName: 'Điểm quá trình thấp',
+    ruleName: 'Không đạt học phần',
     ruleGroup: RuleGroup.ACADEMIC,
     scope: 'PER_COURSE',
     priority: 60,
+    signal: 'ACADEMIC',
     requires: null,
   },
   conditionSchema,
-  defaultCondition: { threshold: 5, severity: Severity.HIGH },
+  defaultCondition: { severity: Severity.HIGH },
   maxSeverity: (c) => c.severity,
 
   evaluate({ facts }, c) {
     const r = facts.result;
-    if (r?.resultStatus !== CourseResultStatus.PROCESS_ONLY || r.processScore === null) {
-      return { hit: null };
-    }
-    if (tenths(r.processScore) >= tenths(c.threshold)) return { hit: null };
+    if (!r || r.passed) return { hit: null };
+    const cause =
+      r.eligibleForExam === false ? ' — không được dự thi' : r.absentFromExam ? ' — vắng thi' : '';
     return {
       hit: {
         severity: c.severity,
-        reason: `Điểm quá trình ${formatNumber(r.processScore, 1)} dưới ${formatNumber(c.threshold, 1)} (công bố ${vnDateKey(r.publishedAt)}).`,
+        reason: `Không đạt học phần: điểm ${r.letterGrade}${cause} (công bố ${formatVnDate(r.publishedAt)}).`,
         inputSnapshot: {
-          processScore: r.processScore,
-          threshold: c.threshold,
+          letterGrade: r.letterGrade,
+          eligibleForExam: r.eligibleForExam,
+          absentFromExam: r.absentFromExam,
           publishedAt: vnDateKey(r.publishedAt),
         },
       },

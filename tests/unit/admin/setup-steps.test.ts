@@ -12,7 +12,7 @@ const SEEDED: SetupCounts = {
   currentTerm: null,
   attendanceRows: 0,
   lmsRows: 0,
-  processResults: 0,
+  assignmentRows: 0,
   finalResults: 0,
   completedRuns: 0,
   alerts: 0,
@@ -36,7 +36,6 @@ describe('Trang "Bắt đầu" — checklist theo Quy trình vận hành (docs/r
       'term',
       'attendance',
       'lms',
-      'process-results',
       'evaluation',
       'advisor-handling',
       'final-results',
@@ -80,7 +79,7 @@ describe('Trang "Bắt đầu" — checklist theo Quy trình vận hành (docs/r
       ...base,
       attendanceRows: 30,
       lmsRows: 40,
-      processResults: 12,
+      assignmentRows: 12,
       completedRuns: 1,
       alerts: 10,
       waitingAlerts: 3,
@@ -88,7 +87,7 @@ describe('Trang "Bắt đầu" — checklist theo Quy trình vận hành (docs/r
     expect(stepOf(evaluated, 'evaluation').done).toBe(true);
     expect(stepOf(evaluated, 'advisor-handling')).toMatchObject({ done: false, next: true });
     expect(stepOf({ ...evaluated, waitingAlerts: 0 }, 'advisor-handling').done).toBe(true);
-    expect(stepOf(evaluated, 'close-term').blockedReason).toMatch(/cuối kỳ/);
+    expect(stepOf(evaluated, 'close-term').blockedReason).toMatch(/kết quả học phần/);
   });
 
   it('học kỳ đã chốt → bước chốt xong; không nhập thêm dữ liệu học tập', () => {

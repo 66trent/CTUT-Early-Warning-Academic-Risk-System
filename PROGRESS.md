@@ -92,3 +92,12 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - DoD máy sạch: clone mới từ GitHub → làm đúng README (npm ci, docker compose up --build, db:init, migration:run, seed, demo:reset --evaluate) trên stack Docker riêng → đúng 12 cảnh báo, Playwright 2/2, kịch bản 08 nạp 2 đợt đúng kết quả.
 - Còn lại: ẩn danh hóa sinh viên (hoãn); TLS/Google OAuth khi triển khai thật.
 - Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md`; `npm run demo:scenario -- 8 --evaluate` rồi đọc `docs/demo-data/kich-ban/08-vong-doi-canh-bao/README.md`.
+
+## Phase 8a — Điều chỉnh theo dữ liệu thật của trường (2026-10-19)
+
+- Căn cứ: `docs/doi-soat-du-lieu-truong.md` (ảnh hệ thống trường + Quy chế 336). Rules `00`, `08`–`12` viết lại; 12 luật: ATT-01/02 (theo tiết), LMS-01–04 (trắc nghiệm + bài thực hành có hạn nộp), ACA-01–04 (Điều 11, A = 3,8, ACA-04 so học kỳ trước), COMB-01/02. Bỏ ATT-03 và điểm giữa kỳ.
+- Dữ liệu: sao lưu `backups/before-phase8a-20261018.dump` rồi migration làm sạch; bảng mới `lms_activities`, `lms_assignment_submissions`; điểm danh theo tiết; kết quả có được dự thi / vắng thi; `Enrollment.sectionCode`; chốt học kỳ = lần chạy `TERM_CLOSING` rồi mới `closedAt`.
+- Nhập: 5 mẫu file mới, mã học phần tự suy từ mã lớp học phần, cảnh báo sai tên / đổi hạn nộp / lệch thang điểm 4, chọn học phần tùy chọn (`COURSE_MISMATCH`), thẻ nhận diện học phần ở màn xem trước, tự tìm dòng tiêu đề.
+- Demo v2: lớp KTPM2411, 20 SV giả, 3 môn, HK1 2025–2026, 3 mốc → 10/13/16 cảnh báo (`KET_QUA_MONG_DOI.md`). Demo cũ + 8 kịch bản lưu ở `_luu-tru-v1/` (viết lại Phase 9).
+- Kiểm tra: typecheck, lint, format, migration:check, 365 test, build — xanh. Kiểm tay 3 mục DoD đạt. Playwright chưa sửa (8b).
+- Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → Admin → Nhập dữ liệu → mở lô điểm danh (thẻ học phần, cảnh báo sai tên) → GV001 xem KTPM2411908 (LMS-03) → Admin → Học kỳ → Chốt học kỳ (mốc 2025-12-31).

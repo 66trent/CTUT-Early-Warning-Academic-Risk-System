@@ -4,7 +4,7 @@
 >
 > Nguồn sự thật: `docs/rules/00`–`12`. Bộ dữ liệu nghiệm thu: `docs/demo-data/` + `KET_QUA_MONG_DOI.md`. Bài học từ dự án cũ: `docs/bai-hoc-du-an-cu.md` — đọc trước Phase 0.
 >
-> Phạm vi: 3 role; nhập CSV từ 3 nguồn (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần) + danh sách sinh viên; 10 luật trong `08`. Ngoài phạm vi: API đồng bộ SIS/LMS, SMS, lịch học từng buổi, đăng ký học phần riêng.
+> Phạm vi: 3 role; nhập CSV từ 3 nguồn (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần) + danh sách sinh viên; 10 luật trong `08` (từ Phase 8a: 12 luật, LMS tách bài trắc nghiệm / bài thực hành). Ngoài phạm vi: API đồng bộ SIS/LMS, SMS, lịch học từng buổi, đăng ký học phần riêng.
 
 ## Nguyên tắc mỗi vòng lặp
 
@@ -27,6 +27,9 @@
 | 5 | Cảnh báo, giao diện CVHT và sinh viên | 4 |
 | 6 | Quản trị và vận hành | 5 |
 | 7 | Hoàn thiện và demo | 6 |
+| 8a | Điều chỉnh theo dữ liệu thật: quy chế 336, mẫu file, 12 luật | 7 |
+| 8b | Giao diện trực quan + nạp nhiều file | 8a |
+| 9 | Mở rộng dữ liệu demo: thêm môn, lớp, khoa, học kỳ trước; kịch bản nhỏ | 8b |
 
 ---
 
@@ -141,3 +144,50 @@ Làm trước (chốt 2026-10-15, chạy lại nghiệm thu sau khi xong):
 - [x] Kịch bản demo theo `KET_QUA_MONG_DOI.md`, phủ MỌI tình huống hệ thống đáp ứng được: 1 kịch bản chính (bộ demo hiện tại, trình bày 10 phút) + nhiều kịch bản nhỏ ở `docs/demo-data/kich-ban/NN-ten/` (file dữ liệu + các bước + kết quả mong đợi riêng; dùng chung lớp KTPM2311/KHMT2311 + GV001/GV002, mỗi kịch bản 1 dải MSSV riêng để nạp chồng không đụng nhau; mỗi kịch bản 1 test nghiệm thu); `docs/demo-script.md` có mục "hội đồng hỏi X → mở kịch bản Y"; `docs/demo-script.md`; lệnh `npm run demo:reset`; ảnh chụp màn hình; bảng số liệu hiệu năng. (Sinh viên đăng nhập bằng đăng nhập nhanh demo; ẩn danh hóa vẫn hoãn — ghi là hướng phát triển.)
 
 **DoD:** build production chạy từ máy sạch theo README; demo trọn kịch bản không lỗi.
+
+## Phase 8a — Điều chỉnh theo dữ liệu thật của trường (chốt 2026-10-18)
+
+Căn cứ: `docs/doi-soat-du-lieu-truong.md` (mục "Đã chốt", 6, 6b, 9) + Quy chế 336/QĐ-ĐHKTCN. Thứ tự bắt buộc: rules → kết quả mong đợi + dữ liệu demo → code → test.
+
+Chuẩn bị:
+- [x] Sao lưu `pg_dump` vào `backups/before-phase8-*.dump`; hỏi xác nhận lần cuối → làm sạch dữ liệu học tập (`Course`, `Enrollment`, 3 nguồn, `ImportBatch`), cảnh báo, can thiệp, thông báo, lần chạy, trigger, `RiskScoreLog`, `Rule`/`RuleVersion`. Giữ tài khoản, khoa, lớp, sinh viên, học kỳ, Audit Log.
+
+Rules và tài liệu (làm trước code, báo người dùng đã đổi gì):
+- [x] `00`: 12 luật, 1 năm 3 học kỳ chính (không có hè), sửa thứ tự dữ liệu (kết quả chỉ nạp khi học phần khóa điểm). `CLAUDE.md`, `HANDOFF` "10 luật" → 12.
+- [x] `08`: viết lại theo mục 6 file đối soát — A = 3,8 (so sánh phần mười); ATT-01/02 theo tiết, bỏ `minSessions`, bỏ ATT-03; LMS-01 theo `dueAt` (thiếu thì cách cũ), LMS-03, LMS-04; ACA-01 không đạt học phần; ACA-02 % tín chỉ; ACA-03 2 mức + học kỳ đầu khóa; ACA-04 so học kỳ liền trước (tính từ dữ liệu, thiếu → không xét); COMB-01 3 nhóm (điểm danh / trắc nghiệm / thực hành); điều kiện "đủ kết quả học kỳ" + lần chạy cuối khi chốt; RiskScore học lực = ĐTB học kỳ trước khi kỳ này chưa có kết quả. Phân biệt ngưỡng quy chế với ngưỡng báo sớm do nhóm đề xuất. Cập nhật "Giới hạn đã biết".
+- [x] `09`: học kỳ đầu khóa = `HK1_{AdministrativeClass.cohortYear}` (lớp đã có khóa — không thêm cột `khoa` ở file sinh viên); `Enrollment.sectionCode`; 3 học kỳ chính.
+- [x] `10`: `AttendanceSummary` theo tiết (`totalPeriods` bắt buộc, `excusedAbsence`, `unexcusedAbsence`; bỏ `present`, `late`, `totalSessions`); bảng mới `LmsActivity` (học phần × học kỳ × `activityKey`, `activityType` QUIZ/ASSIGNMENT, tên, `dueAt`); `LmsQuizAttempt` trỏ `LmsActivity`, thêm `correctCount`, `totalQuestions`; bảng mới `LmsAssignmentSubmission` (`status` ON_TIME/LATE/NOT_SUBMITTED, `submittedAt`); `CourseResult` chỉ `FINAL`, thêm `eligibleForExam`, `absentFromExam`; bỏ `processPublishedAt`.
+- [x] `11`: seed 12 luật + `condition` mặc định; `EvaluationRun` thêm cờ lần chạy cuối khi chốt học kỳ.
+- [x] `12`: cột 5 mẫu theo mục 6b; loại nhập mới `LMS_ASSIGNMENT`; `ma_hoc_phan` suy từ `ma_lop_hoc_phan` bỏ 2 số cuối; cảnh báo `NAME_MISMATCH` (`ho_dem` + `ten` lệch tên hệ thống sau bỏ dấu), `DUE_DATE_CHANGED`, `GRADE_POINT_MISMATCH` (`thang_diem_4` lệch điểm chữ), `ABSENCE_RATE_MISMATCH`; lỗi hạn nộp lệch trong 1 file; lỗi `COURSE_MISMATCH` (khi Admin chọn học phần); form nạp + thẻ nhận diện; trạng thái Moodle tiếng Việt/Anh; tự tìm dòng tiêu đề trong 10 dòng đầu.
+- [x] Lưu trữ 5 file demo cũ + 8 kịch bản vào `docs/demo-data/_luu-tru-v1/` (định dạng cũ, không nạp được), tắt test của chúng; viết lại ở phase mở rộng dữ liệu.
+- [x] **Bộ dữ liệu v2 — giai đoạn 1 (chốt 2026-10-18): 1 khoa (K.CNTT), 1 lớp (KTPM2411, CVHT GV001), 3 môn, 1 học kỳ, ~20 sinh viên.** Môn chính Logic học (mã lớp học phần `010100240802` như ảnh 1, 45 tiết, tỷ lệ 40/60) + 2 môn khác (Ngôn ngữ lập trình 1 theo ảnh 2 + 1 môn nữa) — tên/mã/tín chỉ/số tiết 2 môn còn lại: người dùng cung cấp, không có thì dùng giá trị giả định ghi rõ "demo". Mỗi môn đủ 4 nguồn (điểm danh, trắc nghiệm, thực hành, kết quả). Họ tên giả; MSSV dải `KTPM2411901`–`KTPM2411920` (tránh trùng MSSV thật trong ảnh). Đăng nhập nhanh demo đổi sang 2 sinh viên mới. `KET_QUA_MONG_DOI.md` viết lại trước code: phủ mọi luật chạy được trong 1 học kỳ (ATT-01/02, LMS-01–04, ACA-01–03, COMB-01) + chốt học kỳ thiếu kết quả. ACA-04 và COMB-02 cần học kỳ trước → chỉ test đơn vị ở 8a, nghiệm thu khi mở rộng.
+
+Code:
+- [x] Migration (sau khi làm sạch): cấu trúc mới ở `09`–`11`; xóa câu `CREATE TYPE` trùng (bẫy #13); `migration:check` sạch.
+- [x] Nhập dữ liệu: 5 loại theo `12`; mẫu CSV + `.xlsx` (`npm run templates:build`); màn xem trước hiện họ tên tra từ danh sách sinh viên và mã học phần tự suy.
+- [x] Form nạp rõ ngữ cảnh (chốt 2026-10-18): Học kỳ + Loại dữ liệu (bắt buộc) + **Học phần (tùy chọn, mặc định "tự nhận diện từ file")** — chọn 1 học phần thì dòng thuộc học phần khác báo lỗi `COURSE_MISMATCH`. KHÔNG chọn khoa/lớp sinh hoạt khi nạp (1 lớp học phần có sinh viên nhiều lớp, nhiều khoa — chọn trước sẽ bỏ sót). Màn xem trước có **thẻ nhận diện** cho từng học phần trong file: tên + mã lớp học phần + mã học phần (tự suy), số tiết / bài + hạn nộp / ngày chốt (so với lần nạp trước), số sinh viên chia theo lớp sinh hoạt và khoa, nhãn "khớp học kỳ" / "học phần mới, sẽ tạo", số dòng lỗi / cảnh báo; nút xác nhận ghi rõ số dòng. Lịch sử nạp thêm cột Học phần (lọc theo học phần/khoa: chuyển sang 8b cùng màn nạp nhiều file).
+- [x] Rule engine: sửa/thêm/xóa file luật + registry, `facts.ts` (tiết, `LmsActivity`, bài thực hành tại `asOf`, ĐTB học kỳ trước), `risk-score.ts`; form cấu hình luật tự sinh cho luật mới; nhãn `labels.ts`.
+- [x] Chốt học kỳ: hộp thoại liệt kê sinh viên thiếu kết quả → xác nhận → lần chạy cuối (ACA-02/03/04 trên môn đã có, lý do "thiếu N môn") → `closedAt` (Audit Log).
+- [x] Giao diện tối thiểu cho dữ liệu mới: hồ sơ / trang sinh viên hiện tiết vắng, bài trắc nghiệm + thực hành, kết quả có điểm chữ / hệ 4; bỏ chỗ hiện "điểm quá trình".
+- [x] Test: mỗi luật 4 ca (kích hoạt, sát ngưỡng, ngoại lệ, thiếu dữ liệu) — kèm ca A = 3,8 sát ngưỡng 2,0 / 1,0 / 0,8; ACA-04 thiếu học kỳ trước; bài thực hành tại `asOf` trước/sau hạn; nghiệm thu `KET_QUA_MONG_DOI.md` bộ v2 giai đoạn 1.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` xanh; nghiệm thu khớp 100%; `npm run demo:reset -- --yes --evaluate` ra đúng danh sách cảnh báo mới. **Kiểm tra tay:** nạp file mẫu có 1 dòng sai tên → thấy cảnh báo "có thể sai MSSV"; nạp bài thực hành có 1 sinh viên chưa nộp quá hạn → CVHT thấy LMS-03; chốt học kỳ còn sinh viên thiếu kết quả → thấy danh sách, xác nhận → lần chạy cuối có ACA-03.
+
+**Kết quả (2026-10-19):** đạt DoD — typecheck, lint, format, migration:check, 365 test, build xanh; `demo:reset --evaluate` ra đúng 10 → 13 → 16 cảnh báo; kiểm tay: cảnh báo sai tên ở lô điểm danh, CVHT thấy LMS-03 của KTPM2411908, hộp thoại chốt học kỳ liệt kê KTPM2411919 → lần chạy cuối 19 dấu hiệu, học kỳ đã chốt. Đổi so với kế hoạch: không thêm cột `khoa` (dùng khóa của lớp sinh hoạt); bộ demo chuyển sang HK1 2025–2026 (chế độ demo không cho chọn mốc tương lai).
+
+## Phase 8b — Giao diện trực quan và nạp nhiều file
+
+- [ ] Nạp nhiều file 1 lần (cùng loại, cùng học kỳ) → 1 lô: xem trước tóm tắt từng file (lớp học phần, số sinh viên, ngày chốt / bài), dòng lỗi ghi tên file + số dòng; giới hạn tổng 50.000 dòng / 20MB mỗi file như cũ.
+- [ ] Trang sinh viên: bỏ nhãn "Ổn định"; mỗi học phần thanh tiến độ vắng so với vạch 20%, bài trắc nghiệm / thực hành đã nộp / quá hạn — số liệu thật, cảnh báo vẫn chỉ hiện sau khi CVHT xác nhận (`07`).
+- [ ] Danh sách CVHT: cột lý do = câu nguyên nhân nặng nhất; tìm kiếm; lọc lớp / mức / nguồn; thẻ đếm Cần xử lý / Đang theo dõi / Đã xong; nhãn "quá 7 ngày chưa xử lý".
+- [ ] Ma trận lớp × học phần cho CVHT (ô màu theo mức, bấm ô mở chi tiết).
+- [ ] Hồ sơ sinh viên: dòng thời gian (nạp, cảnh báo, can thiệp), biểu đồ tỷ lệ vắng theo ngày chốt, ĐTB các học kỳ, biểu tượng 3 nguồn theo mức.
+- [ ] Tổng quan Admin: thay "Sĩ số theo lớp" bằng cảnh báo theo nguồn, theo lớp/khoa, xu hướng theo tuần, top học phần nhiều cảnh báo, tỷ lệ đã xử lý.
+- [ ] Trang nhập: bảng "tuần này học phần nào chưa có điểm danh / LMS".
+- [ ] Cập nhật `03`/`07` nếu đổi quy ước giao diện; chụp lại ảnh (`npm run screenshots`); sửa Playwright 2 luồng; `docs/demo-script.md`.
+
+**DoD:** toàn bộ test + `build` xanh; Playwright 2 luồng chạy được. **Kiểm tra tay:** 3 kích thước màn hình + dark mode; nạp 3 file điểm danh 1 lần; CVHT tìm được 1 sinh viên bằng ma trận lớp trong ≤ 2 click.
+
+## Phase 9 — Mở rộng dữ liệu demo (chưa lập chi tiết)
+
+- [ ] Từ bộ v2 giai đoạn 1: thêm học kỳ trước (có môn rớt → học lại, nghiệm thu ACA-04, COMB-02), thêm môn, lớp, khoa; viết lại các kịch bản nhỏ từ `_luu-tru-v1/` theo luật mới, mỗi kịch bản 1 test nghiệm thu; cập nhật `docs/demo-script.md`.

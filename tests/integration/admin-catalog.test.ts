@@ -19,12 +19,11 @@ import {
   listClasses,
   listDepartments,
 } from '@/modules/admin/services/class.service';
+import { createTerm, listTerms, setCurrentTerm } from '@/modules/admin/services/term.service';
 import {
-  closeTerm,
-  createTerm,
-  listTerms,
-  setCurrentTerm,
-} from '@/modules/admin/services/term.service';
+  processEvaluationRun,
+  requestTermClosing,
+} from '@/modules/rule-engine/services/evaluation-run.service';
 import { cleanupIdentityFixtures, createIdentityFixtures, FX } from '../helpers/identity-fixtures';
 
 /** Học kỳ thử dùng năm 2091–2093 để không đụng dữ liệu thật/demo. */
@@ -37,6 +36,7 @@ async function cleanupTerms() {
   await ds.query(
     `DELETE FROM audit_logs WHERE target_type = 'Term' AND target_id LIKE 'HK%\\_209%'`,
   );
+  await ds.query(`DELETE FROM evaluation_runs WHERE ${TEST_TERM_FILTER}`);
   await ds.query(`DELETE FROM terms WHERE ${TEST_TERM_FILTER}`);
 }
 
@@ -110,13 +110,23 @@ describe('Học kỳ — tối đa 1 học kỳ hiện tại', () => {
     await expect(createTerm(term(1, 2092), ACTOR)).rejects.toMatchObject({ code: 'TERM_EXISTS' });
   });
 
-  it('chốt học kỳ: không chốt lại được, không đặt làm hiện tại được', async () => {
+  it('chốt học kỳ = lần chạy đánh giá cuối rồi mới chốt; không chốt lại được, không đặt làm hiện tại được', async () => {
     await createTerm(term(1, 2093), ACTOR);
-    const closed = await closeTerm('HK1_2093', ACTOR);
-    expect(closed.closedAt).not.toBeNull();
-    await expect(closeTerm('HK1_2093', ACTOR)).rejects.toMatchObject({
-      code: 'TERM_ALREADY_CLOSED',
-    });
+    const noEnqueue = () => Promise.resolve();
+    const runId = await requestTermClosing(
+      { termId: 'HK1_2093', asOf: new Date(), actorId: ACTOR },
+      noEnqueue,
+    );
+    expect(
+      (await ds.getRepository(Term).findOneByOrFail({ termId: 'HK1_2093' })).closedAt,
+    ).toBeNull();
+    await processEvaluationRun(runId, noEnqueue);
+    expect(
+      (await ds.getRepository(Term).findOneByOrFail({ termId: 'HK1_2093' })).closedAt,
+    ).not.toBeNull();
+    await expect(
+      requestTermClosing({ termId: 'HK1_2093', asOf: new Date(), actorId: ACTOR }, noEnqueue),
+    ).rejects.toMatchObject({ code: 'TERM_CLOSED' });
     await expect(setCurrentTerm('HK1_2093', ACTOR)).rejects.toMatchObject({ code: 'TERM_CLOSED' });
   });
 

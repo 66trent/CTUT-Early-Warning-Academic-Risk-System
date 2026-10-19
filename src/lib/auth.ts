@@ -29,7 +29,7 @@ const ADVISOR_SIGN_UP_PATH = '/sign-up/email';
 
 /** Tài khoản demo đăng nhập nhanh — chỉ khi DEMO_MODE=true (docs/rules/06). */
 /** 2 sinh viên demo đăng nhập không cần Google (người dùng chốt 2026-10-13, docs/rules/06). */
-export const DEMO_STUDENT_ACCOUNTS = ['KTPM2311003', 'KTPM2311001'] as const;
+export const DEMO_STUDENT_ACCOUNTS = ['KTPM2411903', 'KTPM2411901'] as const;
 export const DEMO_ACCOUNTS = ['ADMIN', 'GV001', 'GV002', ...DEMO_STUDENT_ACCOUNTS] as const;
 export type DemoAccount = (typeof DEMO_ACCOUNTS)[number];
 

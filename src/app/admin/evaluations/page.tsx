@@ -34,7 +34,7 @@ export default async function EvaluationsPage({ searchParams }: EvaluationsPageP
       <AutoRefresh active={busy} />
       <PageHeader
         title="Chạy đánh giá"
-        description="Áp dụng 10 luật cảnh báo và tính điểm rủi ro trên dữ liệu đã nạp. Hệ thống tự chạy sau mỗi lần nạp dữ liệu học tập và mỗi đêm (chế độ demo: chỉ chạy khi Admin bấm)."
+        description="Áp dụng 12 luật cảnh báo và tính điểm rủi ro trên dữ liệu đã nạp. Hệ thống tự chạy sau mỗi lần nạp dữ liệu học tập và mỗi đêm (chế độ demo: chỉ chạy khi Admin bấm)."
       />
 
       <Card className="shadow-sm">

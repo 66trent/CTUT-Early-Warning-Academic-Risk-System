@@ -200,3 +200,31 @@ export async function openRowSource(kind: ImportFileKind, stream: Readable): Pro
   const source = kind === 'csv' ? await openCsv(stream) : await openXlsx(stream);
   return { ...source, rows: limitRows(source.rows) };
 }
+
+/** Số dòng đầu file được dò để tìm dòng tiêu đề (docs/rules/12). */
+export const HEADER_SCAN_ROWS = 10;
+
+/**
+ * Dòng tiêu đề = dòng đầu tiên trong 10 dòng đầu có đủ cột bắt buộc `isHeader` — để dán cả vùng
+ * bảng có dòng tiêu đề phụ phía trên (VD tên lớp học phần). Các dòng trước tiêu đề bị bỏ qua;
+ * số dòng báo lỗi vẫn là số dòng thật trong file.
+ */
+export async function locateHeader(
+  source: RowSource,
+  isHeader: (headers: string[]) => boolean,
+): Promise<RowSource> {
+  if (isHeader(source.headers)) return source;
+  const iterator = source.rows[Symbol.asyncIterator]();
+  for (let i = 1; i < HEADER_SCAN_ROWS; i += 1) {
+    const next = await iterator.next();
+    if (next.done) break;
+    if (isHeader(next.value.values)) {
+      return {
+        ...source,
+        headers: next.value.values,
+        rows: { [Symbol.asyncIterator]: () => iterator },
+      };
+    }
+  }
+  return source;
+}

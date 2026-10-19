@@ -11,7 +11,7 @@ import { requestEvaluationAfterImport } from '@/modules/rule-engine/services/eva
 import { FileRejectedError } from '../parsing/errors';
 import { type ImportFileKind } from '../parsing/file-sniff';
 import { buildHeaderMap, type HeaderMap, missingColumns } from '../parsing/headers';
-import { openRowSource, type RawRow } from '../parsing/row-reader';
+import { locateHeader, openRowSource, type RawRow } from '../parsing/row-reader';
 import {
   type ImportTypeDefinition,
   type LoadResult,
@@ -19,6 +19,7 @@ import {
   type RowWarning,
 } from '../types/definition';
 import { getImportDefinition } from '../types/registry';
+import { addToCard, buildCourseCards, type CardAccumulators } from './import-cards';
 import {
   type ImportSummary,
   MAX_WARNINGS,
@@ -45,6 +46,8 @@ interface PassResult {
   /** Cảnh báo không chặn nạp của các dòng hợp lệ (tối đa MAX_WARNINGS). */
   warnings: ImportWarning[];
   load: LoadResult;
+  /** Thẻ nhận diện học phần (cộng dồn) — chỉ loại học tập. */
+  cards: CardAccumulators;
 }
 
 function fileKindOf(fileName: string): ImportFileKind {
@@ -88,9 +91,12 @@ async function runPass(
 ): Promise<PassResult> {
   const dataSource = await getDataSource();
   await assertTermOpen(dataSource.manager, batch, def);
-  const source = await openRowSource(
-    fileKindOf(batch.fileName),
-    await getStorage().getStream(batch.originalFilePath),
+  const source = await locateHeader(
+    await openRowSource(
+      fileKindOf(batch.fileName),
+      await getStorage().getStream(batch.originalFilePath),
+    ),
+    (headers) => missingColumns(buildHeaderMap(headers), def.requiredColumns).length === 0,
   );
   const headerMap = buildHeaderMap(source.headers);
   const missing = missingColumns(headerMap, def.requiredColumns);
@@ -108,8 +114,10 @@ async function runPass(
     preview: [],
     warnings: [],
     load: { inserted: 0, updated: 0, unchanged: 0, createdKeys: [] },
+    cards: new Map(),
   };
   const seenKeys = new Map<string, number>();
+  const consistentValues = new Map<string, string>();
   let pending: PendingRow[] = [];
   let errors: { rowNumber: number; raw: Record<string, string>; error: RowError }[] = [];
 
@@ -123,11 +131,23 @@ async function runPass(
         rows.map((r) => r.value),
         em,
         batch,
+        (i, warning) => rows[i]?.warnings.push(warning),
       );
       const valid = rows.filter((_, i) => !refErrors.has(i));
       for (const [i, error] of refErrors) {
         const row = rows[i];
         if (row) rowErrors.push({ rowNumber: row.rowNumber, raw: row.raw, error });
+      }
+      if (def.describe) {
+        rows.forEach((row, i) => {
+          const card = def.describe?.(row.value);
+          if (card) {
+            addToCard(result.cards, card, {
+              valid: !refErrors.has(i),
+              warned: row.warnings.length > 0,
+            });
+          }
+        });
       }
       if (rowErrors.length > 0) {
         await em.insert(
@@ -178,13 +198,22 @@ async function runPass(
         .uniqueKeys(parsed.value)
         .map((k) => seenKeys.get(k))
         .find((n) => n !== undefined);
+      const consistency = def.consistency?.(parsed.value);
+      const firstValue = consistency ? consistentValues.get(consistency.key) : undefined;
       if (duplicateOf !== undefined) {
         errors.push({
           rowNumber: row.rowNumber,
           raw,
           error: { reason: 'DUPLICATE', detail: `Trùng với dòng ${duplicateOf} trong cùng file.` },
         });
+      } else if (consistency && firstValue !== undefined && firstValue !== consistency.value) {
+        errors.push({
+          rowNumber: row.rowNumber,
+          raw,
+          error: { reason: 'INVALID_FORMAT', detail: consistency.message },
+        });
       } else {
+        if (consistency) consistentValues.set(consistency.key, consistency.value);
         for (const key of def.uniqueKeys(parsed.value)) seenKeys.set(key, row.rowNumber);
         pending.push({
           rowNumber: row.rowNumber,
@@ -258,6 +287,7 @@ export async function validateImportBatch(batchId: string): Promise<void> {
       columns: pass.columns,
       preview: pass.preview,
       errorRate: pass.totalRows === 0 ? 0 : pass.errorRows / pass.totalRows,
+      courses: await buildCourseCards(dataSource.manager, batch, pass.cards),
     };
     await dataSource.getRepository(ImportBatch).update(batchId, {
       status: ImportBatchStatus.STAGED,

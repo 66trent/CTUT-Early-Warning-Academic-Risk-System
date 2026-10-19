@@ -1,97 +1,152 @@
-# Bộ dữ liệu demo — thứ tự nạp và kết quả mong đợi
+# Bộ dữ liệu demo v2 — thứ tự nạp và kết quả mong đợi
 
-Bộ dữ liệu này vừa là **kịch bản demo** khi bảo vệ, vừa là **test nghiệm thu** (xem `docs/rules/02-code-quality.md`). Mọi con số dưới đây đã được tính lại bằng một bộ tính độc lập theo đúng `08-business-rules-catalog.md` với ngưỡng mặc định: vắng tính cả có phép và không phép trên tổng số buổi theo kế hoạch (`tong_buoi_ke_hoach`), cấm thi khi vượt quá 20%; thang điểm chữ 9 mức và hệ 4 A+=4, A=4, B+=3,5, B=3, C+=2,5, C=2, D+=1,5, D=1, F=0 (xem `08`, `10`). Khi đổi luật hoặc ngưỡng mặc định: sửa file này trước, rồi mới sửa code.
+Bộ dữ liệu này vừa là **kịch bản demo** khi bảo vệ, vừa là **test nghiệm thu** (`docs/rules/02`). Phiên bản 2 (Phase 8a, chốt 2026-10-18): cột theo ảnh hệ thống của trường, 12 luật của `08` bản 2. Giai đoạn 1 = **1 khoa, 1 lớp, 3 môn, 1 học kỳ** — mở rộng (học kỳ trước, học lại, nhiều lớp/khoa, kịch bản nhỏ) ở Phase 9. Bộ cũ (bản 1): `_luu-tru-v1/` (định dạng cũ, không nạp được).
 
-## Dữ liệu nền (tạo bằng `npm run seed:demo`, chỉ khi `DEMO_MODE=true`)
+Mọi con số dưới đây tính tay theo `08` với ngưỡng mặc định. Họ tên, MSSV là GIẢ (dải `KTPM2411901`–`920`, tránh MSSV thật). Tên/mã/tín chỉ/số tiết của "Ngôn ngữ lập trình 1" và "Cơ sở dữ liệu" là giá trị demo. Sinh lại file: `gen_demo_v2.py` (ghi chú ở cuối).
+
+## Dữ liệu nền (`npm run seed:demo`, chỉ khi `DEMO_MODE=true`)
 
 | Loại | Giá trị |
 |---|---|
-| CVHT | `GV001` (`gv001@ctuet.edu.vn`), `GV002` (`gv002@ctuet.edu.vn`) — `ACTIVE`, mật khẩu đọc từ biến môi trường |
-| Lớp sinh hoạt | `KTPM2311` (Kỹ thuật phần mềm K2023, khoa `K.CNTT`, CVHT `GV001`) · `KHMT2311` (Khoa học máy tính K2023, khoa `K.CNTT`, CVHT `GV002`) |
-| Học kỳ | `HK2_2025` (Học kỳ 2, 2025–2026, 2026-01-05 → 2026-05-31) · `HK1_2026` (Học kỳ 1, 2026–2027, 2026-08-17 → 2026-12-27, **hiện tại**) |
+| CVHT | `GV001`, `GV002` — `ACTIVE`, mật khẩu đọc từ biến môi trường. `GV002` không phụ trách lớp nào (để kiểm tra phân quyền) |
+| Lớp sinh hoạt | `KTPM2411` (Kỹ thuật phần mềm K2024, khoa `K.CNTT`, khóa `2024`, CVHT `GV001`) |
+| Học kỳ | `HK1_2025` (Học kỳ 1, 2025–2026, 2025-08-18 → 2025-12-28, **hiện tại** — học kỳ đã qua để mọi mốc demo đều ở quá khứ; chế độ demo không cho chọn mốc tương lai). Khóa 2024 → học kỳ đầu khóa là `HK1_2024` (không phải học kỳ này → ngưỡng ĐTB thường 1,0) |
 
-## Thứ tự nạp và chạy
+## Học phần (mã học phần để trống trong file → tự suy = mã lớp học phần bỏ 2 số cuối)
 
-| Bước | Việc | Học kỳ chọn trên form |
+| Học phần | Mã lớp học phần | Mã học phần (tự suy) | Số tiết | Tín chỉ | LMS |
+|---|---|---|---|---|---|
+| Logic học | `010100240802` | `0101002408` | 30 | 2 | Trắc nghiệm TN01 (hạn 20/09), TN02 (hạn 04/10) |
+| Ngôn ngữ lập trình 1 | `010100239401` | `0101002394` | 45 | 3 | Trắc nghiệm TN01 (27/09), TN02 (08/10); thực hành TH01 (25/09), TH02 (05/10), TH03 (14/10) |
+| Cơ sở dữ liệu | `010100241001` | `0101002410` | 45 | 3 | Thực hành TH01 (30/09), TH02 (07/10) — không có trắc nghiệm |
+
+## Thứ tự nạp và chạy (học kỳ chọn trên form: `HK1_2025`)
+
+| Bước | Việc | Kết quả nạp mong đợi |
 |---|---|---|
-| 1 | Nạp `01_sinh_vien.csv` | — |
-| 2 | Nạp `02_HK2_2025_ket_qua_hoc_phan.csv` | `HK2_2025` |
-| 3 | Chạy đánh giá `HK2_2025`, **asOf = 2026-06-15** | — |
-| 4 | Nạp `03_HK1_2026_diem_danh_tong_hop.csv` | `HK1_2026` |
-| 5 | Nạp `04_HK1_2026_lms_bai_kiem_tra.csv` | `HK1_2026` |
-| 6 | Nạp `05_HK1_2026_ket_qua_giua_ky.csv` | `HK1_2026` |
-| 7 | Chạy đánh giá `HK1_2026`, **asOf = 2026-10-10** | — |
+| 1 | Nạp `01_sinh_vien.csv` | 20 sinh viên, 0 lỗi |
+| 2 | Nạp `02_HK1_2025_diem_danh.csv` (ngày chốt 02/10 và 09/10) | 120 dòng, 0 lỗi, **1 cảnh báo `NAME_MISMATCH`** (dòng KTPM2411920 · Cơ sở dữ liệu · 09/10 ghi "Tuấn", hệ thống "Tú"); 3 thẻ nhận diện, mỗi thẻ 20 sinh viên lớp KTPM2411, mã học phần "tự suy" |
+| 3 | Nạp `03_HK1_2025_lms_trac_nghiem.csv` | 81 dòng, 0 lỗi; 4 bài; 79 lượt làm (2 dòng "Chưa làm" không tạo lượt) |
+| 4 | Nạp `04_HK1_2025_lms_thuc_hanh.csv` | 100 dòng, 0 lỗi; 5 bài |
+| 5 | **Chạy 1** — `MANUAL`, **asOf = 2025-10-10** | xem "Chạy 1" |
+| 6 | Nạp `05_HK1_2025_ket_qua_logic_hoc.csv` (công bố 16/11) | 20 dòng, 0 lỗi |
+| 7 | **Chạy 2** — `MANUAL`, **asOf = 2025-11-20** | xem "Chạy 2" |
+| 8 | Nạp `06_HK1_2025_ket_qua_cuoi_ky.csv` (công bố 28/12; **KTPM2411919 thiếu Cơ sở dữ liệu**) | 39 dòng, 0 lỗi |
+| 9 | **Chốt học kỳ** → hộp thoại liệt kê **1 sinh viên thiếu kết quả: KTPM2411919 (Cơ sở dữ liệu)** → xác nhận → **Chạy 3** `TERM_CLOSING`, **asOf = 2025-12-31** → `HK1_2025` có `closedAt` | xem "Chạy 3" |
 
-Lần chạy tự động sau mỗi lần nạp dùng `asOf` = thời điểm thật nên có thể ra ít cảnh báo hơn (VD: số liệu điểm danh quá 14 ngày → `STALE`). Nghiệm thu chỉ dựa vào bước 3 và 7.
+Chế độ demo không tự chạy sau nạp. Nghiệm thu dựa vào 3 lần chạy trên.
 
-## Cảnh báo mong đợi — PHẢI có đúng và đủ danh sách này
-
-### Học kỳ `HK2_2025` (asOf 2026-06-15)
-
-| Sinh viên | Luật | Mức | Vì sao |
-|---|---|---|---|
-| KTPM2311009 | `ACA-02` | CRITICAL | Rớt 2 học phần (KTPM101, KTPM103) |
-| KTPM2311009 | `ACA-03` | HIGH | GPA4 = (0 + 1 + 0) × 3 / 9 = 0,33 |
-| KTPM2311010 | `ACA-02` | HIGH | Rớt 1 học phần (KTPM101) |
-| KTPM2311011 | `ACA-03` | HIGH | Đạt hết (D, D+, C) nhưng GPA4 = (1 + 1,5 + 2) × 3 / 9 = 1,5 |
-
-### Học kỳ `HK1_2026` (asOf 2026-10-10)
+## Chạy 1 (asOf 2025-10-10) — dấu hiệu mong đợi, PHẢI đúng và đủ
 
 | Sinh viên | Học phần | Luật | Mức | Vì sao |
 |---|---|---|---|---|
-| KTPM2311002 | KTPM201 | `ATT-01` | MEDIUM | Vắng 3/30 buổi kế hoạch (1 có phép + 2 không phép) = đúng 10% |
-| KTPM2311003 | KTPM201 | `ATT-01` | CRITICAL | Vắng 7/30 = 23,3% > 20% — đã vượt ngưỡng cấm thi |
-| KTPM2311003 | KTPM201 | `ATT-02` | HIGH | Vắng không phép 1 (02/10) → 6 (09/10), tăng 5 trong 7 ngày |
-| KTPM2311004 | KTPM201 | `ATT-03` | LOW | Đi trễ 3 buổi |
-| KTPM2311005 | KTPM201 | `LMS-01` | HIGH | Bỏ 3 bài đến hạn Q01, Q02, Q03 (Q03 chỉ có lượt đang làm, không nộp) |
-| KTPM2311006 | KTPM201 | `LMS-02` | MEDIUM | 2 bài gần nhất: Q03 = 4/10, Q02 = 3/10 (lấy lượt cao nhất trong 2 lần) |
-| KTPM2311007 | KTPM201 | `ACA-01` | HIGH | Điểm quá trình 4,0 |
-| KTPM2311008 | KTPM201 | `ATT-01` | MEDIUM | Vắng 3/30 = 10% |
-| KTPM2311008 | KTPM201 | `LMS-01` | MEDIUM | Bỏ Q02 |
-| KTPM2311008 | KTPM201 | `COMB-01` | CRITICAL | Nhóm điểm danh + nhóm LMS cùng ≥ MEDIUM |
-| KTPM2311009 | KTPM103 | `LMS-01` | MEDIUM | Bỏ QA (2/3 lớp đã làm) |
-| KTPM2311009 | KTPM103 | `COMB-02` | HIGH | Đang học lại KTPM103 (rớt ở `HK2_2025`, `attemptNumber = 2`) + LMS-01 MEDIUM → nâng 1 bậc |
-| KHMT2311012 | KTPM201 | `ATT-01` | HIGH | Vắng 6/30 = đúng 20%, chưa vượt nên là HIGH, không phải CRITICAL — chỉ CVHT `GV002` thấy |
+| 902 | Logic học | `ATT-01` | MEDIUM | Vắng 3/30 tiết (1 có phép + 2 không phép) = đúng 10% |
+| 903 | NNLT 1 | `ATT-01` | CRITICAL | Vắng 10/45 = 22,2% > 20% — đã vượt ngưỡng cấm thi |
+| 903 | NNLT 1 | `ATT-02` | HIGH | Vắng không phép 2 (02/10) → 8 (09/10): tăng 6 tiết ≥ 10% × 45 = 4,5 |
+| 904 | NNLT 1 | `ATT-01` | HIGH | Vắng 9/45 = đúng 20%, chưa vượt nên là HIGH |
+| 905 | Logic học | `LMS-01` | HIGH | Không làm TN01, TN02 (đã quá hạn) |
+| 906 | Logic học | `LMS-02` | MEDIUM | TN02 = 4,5/10; TN01 = 4/10 (lượt cao nhất trong 2 lượt) — cả 2 < 50% |
+| 908 | NNLT 1 | `LMS-03` | HIGH | Không nộp TH01, TH02 (đã quá hạn) |
+| 909 | NNLT 1 | `LMS-04` | LOW | Nộp trễ TH01 (27/09 > hạn 25/09), TH02 (07/10 > 05/10) |
+| 910 | CSDL | `ATT-01` | MEDIUM | Vắng 5/45 = 11,1% |
+| 910 | CSDL | `LMS-03` | MEDIUM | Không nộp TH01 |
+| 910 | CSDL | `COMB-01` | CRITICAL | Điểm danh + thực hành cùng ≥ MEDIUM |
+| 911 | CSDL | `ATT-01` | MEDIUM | Vắng 5/45 = 11,1% |
+| 911 | CSDL | `LMS-04` | LOW | Nộp trễ TH01, TH02 |
+| 913 | Logic học | `ATT-01` | CRITICAL | Vắng 8/30 = 26,7% |
+| 913 | Logic học | `ATT-02` | HIGH | Vắng không phép 4 → 8: tăng 4 tiết ≥ 10% × 30 = 3 |
 
-## PHẢI KHÔNG có cảnh báo — ca sát ngưỡng và ngoại lệ
+**PHẢI KHÔNG có** ở chạy 1:
 
-| Sinh viên | Học phần | Vì sao không |
-|---|---|---|
-| KTPM2311001 | mọi học phần | Đối chứng, không có tín hiệu |
-| KTPM2311010 | `HK2_2025` | `ACA-03`: GPA4 = (0 + 3 + 3) × 3 / 9 = đúng 2,0 (luật là `< 2.0`) — F, B, B |
-| KTPM2311007, KTPM2311013 | KTPM201 | Vắng 1/30 = 3,3%, dưới 10% |
-| KTPM2311003 | KTPM201 | `LMS-02`: Q03 = 5/10 đúng bằng 50% (luật là `< 0.5`) |
-| KTPM2311006 | KTPM201 | `ACA-01`: điểm quá trình 5,0 (luật là `< 5.0`) |
-| KTPM2311013 | KTPM202 | Vắng 2/15 = 13,3% nhưng mới học 3 buổi `< minSessions` (4); học phần không có bài kiểm tra → LMS `NOT_APPLICABLE` |
-| mọi sinh viên | KTPM201 | Q04 (lượt làm đầu 08/10) chưa đến hạn: chưa đủ 3 ngày và chỉ 2/10 sinh viên làm |
-| KTPM2311010, KTPM2311011 | `HK1_2026` | Không có dữ liệu học kỳ này |
+| Sinh viên | Vì sao không |
+|---|---|
+| 901 | Đối chứng, không có tín hiệu |
+| 904 | `ATT-02`: tăng 5 → 9 = 4 tiết < 4,5 (10% của 45) |
+| 902 | `ATT-02`: tăng 1 tiết |
+| 907 | Vắng 1/30 = 3,3%; `LMS-02`: TN01 = 5/10 đúng 50% (luật là `< 50%`) |
+| 911 | `COMB-01`: `LMS-04` mức LOW không tính |
+| 912 | TH03 "Chưa nộp" nhưng hạn 14/10 chưa tới |
+| 920 | Vắng có phép 4/45 = 8,9% < 10% |
+| mọi sinh viên | Cơ sở dữ liệu không có trắc nghiệm → `LMS-01/02` không xét; Logic học không có thực hành → `LMS-03/04` không xét; chưa có kết quả → `ACA-*` không xét |
 
-## Cảnh báo mong đợi (Phase 5) — 1 cảnh báo / sinh viên / học kỳ, mức = cao nhất
+## Chạy 2 (asOf 2025-11-20) — Logic học đã khóa điểm
 
-Sau 2 lần chạy ở bước 3 và 7 (mỗi học kỳ 1 lần), PHẢI có đúng các cảnh báo `OPEN` sau, mỗi cảnh báo gắn đúng các trigger ở bảng trên:
+Logic học `COMPLETED` với mọi sinh viên → luật điểm danh/LMS của Logic học không chạy nữa (dấu hiệu cũ của học phần này không còn là dấu hiệu hiện tại). Điểm danh NNLT 1, CSDL (ngày chốt 09/10) đã quá 14 ngày → `STALE`: luật điểm danh không chạy, dấu hiệu điểm danh cũ (và `COMB-*`) của 2 học phần này được GIỮ. `ACA-02/03` chưa xét (sinh viên còn học phần chưa có kết quả).
 
-| Học kỳ | Sinh viên | Mức | Dấu hiệu | Cố vấn học tập |
+Dấu hiệu mới của lần chạy:
+
+| Sinh viên | Học phần | Luật | Mức | Vì sao |
 |---|---|---|---|---|
-| `HK2_2025` | KTPM2311009 | CRITICAL | `ACA-02`, `ACA-03` | GV001 |
-| `HK2_2025` | KTPM2311010 | HIGH | `ACA-02` | GV001 |
-| `HK2_2025` | KTPM2311011 | HIGH | `ACA-03` | GV001 |
-| `HK1_2026` | KTPM2311002 | MEDIUM | `ATT-01` | GV001 |
-| `HK1_2026` | KTPM2311003 | CRITICAL | `ATT-01`, `ATT-02` | GV001 |
-| `HK1_2026` | KTPM2311004 | LOW | `ATT-03` | GV001 |
-| `HK1_2026` | KTPM2311005 | HIGH | `LMS-01` | GV001 |
-| `HK1_2026` | KTPM2311006 | MEDIUM | `LMS-02` | GV001 |
-| `HK1_2026` | KTPM2311007 | HIGH | `ACA-01` | GV001 |
-| `HK1_2026` | KTPM2311008 | CRITICAL | `ATT-01`, `LMS-01`, `COMB-01` | GV001 |
-| `HK1_2026` | KTPM2311009 | HIGH | `LMS-01`, `COMB-02` (học phần KTPM103) | GV001 |
-| `HK1_2026` | KHMT2311012 | HIGH | `ATT-01` | GV002 |
+| 908 | NNLT 1 | `LMS-03` | HIGH | Như chạy 1 |
+| 909 | NNLT 1 | `LMS-04` | LOW | Như chạy 1 |
+| 910 | CSDL | `LMS-03` | MEDIUM | Như chạy 1 |
+| 911 | CSDL | `LMS-04` | LOW | Như chạy 1 |
+| 912 | NNLT 1 | `LMS-03` | MEDIUM | TH03 hết hạn 14/10, vẫn chưa nộp |
+| 913 | Logic học | `ACA-01` | HIGH | Điểm F — không được dự thi |
+| 914 | Logic học | `ACA-01` | HIGH | Điểm F — vắng thi |
+| 919 | Logic học | `ACA-01` | HIGH | Điểm F |
 
-Chạy lại cùng mốc: KHÔNG thêm cảnh báo nào (chỉ thêm trigger vào cảnh báo cũ), không gửi thông báo mới. Thông báo khi tạo: 12 `IN_APP` + 11 `EMAIL` (KTPM2311004 mức LOW chỉ `IN_APP`).
+## Chạy 3 — chốt học kỳ (`TERM_CLOSING`, asOf 2025-12-31)
 
-**Kịch bản mở lại (demo):** GV001 xử lý cảnh báo HK1 của KTPM2311003 tới `RESOLVED` → chạy lại mốc 10/10 → vẫn `RESOLVED` (dấu hiệu y hệt) → nạp thêm điểm danh ngày chốt 2026-10-16 cho KTPM2311003 (KTPM201: 18 buổi, có mặt 9, vắng có phép 1, vắng không phép 8, kế hoạch 30) → chạy mốc 2026-10-16 → `ATT-02` vẫn HIGH, `ATT-01` vẫn CRITICAL → dấu hiệu y hệt (cùng luật, cùng học phần, không nặng hơn) → KHÔNG mở lại. Kịch bản tăng mức: thêm điểm danh 2026-10-16 cho KTPM2311004 (18 buổi, có mặt 11, đi trễ 3, vắng không phép 4, kế hoạch 30) → chạy mốc 2026-10-16 → cảnh báo KTPM2311004 tăng LOW → HIGH (ATT-01 13,3% MEDIUM, ATT-02 tăng 4 buổi HIGH), có thông báo.
+Mọi học phần `COMPLETED` trừ KTPM2411919 · CSDL (còn `REGISTERED`, điểm danh `STALE`, đã nộp đủ thực hành → không dấu hiệu). `ACA-02/03` chạy vì là lần chạy chốt học kỳ. `ACA-04`: học kỳ liền trước không có trong hệ thống → không xét. ĐTB hệ 4: A = 3,8.
+
+| Sinh viên | Phạm vi | Luật | Mức | Vì sao |
+|---|---|---|---|---|
+| 903 | NNLT 1 | `ACA-01` | HIGH | F — không được dự thi |
+| 903 | sinh viên | `ACA-02` | HIGH | Rớt 3/8 tín chỉ = 37,5% |
+| 903 | sinh viên | `ACA-03` | HIGH | ĐTB = (3×2 + 0×3 + 3×3)/8 = 1,88 |
+| 908 | sinh viên | `ACA-03` | HIGH | ĐTB = (3×2 + 1×3 + 2×3)/8 = 1,88 |
+| 913 | Logic học | `ACA-01` | HIGH | F — không được dự thi |
+| 913 | sinh viên | `ACA-02` | HIGH | Rớt 2/8 = đúng 25% |
+| 914 | Logic học | `ACA-01` | HIGH | F — vắng thi |
+| 914 | sinh viên | `ACA-02` | HIGH | Rớt 2/8 = 25% (ĐTB 2,25 — không `ACA-03`) |
+| 915 | NNLT 1 | `ACA-01` | HIGH | F |
+| 915 | CSDL | `ACA-01` | HIGH | F |
+| 915 | sinh viên | `ACA-02` | CRITICAL | Rớt 6/8 = 75% > 50% — chạm ngưỡng Điều 11a |
+| 915 | sinh viên | `ACA-03` | CRITICAL | ĐTB = (1×2)/8 = 0,25 < 1,0 — chạm ngưỡng Điều 11b |
+| 917 | sinh viên | `ACA-03` | HIGH | ĐTB = (1×2 + 1,5×3 + 2×3)/8 = 1,56, không rớt môn nào |
+| 918 | CSDL | `ACA-01` | HIGH | F |
+| 918 | sinh viên | `ACA-02` | HIGH | Rớt 3/8 = 37,5% |
+| 918 | sinh viên | `ACA-03` | HIGH | ĐTB = (2×2 + **3,8**×3 + 0×3)/8 = 1,93 — nếu A = 4,0 thì đúng 2,0 và KHÔNG cảnh báo |
+| 919 | Logic học | `ACA-01` | HIGH | F |
+| 919 | sinh viên | `ACA-02` | HIGH | Rớt 2/5 tín chỉ đã có kết quả = 40%; lý do ghi "còn 1 học phần chưa có kết quả" |
+| 919 | sinh viên | `ACA-03` | HIGH | ĐTB = (0×2 + 3×3)/5 = 1,8 trên 5 tín chỉ đã có kết quả |
+
+**PHẢI KHÔNG có** ở chạy 3: 916 (C, C, C → ĐTB đúng 2,0 — luật là `< 2,0`); 901, 902, 904–907, 909–912, 920 (ĐTB ≥ 2,0, không rớt); mọi `ATT-*`/`LMS-*`/`COMB-*` (học phần đã có kết quả).
+
+## Cảnh báo mong đợi sau mỗi lần chạy (1 cảnh báo / sinh viên / học kỳ, CVHT `GV001`)
+
+| Sinh viên | Sau chạy 1 | Sau chạy 2 | Sau chạy 3 |
+|---|---|---|---|
+| 902 | MEDIUM (`ATT-01`) | MEDIUM, không còn dấu hiệu | MEDIUM, không còn dấu hiệu |
+| 903 | CRITICAL (`ATT-01`, `ATT-02`) | CRITICAL (giữ — điểm danh quá hạn) | **HIGH** (`ACA-01`, `ACA-02`, `ACA-03`) |
+| 904 | HIGH (`ATT-01`) | HIGH (giữ) | HIGH, không còn dấu hiệu |
+| 905 | HIGH (`LMS-01`) | HIGH, không còn dấu hiệu | như chạy 2 |
+| 906 | MEDIUM (`LMS-02`) | MEDIUM, không còn dấu hiệu | như chạy 2 |
+| 908 | HIGH (`LMS-03`) | HIGH (`LMS-03`) | HIGH (`ACA-03`) |
+| 909 | LOW (`LMS-04`) | LOW (`LMS-04`) | LOW, không còn dấu hiệu |
+| 910 | CRITICAL (`ATT-01`, `LMS-03`, `COMB-01`) | CRITICAL (`ATT-01`, `COMB-01` giữ + `LMS-03`) | CRITICAL, không còn dấu hiệu |
+| 911 | MEDIUM (`ATT-01`, `LMS-04`) | MEDIUM (`ATT-01` giữ + `LMS-04`) | MEDIUM, không còn dấu hiệu |
+| 912 | — | **mới** MEDIUM (`LMS-03`) | MEDIUM, không còn dấu hiệu |
+| 913 | CRITICAL (`ATT-01`, `ATT-02`) | **HIGH** (`ACA-01`) | HIGH (`ACA-01`, `ACA-02`) |
+| 914 | — | **mới** HIGH (`ACA-01`) | HIGH (`ACA-01`, `ACA-02`) |
+| 915 | — | — | **mới** CRITICAL (`ACA-01` ×2, `ACA-02`, `ACA-03`) |
+| 917 | — | — | **mới** HIGH (`ACA-03`) |
+| 918 | — | — | **mới** HIGH (`ACA-01`, `ACA-02`, `ACA-03`) |
+| 919 | — | **mới** HIGH (`ACA-01`) | HIGH (`ACA-01`, `ACA-02`, `ACA-03`) |
+
+Tổng: 10 → 13 → 16 cảnh báo, tất cả `OPEN`. Mức giảm (903, 913) không gửi thông báo. Thông báo: chạy 1 = 10 `IN_APP` + 9 `EMAIL` (909 mức LOW chỉ `IN_APP`); chạy 2 = 3 + 3; chạy 3 = 3 + 3. Chạy lại cùng mốc: KHÔNG thêm cảnh báo, không gửi thông báo mới.
+
+Sau chạy 3: `HK1_2025` đã chốt — không nạp thêm, không chạy đánh giá được (demo:reset đưa về chưa chốt).
 
 ## Kiểm tra phân quyền bằng tay
 
-- Đăng nhập `GV001`: thấy cảnh báo của các sinh viên `KTPM2311*`, KHÔNG thấy `KHMT2311012`.
-- Đăng nhập `GV002`: chỉ thấy `KHMT2311012`.
-- Admin đổi CVHT lớp `KTPM2311` sang `GV002` → mọi cảnh báo đang mở của lớp chuyển sang `GV002`; `GV001` mất quyền xem ngay.
+- Đăng nhập `GV001`: thấy cảnh báo của sinh viên `KTPM2411*`.
+- Đăng nhập `GV002`: không thấy cảnh báo nào (không phụ trách lớp).
+- Admin đổi CVHT lớp `KTPM2411` sang `GV002` → mọi cảnh báo đang mở chuyển sang `GV002`; `GV001` mất quyền xem ngay.
 - Sinh viên chưa có trong `01_sinh_vien.csv` đăng nhập Google → trang "Chưa có hồ sơ".
+- Đăng nhập nhanh sinh viên demo: `KTPM2411903` (có cảnh báo), `KTPM2411901` (không cảnh báo) — chỉ thấy cảnh báo sau khi CVHT xác nhận.
+
+## Sinh lại dữ liệu
+
+File CSV được sinh bằng script Python lưu kèm ở `docs/demo-data/gen_demo_v2.py` (`python -I docs/demo-data/gen_demo_v2.py .`). Sửa kết quả mong đợi ở đây TRƯỚC, rồi mới sửa script/dữ liệu.

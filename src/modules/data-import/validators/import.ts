@@ -10,6 +10,14 @@ export const uploadImportSchema = z.object({
     .transform((v) => (v === '' ? null : v))
     .nullable()
     .default(null),
+  /** Học phần Admin chọn (tùy chọn — trống = tự nhận diện từ file; docs/rules/12). */
+  courseId: z
+    .string()
+    .trim()
+    .max(20)
+    .transform((v) => (v === '' ? null : v.toUpperCase()))
+    .nullable()
+    .default(null),
   parentBatchId: z
     .uuid()
     .nullable()

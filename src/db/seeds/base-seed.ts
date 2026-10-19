@@ -71,7 +71,7 @@ export async function seedBase(dataSource: DataSource, auth: Auth, env: Env): Pr
     role: UserRole.ADMIN,
     password: env.ADMIN_SEED_PASSWORD,
   });
-  // 10 luật + RISK-SCORE với ngưỡng mặc định (docs/rules/08) — cần Admin làm người cấu hình.
+  // 12 luật + RISK-SCORE với ngưỡng mặc định (docs/rules/08) — cần Admin làm người cấu hình.
   const rulesCreated = await dataSource.transaction((em) => seedRules(em, SEED_ADMIN_USER_ID));
   return { departments, adminCreated, rulesCreated };
 }

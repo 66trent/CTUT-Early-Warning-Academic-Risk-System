@@ -1,4 +1,4 @@
-import { CourseResultStatus, QuizAttemptStatus } from '@/db/enums';
+import { QuizAttemptStatus, SubmissionStatus } from '@/db/enums';
 import {
   DEFAULT_RISK_SCORE_CONFIG,
   type RiskScoreConfig,
@@ -9,98 +9,177 @@ import {
   type ActiveRule,
   type AttendanceSnapshotInput,
   type CourseResultInput,
+  type DueAssignment,
+  type DueQuiz,
   type EnrollmentInput,
+  type LmsGroupContext,
+  type PreviousTermInput,
   type QuizAttemptInput,
   type StudentInput,
+  type SubmissionInput,
+  type TermResultInput,
 } from '@/modules/rule-engine/evaluator/types';
 
-/** Dữ liệu mẫu cho test evaluator (hàm thuần, không DB). Mốc mặc định: hết ngày 10/10/2026. */
-export const AS_OF = new Date('2026-10-10T23:59:59+07:00');
+/** Dữ liệu mẫu cho test evaluator (hàm thuần, không DB). Mốc mặc định: hết ngày 10/10/2025. */
+export const AS_OF = new Date('2025-10-10T23:59:59+07:00');
 export const vn = (date: string, time = '00:00') => new Date(`${date}T${time}:00+07:00`);
 
+/** Snapshot điểm danh (tiết) — học phần 45 tiết, không vắng. */
 export function snapshot(
   date: string,
   over: Partial<AttendanceSnapshotInput> = {},
 ): AttendanceSnapshotInput {
   return {
     snapshotDate: vn(date),
-    totalSessions: 16,
-    plannedSessions: 30,
-    present: 16,
-    late: 0,
+    totalPeriods: 45,
     excusedAbsence: 0,
     unexcusedAbsence: 0,
-    sectionCode: null,
     ...over,
   };
 }
 
+/** Q01–Q03 đã đến hạn (theo hạn nộp) của lớp học phần. */
+export const DUE_QUIZZES: DueQuiz[] = ['Q01', 'Q02', 'Q03'].map((activityId, i) => ({
+  activityId,
+  quizName: `Bài ${activityId}`,
+  orderAt: vn(`2025-09-${14 + i * 7}`, '23:59'),
+}));
+
+/** TH01–TH02 đã quá hạn. */
+export const DUE_ASSIGNMENTS: DueAssignment[] = ['TH01', 'TH02'].map((activityId, i) => ({
+  activityId,
+  name: `Thực hành ${activityId}`,
+  dueAt: vn(`2025-09-${20 + i * 7}`, '23:59'),
+}));
+
 export function attempt(
-  quizKey: string,
+  activityId: string,
   date: string,
   over: Partial<QuizAttemptInput> = {},
 ): QuizAttemptInput {
   return {
-    quizKey,
-    quizName: `Bài ${quizKey}`,
+    activityId,
     attemptNumber: 1,
     startedAt: vn(date, '08:00'),
     submittedAt: vn(date, '08:20'),
     score: 8,
     maxScore: 10,
+    correctCount: 8,
+    totalQuestions: 10,
     status: QuizAttemptStatus.SUBMITTED,
     ...over,
   };
 }
 
-export function result(over: Partial<CourseResultInput> = {}): CourseResultInput {
+/** Nộp bài thực hành; mặc định nộp 1 ngày trước hạn. */
+export function submission(
+  activityId: string,
+  submittedAt: Date | null,
+  status: SubmissionStatus = SubmissionStatus.ON_TIME,
+): SubmissionInput {
+  return { activityId, status, submittedAt };
+}
+
+const onTimeSubmissions = () =>
+  DUE_ASSIGNMENTS.map((a) => submission(a.activityId, new Date(a.dueAt.getTime() - 86_400_000)));
+
+export function lmsContext(over: Partial<LmsGroupContext> = {}): LmsGroupContext {
   return {
-    processScore: 7,
-    finalScore: null,
-    letterGrade: null,
-    passed: null,
-    resultStatus: CourseResultStatus.PROCESS_ONLY,
-    publishedAt: vn('2026-10-05'),
-    processPublishedAt: vn('2026-10-05'),
+    quizApplicable: true,
+    dueQuizzes: DUE_QUIZZES,
+    assignmentApplicable: true,
+    dueAssignments: DUE_ASSIGNMENTS,
+    assignmentDueAt: new Map(DUE_ASSIGNMENTS.map((a) => [a.activityId, a.dueAt])),
     ...over,
   };
 }
 
-export const finalResult = (letterGrade: string, passed: boolean, finalScore = 6) =>
-  result({
-    finalScore,
+/** Kết quả học phần đã khóa điểm (mặc định công bố trước mốc AS_OF). */
+export function result(
+  letterGrade: string,
+  over: Partial<CourseResultInput> = {},
+): CourseResultInput {
+  return {
     letterGrade,
-    passed,
-    resultStatus: CourseResultStatus.FINAL,
-    publishedAt: vn('2026-06-10'),
-    processPublishedAt: null,
-  });
-
-/** Q01–Q03 đã đến hạn của nhóm (mặc định). */
-export const DUE = ['Q01', 'Q02', 'Q03'].map((quizKey, i) => ({
-  quizKey,
-  quizName: `Bài ${quizKey}`,
-  firstStartedAt: vn(`2026-09-${14 + i * 7}`, '08:00'),
-}));
+    passed: letterGrade !== 'F',
+    eligibleForExam: true,
+    absentFromExam: false,
+    publishedAt: vn('2025-10-05'),
+    ...over,
+  };
+}
 
 export function enrollment(over: Partial<EnrollmentInput> = {}): EnrollmentInput {
   return {
-    enrollmentId: `E-${over.courseId ?? 'KTPM201'}`,
-    courseId: 'KTPM201',
+    enrollmentId: `E-${over.courseId ?? 'HP001'}`,
+    courseId: 'HP001',
     courseName: 'Công nghệ phần mềm',
     credits: 3,
     withdrawn: false,
-    attendance: [snapshot('2026-10-09')],
-    quizAttempts: DUE.map((q) => attempt(q.quizKey, q.firstStartedAt.toISOString().slice(0, 10))),
+    attendance: [snapshot('2025-10-09')],
+    quizAttempts: DUE_QUIZZES.map((q) =>
+      attempt(q.activityId, q.orderAt.toISOString().slice(0, 10)),
+    ),
+    submissions: onTimeSubmissions(),
     result: null,
     priorAttempts: [],
-    lmsGroup: { applicable: true, groupKey: '', groupSize: 10, dueQuizzes: DUE },
+    lms: lmsContext(),
     ...over,
   };
 }
 
-export function student(enrollments: EnrollmentInput[]): StudentInput {
-  return { studentId: 'SV001', termId: 'HK1_2026', termName: 'Học kỳ 1, 2026–2027', enrollments };
+/** Học phần đã có kết quả, không còn dữ liệu đang học. */
+export const completed = (
+  courseId: string,
+  letterGrade: string,
+  credits = 3,
+  over: Partial<EnrollmentInput> = {},
+) =>
+  enrollment({
+    courseId,
+    courseName: `Học phần ${courseId}`,
+    credits,
+    result: result(letterGrade),
+    ...over,
+  });
+
+export function termResult(courseId: string, letterGrade: string, credits = 3): TermResultInput {
+  return {
+    courseId,
+    courseName: `Học phần ${courseId}`,
+    credits,
+    letterGrade,
+    passed: letterGrade !== 'F',
+    publishedAt: vn('2025-06-10'),
+  };
+}
+
+export function previousTerm(
+  results: TermResultInput[],
+  over: Partial<PreviousTermInput> = {},
+): PreviousTermInput {
+  return {
+    termId: 'HK3_2024',
+    termName: 'Học kỳ 3, 2024–2025',
+    isFirstTerm: false,
+    results,
+    ...over,
+  };
+}
+
+export function student(
+  enrollments: EnrollmentInput[],
+  over: Partial<StudentInput> = {},
+): StudentInput {
+  return {
+    studentId: 'SV001',
+    termId: 'HK1_2025',
+    termName: 'Học kỳ 1, 2025–2026',
+    isFirstTerm: false,
+    enrollments,
+    previousTerm: null,
+    ...over,
+  };
 }
 
 /** Mọi luật bật với ngưỡng mặc định; `overrides` thay condition của vài luật. */
@@ -108,6 +187,7 @@ export function context(
   overrides: Record<string, unknown> = {},
   config: RiskScoreConfig = DEFAULT_RISK_SCORE_CONFIG,
   asOf = AS_OF,
+  extra: Partial<EvaluationContext> = {},
 ): EvaluationContext {
   const activeRules = new Map<string, ActiveRule>(
     RULES.map((r) => [
@@ -118,7 +198,7 @@ export function context(
       },
     ]),
   );
-  return { asOf, activeRules, config };
+  return { asOf, activeRules, config, ...extra };
 }
 
 /** Trigger của 1 luật khi đánh giá sinh viên có các Enrollment cho trước. */
@@ -126,6 +206,9 @@ export function triggersOf(
   ruleCode: string,
   enrollments: EnrollmentInput[],
   ctx: EvaluationContext = context(),
+  studentOver: Partial<StudentInput> = {},
 ) {
-  return evaluateStudent(student(enrollments), ctx).triggers.filter((t) => t.ruleCode === ruleCode);
+  return evaluateStudent(student(enrollments, studentOver), ctx).triggers.filter(
+    (t) => t.ruleCode === ruleCode,
+  );
 }

@@ -3,38 +3,41 @@ import { In } from 'typeorm';
 import { AttendanceSummary } from '@/db/entities/attendance-summary.entity';
 import { ensureEnrollments } from '../services/enrollment-sync';
 import { rollbackSourceRows } from '../services/source-rollback';
-import { parseDate, parseInteger } from '../parsing/values';
+import { parseDate, parseDecimal, parseInteger } from '../parsing/values';
 import {
   ACADEMIC_OPTIONAL_COLUMNS,
+  ACADEMIC_REQUIRED_COLUMNS,
   type AcademicRowBase,
   checkAcademicReferences,
   isWithinTerm,
   pairKey,
   parseAcademicBase,
 } from './academic-row';
-import { type ImportTypeDefinition, type LoadResult, type ParsedRow } from './definition';
+import {
+  type ImportTypeDefinition,
+  type LoadResult,
+  type ParsedRow,
+  type RowWarning,
+} from './definition';
 
 export interface AttendanceRow extends AcademicRowBase {
   /** `YYYY-MM-DD` — lưu 00:00 giờ Việt Nam. */
   snapshotDate: string;
-  totalSessions: number;
-  plannedSessions: number | null;
-  present: number;
-  late: number;
+  totalPeriods: number;
   excusedAbsence: number;
   unexcusedAbsence: number;
-  sectionCode: string | null;
 }
 
 const COUNT_COLUMNS = [
-  ['tong_buoi', 'Tổng số buổi đã học', 'totalSessions'],
-  ['co_mat', 'Có mặt', 'present'],
-  ['di_tre', 'Đi trễ', 'late'],
-  ['vang_co_phep', 'Vắng có phép', 'excusedAbsence'],
-  ['vang_khong_phep', 'Vắng không phép', 'unexcusedAbsence'],
+  ['tong_so_tiet', 'Tổng số tiết', 'totalPeriods'],
+  ['vang_co_phep', 'Số tiết vắng có phép', 'excusedAbsence'],
+  ['vang_khong_phep', 'Số tiết vắng không phép', 'unexcusedAbsence'],
 ] as const;
 
 type CountField = (typeof COUNT_COLUMNS)[number][2];
+
+/** Tỷ lệ vắng trong file lệch số tính lại quá mức này (điểm %) → cảnh báo. */
+const RATE_TOLERANCE = 0.5;
 
 const vnMidnight = (date: string) => new Date(`${date}T00:00:00+07:00`);
 
@@ -56,12 +59,26 @@ function parseCounts(
   return { ok: true, value: counts };
 }
 
+/** Cột `ty_le_vang` (tùy chọn, `22,22` hoặc `22,22 %`) chỉ để đối chiếu với số tính lại. */
+function rateWarning(
+  raw: string | undefined,
+  c: Record<CountField, number>,
+  decimalComma: boolean,
+): RowWarning | null {
+  const text = (raw ?? '').replace('%', '').trim();
+  if (!text) return null;
+  const given = parseDecimal(text, decimalComma || text.includes(','));
+  const computed = ((c.excusedAbsence + c.unexcusedAbsence) * 100) / c.totalPeriods;
+  if (given.ok && Math.abs(given.value - computed) <= RATE_TOLERANCE) return null;
+  return {
+    code: 'ABSENCE_RATE_MISMATCH',
+    message: `Tỷ lệ vắng trong file "${raw}" khác số tính lại ${computed.toFixed(2)}% — hệ thống dùng số tiết.`,
+  };
+}
+
 function sameValues(a: AttendanceSummary, row: AttendanceRow): boolean {
   return (
-    a.totalSessions === row.totalSessions &&
-    a.plannedSessions === row.plannedSessions &&
-    a.present === row.present &&
-    a.late === row.late &&
+    a.totalPeriods === row.totalPeriods &&
     a.excusedAbsence === row.excusedAbsence &&
     a.unexcusedAbsence === row.unexcusedAbsence &&
     a.sectionCode === row.sectionCode
@@ -69,68 +86,53 @@ function sameValues(a: AttendanceSummary, row: AttendanceRow): boolean {
 }
 
 /**
- * Điểm danh tổng hợp theo ngày chốt (docs/rules/10, 12). Upsert theo (Enrollment, ngày chốt):
- * nạp lại cùng ngày chốt = cập nhật; ngày chốt khác = bản ghi mới, KHÔNG đụng ngày khác.
+ * Điểm danh tổng hợp theo ngày chốt, đơn vị TIẾT (docs/rules/10, 12). Upsert theo (Enrollment,
+ * ngày chốt): nạp lại cùng ngày chốt = cập nhật; ngày chốt khác = bản ghi mới.
  */
 export const attendanceImport: ImportTypeDefinition<AttendanceRow> = {
   dataType: 'ATTENDANCE_SUMMARY',
-  label: 'Điểm danh tổng hợp',
+  label: 'Điểm danh',
   requiresTerm: true,
   requiredColumns: [
-    'mssv',
-    'ma_hoc_phan',
+    ...ACADEMIC_REQUIRED_COLUMNS,
     'ten_hoc_phan',
     'ngay_chot',
-    'tong_buoi',
-    'co_mat',
-    'di_tre',
+    'tong_so_tiet',
     'vang_co_phep',
     'vang_khong_phep',
   ],
-  optionalColumns: ['tong_buoi_ke_hoach', 'ma_lop_hoc_phan', ...ACADEMIC_OPTIONAL_COLUMNS],
-  templatePath: '/templates/mau_diem_danh_tong_hop.csv',
+  optionalColumns: [...ACADEMIC_OPTIONAL_COLUMNS, 'ty_le_vang'],
+  templatePath: '/templates/mau_diem_danh.csv',
 
-  parseRow(record) {
+  parseRow(record, { decimalComma }) {
     const base = parseAcademicBase(record);
     if (!base.ok) return fail('INVALID_FORMAT', base.detail);
     const date = parseDate(record.ngay_chot ?? '');
     if (!date.ok) return fail('INVALID_FORMAT', `Ngày chốt: ${date.message}`);
     const counts = parseCounts(record);
     if (!counts.ok) return counts;
-    const plannedText = (record.tong_buoi_ke_hoach ?? '').trim();
-    const planned = plannedText ? parseInteger(plannedText) : null;
-    if (planned && !planned.ok) {
-      return fail('INVALID_FORMAT', `Tổng số buổi kế hoạch: ${planned.message}`);
-    }
-    const sectionCode = (record.ma_lop_hoc_phan ?? '').trim() || null;
-    if (sectionCode && sectionCode.length > 30) {
-      return fail('INVALID_FORMAT', 'Mã lớp học phần tối đa 30 ký tự.');
-    }
-
     const c = counts.value;
-    if (c.present + c.late + c.excusedAbsence + c.unexcusedAbsence > c.totalSessions) {
+    if (c.totalPeriods < 1 || c.totalPeriods > 500) {
+      return fail('OUT_OF_RANGE', 'Tổng số tiết phải từ 1 đến 500.');
+    }
+    if (c.excusedAbsence + c.unexcusedAbsence > c.totalPeriods) {
       return fail(
         'OUT_OF_RANGE',
-        `Có mặt + đi trễ + vắng (${c.present + c.late + c.excusedAbsence + c.unexcusedAbsence}) vượt tổng số buổi đã học (${c.totalSessions}).`,
+        `Số tiết vắng (${c.excusedAbsence + c.unexcusedAbsence}) vượt tổng số tiết (${c.totalPeriods}).`,
       );
     }
-    const plannedSessions = planned?.ok ? planned.value : null;
-    if (plannedSessions !== null && plannedSessions < c.totalSessions) {
-      return fail(
-        'OUT_OF_RANGE',
-        `Tổng số buổi kế hoạch (${plannedSessions}) nhỏ hơn số buổi đã học (${c.totalSessions}).`,
-      );
-    }
+    const warning = rateWarning(record.ty_le_vang, c, decimalComma);
     return {
       ok: true,
-      value: { ...base.value, ...c, snapshotDate: date.value, plannedSessions, sectionCode },
+      value: { ...base.value, ...c, snapshotDate: date.value },
+      warnings: warning ? [warning] : [],
     };
   },
 
   uniqueKeys: (row) => [`${pairKey(row)}|${row.snapshotDate}`],
 
-  checkReferences(rows, em, batch) {
-    return checkAcademicReferences(rows, em, batch, (row, term) =>
+  checkReferences(rows, em, batch, warn) {
+    return checkAcademicReferences(rows, em, batch, warn, (row, term) =>
       isWithinTerm(vnMidnight(row.snapshotDate), term)
         ? null
         : {
@@ -139,6 +141,16 @@ export const attendanceImport: ImportTypeDefinition<AttendanceRow> = {
           },
     );
   },
+
+  describe: (row) => ({
+    courseId: row.courseId,
+    courseName: row.courseName,
+    derivedCode: row.derivedCode,
+    sectionCode: row.sectionCode,
+    studentId: row.studentId,
+    totalPeriods: row.totalPeriods,
+    snapshotDate: row.snapshotDate,
+  }),
 
   async load(rows, em, batch) {
     const enrollments = await ensureEnrollments(em, batch, rows);
@@ -155,10 +167,7 @@ export const attendanceImport: ImportTypeDefinition<AttendanceRow> = {
       const enrollmentId = enrollments.get(pairKey(row)) ?? '';
       const snapshotDate = vnMidnight(row.snapshotDate);
       const values = {
-        totalSessions: row.totalSessions,
-        plannedSessions: row.plannedSessions,
-        present: row.present,
-        late: row.late,
+        totalPeriods: row.totalPeriods,
         excusedAbsence: row.excusedAbsence,
         unexcusedAbsence: row.unexcusedAbsence,
         sectionCode: row.sectionCode,

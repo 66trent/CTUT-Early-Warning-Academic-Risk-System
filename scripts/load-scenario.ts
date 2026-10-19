@@ -6,7 +6,7 @@
  * Chỉ khi DEMO_MODE=true. Các bước trình bày + kết quả mong đợi: README.md của từng kịch bản.
  */
 import 'dotenv/config';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
 import { closeDataSource, getDataSource } from '../src/db/data-source';
@@ -61,6 +61,11 @@ async function waitFor(batchId: string, done: (b: ImportBatch) => boolean): Prom
 
 async function main(): Promise<void> {
   if (!getEnv().DEMO_MODE) throw new Error('demo:scenario chỉ chạy khi DEMO_MODE=true.');
+  if (!existsSync(ROOT)) {
+    // Phase 8a: kịch bản nhỏ bản 1 đã lưu trữ ở docs/demo-data/_luu-tru-v1 (định dạng cũ, không
+    // nạp được với 12 luật mới) — viết lại ở Phase 9 (docs/implement.md).
+    throw new Error('Chưa có kịch bản nhỏ cho bộ luật mới (sẽ viết lại ở Phase 9).');
+  }
   const id = process.argv
     .slice(2)
     .find((a) => /^\d{1,2}$/.test(a))

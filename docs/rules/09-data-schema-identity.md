@@ -45,7 +45,7 @@ Danh sách khoa nạp bằng seed (danh mục chính thức do người dùng cu
 | classId | String(20) | NOT NULL | PK | VD: `KTPM2311` |
 | className | String(100) | NOT NULL | | |
 | departmentId | String(10) | NOT NULL | FK → Department | |
-| cohortYear | String(10) | NOT NULL | | Khóa tuyển sinh |
+| cohortYear | String(10) | NOT NULL | | Khóa tuyển sinh — năm 4 chữ số (VD `2024`). Xác định "học kỳ đầu khóa" = `HK1_{cohortYear}` cho ngưỡng 0,8 của `ACA-03` (`08`, chốt 2026-10-18) |
 | advisorId | String(20) | NULL | FK → User.userId | CVHT chủ nhiệm. `User` phải có `role = ADVISOR` và `accountStatus = ACTIVE`. NULL = chưa gán |
 
 Quản lý tài khoản cán bộ (Admin): trạng thái chỉ chuyển `PENDING_APPROVAL→ACTIVE` (duyệt), `PENDING_APPROVAL→REJECTED` (từ chối), `ACTIVE→SUSPENDED` (khóa), `SUSPENDED→ACTIVE` (mở khóa); vai trò chỉ đổi `ADVISOR↔ADMIN` khi `ACTIVE`; mã cán bộ sửa được khi `PENDING_APPROVAL`. MUST NOT tự thay đổi tài khoản của chính mình. CVHT đang phụ trách lớp MUST NOT bị khóa hay đổi vai trò — chuyển lớp cho người khác trước (giữ đúng ràng buộc `advisorId` là ADVISOR ACTIVE). Mọi thao tác ghi Audit Log.
@@ -73,15 +73,15 @@ RÀNG BUỘC: CVHT quản lý sinh viên QUA lớp sinh hoạt — phạm vi c�
 | isCurrent | Boolean | NOT NULL, default `false` | | Học kỳ đang hoạt động. MUST có partial unique index `WHERE is_current = true` (tối đa 1 học kỳ hiện tại). Đổi học kỳ hiện tại trong 1 transaction (bỏ cờ cũ → bật cờ mới); học kỳ đã chốt không đặt làm hiện tại được |
 | closedAt | DateTime | NULL | | Thời điểm Admin chốt học kỳ sau khi nhập kết quả cuối kỳ. Học kỳ đã chốt MUST NOT nhận thêm dữ liệu điểm danh/LMS. Không mở lại được |
 
-Tạo học kỳ: Admin chọn số học kỳ (1–3) + năm bắt đầu năm học → hệ thống sinh `termId` = `HK{n}_{năm}`, `termName` = "Học kỳ n, năm–năm+1", `academicYear` = "năm-năm+1". `startDate`/`endDate` nhập theo ngày, lưu 00:00 và 23:59:59 giờ Việt Nam (UTC+7).
+1 năm học = 3 học kỳ CHÍNH (HK1, HK2, HK3), không có học kỳ hè (người dùng chốt 2026-10-18) — mọi học kỳ xét đủ luật. Chốt học kỳ đi qua lần chạy đánh giá cuối `TERM_CLOSING` (`08`): `closedAt` được đặt khi lần chạy đó xong. Tạo học kỳ: Admin chọn số học kỳ (1–3) + năm bắt đầu năm học → hệ thống sinh `termId` = `HK{n}_{năm}`, `termName` = "Học kỳ n, năm–năm+1", `academicYear` = "năm-năm+1". `startDate`/`endDate` nhập theo ngày, lưu 00:00 và 23:59:59 giờ Việt Nam (UTC+7).
 
 ## Course (Học phần)
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
-| courseId | String(20) | NOT NULL | PK | Mã học phần (`ma_hoc_phan`) |
+| courseId | String(20) | NOT NULL | PK | Mã học phần (`ma_hoc_phan`, VD `0101002408`; trống thì suy từ mã lớp học phần — `12`). KHÔNG dùng mã lớp học phần (đổi mỗi học kỳ → không nhận ra học lại) |
 | courseName | String(150) | NOT NULL | | |
-| credits | Int | NULL | | Số tín chỉ. Điền khi nhập kết quả học phần; NULL thì học phần không được tính vào `ACA-03` |
+| credits | Int | NULL | | Số tín chỉ. Điền khi nhập kết quả học phần; NULL thì học phần không được tính vào `ACA-02`/`ACA-03` |
 | theoryPeriods | Int | NULL | | Số tiết lý thuyết — chỉ hiển thị, không dùng trong luật |
 | practicePeriods | Int | NULL | | Số tiết thực hành — chỉ hiển thị, không dùng trong luật |
 
@@ -95,9 +95,10 @@ Tạo tự động (upsert theo `courseId`) khi một file nguồn nhắc tới 
 | studentId | String(20) | NOT NULL | FK → Student | |
 | courseId | String(20) | NOT NULL | FK → Course | |
 | termId | String(10) | NOT NULL | FK → Term | |
-| enrollmentStatus | EnrollmentStatus (enum) | NOT NULL | | `REGISTERED` / `WITHDRAWN` (Admin đánh dấu tay ở hồ sơ sinh viên, bỏ đánh dấu được — cả 2 chiều ghi Audit Log `ENROLLMENT_WITHDRAWN`/`ENROLLMENT_WITHDRAWAL_UNDONE`; người dùng chốt 2026-10-13) / `COMPLETED` (khi có kết quả `FINAL`) |
+| enrollmentStatus | EnrollmentStatus (enum) | NOT NULL | | `REGISTERED` / `WITHDRAWN` (Admin đánh dấu tay ở hồ sơ sinh viên, bỏ đánh dấu được — cả 2 chiều ghi Audit Log `ENROLLMENT_WITHDRAWN`/`ENROLLMENT_WITHDRAWAL_UNDONE`; người dùng chốt 2026-10-13) / `COMPLETED` (khi có kết quả học phần) |
 | attemptNumber | Int | NOT NULL | | = 1 + số học kỳ TRƯỚC (theo `Term.startDate`) có `attemptOutcome = FAILED` cho cùng `(studentId, courseId)`. Tính khi tạo; tính lại khi kết quả `FINAL` của học kỳ trước thay đổi (xem `10`) |
 | attemptOutcome | AttemptOutcome (enum) | NOT NULL, default `PENDING` | | `PENDING`/`PASSED`/`FAILED` — cập nhật từ `CourseResult` |
+| sectionCode | String(30) | NULL | | Lớp học phần hiện tại (`ma_lop_hoc_phan` của dòng nguồn gần nhất) — bài LMS chỉ xét sinh viên cùng lớp học phần (`08`) |
 | firstSeenBatchId | String (uuid) | NOT NULL | FK → ImportBatch | Batch đầu tiên làm phát sinh bản ghi |
 | createdAt | DateTime | NOT NULL | | |
 

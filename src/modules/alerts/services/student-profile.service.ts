@@ -4,14 +4,16 @@ import { Alert } from '@/db/entities/alert.entity';
 import { AttendanceSummary } from '@/db/entities/attendance-summary.entity';
 import { CourseResult } from '@/db/entities/course-result.entity';
 import { Enrollment } from '@/db/entities/enrollment.entity';
+import { LmsActivity } from '@/db/entities/lms-activity.entity';
+import { LmsAssignmentSubmission } from '@/db/entities/lms-assignment-submission.entity';
 import { LmsQuizAttempt } from '@/db/entities/lms-quiz-attempt.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
 import {
   AlertStatus,
-  type CourseResultStatus,
   type EnrollmentStatus,
+  LmsActivityType,
   QuizAttemptStatus,
   Severity,
   SEVERITY_ORDER,
@@ -26,19 +28,23 @@ export interface CourseSnapshotDto {
   courseName: string;
   credits: number | null;
   attemptNumber: number;
+  /** Snapshot điểm danh mới nhất, đơn vị tiết. */
   attendance: {
     snapshotDate: string;
     absences: number;
-    denominator: number;
-    late: number;
+    totalPeriods: number;
   } | null;
-  quizzesSubmitted: number;
-  quizzesAttempted: number;
+  /** Bài trắc nghiệm của lớp học phần: tổng số bài / số bài đã nộp. */
+  quizzes: { total: number; submitted: number };
+  /** Bài thực hành: tổng / đã nộp / nộp trễ / quá hạn chưa nộp (tính tại thời điểm xem). */
+  assignments: { total: number; submitted: number; late: number; overdue: number };
   result: {
-    status: CourseResultStatus;
+    letterGrade: string;
+    passed: boolean;
     processScore: number | null;
-    finalScore: number | null;
-    letterGrade: string | null;
+    examScore: number | null;
+    eligibleForExam: boolean | null;
+    absentFromExam: boolean | null;
   } | null;
 }
 
@@ -51,6 +57,27 @@ export interface StudentProfileDto {
   /** Học kỳ đã chốt — không sửa dữ liệu (VD đánh dấu rút học phần) được nữa. */
   termClosed: boolean;
   courses: CourseSnapshotDto[];
+}
+
+/** Bài thực hành của 1 Enrollment: đã nộp / nộp trễ / quá hạn chưa nộp tại `now`. */
+function assignmentSummary(
+  assignments: readonly LmsActivity[],
+  submissions: readonly LmsAssignmentSubmission[],
+  now: Date,
+): CourseSnapshotDto['assignments'] {
+  let submitted = 0;
+  let late = 0;
+  let overdue = 0;
+  for (const a of assignments) {
+    const at = submissions.find((s) => s.activityId === a.id)?.submittedAt ?? null;
+    if (at) {
+      submitted += 1;
+      if (a.dueAt && at > a.dueAt) late += 1;
+    } else if (a.dueAt && a.dueAt <= now) {
+      overdue += 1;
+    }
+  }
+  return { total: assignments.length, submitted, late, overdue };
 }
 
 /** Số liệu từng học phần của 1 sinh viên trong học kỳ (snapshot điểm danh mới nhất). */
@@ -70,14 +97,19 @@ export async function getStudentProfile(
     order: { courseId: 'ASC' },
   });
   const ids = enrollments.map((e) => e.enrollmentId);
-  const [snapshots, attempts, results] = await Promise.all([
+  const [snapshots, attempts, submissions, results, activities] = await Promise.all([
     ds.getRepository(AttendanceSummary).find({
       where: { enrollmentId: In(ids) },
       order: { snapshotDate: 'DESC' },
     }),
     ds.getRepository(LmsQuizAttempt).find({ where: { enrollmentId: In(ids) } }),
+    ds.getRepository(LmsAssignmentSubmission).find({ where: { enrollmentId: In(ids) } }),
     ds.getRepository(CourseResult).find({ where: { enrollmentId: In(ids) } }),
+    ds.getRepository(LmsActivity).find({
+      where: { termId, courseId: In([...new Set(enrollments.map((e) => e.courseId))]) },
+    }),
   ]);
+  const now = new Date();
   return {
     studentId,
     fullName: student.fullName,
@@ -89,6 +121,10 @@ export async function getStudentProfile(
       const latest = snapshots.find((s) => s.enrollmentId === e.enrollmentId);
       const mine = attempts.filter((a) => a.enrollmentId === e.enrollmentId);
       const r = results.find((x) => x.enrollmentId === e.enrollmentId);
+      const own = activities.filter(
+        (a) =>
+          a.courseId === e.courseId && (e.sectionCode === null || a.sectionCode === e.sectionCode),
+      );
       return {
         enrollmentId: e.enrollmentId,
         enrollmentStatus: e.enrollmentStatus,
@@ -100,20 +136,28 @@ export async function getStudentProfile(
           ? {
               snapshotDate: latest.snapshotDate.toISOString(),
               absences: latest.excusedAbsence + latest.unexcusedAbsence,
-              denominator: latest.plannedSessions ?? latest.totalSessions,
-              late: latest.late,
+              totalPeriods: latest.totalPeriods,
             }
           : null,
-        quizzesSubmitted: new Set(
-          mine.filter((a) => a.status === QuizAttemptStatus.SUBMITTED).map((a) => a.quizKey),
-        ).size,
-        quizzesAttempted: new Set(mine.map((a) => a.quizKey)).size,
+        quizzes: {
+          total: own.filter((a) => a.activityType === LmsActivityType.QUIZ).length,
+          submitted: new Set(
+            mine.filter((a) => a.status === QuizAttemptStatus.SUBMITTED).map((a) => a.activityId),
+          ).size,
+        },
+        assignments: assignmentSummary(
+          own.filter((a) => a.activityType === LmsActivityType.ASSIGNMENT),
+          submissions.filter((s) => s.enrollmentId === e.enrollmentId),
+          now,
+        ),
         result: r
           ? {
-              status: r.resultStatus,
-              processScore: r.processScore,
-              finalScore: r.finalScore,
               letterGrade: r.letterGrade,
+              passed: r.passed,
+              processScore: r.processScore,
+              examScore: r.examScore,
+              eligibleForExam: r.eligibleForExam,
+              absentFromExam: r.absentFromExam,
             }
           : null,
       };

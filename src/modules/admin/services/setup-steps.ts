@@ -14,7 +14,8 @@ export interface SetupCounts {
   /** Các số dưới đây tính trong học kỳ hiện tại. */
   attendanceRows: number;
   lmsRows: number;
-  processResults: number;
+  assignmentRows: number;
+  /** Kết quả học phần đã khóa điểm. */
   finalResults: number;
   completedRuns: number;
   alerts: number;
@@ -116,7 +117,7 @@ function academicBlock(c: SetupCounts): string | null {
 
 function termSteps(c: SetupCounts): StepDraft[] {
   const block = academicBlock(c);
-  const hasAcademic = c.attendanceRows + c.lmsRows + c.processResults + c.finalResults > 0;
+  const hasAcademic = c.attendanceRows + c.lmsRows + c.assignmentRows + c.finalResults > 0;
   return [
     {
       key: 'term',
@@ -132,8 +133,8 @@ function termSteps(c: SetupCounts): StepDraft[] {
     {
       key: 'attendance',
       phase: 'DURING_TERM',
-      title: 'Nhập điểm danh tổng hợp',
-      description: 'Hằng tuần, mỗi lần 1 ngày chốt số liệu.',
+      title: 'Nhập điểm danh',
+      description: 'Hằng tuần, mỗi lần 1 ngày chốt số liệu (số tiết vắng).',
       done: c.attendanceRows > 0,
       status: c.attendanceRows > 0 ? `${c.attendanceRows} dòng điểm danh` : 'Chưa có',
       href: '/admin/imports',
@@ -143,21 +144,13 @@ function termSteps(c: SetupCounts): StepDraft[] {
     {
       key: 'lms',
       phase: 'DURING_TERM',
-      title: 'Nhập kết quả bài kiểm tra LMS',
-      description: 'Hằng tuần, xuất từ LMS.',
-      done: c.lmsRows > 0,
-      status: c.lmsRows > 0 ? `${c.lmsRows} lượt làm bài` : 'Chưa có',
-      href: '/admin/imports',
-      actionLabel: 'Nhập dữ liệu',
-      blockedReason: block,
-    },
-    {
-      key: 'process-results',
-      phase: 'DURING_TERM',
-      title: 'Nhập điểm quá trình (giữa kỳ)',
-      description: 'File kết quả học phần chỉ có điểm quá trình.',
-      done: c.processResults + c.finalResults > 0,
-      status: c.processResults > 0 ? `${c.processResults} kết quả` : 'Chưa có',
+      title: 'Nhập bài LMS (trắc nghiệm, thực hành)',
+      description: 'Hằng tuần, xuất từ LMS kèm hạn nộp của từng bài.',
+      done: c.lmsRows + c.assignmentRows > 0,
+      status:
+        c.lmsRows + c.assignmentRows > 0
+          ? `${c.lmsRows} lượt làm trắc nghiệm · ${c.assignmentRows} bài thực hành`
+          : 'Chưa có',
       href: '/admin/imports',
       actionLabel: 'Nhập dữ liệu',
       blockedReason: block,
@@ -196,11 +189,11 @@ function endOfTermSteps(c: SetupCounts): StepDraft[] {
     {
       key: 'final-results',
       phase: 'END_OF_TERM',
-      title: 'Nhập kết quả cuối kỳ và chạy đánh giá',
+      title: 'Nhập kết quả học phần (khi khóa điểm)',
       description:
-        'Kết quả cuối kỳ dùng cho luật rớt học phần, điểm trung bình và nhận diện học lại.',
+        'Học phần nào khóa điểm thì nhập ngay — dùng cho luật không đạt học phần, tín chỉ không đạt, điểm trung bình và nhận diện học lại.',
       done: c.finalResults > 0,
-      status: c.finalResults > 0 ? `${c.finalResults} kết quả cuối kỳ` : 'Chưa có',
+      status: c.finalResults > 0 ? `${c.finalResults} kết quả học phần` : 'Chưa có',
       href: '/admin/imports',
       actionLabel: 'Nhập dữ liệu',
       blockedReason: academicBlock(c),
@@ -209,7 +202,8 @@ function endOfTermSteps(c: SetupCounts): StepDraft[] {
       key: 'close-term',
       phase: 'END_OF_TERM',
       title: 'Chốt học kỳ',
-      description: 'Sau khi chốt, học kỳ không nhận thêm dữ liệu điểm danh/LMS.',
+      description:
+        'Hệ thống chạy đánh giá lần cuối (tín chỉ không đạt, điểm trung bình) rồi chốt; sau đó không nhận thêm dữ liệu.',
       done: c.currentTerm?.closed ?? false,
       status: c.currentTerm?.closed ? 'Đã chốt' : 'Chưa chốt',
       href: '/admin/terms',
@@ -218,7 +212,7 @@ function endOfTermSteps(c: SetupCounts): StepDraft[] {
         !c.currentTerm || c.currentTerm.closed
           ? null
           : c.finalResults === 0
-            ? 'Chưa có kết quả cuối kỳ.'
+            ? 'Chưa có kết quả học phần.'
             : null,
     },
   ];

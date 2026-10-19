@@ -18,7 +18,7 @@ const ADMIN = [UserRole.ADMIN] as const;
 const REVALIDATE = ['/admin/imports', '/admin/classes'];
 const MAX_UPLOADS_PER_HOUR = 30;
 
-/** Tải file lên (FormData: dataType, termId, parentBatchId, file). Chỉ Admin, có rate-limit. */
+/** Tải file lên (FormData: dataType, termId, courseId, parentBatchId, file). Chỉ Admin, có rate-limit. */
 export async function uploadImportAction(
   formData: FormData,
 ): Promise<ActionResult<{ batchId: string }>> {
@@ -46,6 +46,7 @@ export async function uploadImportAction(
     const parsed = uploadImportSchema.safeParse({
       dataType: formData.get('dataType'),
       termId: formData.get('termId') ?? '',
+      courseId: formData.get('courseId') ?? '',
       parentBatchId: formData.get('parentBatchId') ?? '',
     });
     if (!parsed.success) {

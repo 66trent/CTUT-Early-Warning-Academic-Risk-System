@@ -1,10 +1,11 @@
 /**
  * npm run demo:reset -- --yes — đưa DB về trạng thái demo chuẩn trước giờ bảo vệ:
  *   sao lưu (npm run backup) → XÓA toàn bộ dữ liệu (schema public + auth) → db:init →
- *   migration:run → seed → seed:demo → nạp 5 file demo qua quy trình nhập thật (worker xử lý).
+ *   migration:run → seed → seed:demo → nạp 6 file demo qua quy trình nhập thật (worker xử lý).
  * Chỉ khi DEMO_MODE=true; bắt buộc `--yes`. Cần container postgres, redis, minio, worker đang chạy.
- * `--evaluate`: chạy luôn 2 mốc chính thức của KET_QUA_MONG_DOI.md (HK2_2025 mốc 15/06, HK1_2026
- * mốc 10/10) — dùng để tập dượt / chụp ảnh; khi trình bày thật nên bấm chạy trước hội đồng.
+ * `--evaluate`: chạy luôn 3 mốc chính thức của KET_QUA_MONG_DOI.md (HK1_2025: 10/10, 20/11 và chốt
+ * học kỳ 31/12) — dùng để tập dượt / chụp ảnh; khi trình bày thật nên bấm chạy trước hội đồng.
+ * `--evaluate=2`: chỉ 2 mốc đầu (học kỳ chưa chốt — để trình diễn chốt học kỳ trên giao diện).
  * Sau khi chạy: đăng nhập lại (mọi phiên cũ bị xóa).
  */
 import 'dotenv/config';
@@ -18,20 +19,21 @@ import { vnEndOfDay } from '../src/lib/dates';
 import { getEnv } from '../src/lib/env';
 import { requestEvaluation } from '../src/modules/rule-engine/services/evaluation-run.service';
 
-/** 2 mốc chính thức của docs/demo-data/KET_QUA_MONG_DOI.md. */
+/** 3 mốc chính thức của docs/demo-data/KET_QUA_MONG_DOI.md (mốc cuối = chốt học kỳ). */
 const OFFICIAL_RUNS = [
-  ['HK2_2025', '2026-06-15'],
-  ['HK1_2026', '2026-10-10'],
+  ['HK1_2025', '2025-10-10', EvaluationTrigger.MANUAL],
+  ['HK1_2025', '2025-11-20', EvaluationTrigger.MANUAL],
+  ['HK1_2025', '2025-12-31', EvaluationTrigger.TERM_CLOSING],
 ] as const;
 
 /** Đưa lần chạy vào hàng đợi rồi chờ worker chạy xong (tối đa 2 phút). */
-async function runOfficial(): Promise<void> {
+async function runOfficial(count: number): Promise<void> {
   const repo = (await getDataSource()).getRepository(EvaluationRun);
-  for (const [termId, asOf] of OFFICIAL_RUNS) {
+  for (const [termId, asOf, trigger] of OFFICIAL_RUNS.slice(0, count)) {
     const runId = await requestEvaluation({
       termId,
       courseId: null,
-      trigger: EvaluationTrigger.MANUAL,
+      trigger,
       asOf: vnEndOfDay(asOf),
       actorId: SEED_ADMIN_USER_ID,
       importBatchId: null,
@@ -84,15 +86,17 @@ async function main(): Promise<void> {
   await wipe();
   step('Tạo schema auth + bảng Better Auth', 'db:init');
   step('Chạy migration', 'migration:run');
-  step('Dữ liệu nền (khoa, Admin, 10 luật)', 'seed');
-  step('Dữ liệu nền demo (GV001, GV002, lớp, học kỳ)', 'seed:demo');
-  step('Nạp 5 file demo qua worker', 'demo:load', ['--with-students']);
-  if (process.argv.includes('--evaluate')) {
-    process.stdout.write('\n▶ Chạy đánh giá 2 mốc chính thức\n');
-    await runOfficial();
+  step('Dữ liệu nền (khoa, Admin, 12 luật)', 'seed');
+  step('Dữ liệu nền demo (GV001, GV002, lớp KTPM2411, học kỳ HK1_2025)', 'seed:demo');
+  step('Nạp 6 file demo qua worker', 'demo:load', ['--with-students']);
+  const evaluate = process.argv.find((a) => a.startsWith('--evaluate'));
+  if (evaluate) {
+    const count = evaluate === '--evaluate=2' ? 2 : OFFICIAL_RUNS.length;
+    process.stdout.write(`\n▶ Chạy đánh giá ${count} mốc chính thức\n`);
+    await runOfficial(count);
   }
   process.stdout.write(
-    '\n✔ Xong. Đăng nhập lại; mở Admin → Chạy đánh giá để chạy 2 mốc trong KET_QUA_MONG_DOI.md.\n',
+    '\n✔ Xong. Đăng nhập lại; mở Admin → Chạy đánh giá để chạy các mốc trong KET_QUA_MONG_DOI.md.\n',
   );
 }
 

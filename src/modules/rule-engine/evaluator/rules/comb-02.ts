@@ -22,12 +22,14 @@ const TRIGGER_GROUPS: readonly RuleGroup[] = [RuleGroup.ATTENDANCE, RuleGroup.LM
 export const comb02: CourseRule<Comb02Condition> = {
   kind: 'PER_COURSE',
   stage: 'COMBINED',
+  appliesTo: 'REGISTERED',
   meta: {
     ruleCode: 'COMB-02',
     ruleName: 'Học lại vẫn sa sút',
     ruleGroup: RuleGroup.COMBINED,
     scope: 'PER_COURSE',
     priority: 100,
+    signal: null,
     requires: null,
   },
   conditionSchema,

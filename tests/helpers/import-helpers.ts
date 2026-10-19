@@ -24,27 +24,25 @@ export function useMemoryStorage(): MemoryStorage {
 
 /**
  * Bản sao file demo đổi sang mã `TST…` — test không đụng dữ liệu thật trong DB:
- * KTPM2311 → TSTK2311, KHMT2311 → TSTH2311 (cả mssv, lớp, email).
+ * KTPM2411 → TSTK2411 (cả mssv, lớp, email).
  */
 export function demoStudentsCsv(): string {
   return readFileSync('docs/demo-data/01_sinh_vien.csv', 'utf8')
-    .replace(/KTPM2311/g, 'TSTK2311')
-    .replace(/KHMT2311/g, 'TSTH2311')
-    .replace(/ktpm2311/g, 'tstk2311')
-    .replace(/khmt2311/g, 'tsth2311');
+    .replace(/KTPM2411/g, 'TSTK2411')
+    .replace(/ktpm2411/g, 'tstk2411');
 }
 
-export const TEST_CLASSES = ['TSTK2311', 'TSTH2311'] as const;
+/** Lớp thử: TSTK2411 (vai KTPM2411, CVHT A) và TSTH2411 (CVHT B, chưa có sinh viên). */
+export const TEST_CLASSES = ['TSTK2411', 'TSTH2411'] as const;
 
 /**
- * File demo học tập (02–05) đổi sang mã `TST…`: sinh viên như `demoStudentsCsv()`,
- * học phần KTPM101 → TSTC101 (cả mã lớp học phần).
+ * File demo học tập (02–06) đổi sang mã `TST…`: sinh viên như `demoStudentsCsv()`, mã lớp học
+ * phần 010100xxxxxx → TST010xxxxxx (mã học phần tự suy → TST0102408… — dọn được theo tiền tố).
  */
 export function demoAcademicCsv(fileName: string): string {
   return readFileSync(`docs/demo-data/${fileName}`, 'utf8')
-    .replace(/KTPM2311/g, 'TSTK2311')
-    .replace(/KHMT2311/g, 'TSTH2311')
-    .replace(/KTPM(\d{3})(?!\d)/g, 'TSTC$1');
+    .replace(/KTPM2411/g, 'TSTK2411')
+    .replace(/010100(\d{6})/g, 'TST010$1');
 }
 
 export async function csvToXlsx(csv: string): Promise<Buffer> {
@@ -97,7 +95,13 @@ export async function cleanupImportBatches(ds: DataSource): Promise<void> {
   await ds.query(`DELETE FROM rule_triggers WHERE evaluation_run_id IN (${tstRuns})`);
   await ds.query(`DELETE FROM risk_score_logs WHERE evaluation_run_id IN (${tstRuns})`);
   await ds.query(`DELETE FROM evaluation_runs WHERE id IN (${tstRuns})`);
-  for (const table of ['attendance_summaries', 'lms_quiz_attempts', 'course_results']) {
+  for (const table of [
+    'attendance_summaries',
+    'lms_quiz_attempts',
+    'lms_assignment_submissions',
+    'course_results',
+    'lms_activities',
+  ]) {
     await ds.query(`DELETE FROM ${table} WHERE import_batch_id IN (${tstBatches})`);
   }
   await ds.query(`DELETE FROM enrollments WHERE first_seen_batch_id IN (${tstBatches})`);

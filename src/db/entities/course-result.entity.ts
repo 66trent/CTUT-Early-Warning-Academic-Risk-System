@@ -7,12 +7,11 @@ import {
   PrimaryGeneratedColumn,
   type Relation,
 } from 'typeorm';
-import { CourseResultStatus } from '../enums';
 import { Enrollment } from './enrollment.entity';
 import { ImportBatch } from './import-batch.entity';
 
 /**
- * Kết quả 1 học phần của 1 sinh viên trong 1 học kỳ (docs/rules/10). 1 kết quả / Enrollment.
+ * Kết quả 1 học phần ĐÃ KHÓA ĐIỂM của 1 sinh viên trong 1 học kỳ (docs/rules/10). 1 kết quả / Enrollment.
  * KHÔNG lưu điểm hệ 4 — rule-engine quy đổi từ `letterGrade` lúc đánh giá.
  */
 @Entity('course_results')
@@ -25,25 +24,29 @@ export class CourseResult {
   @Column({ type: 'uuid' })
   enrollmentId!: string;
 
+  /** Điểm thường xuyên, thang 10 — chỉ hiển thị. */
   @Column({ type: 'double precision', nullable: true })
   processScore!: number | null;
 
+  /** Điểm cuối kỳ, thang 10 — chỉ hiển thị. */
   @Column({ type: 'double precision', nullable: true })
   examScore!: number | null;
 
-  @Column({ type: 'double precision', nullable: true })
-  finalScore!: number | null;
+  /** Thang 9 mức: A+, A, B+, B, C+, C, D+, D, F (Quy chế 336). */
+  @Column({ type: 'varchar', length: 2 })
+  letterGrade!: string;
 
-  /** Thang 9 mức: A+, A, B+, B, C+, C, D+, D, F. */
-  @Column({ type: 'varchar', length: 2, nullable: true })
-  letterGrade!: string | null;
+  /** `letterGrade != 'F'`. */
+  @Column({ type: 'boolean' })
+  passed!: boolean;
 
-  /** NULL khi chưa có kết quả cuối kỳ. */
+  /** `duoc_du_thi` — false = bị cấm thi. NULL khi file không có cột. */
   @Column({ type: 'boolean', nullable: true })
-  passed!: boolean | null;
+  eligibleForExam!: boolean | null;
 
-  @Column({ type: 'enum', enum: CourseResultStatus, enumName: 'course_result_status' })
-  resultStatus!: CourseResultStatus;
+  /** `vang_thi`. NULL khi file không có cột. */
+  @Column({ type: 'boolean', nullable: true })
+  absentFromExam!: boolean | null;
 
   /** Lô cập nhật gần nhất. */
   @Column({ type: 'uuid' })
@@ -55,13 +58,6 @@ export class CourseResult {
 
   @Column({ type: 'timestamptz' })
   importedAt!: Date;
-
-  /**
-   * Ngày công bố điểm quá trình (lần nạp PROCESS_ONLY) — GIỮ LẠI khi kết quả chuyển FINAL, để
-   * chạy lại đánh giá ở mốc giữa kỳ vẫn thấy điểm quá trình (chống rò rỉ thời gian, docs/rules/08).
-   */
-  @Column({ type: 'timestamptz', nullable: true })
-  processPublishedAt!: Date | null;
 
   @ManyToOne(() => Enrollment, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'enrollment_id' })

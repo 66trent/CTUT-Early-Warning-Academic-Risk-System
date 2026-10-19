@@ -65,6 +65,24 @@ export async function recomputeAttemptNumbers(
   );
 }
 
+/** Lớp học phần hiện tại của Enrollment = `ma_lop_hoc_phan` của dòng nguồn gần nhất (docs/rules/09). */
+async function syncSectionCodes(
+  em: EntityManager,
+  enrollments: readonly Pick<
+    Enrollment,
+    'enrollmentId' | 'studentId' | 'courseId' | 'sectionCode'
+  >[],
+  pairs: readonly AcademicRowBase[],
+): Promise<void> {
+  const sectionOf = new Map(pairs.map((p) => [pairKey(p), p.sectionCode]));
+  for (const e of enrollments) {
+    const section = sectionOf.get(pairKey(e));
+    if (section && section !== e.sectionCode) {
+      await em.update(Enrollment, { enrollmentId: e.enrollmentId }, { sectionCode: section });
+    }
+  }
+}
+
 /**
  * Tìm hoặc tạo `Enrollment` cho các dòng của lô (học kỳ của lô), trong transaction `em`.
  * Trả map `mssv|mã học phần` → enrollmentId. Course/Enrollment là ngoại lệ DUY NHẤT được tự tạo.
@@ -79,7 +97,7 @@ export async function ensureEnrollments(
   const pairs = [...new Map(rows.map((r) => [pairKey(r), r])).values()];
   const find = () =>
     em.find(Enrollment, {
-      select: { enrollmentId: true, studentId: true, courseId: true },
+      select: { enrollmentId: true, studentId: true, courseId: true, sectionCode: true },
       where: {
         termId,
         studentId: In([...new Set(pairs.map((p) => p.studentId))]),
@@ -102,6 +120,7 @@ export async function ensureEnrollments(
           enrollmentStatus: EnrollmentStatus.REGISTERED,
           attemptNumber: 1,
           attemptOutcome: AttemptOutcome.PENDING,
+          sectionCode: p.sectionCode,
           firstSeenBatchId: batch.id,
         })),
       )
@@ -110,6 +129,7 @@ export async function ensureEnrollments(
     await recomputeAttemptNumbers(em, missing);
     found = await find();
   }
+  await syncSectionCodes(em, found, pairs);
   return new Map(found.map((e) => [pairKey(e), e.enrollmentId]));
 }
 
@@ -126,6 +146,7 @@ export async function deleteOrphanEnrollments(
       WHERE e.first_seen_batch_id = $1
         AND NOT EXISTS (SELECT 1 FROM attendance_summaries a WHERE a.enrollment_id = e.enrollment_id)
         AND NOT EXISTS (SELECT 1 FROM lms_quiz_attempts q WHERE q.enrollment_id = e.enrollment_id)
+        AND NOT EXISTS (SELECT 1 FROM lms_assignment_submissions s WHERE s.enrollment_id = e.enrollment_id)
         AND NOT EXISTS (SELECT 1 FROM course_results r WHERE r.enrollment_id = e.enrollment_id)
       RETURNING e.student_id, e.course_id`,
     [batchId],

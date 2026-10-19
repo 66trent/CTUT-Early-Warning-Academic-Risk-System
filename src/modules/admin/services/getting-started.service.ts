@@ -6,48 +6,35 @@ import { AttendanceSummary } from '@/db/entities/attendance-summary.entity';
 import { CourseResult } from '@/db/entities/course-result.entity';
 import { Department } from '@/db/entities/department.entity';
 import { EvaluationRun } from '@/db/entities/evaluation-run.entity';
+import { LmsAssignmentSubmission } from '@/db/entities/lms-assignment-submission.entity';
 import { LmsQuizAttempt } from '@/db/entities/lms-quiz-attempt.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
-import {
-  AlertStatus,
-  CourseResultStatus,
-  EvaluationRunStatus,
-  UserAccountStatus,
-  UserRole,
-} from '@/db/enums';
+import { AlertStatus, EvaluationRunStatus, UserAccountStatus, UserRole } from '@/db/enums';
 import { buildSetupSteps, type SetupCounts, type SetupStep } from './setup-steps';
 
 /** Đếm dòng dữ liệu nguồn của học kỳ (qua Enrollment — mọi dữ liệu nguồn trỏ qua đây). */
 async function countSourceRows<T extends ObjectLiteral>(
   entity: EntityTarget<T>,
   termId: string,
-  where?: { sql: string; params: Record<string, unknown> },
 ): Promise<number> {
-  const qb = (await getDataSource())
+  return (await getDataSource())
     .getRepository(entity)
     .createQueryBuilder('r')
     .innerJoin('r.enrollment', 'e')
-    .where('e.termId = :termId', { termId });
-  if (where) qb.andWhere(where.sql, where.params);
-  return qb.getCount();
+    .where('e.termId = :termId', { termId })
+    .getCount();
 }
 
 async function termCounts(termId: string) {
   const ds = await getDataSource();
-  const [attendanceRows, lmsRows, processResults, finalResults, completedRuns, alerts, waiting] =
+  const [attendanceRows, lmsRows, assignmentRows, finalResults, completedRuns, alerts, waiting] =
     await Promise.all([
       countSourceRows(AttendanceSummary, termId),
       countSourceRows(LmsQuizAttempt, termId),
-      countSourceRows(CourseResult, termId, {
-        sql: 'r.resultStatus = :status',
-        params: { status: CourseResultStatus.PROCESS_ONLY },
-      }),
-      countSourceRows(CourseResult, termId, {
-        sql: 'r.resultStatus = :status',
-        params: { status: CourseResultStatus.FINAL },
-      }),
+      countSourceRows(LmsAssignmentSubmission, termId),
+      countSourceRows(CourseResult, termId),
       ds.getRepository(EvaluationRun).countBy({ termId, status: EvaluationRunStatus.COMPLETED }),
       ds.getRepository(Alert).countBy({ termId }),
       ds.getRepository(Alert).countBy({
@@ -58,7 +45,7 @@ async function termCounts(termId: string) {
   return {
     attendanceRows,
     lmsRows,
-    processResults,
+    assignmentRows,
     finalResults,
     completedRuns,
     alerts,
@@ -85,7 +72,7 @@ export async function getSetupCounts(): Promise<SetupCounts> {
     : {
         attendanceRows: 0,
         lmsRows: 0,
-        processResults: 0,
+        assignmentRows: 0,
         finalResults: 0,
         completedRuns: 0,
         alerts: 0,

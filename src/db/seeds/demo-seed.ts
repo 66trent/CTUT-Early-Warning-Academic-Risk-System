@@ -19,39 +19,29 @@ export const DEMO_ADVISORS = [
 
 export const DEMO_CLASSES = [
   {
-    classId: 'KTPM2311',
-    className: 'Kỹ thuật phần mềm K2023',
+    classId: 'KTPM2411',
+    className: 'Kỹ thuật phần mềm K2024',
     departmentId: 'K.CNTT',
-    cohortYear: '2023',
+    cohortYear: '2024',
     advisorId: 'GV001',
   },
-  {
-    classId: 'KHMT2311',
-    className: 'Khoa học máy tính K2023',
-    departmentId: 'K.CNTT',
-    cohortYear: '2023',
-    advisorId: 'GV002',
-  },
 ] as const;
 
+/**
+ * Bộ demo v2 (Phase 8a): 1 học kỳ ĐÃ QUA để mọi mốc demo (10/10, 20/11, 31/12) ở quá khứ —
+ * chế độ demo không cho chọn mốc tương lai (docs/demo-data/KET_QUA_MONG_DOI.md).
+ */
 export const DEMO_TERMS = [
   {
-    termId: 'HK2_2025',
-    termName: 'Học kỳ 2, 2025–2026',
+    termId: 'HK1_2025',
+    termName: 'Học kỳ 1, 2025–2026',
     academicYear: '2025-2026',
-    startDate: '2026-01-05',
-    endDate: '2026-05-31',
-  },
-  {
-    termId: 'HK1_2026',
-    termName: 'Học kỳ 1, 2026–2027',
-    academicYear: '2026-2027',
-    startDate: '2026-08-17',
-    endDate: '2026-12-27',
+    startDate: '2025-08-18',
+    endDate: '2025-12-28',
   },
 ] as const;
 
-export const DEMO_CURRENT_TERM_ID = 'HK1_2026';
+export const DEMO_CURRENT_TERM_ID = 'HK1_2025';
 
 export interface DemoSeedReport {
   advisorsCreated: number;

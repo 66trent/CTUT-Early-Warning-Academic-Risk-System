@@ -1,6 +1,6 @@
 # 11 — Data Schema Reference: Rule Engine & Alerts
 
-Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File này đặc tả 10 bảng — phạm vi module `rule-engine` và `alerts`.
+Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File này đặc tả các bảng — phạm vi module `rule-engine` và `alerts`.
 
 ## Rule
 
@@ -22,7 +22,7 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | ruleCode | String(20) | NOT NULL | FK → Rule | |
 | version | Int | NOT NULL | | Tăng dần |
 | condition | Json | NOT NULL | | Ngưỡng/toán tử cụ thể — MUST validate bằng Zod trước khi ghi |
-| severity | Severity (enum) | NOT NULL | | `LOW`/`MEDIUM`/`HIGH`/`CRITICAL`. Luật nhiều mức (`ATT-01`, `LMS-01`, `ACA-02`, `COMB-02`): các mức nằm trong `condition`, cột này = mức cao nhất luật có thể ra (chỉ hiển thị) |
+| severity | Severity (enum) | NOT NULL | | `LOW`/`MEDIUM`/`HIGH`/`CRITICAL`. Luật nhiều mức (`ATT-01`, `LMS-01`, `LMS-03`, `ACA-02`, `ACA-03`, `ACA-04`, `COMB-02`): các mức nằm trong `condition`, cột này = mức cao nhất luật có thể ra (chỉ hiển thị) |
 | action | Json | NOT NULL | | Danh sách hành động khi kích hoạt |
 | effectiveFrom | DateTime | NOT NULL | | |
 | effectiveTo | DateTime | NULL | | NULL = đang dùng |
@@ -30,7 +30,7 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | configuredBy | String(20) | NOT NULL | FK → User | |
 | lastDryRunAt | DateTime | NULL | | Thời điểm chạy thử (dry-run) gần nhất. MUST NOT chuyển `status` sang `ACTIVE` khi còn NULL. Chạy thử trên học kỳ hiện tại, không ghi DB ngoài cột này; hiển thị số sinh viên kích hoạt theo bản `ACTIVE` vs bản nháp và danh sách sinh viên thêm/bớt (tối đa 50 dòng) — người dùng chốt 2026-10-13 |
 
-RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastDryRunAt` = thời điểm seed (ngưỡng mặc định của `08` coi như đã chạy thử). Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
+RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 12 luật `ACTIVE` (Phase 8a: `ATT-01/02`, `LMS-01–04`, `ACA-01–04`, `COMB-01/02`) với `lastDryRunAt` = thời điểm seed (ngưỡng mặc định của `08` coi như đã chạy thử). Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
 
 ## RuleTrigger — bằng chứng, KHÔNG hiển thị trực tiếp cho người dùng
 
@@ -58,7 +58,7 @@ RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastD
 | termId | String(10) | NOT NULL | FK → Term | |
 | riskScoreValue | Float | NULL | | NULL nếu `dataCompletenessLevel = INSUFFICIENT` |
 | dataCompletenessLevel | DataCompletenessLevel (enum) | NOT NULL | | `FULL`/`PARTIAL`/`INSUFFICIENT` — xem tầng 2 trong `00-project-context.md` |
-| componentsUsed | Json | NOT NULL | | `[{ group: ATTENDANCE/LMS/ACADEMIC, status, weight, rawValue, normalized }]` — validate Zod |
+| componentsUsed | Json | NOT NULL | | `[{ group: ATTENDANCE/LMS/ACADEMIC, status, weight, rawValue, normalized, basis? }]` — `basis` của ACADEMIC: `CURRENT_TERM`/`PREVIOUS_TERM` (`08`) — validate Zod |
 | ruleVersionId | String (uuid) | NOT NULL | FK → RuleVersion | Phiên bản `RISK-SCORE` (trọng số) dùng để tính |
 | evaluationRunId | String (uuid) | NOT NULL | FK → EvaluationRun | Lần chạy tạo bản ghi — job chạy lại xóa và ghi lại theo lần chạy (idempotent) |
 | calculatedAt | DateTime | NOT NULL | | |
@@ -156,7 +156,7 @@ RÀNG BUỘC: không expose `UPDATE`/`DELETE` ở tầng ứng dụng (xem `06-s
 | id | String (uuid) | NOT NULL | PK | Dùng làm `jobId` gốc của BullMQ |
 | termId | String(10) | NOT NULL | FK → Term | |
 | courseId | String(20) | NULL | FK → Course | NULL = toàn bộ học kỳ |
-| trigger | EvaluationTrigger (enum) | NOT NULL | | `AUTO_AFTER_IMPORT`/`MANUAL`/`SCHEDULED` (lịch mỗi đêm — `05`) |
+| trigger | EvaluationTrigger (enum) | NOT NULL | | `AUTO_AFTER_IMPORT`/`MANUAL`/`SCHEDULED` (lịch mỗi đêm — `05`)/`TERM_CLOSING` (lần chạy cuối khi chốt học kỳ — xong thì đặt `Term.closedAt`, `08`) |
 | asOf | DateTime | NOT NULL | | Mốc dữ liệu được dùng khi tính — xem `08` (mặc định = `createdAt`) |
 | triggeredBy | String(20) | NULL | FK → User | NULL khi `AUTO_AFTER_IMPORT` |
 | importBatchId | String (uuid) | NULL | FK → ImportBatch | Có khi `AUTO_AFTER_IMPORT` |
