@@ -385,8 +385,8 @@ export default async function AdminHomePage({
       <DashboardCard
         title="Độ mới dữ liệu"
         description={`${o.freshness.totalCourses} học phần trong học kỳ. "Chậm" = ngày dữ liệu cũ hơn ${STALE_DAYS} ngày so với ngày mới nhất của học kỳ.`}
-        href="/admin/imports"
-        hrefLabel="Nhập dữ liệu"
+        href="/admin/imports#do-moi-du-lieu"
+        hrefLabel="Xem từng học phần"
         className="scroll-mt-20"
       >
         <div id="do-moi-du-lieu" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

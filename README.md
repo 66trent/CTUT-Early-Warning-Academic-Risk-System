@@ -2,11 +2,11 @@
 
 Đồ án tốt nghiệp — Trường Đại học Kỹ thuật - Công nghệ Cần Thơ.
 
-Hệ thống phát hiện **dấu hiệu rủi ro học tập** của sinh viên từ 3 nguồn dữ liệu (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần) bằng **10 luật nghiệp vụ cấu hình được**, tạo **cảnh báo sớm mang tính tham khảo** gửi Cố vấn học tập xử lý. Hệ thống KHÔNG sửa tình trạng học vụ chính thức của sinh viên.
+Hệ thống phát hiện **dấu hiệu rủi ro học tập** của sinh viên từ 4 nguồn dữ liệu (điểm danh theo tiết, bài trắc nghiệm LMS, bài thực hành LMS, kết quả học phần đã khóa điểm) bằng **12 luật nghiệp vụ cấu hình được**, tạo **cảnh báo sớm mang tính tham khảo** gửi Cố vấn học tập xử lý. Hệ thống KHÔNG sửa tình trạng học vụ chính thức của sinh viên.
 
 - 3 vai trò: **Admin** (nhập dữ liệu, cấu hình luật, giám sát — chỉ đọc cảnh báo), **Cố vấn học tập** (xác nhận, can thiệp, đóng cảnh báo), **Sinh viên** (xem tình hình học tập của mình).
 - Công nghệ: Next.js 16 · PostgreSQL 16 · TypeORM · Better Auth · BullMQ + Redis · MinIO · Tailwind 4 + shadcn/ui · Recharts · Docker.
-- Tài liệu: luật nghiệp vụ `docs/rules/08-business-rules-catalog.md` · dữ liệu demo + kết quả mong đợi `docs/demo-data/KET_QUA_MONG_DOI.md` · kịch bản demo `docs/demo-script.md` · báo cáo kiểm tra `docs/bao-cao/`.
+- Tài liệu: luật nghiệp vụ `docs/rules/08-business-rules-catalog.md` · dữ liệu demo + kết quả mong đợi `docs/demo-data/KET_QUA_MONG_DOI.md` · kịch bản demo `docs/demo-script.md` · báo cáo kiểm tra `docs/bao-cao/` · ảnh màn hình `docs/screenshots/` (mục 6).
 
 ## 1. Chạy trên máy sạch
 
@@ -48,7 +48,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 docker compose --profile dev up -d --build
 ```
 
-**Tạo bảng và dữ liệu nền** (7 khoa, Admin đầu tiên, 10 luật):
+**Tạo bảng và dữ liệu nền** (7 khoa, Admin đầu tiên, 12 luật):
 
 ```bash
 npm run db:init
@@ -64,7 +64,7 @@ npm run seed
 
 Mở http://localhost:3000 → tab **Cán bộ** → đăng nhập bằng `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD`. Trang **Bắt đầu** hướng dẫn từng bước vận hành.
 
-**Nạp sẵn bộ dữ liệu demo** (tùy chọn, cần `DEMO_MODE=true`): tạo GV001/GV002, 2 lớp, 2 học kỳ, nạp 5 file demo.
+**Nạp sẵn bộ dữ liệu demo** (tùy chọn, cần `DEMO_MODE=true`): tạo GV001/GV002, lớp KTPM2411 (20 sinh viên), học kỳ 1 2025–2026, nạp 6 file demo (thêm `--evaluate=2` để chạy luôn 2 mốc đánh giá).
 
 ```bash
 npm run demo:reset -- --yes
@@ -98,7 +98,7 @@ Kiểm tra trước khi gửi PR (CI chạy đúng thứ tự này):
 npm run typecheck && npm run lint && npm run format:check && npm run migration:check && npm test && npm run build
 ```
 
-Kiểm thử giao diện end-to-end (Playwright, chạy trên máy — cần app ở cổng 3000 và đã `demo:reset`):
+Kiểm thử giao diện end-to-end (Playwright, 2 luồng: nạp nhiều file có dòng lỗi → sửa → nạp lại; Cố vấn học tập xác nhận + ghi can thiệp — chạy trên máy, cần app ở cổng 3000 và đã `npm run demo:reset -- --yes --evaluate=2`):
 
 ```bash
 npm run test:e2e
@@ -142,7 +142,23 @@ npm run restore -- backups/<file>.dump
 | Lệnh | Việc |
 |---|---|
 | `npm run demo:reset -- --yes` | Xóa dữ liệu, dựng lại bộ demo chuẩn |
-| `npm run demo:scenario -- <số>` | Nạp thêm 1 kịch bản nhỏ trong `docs/demo-data/kich-ban/` |
 | `npm run templates:build` | Sinh file mẫu `.xlsx` từ mẫu `.csv` (`public/templates/`) |
 | `npm run perf:seed`, `npm run perf:measure` | Đo hiệu năng trên DB riêng `*_perf` (`docs/bao-cao/02-hieu-nang.md`) |
 | `npm run backup`, `npm run restore` | Sao lưu / khôi phục |
+| `npm run screenshots` | Chụp lại ảnh màn hình (mục 6) |
+
+## 6. Ảnh màn hình
+
+`docs/screenshots/<giao diện>-<khổ>-<số>-<tên>.jpg` — sáng / tối, `desktop` 1440px (tối chỉ chụp khổ này), `tablet` 768px và `mobile` 390px cho các trang chính: đăng nhập, Bắt đầu, Tổng quan Admin, Nhập dữ liệu (độ mới theo học phần, xem trước lô), Cấu hình luật, Chạy đánh giá + kết quả, Cảnh báo sớm, hồ sơ sinh viên, Khoa và lớp, Tài khoản, Nhật ký; Cố vấn học tập: Tổng quan, Cảnh báo cần xử lý, chi tiết cảnh báo, Ma trận lớp, hồ sơ, Thông báo; trang sinh viên; chính sách dữ liệu cá nhân.
+
+Chụp lại (cần app ở cổng 3000, `DEMO_MODE=true`):
+
+```bash
+npm run demo:reset -- --yes --evaluate=2
+```
+
+```bash
+npm run screenshots
+```
+
+Lệnh báo trang nào bị tràn ngang (kiểm tra giao diện điện thoại).

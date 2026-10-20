@@ -23,6 +23,17 @@ export const uploadImportSchema = z.object({
     .nullable()
     .default(null)
     .or(z.literal('').transform(() => null)),
+  /** Lô đang tải lên (file thứ 2 trở đi của lô nhiều file — Phase 8f). */
+  batchId: z
+    .uuid()
+    .nullable()
+    .default(null)
+    .or(z.literal('').transform(() => null)),
+  /** File cuối của lô → bắt đầu kiểm tra. */
+  last: z
+    .string()
+    .default('')
+    .transform((v) => v === '1'),
 });
 
 export const batchIdSchema = z.object({ batchId: z.uuid() });

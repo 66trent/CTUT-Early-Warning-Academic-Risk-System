@@ -141,3 +141,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Trang sinh viên: thẻ từng học phần với thanh vắng so với vạch, bỏ nhãn "Ổn định"; thẻ "Lần đầu dùng?" cho CVHT và sinh viên.
 - Rules `06`, `07`. Kiểm tra: typecheck, lint, format, migration:check, 395 test, build — xanh; kiểm tay GV001 + sinh viên, điện thoại.
 - Tự kiểm tra: GV001 → Cảnh báo cần xử lý → lọc + Xuất Excel; Ma trận lớp → bấm 1 ô; mở 1 sinh viên → biểu đồ vắng; đăng nhập sinh viên KTPM2411903 → thẻ học phần.
+
+## Phase 8f — Nạp nhiều file và chốt giao diện (2026-10-20)
+
+- Rà trước khi code, người dùng chốt: 1 lô thật nhiều file (không "nhóm lô"), tối đa 50 file / lô, bảng độ mới theo cách của 8d.
+- Nạp nhiều file: bảng mới `import_batch_files` + `import_error_rows.source_file_name` (migration `Phase8fImportFiles`, điền 1 dòng cho lô cũ); tải lên lần lượt từng file (`beginImportUpload` / `addImportFile` / `finishImportUpload`, trạng thái `UPLOADING`); xử lý đọc lần lượt các file, trùng khóa xuyên file, trần 50.000 dòng cả lô; rate-limit 30 lô / giờ.
+- Giao diện nhập: kéo thả nhiều file, thanh tiến độ tải lên; xem trước có bảng từng file, dòng lỗi / cảnh báo ghi tên file; file lỗi thêm cột `ten_file`; lịch sử lọc loại / học phần / khoa; bảng "Học phần nào cần nạp dữ liệu" (`getDataFreshness` thêm từng học phần).
+- Playwright 2 luồng viết lại theo demo v2; `npm run screenshots` 22 trang (62 ảnh); `docs/demo-script.md` viết lại; README mục 6 ảnh; demo `docs/demo-data/nhieu-file/`.
+- Rà 3 khổ + tối + bàn phím: sửa tràn ngang form luật (bảng mức cảnh báo).
+- Rules `07`, `12`. Kiểm tra: typecheck, lint, format, migration:check, 402 test, build, e2e (cả image Docker) — xanh.
+- Tự kiểm tra: Admin → Nhập dữ liệu → loại "Điểm danh" → kéo 3 file trong `docs/demo-data/nhieu-file/` → xem bảng từng file → Hủy lô; xem bảng "Học phần nào cần nạp dữ liệu"; lọc lịch sử theo học phần.

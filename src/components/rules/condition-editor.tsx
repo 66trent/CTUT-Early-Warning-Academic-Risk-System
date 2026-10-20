@@ -114,7 +114,8 @@ function ArrayField({ ruleCode, schema, value, onChange, readOnly, path }: Field
   const columns = Object.entries(itemSchema.properties ?? {});
   const min = schema.minItems ?? 0;
   return (
-    <div className="flex flex-col gap-2">
+    // min-w-0: ô lưới không giãn theo bảng — bảng cuộn ngang trong khung trên điện thoại.
+    <div className="flex min-w-0 flex-col gap-2">
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
           <thead className="bg-muted text-left">

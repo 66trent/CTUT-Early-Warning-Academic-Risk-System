@@ -67,6 +67,7 @@ export const importWarningsSchema: z.ZodType<ImportWarning[]> = z
   .array(
     z.object({
       row: z.number().int().min(1),
+      file: z.string().max(255).optional(),
       code: z.string().max(40),
       message: z.string().max(255),
     }),

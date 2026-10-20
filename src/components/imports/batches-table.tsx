@@ -33,9 +33,19 @@ const columns: ColumnDef<ImportBatchListItemDto>[] = [
     header: 'File',
     meta: { sortKey: 'fileName', mobile: 'title' },
     cell: ({ row }) => (
-      <Link href={`/admin/imports/${row.original.id}`} className="text-primary hover:underline">
-        {row.original.fileName}
-      </Link>
+      <span className="inline-flex flex-wrap items-baseline gap-x-1">
+        <Link
+          href={`/admin/imports/${row.original.id}`}
+          className="break-all text-primary hover:underline"
+        >
+          {row.original.fileName}
+        </Link>
+        {row.original.fileCount > 1 && (
+          <span className="text-xs text-muted-foreground">
+            + {row.original.fileCount - 1} file khác
+          </span>
+        )}
+      </span>
     ),
   },
   {

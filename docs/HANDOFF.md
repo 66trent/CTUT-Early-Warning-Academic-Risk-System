@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-19 (sau Phase 8e).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-20 (sau Phase 8f).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -20,7 +20,8 @@
 | 8b Nền tảng giao diện (phân trang, thẻ điện thoại, Ctrl+K, menu nhóm) | Xong | `phase-8b` | #11 → `phase-8a` | — |
 | 8c Trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá) | Xong | `phase-8c` | #12 → `phase-8b` | — |
 | 8d Hai trang tổng quan (Admin + CVHT) | Xong | `phase-8d` | #13 → `phase-8c` | — |
-| 8e Màn hình CVHT và sinh viên (lọc, xuất Excel, thông báo, ma trận, hồ sơ) | Xong | `phase-8e` (đang checkout) | → `phase-8d` | — |
+| 8e Màn hình CVHT và sinh viên (lọc, xuất Excel, thông báo, ma trận, hồ sơ) | Xong | `phase-8e` | #14 → `phase-8d` | — |
+| 8f Nạp nhiều file, bảng độ mới, ảnh/Playwright/demo-script, rà giao diện | Xong | `phase-8f` (đang checkout) | → `phase-8e` | — |
 
 - Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **đã merge #1–#8 vào `main` (merge commit, 2026-10-15)**. Từ Phase 7 PR đi thẳng vào `main`.
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
@@ -28,7 +29,7 @@
 
 ## 2. Môi trường đang chạy
 
-- Docker Compose (project `ewars`): `app` (3000), `worker`, `postgres` (5432), `redis` (6379), `minio` (9000/9001), `mailhog` (1025/8025, profile `dev`) — port chỉ mở `127.0.0.1`. Image app/worker đã build theo code Phase 7.
+- Docker Compose (project `ewars`): `app` (3000), `worker`, `postgres` (5432), `redis` (6379), `minio` (9000/9001), `mailhog` (1025/8025, profile `dev`) — port chỉ mở `127.0.0.1`. Image app/worker đã build lại theo code Phase 8f (2026-10-20), e2e chạy xanh trên image.
 - Container dự án CŨ (`ctut-ewars-*`, ở `E:\CTUT-EWARS`) đã **dừng** (không xóa) để nhường port.
 - `.env` (không commit): `STAFF_EMAIL_DOMAIN=@ctuet.edu.vn` (Phase 7 đặt lại); `AUTH_SECRET` sinh mới Phase 7; `DEMO_MODE=true`; có thêm `POSTGRES_USER/PASSWORD/DB` khớp `DATABASE_URL`. DB phụ `ewars_perf` (5.000 SV giả, đo hiệu năng).
 - Dữ liệu trong DB dev: bộ demo chuẩn dựng bằng `npm run demo:reset -- --yes --evaluate` (2026-10-15) — GV001/GV002 mật khẩu = `DEMO_ADVISOR_PASSWORD`, 13 SV, 5 file, 2 mốc chính thức → đúng 12 cảnh báo. Có thể còn dữ liệu do `npm run screenshots` (chỉ đọc). Sao lưu cũ: `backups/before-phase6-dod-20261013.dump` (dữ liệu người dùng trước Phase 6), `before-phase7-migration-20261015.dump`, `ewars-*.dump`.
@@ -42,6 +43,7 @@
 - `src/modules/alerts`: quyết định gộp/mở lại thuần `services/alert-decision.ts`, gộp vào DB `alert-sync.service.ts`, máy trạng thái + can thiệp + chuyển người phụ trách `alert-lifecycle.service.ts`, truy vấn `alert-query.service.ts`, hồ sơ/trang sinh viên `student-profile.service.ts`, thông báo `notification.service.ts`, Server Action `actions/alert.actions.ts`.
 - Giao diện: `src/app/{admin,advisor,student}/**`, component `src/components/{alerts,evaluations,imports,admin,domain}/*`. Menu `src/components/layout/nav-config.ts`. Phase 6: `src/app/admin/{rules,audit-logs,getting-started,students}`, `/legal/privacy-policy`, component `src/components/{rules,admin}/*`, service `src/modules/admin/services/{overview,getting-started,setup-steps,audit-log,enrollment,student-search}*`, `rule-engine/services/rule-query.service.ts`, form luật tự sinh `rule-engine/condition-schema.ts` + `components/rules/condition-editor.tsx`, biểu đồ `components/ui/chart.tsx` (shadcn).
 - Phase 7: dấu hiệu hiện tại `alerts/services/current-signals.ts` + gộp `alert-sync.service.ts` (giữ dấu hiệu điểm danh quá hạn), lịch đêm `SCHEDULED_EVALUATION_JOB`, bộ lọc Khoa `components/admin/department-filter.tsx`; script `scripts/{demo-reset,load-scenario,db-backup,perf-seed,perf-measure,screenshots}.ts`; kịch bản `docs/demo-data/kich-ban/*` (+ `tests/integration/demo-scenarios.test.ts`); Playwright `tests/e2e/*`; báo cáo `docs/bao-cao/*`.
+- Phase 8f: file của lô `db/entities/import-batch-file.entity.ts` (migration `Phase8fImportFiles`); tải lên từng file `beginImportUpload` / `addImportFile` / `finishImportUpload` (`import-batch.service.ts`); đọc nhiều file `runPass` (`import-processor.service.ts`); bảng độ mới theo học phần `getDataFreshness().courses` + `components/imports/course-freshness-table.tsx`; demo nhiều file `docs/demo-data/nhieu-file/`.
 - Worker: `src/workers/index.ts` + `processors/{import-batch,evaluation-run,notification}.processor.ts`; 3 queue ở `src/lib/queue/queues.ts`.
 - Test: `tests/unit/**`, `tests/integration/**` (Postgres thật); helper dữ liệu demo `tests/helpers/demo-setup.ts`, `import-helpers.ts`, `evaluator-fixtures.ts`. Nghiệm thu: `rule-engine-acceptance.test.ts` (trigger), `alerts.test.ts` (cảnh báo).
 - Lệnh thêm: `npm run demo:load` (nạp file demo 02–05 qua worker), `npm run templates:build` (sinh mẫu `.xlsx` từ `.csv`).
@@ -57,6 +59,7 @@
 - Phiên bản: TypeScript 5.9, TypeORM 0.3.x (chưa lên TS 7 / TypeORM 1.x).
 - Màn hình CVHT / sinh viên (chốt 2026-10-19, Phase 8e): ma trận = sinh viên × học phần của 1 lớp; dòng thời gian hồ sơ = cảnh báo + can thiệp (chỉ loại) + ngày chốt dữ liệu; vạch vắng đọc từ ATT-01 đang áp dụng.
 - Tổng quan (chốt 2026-10-19, Phase 8d): xu hướng theo các lần đánh giá (mốc dữ liệu), không theo tuần lịch; "học phần chậm dữ liệu" so với ngày dữ liệu mới nhất của học kỳ, không so với hôm nay; CVHT: `/advisor` = tổng quan, danh sách cảnh báo `/advisor/alerts` (email + chuông đổi link, link cũ tự chuyển). DB `ewars_perf` đã tạo lại theo cấu trúc 8a (5.000 SV giả).
+- Nạp nhiều file (chốt 2026-10-20, Phase 8f, ghi `07`, `12`): 1 lô thật nhiều file (KHÔNG nhóm lô), ≤ 50 file / lô, cùng loại + học kỳ; trình duyệt gửi từng file (Server Action 21MB/lần); rate-limit 30 LÔ / giờ; bảng độ mới ở trang nhập theo cách 8d (so với ngày mới nhất của học kỳ).
 - Giao diện (chốt 2026-10-19, ghi `03`): họ tên sắp theo tên rồi họ; RiskScore hiển thị 0–1 (dấu phẩy) + thanh; danh mục khoa = chip lọc + mục thu gọn; giữ shadcn, chỉ thêm thành phần; kế hoạch giao diện chia 8b–8f.
 
 ## 4. Câu hỏi còn mở (hỏi người dùng đúng lúc)
@@ -102,11 +105,14 @@ un\dockerInference` → tắt Docker, xóa file, `wsl --shutdown`, mở lại (K
 25. Next 16 tách thư mục dev (`.next/dev`) — `next build` chạy song song dev server không còn làm hỏng cache (bẫy #0 cũ). Dev server của phiên khác chiếm cổng 3000 → Browser pane mở thẳng `http://localhost:3000` dùng chung.
 26. `listX(filter, firstPage({ size }))` trong test/script truyền `sort: null, dir: asc` → service phải dùng `resolveSort` để lấy cả hướng mặc định (VD mức cao nhất giảm dần), nếu không sẽ ra tăng dần.
 27. Python `io.open(..., "w")` trên Windows đôi khi lỗi `OSError [Errno 22]` khi dev server/prettier đang giữ file → ghi lại bằng tool Edit.
+29. Trang app chặn nhúng iframe (header bảo mật) → rà nhiều trang bằng `browser_batch` (navigate + `javascript_tool` đo `scrollWidth`); khổ < 768 mà `innerWidth` > 375 = trang tràn ngang (khung nhìn tự giãn).
+30. Playwright / `scripts/screenshots.ts` ở khổ điện thoại: bảng thành thẻ `li`, không có role `row` → chọn `tr:visible, li:visible` + `filter({ hasText })`.
+31. `demo:reset --evaluate` (3 mốc) CHỐT học kỳ → không nạp thêm được, trang nhập ẩn bảng độ mới. Thử nạp / e2e / screenshots: dùng `--evaluate=2`; trước buổi bảo vệ: `demo:reset -- --yes` (chưa chạy đánh giá).
 28. Hằng / hàm dùng ở Client Component KHÔNG đặt trong file service có `getDataSource` (VD `OVERDUE_DAYS` để ở `alert-presentation.ts`) — nếu không TypeORM bị kéo vào bundle trình duyệt. Browser pane ẩn: trang đôi khi kẹt "Đang tải…" (React không đổi khung khi tab nền) → chụp màn hình để ép vẽ rồi đọc lại.
 
 ## 6. Việc tiếp theo
 
-Phase 8a–8e xong (chờ merge PR). Tiếp: Phase 8f (8b–8e đã làm) (chốt 2026-10-19, chi tiết `docs/implement.md`; giữ shadcn + thêm thành phần): 8b nền tảng giao diện (phân trang, thẻ trên điện thoại, tải/lỗi/trống, menu nhóm, Ctrl+K), 8c trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá), 8d hai trang tổng quan Admin + CVHT (`/advisor` thành tổng quan, cảnh báo sang `/advisor/alerts`), 8e CVHT + sinh viên (xuất Excel, trang thông báo, ma trận, hồ sơ), 8f nạp nhiều file + Playwright/ảnh/demo-script, Phase 9 (mở rộng dữ liệu demo, kịch bản nhỏ). Image Docker app/worker CHƯA build lại theo code 8a. Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/`), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
+Phase 8a–8f xong (chờ merge PR #10–#14 + PR 8f). Tiếp: Phase 9 (mở rộng dữ liệu demo: học kỳ trước có rớt → học lại, nghiệm thu ACA-04 / COMB-02, thêm môn/lớp/khoa; viết lại kịch bản nhỏ từ `_luu-tru-v1/` theo 12 luật, mỗi kịch bản 1 test; cập nhật mục "hội đồng hỏi" của `docs/demo-script.md`). Còn treo: chạy tay trọn kịch bản 10 phút theo `docs/demo-script.md` (viết lại 8f). Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/` — tên ảnh đổi ở 8f), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
 
 **Báo cáo tiến độ với giảng viên:** `docs/BAO_CAO_TIEN_DO.md` (checklist A–G + nhật ký báo cáo). Mỗi khi người dùng hỏi "báo cáo tiến độ" hoặc xong một việc trong danh sách: tick `[x]` kèm ngày, cập nhật bảng Tổng hợp (đếm lại), thêm 1 dòng Nhật ký báo cáo — không xóa mục cũ. Báo cáo Word cho hội đồng: `docs/bao-cao/Bao-cao-do-an-CTUT-EWARS.docx` (bìa "Đồ án Kỹ thuật phần mềm 3" — người dùng chốt), bản kỹ thuật: `docs/bao-cao/CTUT-EWARS_Bao-cao-yeu-cau-va-thiet-ke-ky-thuat.docx` (cả 2 chưa commit).
 

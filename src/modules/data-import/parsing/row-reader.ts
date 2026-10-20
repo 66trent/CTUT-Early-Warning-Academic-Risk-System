@@ -182,23 +182,30 @@ async function openXlsx(stream: Readable): Promise<RowSource> {
   return { headers: toValues(headerRow), decimalComma: false, rows: rows() };
 }
 
-/** Giới hạn số dòng dữ liệu (docs/rules/12). */
-async function* limitRows(rows: AsyncIterable<RawRow>): AsyncIterable<RawRow> {
+/**
+ * Giới hạn số dòng dữ liệu (docs/rules/12): `maxRows` = số dòng còn lại của cả lô (lô nhiều file
+ * dùng chung trần 50.000 dòng).
+ */
+async function* limitRows(rows: AsyncIterable<RawRow>, maxRows: number): AsyncIterable<RawRow> {
   let count = 0;
   for await (const row of rows) {
     count += 1;
-    if (count > IMPORT_LIMITS.maxDataRows) {
+    if (count > maxRows) {
       throw new FileRejectedError(
-        `File có hơn ${IMPORT_LIMITS.maxDataRows.toLocaleString('vi-VN')} dòng dữ liệu. Hãy tách thành nhiều file.`,
+        `Lô có hơn ${IMPORT_LIMITS.maxDataRows.toLocaleString('vi-VN')} dòng dữ liệu. Hãy tách thành nhiều file hoặc nhiều lần nạp.`,
       );
     }
     yield row;
   }
 }
 
-export async function openRowSource(kind: ImportFileKind, stream: Readable): Promise<RowSource> {
+export async function openRowSource(
+  kind: ImportFileKind,
+  stream: Readable,
+  maxRows: number = IMPORT_LIMITS.maxDataRows,
+): Promise<RowSource> {
   const source = kind === 'csv' ? await openCsv(stream) : await openXlsx(stream);
-  return { ...source, rows: limitRows(source.rows) };
+  return { ...source, rows: limitRows(source.rows, maxRows) };
 }
 
 /** Số dòng đầu file được dò để tìm dòng tiêu đề (docs/rules/12). */

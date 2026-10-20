@@ -1,11 +1,12 @@
 import { getDataSource } from '@/db/data-source';
 import { Course } from '@/db/entities/course.entity';
+import { ImportBatchFile } from '@/db/entities/import-batch-file.entity';
 import { ImportBatch, type ImportCourseCard } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
 import { type ImportBatchStatus, IMPORT_DATA_TYPES } from '@/db/enums';
 import {
-  findOrder,
+  applyOrder,
   firstPage,
   type ListParams,
   type Paged,
@@ -26,6 +27,8 @@ export interface ImportBatchListItemDto {
   dataTypeLabel: string;
   termName: string | null;
   fileName: string;
+  /** Số file của lô (Phase 8f — nạp nhiều file 1 lần). */
+  fileCount: number;
   /** Học phần của lô (1 học phần → tên; nhiều → "N học phần"; chưa đọc → null). */
   courseLabel: string | null;
   status: ImportBatchStatus;
@@ -56,13 +59,26 @@ export interface ImportBatchDetailDto extends ImportBatchListItemDto {
   /** Thẻ nhận diện từng học phần trong file (docs/rules/12). */
   courses: ImportCourseCard[];
   /** Cảnh báo không chặn nạp (VD điểm chữ lệch điểm tổng kết). */
-  warnings: { row: number; code: string; message: string }[];
+  warnings: { row: number; file: string | null; code: string; message: string }[];
   stagedAt: string | null;
   completedAt: string | null;
+  /** Các file của lô theo thứ tự tải lên. */
+  files: ImportBatchFileDto[];
+}
+
+export interface ImportBatchFileDto {
+  fileName: string;
+  sizeBytes: number;
+  totalRows: number;
+  successRows: number;
+  errorRows: number;
+  courseIds: string[];
 }
 
 export interface ImportErrorRowDto {
   sourceRowNumber: number;
+  /** Tên file chứa dòng (null ở lô cũ trước Phase 8f). */
+  sourceFileName: string | null;
   errorReason: string;
   errorDetail: string | null;
   rawData: Record<string, string>;
@@ -86,13 +102,14 @@ function courseLabelOf(batch: ImportBatch): string | null {
   return batch.courseId;
 }
 
-function toListItem(batch: ImportBatch): ImportBatchListItemDto {
+function toListItem(batch: ImportBatch, fileCount = 1): ImportBatchListItemDto {
   return {
     id: batch.id,
     dataType: batch.dataType,
     dataTypeLabel: labelOf(batch.dataType),
     termName: batch.term?.termName ?? null,
     fileName: batch.fileName,
+    fileCount,
     courseLabel: courseLabelOf(batch),
     status: batch.status,
     totalRows: batch.totalRows,
@@ -129,26 +146,91 @@ export async function getImportFormOptions(): Promise<ImportFormOptionsDto> {
 
 export interface BatchFilter {
   dataType?: string;
+  /** Học phần chọn trên form hoặc nhận diện trong file (`summary.courses`). */
+  courseId?: string;
+  /** Khoa của lớp sinh hoạt trong thẻ học phần. */
+  departmentId?: string;
 }
 
+const BATCH_SORT_COLUMNS: Record<BatchSortKey, string> = {
+  createdAt: 'b.createdAt',
+  dataType: 'b.dataType',
+  status: 'b.status',
+  fileName: 'b.fileName',
+};
+
+async function countFiles(batchIds: string[]): Promise<Map<string, number>> {
+  if (batchIds.length === 0) return new Map();
+  const rows = await (
+    await getDataSource()
+  )
+    .getRepository(ImportBatchFile)
+    .createQueryBuilder('f')
+    .select('f.import_batch_id', 'id')
+    .addSelect('COUNT(*)', 'n')
+    .where('f.import_batch_id IN (:...batchIds)', { batchIds })
+    .groupBy('f.import_batch_id')
+    .getRawMany<{ id: string; n: string }>();
+  return new Map(rows.map((r) => [r.id, Number(r.n)]));
+}
+
+/** Lịch sử nạp: lọc loại / học phần / khoa (docs/rules/12), phân trang + sắp xếp ở server. */
 export async function listImportBatches(
   filter: BatchFilter = {},
   list: ListParams<BatchSortKey> = firstPage(BATCH_DEFAULT_SORT),
 ): Promise<Paged<ImportBatchListItemDto>> {
-  const repo = (await getDataSource()).getRepository(ImportBatch);
+  const qb = (await getDataSource())
+    .getRepository(ImportBatch)
+    .createQueryBuilder('b')
+    .leftJoinAndSelect('b.term', 'term');
   const dataType = IMPORT_DATA_TYPES.find((t) => t === filter.dataType);
-  const [batches, total] = await repo.findAndCount({
-    where: dataType ? { dataType } : {},
-    relations: { term: true },
-    order: findOrder(
-      resolveSort(list, BATCH_DEFAULT_SORT).sort,
-      resolveSort(list, BATCH_DEFAULT_SORT).dir,
-      'createdAt',
+  if (dataType) qb.andWhere('b.data_type = :dataType', { dataType });
+  if (filter.courseId) {
+    qb.andWhere("(b.course_id = :courseId OR b.summary->'courses' @> CAST(:courseJson AS jsonb))", {
+      courseId: filter.courseId,
+      courseJson: JSON.stringify([{ courseId: filter.courseId }]),
+    });
+  }
+  if (filter.departmentId) {
+    qb.andWhere("b.summary->'courses' @> CAST(:deptJson AS jsonb)", {
+      deptJson: JSON.stringify([{ classes: [{ departmentId: filter.departmentId }] }]),
+    });
+  }
+  const { sort, dir } = resolveSort(list, BATCH_DEFAULT_SORT);
+  applyOrder(qb, BATCH_SORT_COLUMNS[sort], dir, ['b.createdAt', 'DESC'], ['b.id', 'ASC']);
+  const [batches, total] = await qb.skip(pageOffset(list)).take(list.size).getManyAndCount();
+  const files = await countFiles(batches.map((b) => b.id));
+  return {
+    items: batches.map((b) => toListItem(b, files.get(b.id) ?? 1)),
+    total,
+    page: list.page,
+    size: list.size,
+  };
+}
+
+/** Lựa chọn bộ lọc lịch sử nạp: học phần + khoa có trong hệ thống. */
+export async function getBatchFilterOptions(): Promise<{
+  courses: { courseId: string; courseName: string }[];
+  departments: { departmentId: string; departmentName: string }[];
+}> {
+  const ds = await getDataSource();
+  const [courses, departments] = await Promise.all([
+    ds.getRepository(Course).find({
+      select: { courseId: true, courseName: true },
+      order: { courseName: 'ASC' },
+      take: 1000,
+    }),
+    ds.query<{ department_id: string; department_name: string }[]>(
+      'SELECT department_id, department_name FROM departments ORDER BY department_name',
     ),
-    skip: pageOffset(list),
-    take: list.size,
-  });
-  return { items: batches.map(toListItem), total, page: list.page, size: list.size };
+  ]);
+  return {
+    courses: courses.map((c) => ({ courseId: c.courseId, courseName: c.courseName })),
+    departments: departments.map((d) => ({
+      departmentId: d.department_id,
+      departmentName: d.department_name,
+    })),
+  };
 }
 
 export async function getImportBatchDetail(batchId: string): Promise<ImportBatchDetailDto | null> {
@@ -159,10 +241,16 @@ export async function getImportBatchDetail(batchId: string): Promise<ImportBatch
     .findOne({ where: { id: batchId }, relations: { term: true } });
   if (!batch) return null;
   const summary = readSummary(batch.summary);
-  const rollback = await getRollbackEligibility(batch);
+  const [rollback, files] = await Promise.all([
+    getRollbackEligibility(batch),
+    (await getDataSource()).getRepository(ImportBatchFile).find({
+      where: { importBatchId: batchId },
+      order: { fileOrder: 'ASC' },
+    }),
+  ]);
   const preview = summary.preview ?? [];
   return {
-    ...toListItem(batch),
+    ...toListItem(batch, Math.max(1, files.length)),
     termId: batch.termId,
     errorMessage: batch.errorMessage,
     parentBatchId: batch.parentBatchId,
@@ -187,29 +275,48 @@ export async function getImportBatchDetail(batchId: string): Promise<ImportBatch
     })),
     warnings: readWarnings(batch.warnings).map((w) => ({
       row: w.row,
+      file: w.file ?? null,
       code: w.code,
       message: w.message,
     })),
     stagedAt: batch.stagedAt?.toISOString() ?? null,
     completedAt: batch.completedAt?.toISOString() ?? null,
+    files: files.map((f) => ({
+      fileName: f.fileName,
+      sizeBytes: f.sizeBytes,
+      totalRows: f.totalRows,
+      successRows: f.successRows,
+      errorRows: f.errorRows,
+      courseIds: [...f.courseIds],
+    })),
   };
 }
 
-/** Dòng lỗi của 1 lô theo thứ tự dòng trong file. */
+/** Dòng lỗi của 1 lô theo thứ tự file (thứ tự tải lên) rồi thứ tự dòng trong file. */
 export async function listErrorRows(
   batchId: string,
   list: ListParams = firstPage({ size: 50 }),
 ): Promise<Paged<ImportErrorRowDto>> {
-  const [rows, total] = await (await getDataSource()).getRepository(ImportErrorRow).findAndCount({
-    select: { sourceRowNumber: true, errorReason: true, errorDetail: true, rawData: true },
-    where: { importBatchId: batchId },
-    order: { sourceRowNumber: 'ASC' },
-    skip: pageOffset(list),
-    take: list.size,
-  });
+  const [rows, total] = await (
+    await getDataSource()
+  )
+    .getRepository(ImportErrorRow)
+    .createQueryBuilder('r')
+    .leftJoin(
+      ImportBatchFile,
+      'f',
+      'f.import_batch_id = r.import_batch_id AND f.file_name = r.source_file_name',
+    )
+    .where('r.import_batch_id = :batchId', { batchId })
+    .orderBy('f.file_order', 'ASC', 'NULLS FIRST')
+    .addOrderBy('r.source_row_number', 'ASC')
+    .offset(pageOffset(list))
+    .limit(list.size)
+    .getManyAndCount();
   return {
     items: rows.map((r) => ({
       sourceRowNumber: r.sourceRowNumber,
+      sourceFileName: r.sourceFileName,
       errorReason: r.errorReason,
       errorDetail: r.errorDetail,
       rawData: { ...r.rawData },

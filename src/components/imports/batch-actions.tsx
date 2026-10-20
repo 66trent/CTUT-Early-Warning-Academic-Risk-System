@@ -60,6 +60,22 @@ export function StagedActions({
   );
 }
 
+/** Lô tải lên dở (trình duyệt đóng giữa chừng) — hủy để nạp lại. */
+export function UploadingActions({ batchId }: { batchId: string }) {
+  return (
+    <ConfirmActionButton
+      trigger="Hủy lần nạp này"
+      triggerVariant="outline"
+      destructive
+      title="Hủy lần nạp đang tải lên?"
+      description="Các file đã tải lên sẽ bị bỏ, không có dữ liệu nào được ghi. Lô tải lên dở quá 1 ngày cũng tự hủy."
+      confirmLabel="Hủy"
+      successMessage="Đã hủy lần nạp."
+      onConfirm={() => discardImportAction({ batchId })}
+    />
+  );
+}
+
 export function RollbackAction({
   batchId,
   allowed,
