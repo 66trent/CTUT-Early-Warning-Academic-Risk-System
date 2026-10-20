@@ -13,6 +13,7 @@ import { CourseResult } from './entities/course-result.entity';
 import { Department } from './entities/department.entity';
 import { Enrollment } from './entities/enrollment.entity';
 import { EvaluationRun } from './entities/evaluation-run.entity';
+import { ImportBatchFile } from './entities/import-batch-file.entity';
 import { ImportBatch } from './entities/import-batch.entity';
 import { ImportErrorRow } from './entities/import-error-row.entity';
 import { Intervention } from './entities/intervention.entity';
@@ -36,6 +37,7 @@ import { Phase5Alerts1791894767461 } from './migrations/1791894767461-Phase5Aler
 import { Phase7AlertsSchedule1792054500276 } from './migrations/1792054500276-Phase7AlertsSchedule';
 import { Phase7CurrentSignals1792056820711 } from './migrations/1792056820711-Phase7CurrentSignals';
 import { Phase8aSourceRecordsV21792338213883 } from './migrations/1792338213883-Phase8aSourceRecordsV2';
+import { Phase8fImportFiles1792505510980 } from './migrations/1792505510980-Phase8fImportFiles';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
@@ -46,6 +48,7 @@ export const ENTITIES = [
   Term,
   AuditLog,
   ImportBatch,
+  ImportBatchFile,
   ImportErrorRow,
   Course,
   Enrollment,
@@ -74,6 +77,7 @@ const MIGRATIONS = [
   Phase7AlertsSchedule1792054500276,
   Phase7CurrentSignals1792056820711,
   Phase8aSourceRecordsV21792338213883,
+  Phase8fImportFiles1792505510980,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

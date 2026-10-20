@@ -11,8 +11,8 @@ Xem `00-project-context.md` trước. File này đặc tả các bảng vận h�
 | courseId | String(20) | NULL | FK → Course | Học phần Admin chọn trên form (tùy chọn, mặc định "tự nhận diện từ file") — có thì dòng thuộc học phần khác → `COURSE_MISMATCH` |
 | termId | String(10) | NULL | FK → Term | Bắt buộc với mọi loại trừ `STUDENT`. Chọn trên form nhập, mặc định học kỳ `isCurrent` |
 | source | ImportSource (enum) | NOT NULL | | `FILE` (MVP chỉ nhập file CSV/XLSX). Tên enum `ImportSource` để tránh trùng class `DataSource` của TypeORM |
-| fileName | String(255) | NOT NULL | | Tên file gốc người dùng tải lên (chỉ hiển thị) |
-| sourceChecksum | String(64) | NOT NULL | | SHA-256 nội dung file — chống nạp trùng (xem RÀNG BUỘC) |
+| fileName | String(255) | NOT NULL | | Tên file đầu tiên của lô (chỉ hiển thị; lô nhiều file hiện thêm "+ N file") |
+| sourceChecksum | String(64) | NOT NULL | | SHA-256 nội dung file (lô 1 file) / SHA-256 của danh sách checksum các file đã sắp xếp (lô nhiều file) — chống nạp trùng (xem RÀNG BUỘC) |
 | performedBy | String(20) | NOT NULL | FK → User | |
 | status | ImportBatchStatus (enum) | NOT NULL | | `UPLOADING`→`VALIDATING`→`STAGED`→`LOADED`→`RECONCILED` / `REJECTED` / `DISCARDED` |
 | totalRows | Int | NOT NULL | | |
@@ -24,12 +24,12 @@ Xem `00-project-context.md` trước. File này đặc tả các bảng vận h�
 | loadedAt | DateTime | NULL | | Lúc ghi xong — điều kiện hoàn tác lô |
 | errorMessage | String (text) | NULL | | Lý do khi `REJECTED` (lỗi cả file) |
 | parentBatchId | String (uuid) | NULL | FK → ImportBatch | Liên kết batch sửa lỗi với batch gốc |
-| originalFilePath | String(255) | NOT NULL | | Lưu trong MinIO — xem `01-architecture.md` |
+| originalFilePath | String(255) | NOT NULL | | File đầu tiên trong MinIO — xem `01-architecture.md`; danh sách đầy đủ ở `ImportBatchFile` |
 | createdAt | DateTime | NOT NULL | | |
 | completedAt | DateTime | NULL | | |
 
 Quy trình 2 bước (người dùng chọn) — trạng thái:
-- `UPLOADING`: đang nhận file, lưu file gốc vào MinIO.
+- `UPLOADING`: đang nhận file, lưu file gốc vào MinIO. Lô nhiều file: trình duyệt gửi lần lượt từng file (mỗi lần ≤ 20MB — giới hạn thân request Server Action), file cuối kèm cờ kết thúc → `VALIDATING`. Lô `UPLOADING` quá 1 ngày (tải lên dở) → tự `DISCARDED`.
 - `VALIDATING`: job `import-batch-process` đọc file theo stream, kiểm tra từng dòng, ghi `ImportErrorRow`. KHÔNG ghi dữ liệu nghiệp vụ.
 - `STAGED`: kiểm tra xong, chờ Admin xem trước ("X dòng hợp lệ, Y dòng lỗi") rồi bấm **Xác nhận nạp** hoặc **Hủy** (`DISCARDED`).
 - `LOADED`: đã ghi các dòng hợp lệ (đọc lại file gốc từ MinIO, không dùng bảng tạm), theo lô ≤ 500 dòng/transaction; mọi thao tác là upsert theo khóa nghiệp vụ → chạy lại an toàn khi job lỗi giữa chừng.
@@ -38,12 +38,13 @@ Quy trình 2 bước (người dùng chọn) — trạng thái:
 - `ROLLED_BACK`: lô đã nạp bị hoàn tác (xem "Hoàn tác lô").
 
 RÀNG BUỘC:
-- Chỉ hủy được (`DISCARDED`) khi `status = STAGED` (chưa ghi dữ liệu nghiệp vụ nào). Lô `STAGED` quá 7 ngày không xác nhận → tự `DISCARDED` (job hằng ngày).
+- Chỉ hủy được (`DISCARDED`) khi `status = STAGED` hoặc `UPLOADING` (chưa ghi dữ liệu nghiệp vụ nào). Lô `STAGED` quá 7 ngày không xác nhận → tự `DISCARDED` (job hằng ngày).
 - **Kiểm tra lại khi xác nhận**: bước `LOADED` MUST kiểm tra lại mọi dòng với dữ liệu nền tại thời điểm nạp (sinh viên, lớp, học kỳ có thể đã đổi từ lúc xem trước); dòng mới thành lỗi được thêm vào `ImportErrorRow`, `successRows`/`errorRows` cập nhật lại.
 - **Màn xem trước**: hiện số dòng hợp lệ/lỗi, vài dòng mẫu; tỷ lệ lỗi > 10% → cảnh báo nổi bật (với `LMS_QUIZ`, thiếu dòng làm lệch tỷ lệ "phần lớn lớp đã làm" của `LMS-01`).
 - **Thẻ nhận diện** (chốt 2026-10-18): màn xem trước hiện 1 thẻ cho mỗi học phần trong file — tên, mã lớp học phần, mã học phần (ghi "tự suy" nếu suy từ mã lớp học phần), số tiết / danh sách bài + hạn nộp / ngày chốt (kèm ngày chốt lần nạp trước), số sinh viên chia theo lớp sinh hoạt và khoa, nhãn "Khớp học kỳ" / "Học phần mới, sẽ tạo", số dòng lỗi và cảnh báo của học phần đó. Lưu ở `summary.courses` (validate Zod). Nút xác nhận ghi rõ số dòng sẽ nạp. KHÔNG chọn khoa/lớp sinh hoạt khi nạp (1 lớp học phần có sinh viên nhiều lớp, nhiều khoa). Lịch sử nạp có cột Học phần (khi lô chỉ có 1 học phần) và lọc theo học phần.
 - **Nạp đồng thời**: bước nạp giữ khóa theo `(dataType, termId)` (PostgreSQL advisory lock) — lô thứ hai cùng loại, cùng học kỳ chờ lô đầu xong.
-- **Giới hạn file**: ≤ 20MB tải lên, ≤ 50.000 dòng dữ liệu (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`.
+- **Giới hạn file**: ≤ 20MB mỗi file, ≤ 50 file mỗi lô, ≤ 50.000 dòng dữ liệu TỔNG cả lô (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`. Giới hạn tần suất: 30 lô / giờ / Admin (đếm theo lô, không theo file).
+- **Nạp nhiều file 1 lần** (chốt 2026-10-20, Phase 8f — trường xuất 1 file / lớp học phần / lần): 1 lô nhận 1–50 file CÙNG loại, CÙNG học kỳ (được trộn `.csv` và `.xlsx`; mỗi file có dòng tiêu đề và thứ tự cột riêng). Cả lô chung 1 lần xem trước, 1 lần xác nhận, 1 lần chạy đánh giá sau nạp, hoàn tác cả lô. 1 file lỗi cả file (không đọc được, thiếu cột) → `REJECTED` cả lô, `errorMessage` ghi tên file. Kiểm tra trùng khóa chạy xuyên các file: dòng trùng dòng của file trước → `DUPLICATE` "Trùng với dòng N của file X". Chống nạp trùng theo TỪNG file: file đã nằm trong 1 lô còn hiệu lực khác (cùng loại, học kỳ) hoặc chọn 2 lần trong cùng lô → từ chối khi tải lên. Màn xem trước có bảng từng file (số dòng, hợp lệ, lỗi, học phần nhận diện) + thẻ học phần gộp cả lô. Lịch sử nạp lọc theo học phần (học phần chọn trên form hoặc nhận diện trong `summary.courses`) và theo khoa (khoa của lớp sinh hoạt trong thẻ học phần).
 
 **Hoàn tác lô** (người dùng chọn "có điều kiện") — Admin bấm "Hoàn tác" trên lô `LOADED`/`RECONCILED`, xác nhận lần 2 (AlertDialog), chỉ khi ĐỦ cả 2 điều kiện (người dùng bỏ điều kiện "chưa có `EvaluationRun`" vì mỗi lô nạp xong đều tự chạy đánh giá, điều kiện đó khiến lô học tập không bao giờ hoàn tác được):
 1. Lô chỉ THÊM dòng mới, không cập nhật dòng có sẵn (`summary.updated = 0`), và job nạp không phải chạy lại sau sự cố (`summary.retried` khác true).
@@ -61,14 +62,32 @@ Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `
 | id | String (uuid) | NOT NULL | PK | |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 | sourceRowNumber | Int | NOT NULL | | Số dòng trong file gốc, để người nhập đối chiếu khi sửa |
+| sourceFileName | String(255) | NULL | | Tên file chứa dòng lỗi (lô nhiều file — Phase 8f); NULL ở lô cũ trước 8f |
 | rawData | Json | NOT NULL | | Dữ liệu nguyên trạng dòng lỗi |
 | errorDetail | String(255) | NULL | | Diễn giải cụ thể bằng tiếng Việt (VD "Lớp KTPM9999 chưa có trong hệ thống") |
 | errorReason | String(40) | NOT NULL | | Kiểu TS `ImportErrorReason` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `INVALID_FORMAT`/`STUDENT_NOT_FOUND`/`CLASS_NOT_FOUND`/`DUPLICATE`/`OUT_OF_RANGE`/`TERM_MISMATCH`/`COURSE_MISMATCH` |
 | resolved | Boolean | NOT NULL, default `false` | | |
 
-`STUDENT_NOT_FOUND`: `mssv` chưa có trong danh sách sinh viên — MUST NOT tự tạo sinh viên. `TERM_MISMATCH`: cột `hoc_ky` khác học kỳ đã chọn, hoặc ngày chốt điểm danh / giờ bắt đầu làm bài nằm ngoài thời gian học kỳ. `DUPLICATE`: trùng khóa với 1 dòng trước đó trong CÙNG file (giữ dòng đầu), hoặc email sinh viên đã thuộc tài khoản khác. `COURSE_MISMATCH`: Admin đã chọn 1 học phần trên form nhưng dòng thuộc học phần khác.
+`STUDENT_NOT_FOUND`: `mssv` chưa có trong danh sách sinh viên — MUST NOT tự tạo sinh viên. `TERM_MISMATCH`: cột `hoc_ky` khác học kỳ đã chọn, hoặc ngày chốt điểm danh / giờ bắt đầu làm bài nằm ngoài thời gian học kỳ. `DUPLICATE`: trùng khóa với 1 dòng trước đó trong CÙNG lô (cùng file hoặc file trước — giữ dòng đầu), hoặc email sinh viên đã thuộc tài khoản khác. `COURSE_MISMATCH`: Admin đã chọn 1 học phần trên form nhưng dòng thuộc học phần khác.
 
-**File lỗi tải về** (Route Handler GET — export file, chỉ Admin): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), chống chèn công thức (xem `06`), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`).
+**File lỗi tải về** (Route Handler GET — export file, chỉ Admin): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), chống chèn công thức (xem `06`), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, (lô nhiều file: `ten_file`), rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`; các cột thêm được bỏ qua).
+
+## ImportBatchFile (Phase 8f)
+
+1 file của 1 lô. Lô trước 8f được migration điền 1 dòng từ cột của `ImportBatch`.
+
+| Field | Kiểu | Null? | Khóa | Ghi chú |
+|---|---|---|---|---|
+| id | String (uuid) | NOT NULL | PK | |
+| importBatchId | String (uuid) | NOT NULL | FK → ImportBatch (CASCADE) | |
+| fileOrder | Int | NOT NULL | UNIQUE cùng `importBatchId` | Thứ tự tải lên, từ 1 |
+| fileName | String(255) | NOT NULL | | |
+| sourceChecksum | String(64) | NOT NULL | INDEX | SHA-256 nội dung file — chống nạp trùng từng file |
+| originalFilePath | String(255) | NOT NULL | | Khóa đối tượng MinIO |
+| sizeBytes | Int | NOT NULL | | |
+| totalRows / successRows / errorRows | Int | NOT NULL, default 0 | | Cập nhật sau kiểm tra và sau nạp |
+| courseIds | String(20)[] | NOT NULL, default `{}` | | Học phần nhận diện trong file (bảng từng file ở màn xem trước) |
+| createdAt | DateTime | NOT NULL | | |
 
 ## Định dạng file và cột — header tiếng Việt không dấu
 

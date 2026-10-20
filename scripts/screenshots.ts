@@ -1,7 +1,7 @@
 /**
- * npm run screenshots — chụp màn hình cho báo cáo + kiểm tra responsive (Phase 7).
- * Cần app ở http://localhost:3000 (DEMO_MODE=true) và dữ liệu demo đã chạy 2 mốc chính thức:
- *   npm run demo:reset -- --yes --evaluate
+ * npm run screenshots — chụp màn hình cho báo cáo + kiểm tra responsive (Phase 7, cập nhật 8f).
+ * Cần app ở http://localhost:3000 (DEMO_MODE=true) và bộ demo v2 đã chạy 2 mốc chính thức:
+ *   npm run demo:reset -- --yes --evaluate=2
  * Ảnh lưu `docs/screenshots/<chủ đề>-<khổ màn hình>-<tên>.jpg`; báo trang nào bị tràn ngang.
  */
 import { mkdirSync } from 'node:fs';
@@ -30,25 +30,45 @@ interface Shot {
 
 const ALL: ViewportName[] = ['desktop', 'tablet', 'mobile'];
 const openAlert = (studentId: string) => async (page: Page) => {
+  // Khổ lớn: dòng bảng; điện thoại (< 768px): thẻ trong danh sách (docs/rules/07).
   await page
-    .getByRole('row', { name: new RegExp(studentId) })
+    .locator('tr:visible, li:visible')
+    .filter({ hasText: studentId })
     .getByRole('button', { name: 'Xem' })
+    .first()
     .click();
   await page.getByRole('dialog').waitFor();
   await page.waitForTimeout(800);
 };
 
+/** Sinh viên demo có nhiều dấu hiệu nhất (bộ demo v2 — KET_QUA_MONG_DOI.md). */
+const DEMO_STUDENT = 'KTPM2411903';
+const ADMIN = 'Quản trị viên';
+const GV001 = 'Cố vấn học tập GV001';
+
 const SHOTS: Shot[] = [
   { name: '01-dang-nhap', account: null, url: '/login', viewports: ALL },
-  { name: '02-bat-dau', account: 'Quản trị viên', url: '/admin/getting-started' },
-  { name: '03-tong-quan', account: 'Quản trị viên', url: '/admin', viewports: ALL },
-  { name: '04-nhap-du-lieu', account: 'Quản trị viên', url: '/admin/imports' },
-  { name: '05-cau-hinh-luat', account: 'Quản trị viên', url: '/admin/rules' },
-  { name: '06-cau-hinh-att-01', account: 'Quản trị viên', url: '/admin/rules/ATT-01' },
-  { name: '07-chay-danh-gia', account: 'Quản trị viên', url: '/admin/evaluations' },
+  { name: '02-bat-dau', account: ADMIN, url: '/admin/getting-started' },
+  { name: '03-tong-quan', account: ADMIN, url: '/admin', viewports: ALL },
+  { name: '04-nhap-du-lieu', account: ADMIN, url: '/admin/imports', viewports: ALL },
   {
-    name: '08-ket-qua-danh-gia',
-    account: 'Quản trị viên',
+    name: '05-xem-truoc-lo-nhap',
+    account: ADMIN,
+    url: '/admin/imports?type=ATTENDANCE_SUMMARY',
+    before: async (page) => {
+      await page
+        .getByRole('link', { name: /\.(csv|xlsx)$/ })
+        .first()
+        .click();
+      await page.waitForURL(/\/admin\/imports\/[0-9a-f-]{36}/);
+    },
+  },
+  { name: '06-cau-hinh-luat', account: ADMIN, url: '/admin/rules' },
+  { name: '07-cau-hinh-att-01', account: ADMIN, url: '/admin/rules/ATT-01', viewports: ALL },
+  { name: '08-chay-danh-gia', account: ADMIN, url: '/admin/evaluations' },
+  {
+    name: '09-ket-qua-danh-gia',
+    account: ADMIN,
     url: '/admin/evaluations',
     before: async (page) => {
       await page
@@ -58,24 +78,25 @@ const SHOTS: Shot[] = [
       await page.waitForURL(/\/admin\/evaluations\/[0-9a-f-]{36}/);
     },
   },
-  { name: '09-canh-bao-admin', account: 'Quản trị viên', url: '/admin/alerts' },
-  { name: '10-ho-so-sinh-vien', account: 'Quản trị viên', url: '/admin/students/KTPM2311003' },
-  { name: '11-nhat-ky', account: 'Quản trị viên', url: '/admin/audit-logs' },
+  { name: '10-canh-bao-admin', account: ADMIN, url: '/admin/alerts' },
+  { name: '11-ho-so-sinh-vien', account: ADMIN, url: `/admin/students/${DEMO_STUDENT}` },
+  { name: '12-khoa-va-lop', account: ADMIN, url: '/admin/classes' },
+  { name: '13-tai-khoan', account: ADMIN, url: '/admin/users' },
+  { name: '14-nhat-ky', account: ADMIN, url: '/admin/audit-logs' },
+  { name: '15-cvht-tong-quan', account: GV001, url: '/advisor', viewports: ALL },
+  { name: '16-cvht-danh-sach', account: GV001, url: '/advisor/alerts', viewports: ALL },
   {
-    name: '12-cvht-danh-sach',
-    account: 'Cố vấn học tập GV001',
+    name: '17-cvht-chi-tiet',
+    account: GV001,
     url: '/advisor/alerts',
+    before: openAlert(DEMO_STUDENT),
     viewports: ALL,
   },
-  {
-    name: '13-cvht-chi-tiet',
-    account: 'Cố vấn học tập GV001',
-    url: '/advisor/alerts',
-    before: openAlert('KTPM2311003'),
-    viewports: ALL,
-  },
-  { name: '14-sinh-vien', account: 'Sinh viên KTPM2311003', url: '/student', viewports: ALL },
-  { name: '15-chinh-sach', account: null, url: '/legal/privacy-policy' },
+  { name: '18-cvht-ma-tran', account: GV001, url: '/advisor/matrix', viewports: ALL },
+  { name: '19-cvht-ho-so', account: GV001, url: `/advisor/students/${DEMO_STUDENT}` },
+  { name: '20-cvht-thong-bao', account: GV001, url: '/advisor/notifications' },
+  { name: '21-sinh-vien', account: `Sinh viên ${DEMO_STUDENT}`, url: '/student', viewports: ALL },
+  { name: '22-chinh-sach', account: null, url: '/legal/privacy-policy' },
 ];
 
 async function login(page: Page, account: string): Promise<void> {

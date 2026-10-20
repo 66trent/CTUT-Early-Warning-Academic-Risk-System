@@ -16,6 +16,8 @@ import { User } from './user.entity';
 /** Cảnh báo không chặn nạp (VD điểm chữ lệch điểm số) — validate bằng Zod trước khi ghi. */
 export interface ImportWarning {
   row: number;
+  /** Tên file chứa dòng (chỉ lô nhiều file — Phase 8f). */
+  file?: string;
   code: string;
   message: string;
 }

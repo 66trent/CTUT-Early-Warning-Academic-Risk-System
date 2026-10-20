@@ -1,5 +1,6 @@
 import { type EntityManager } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
+import { ImportBatchFile } from '@/db/entities/import-batch-file.entity';
 import { ImportBatch, type ImportWarning } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
@@ -8,10 +9,10 @@ import { writeAuditLog } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { getStorage } from '@/lib/storage';
 import { requestEvaluationAfterImport } from '@/modules/rule-engine/services/evaluation-run.service';
-import { FileRejectedError } from '../parsing/errors';
+import { FileRejectedError, IMPORT_LIMITS } from '../parsing/errors';
 import { type ImportFileKind } from '../parsing/file-sniff';
 import { buildHeaderMap, type HeaderMap, missingColumns } from '../parsing/headers';
-import { locateHeader, openRowSource, type RawRow } from '../parsing/row-reader';
+import { locateHeader, openRowSource, type RawRow, type RowSource } from '../parsing/row-reader';
 import {
   type ImportTypeDefinition,
   type LoadResult,
@@ -30,11 +31,29 @@ import {
 
 const CHUNK_SIZE = 500;
 
-interface PendingRow {
+/** Vị trí 1 dòng trong lô: file nào (thứ tự trong lô), dòng mấy. */
+interface RowOrigin {
+  file: number;
   rowNumber: number;
+}
+
+interface PendingRow extends RowOrigin {
   raw: Record<string, string>;
   value: unknown;
   warnings: RowWarning[];
+}
+
+interface ErrorRow extends RowOrigin {
+  raw: Record<string, string>;
+  error: RowError;
+}
+
+/** Số liệu từng file của lô (bảng từng file ở màn xem trước). */
+interface FileStats {
+  totalRows: number;
+  successRows: number;
+  errorRows: number;
+  courseIds: Set<string>;
 }
 
 interface PassResult {
@@ -46,8 +65,10 @@ interface PassResult {
   /** Cảnh báo không chặn nạp của các dòng hợp lệ (tối đa MAX_WARNINGS). */
   warnings: ImportWarning[];
   load: LoadResult;
-  /** Thẻ nhận diện học phần (cộng dồn) — chỉ loại học tập. */
+  /** Thẻ nhận diện học phần (cộng dồn cả lô) — chỉ loại học tập. */
   cards: CardAccumulators;
+  /** Theo `fileOrder`. */
+  files: Map<number, FileStats>;
 }
 
 function fileKindOf(fileName: string): ImportFileKind {
@@ -80,9 +101,59 @@ async function assertTermOpen(
     throw new FileRejectedError(`${term.termName} đã chốt, không nhận thêm dữ liệu.`);
 }
 
+/** File của lô theo thứ tự tải lên. */
+async function batchFiles(batchId: string): Promise<ImportBatchFile[]> {
+  return (await getDataSource()).getRepository(ImportBatchFile).find({
+    where: { importBatchId: batchId },
+    order: { fileOrder: 'ASC' },
+  });
+}
+
 /**
- * 1 lượt đọc toàn bộ file: chuẩn hóa → chống trùng trong file → đối chiếu dữ liệu nền theo lô
- * 500 dòng → ghi dòng lỗi; khi `load = true` ghi luôn dữ liệu hợp lệ trong CÙNG transaction của lô.
+ * Mở 1 file của lô và tìm dòng tiêu đề. Lỗi cả file ở lô nhiều file ghi kèm tên file (cả lô bị
+ * từ chối — docs/rules/12). `maxRows` = số dòng còn lại của trần 50.000 dòng cả lô.
+ */
+async function openBatchFile(
+  file: ImportBatchFile,
+  def: ImportTypeDefinition<unknown>,
+  maxRows: number,
+  multi: boolean,
+): Promise<{ source: RowSource; headerMap: HeaderMap }> {
+  try {
+    const source = await locateHeader(
+      await openRowSource(
+        fileKindOf(file.fileName),
+        await getStorage().getStream(file.originalFilePath),
+        maxRows,
+      ),
+      (headers) => missingColumns(buildHeaderMap(headers), def.requiredColumns).length === 0,
+    );
+    const headerMap = buildHeaderMap(source.headers);
+    const missing = missingColumns(headerMap, def.requiredColumns);
+    if (missing.length > 0) {
+      throw new FileRejectedError(
+        `File thiếu cột bắt buộc: ${missing.join(', ')}. Hãy dùng đúng file mẫu.`,
+      );
+    }
+    return { source, headerMap };
+  } catch (error) {
+    if (multi && error instanceof FileRejectedError) {
+      throw new FileRejectedError(`${file.fileName}: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+function duplicateDetail(first: RowOrigin, current: RowOrigin, files: ImportBatchFile[]): string {
+  if (first.file === current.file) return `Trùng với dòng ${first.rowNumber} trong cùng file.`;
+  const name = files.find((f) => f.fileOrder === first.file)?.fileName ?? '';
+  return `Trùng với dòng ${first.rowNumber} của file ${name}.`;
+}
+
+/**
+ * 1 lượt đọc toàn bộ các file của lô theo thứ tự: chuẩn hóa → chống trùng trong cả lô → đối chiếu
+ * dữ liệu nền theo lô 500 dòng → ghi dòng lỗi; khi `load = true` ghi luôn dữ liệu hợp lệ trong
+ * CÙNG transaction của lô dòng.
  */
 async function runPass(
   batch: ImportBatch,
@@ -91,23 +162,13 @@ async function runPass(
 ): Promise<PassResult> {
   const dataSource = await getDataSource();
   await assertTermOpen(dataSource.manager, batch, def);
-  const source = await locateHeader(
-    await openRowSource(
-      fileKindOf(batch.fileName),
-      await getStorage().getStream(batch.originalFilePath),
-    ),
-    (headers) => missingColumns(buildHeaderMap(headers), def.requiredColumns).length === 0,
-  );
-  const headerMap = buildHeaderMap(source.headers);
-  const missing = missingColumns(headerMap, def.requiredColumns);
-  if (missing.length > 0) {
-    throw new FileRejectedError(
-      `File thiếu cột bắt buộc: ${missing.join(', ')}. Hãy dùng đúng file mẫu.`,
-    );
-  }
+  const files = await batchFiles(batch.id);
+  if (files.length === 0) throw new FileRejectedError('Lô nhập không có file nào.');
+  const fileNameOf = new Map(files.map((f) => [f.fileOrder, f.fileName]));
+  const multi = files.length > 1;
 
   const result: PassResult = {
-    columns: columnNames(headerMap),
+    columns: [],
     totalRows: 0,
     successRows: 0,
     errorRows: 0,
@@ -115,11 +176,18 @@ async function runPass(
     warnings: [],
     load: { inserted: 0, updated: 0, unchanged: 0, createdKeys: [] },
     cards: new Map(),
+    files: new Map(
+      files.map((f) => [
+        f.fileOrder,
+        { totalRows: 0, successRows: 0, errorRows: 0, courseIds: new Set<string>() },
+      ]),
+    ),
   };
-  const seenKeys = new Map<string, number>();
+  const statsOf = (file: number) => result.files.get(file) as FileStats;
+  const seenKeys = new Map<string, RowOrigin>();
   const consistentValues = new Map<string, string>();
   let pending: PendingRow[] = [];
-  let errors: { rowNumber: number; raw: Record<string, string>; error: RowError }[] = [];
+  let errors: ErrorRow[] = [];
 
   const flush = async () => {
     const rows = pending;
@@ -136,17 +204,17 @@ async function runPass(
       const valid = rows.filter((_, i) => !refErrors.has(i));
       for (const [i, error] of refErrors) {
         const row = rows[i];
-        if (row) rowErrors.push({ rowNumber: row.rowNumber, raw: row.raw, error });
+        if (row) rowErrors.push({ file: row.file, rowNumber: row.rowNumber, raw: row.raw, error });
       }
       if (def.describe) {
         rows.forEach((row, i) => {
           const card = def.describe?.(row.value);
-          if (card) {
-            addToCard(result.cards, card, {
-              valid: !refErrors.has(i),
-              warned: row.warnings.length > 0,
-            });
-          }
+          if (!card) return;
+          statsOf(row.file).courseIds.add(card.courseId);
+          addToCard(result.cards, card, {
+            valid: !refErrors.has(i),
+            warned: row.warnings.length > 0,
+          });
         });
       }
       if (rowErrors.length > 0) {
@@ -155,19 +223,26 @@ async function runPass(
           rowErrors.map((e) => ({
             importBatchId: batch.id,
             sourceRowNumber: e.rowNumber,
+            sourceFileName: fileNameOf.get(e.file) ?? null,
             rawData: e.raw,
             errorReason: e.error.reason,
             errorDetail: e.error.detail.slice(0, 255),
           })),
         );
       }
+      for (const e of rowErrors) statsOf(e.file).errorRows += 1;
       result.errorRows += rowErrors.length;
       result.successRows += valid.length;
       for (const row of valid) {
+        statsOf(row.file).successRows += 1;
         if (result.preview.length < 5) result.preview.push(row.raw);
         for (const warning of row.warnings) {
           if (result.warnings.length < MAX_WARNINGS) {
-            result.warnings.push({ row: row.rowNumber, ...warning });
+            result.warnings.push({
+              row: row.rowNumber,
+              ...(multi ? { file: fileNameOf.get(row.file) } : {}),
+              ...warning,
+            });
           }
         }
       }
@@ -185,48 +260,72 @@ async function runPass(
     });
   };
 
-  for await (const row of source.rows) {
-    result.totalRows += 1;
-    const raw = rawRecord(headerMap, row);
-    const parsed = def.parseRow(canonicalRecord(headerMap, row), {
-      decimalComma: source.decimalComma,
-    });
-    if (!parsed.ok) {
-      errors.push({ rowNumber: row.rowNumber, raw, error: parsed });
-    } else {
-      const duplicateOf = def
-        .uniqueKeys(parsed.value)
-        .map((k) => seenKeys.get(k))
-        .find((n) => n !== undefined);
-      const consistency = def.consistency?.(parsed.value);
-      const firstValue = consistency ? consistentValues.get(consistency.key) : undefined;
-      if (duplicateOf !== undefined) {
-        errors.push({
-          rowNumber: row.rowNumber,
-          raw,
-          error: { reason: 'DUPLICATE', detail: `Trùng với dòng ${duplicateOf} trong cùng file.` },
-        });
-      } else if (consistency && firstValue !== undefined && firstValue !== consistency.value) {
-        errors.push({
-          rowNumber: row.rowNumber,
-          raw,
-          error: { reason: 'INVALID_FORMAT', detail: consistency.message },
-        });
-      } else {
-        if (consistency) consistentValues.set(consistency.key, consistency.value);
-        for (const key of def.uniqueKeys(parsed.value)) seenKeys.set(key, row.rowNumber);
-        pending.push({
-          rowNumber: row.rowNumber,
-          raw,
-          value: parsed.value,
-          warnings: parsed.warnings ?? [],
-        });
-      }
+  for (const file of files) {
+    const { source, headerMap } = await openBatchFile(
+      file,
+      def,
+      IMPORT_LIMITS.maxDataRows - result.totalRows,
+      multi,
+    );
+    for (const column of columnNames(headerMap)) {
+      if (!result.columns.includes(column)) result.columns.push(column);
     }
-    if (pending.length + errors.length >= CHUNK_SIZE) await flush();
+    for await (const row of source.rows) {
+      result.totalRows += 1;
+      statsOf(file.fileOrder).totalRows += 1;
+      const origin = { file: file.fileOrder, rowNumber: row.rowNumber };
+      const raw = rawRecord(headerMap, row);
+      const parsed = def.parseRow(canonicalRecord(headerMap, row), {
+        decimalComma: source.decimalComma,
+      });
+      if (!parsed.ok) {
+        errors.push({ ...origin, raw, error: parsed });
+      } else {
+        const duplicateOf = def
+          .uniqueKeys(parsed.value)
+          .map((k) => seenKeys.get(k))
+          .find((n) => n !== undefined);
+        const consistency = def.consistency?.(parsed.value);
+        const firstValue = consistency ? consistentValues.get(consistency.key) : undefined;
+        if (duplicateOf !== undefined) {
+          errors.push({
+            ...origin,
+            raw,
+            error: { reason: 'DUPLICATE', detail: duplicateDetail(duplicateOf, origin, files) },
+          });
+        } else if (consistency && firstValue !== undefined && firstValue !== consistency.value) {
+          errors.push({
+            ...origin,
+            raw,
+            error: { reason: 'INVALID_FORMAT', detail: consistency.message },
+          });
+        } else {
+          if (consistency) consistentValues.set(consistency.key, consistency.value);
+          for (const key of def.uniqueKeys(parsed.value)) seenKeys.set(key, origin);
+          pending.push({ ...origin, raw, value: parsed.value, warnings: parsed.warnings ?? [] });
+        }
+      }
+      if (pending.length + errors.length >= CHUNK_SIZE) await flush();
+    }
   }
   if (pending.length + errors.length > 0) await flush();
   return result;
+}
+
+/** Ghi số liệu từng file sau mỗi lượt đọc. */
+async function saveFileStats(em: EntityManager, batchId: string, pass: PassResult) {
+  for (const [fileOrder, stats] of pass.files) {
+    await em.update(
+      ImportBatchFile,
+      { importBatchId: batchId, fileOrder },
+      {
+        totalRows: stats.totalRows,
+        successRows: stats.successRows,
+        errorRows: stats.errorRows,
+        courseIds: [...stats.courseIds].sort().slice(0, 50),
+      },
+    );
+  }
 }
 
 async function rejectBatch(batchId: string, message: string): Promise<void> {
@@ -269,6 +368,7 @@ export async function validateImportBatch(batchId: string): Promise<void> {
 
   try {
     const pass = await runPass(batch, requireDefinition(batch), false);
+    await saveFileStats(dataSource.manager, batchId, pass);
     if (pass.successRows === 0) {
       await dataSource.getRepository(ImportBatch).update(batchId, {
         totalRows: pass.totalRows,
@@ -354,6 +454,7 @@ export async function loadImportBatch(
       };
       const now = new Date();
       await dataSource.transaction(async (em) => {
+        await saveFileStats(em, batchId, pass);
         await em.update(
           ImportBatch,
           { id: batchId },

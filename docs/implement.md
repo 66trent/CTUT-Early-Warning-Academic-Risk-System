@@ -242,12 +242,16 @@ Rà trước khi code (2026-10-19, người dùng chốt): ma trận = **sinh vi
 
 ### Phase 8f — Nạp nhiều file và chốt giao diện
 
-- [ ] Nạp nhiều file 1 lần (cùng loại, cùng học kỳ) → 1 lô: xem trước tóm tắt từng file (thẻ nhận diện học phần như 8a), dòng lỗi ghi tên file + số dòng; giới hạn 50.000 dòng tổng / 20MB mỗi file; lịch sử nạp lọc theo học phần / khoa.
-- [ ] Trang nhập: bảng "tuần này học phần nào chưa có điểm danh / trắc nghiệm / thực hành" (dùng chung truy vấn độ mới dữ liệu của 8d).
-- [ ] Chụp lại ảnh (`npm run screenshots`, đường dẫn mới); sửa Playwright 2 luồng (`/advisor` → `/advisor/alerts`); cập nhật `docs/demo-script.md`, README mục ảnh.
-- [ ] Rà toàn bộ: 3 kích thước màn hình + dark mode + bàn phím (Tab, Ctrl+K, Esc) cho mọi trang.
+Rà trước khi code (2026-10-20, người dùng chốt): **1 lô thật nhiều file** (bảng mới `ImportBatchFile` + `ImportErrorRow.sourceFileName`, 1 migration) — không làm "nhóm lô"; tối đa **50 file / lô**; trình duyệt gửi lần lượt từng file (Server Action giới hạn 21MB/lần) qua trạng thái `UPLOADING` có sẵn; giới hạn tần suất đổi sang **30 lô / giờ** (đếm theo file sẽ chặn ngay khi 1 khoa nạp vài chục file); trùng khóa kiểm tra xuyên các file. Bảng độ mới ở trang nhập **theo cách của 8d** (so với ngày dữ liệu mới nhất của học kỳ, không theo tuần lịch thật — demo 2025 sẽ toàn đỏ); LMS "chưa có" màu trung tính. Ghi `12`.
+
+- [x] Nạp nhiều file 1 lần (cùng loại, cùng học kỳ) → 1 lô: xem trước tóm tắt từng file (thẻ nhận diện học phần như 8a), dòng lỗi ghi tên file + số dòng; giới hạn 50.000 dòng tổng / 20MB mỗi file / 50 file; lịch sử nạp lọc theo học phần / khoa.
+- [x] Trang nhập: bảng độ mới dữ liệu theo học phần (điểm danh / trắc nghiệm / thực hành / kết quả — ngày mới nhất, "Chậm" / "Chưa có"), dùng chung truy vấn độ mới dữ liệu của 8d.
+- [x] Chụp lại ảnh (`npm run screenshots`, đường dẫn mới); sửa Playwright 2 luồng (`/advisor` → `/advisor/alerts`); cập nhật `docs/demo-script.md`, README mục ảnh.
+- [x] Rà toàn bộ: 3 kích thước màn hình + dark mode + bàn phím (Tab, Ctrl+K, Esc) cho mọi trang.
 
 **DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` xanh; Playwright 2 luồng chạy được. **Kiểm tra tay:** nạp 3 file điểm danh 1 lần; demo trọn kịch bản 10 phút theo `demo-script.md` không lỗi.
+
+**Kết quả (2026-10-20):** đạt DoD phần tự động — typecheck, lint, format, migration:check, 402 test (thêm `import-multi-file.test.ts`), build xanh; Playwright 2 luồng xanh cả trên dev server lẫn image Docker production (luồng 1 viết lại: nạp 2 file 1 lần có dòng lỗi). Kiểm tay: hoàn tác lô `02` rồi nạp 3 file `docs/demo-data/nhieu-file/` 1 lần → xem trước bảng từng file (mỗi file 1 học phần, 40 dòng), cảnh báo sai tên ghi tên file → nạp 120 dòng mới; lọc lịch sử theo học phần; bảng độ mới hiện 3 học phần × 4 nguồn. Rà 375 / 820 / 1280px mọi trang Admin, CVHT, sinh viên + chế độ tối + Ctrl+K / Esc: sửa 1 lỗi tràn ngang cũ ở form luật (bảng mức cảnh báo, thiếu `min-w-0`), bỏ ô file ẩn khỏi thứ tự Tab; `npm run screenshots` 62 ảnh, 0 tràn ngang. Thêm ngoài kế hoạch: kéo thả file, lô tải lên dở tự hủy sau 1 ngày (+ nút hủy), chặn file trùng tên / trùng nội dung trong lô, viết lại `demo-script.md` theo bộ demo v2 (bản cũ còn số liệu v1). Chưa làm: chưa trình diễn tay trọn 10 phút theo `demo-script.md` (các bước đã kiểm riêng lẻ: 2 mốc đánh giá ra 10 → 13 cảnh báo, xác nhận + can thiệp, nạp nhiều file).
 
 ## Phase 9 — Mở rộng dữ liệu demo (chưa lập chi tiết)
 

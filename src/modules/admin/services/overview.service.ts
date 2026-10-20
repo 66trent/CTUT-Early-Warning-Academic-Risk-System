@@ -46,9 +46,27 @@ export interface SourceFreshnessDto {
   missing: { courseId: string; courseName: string }[];
 }
 
+/** Độ mới 1 nguồn của 1 học phần (bảng ở trang Nhập dữ liệu — Phase 8f). */
+export interface CourseSourceFreshnessDto {
+  /** Ngày dữ liệu mới nhất của học phần ở nguồn này (null = chưa có). */
+  latest: string | null;
+  /** Trễ hơn ngày mới nhất của nguồn trong học kỳ quá STALE_DAYS ngày. */
+  stale: boolean;
+}
+
+export interface CourseFreshnessDto {
+  courseId: string;
+  courseName: string;
+  sources: Record<FreshnessSource, CourseSourceFreshnessDto>;
+  /** Cần nhắc: điểm danh chậm / chưa có, hoặc LMS chậm (cùng tiêu chí `countStaleCourses`). */
+  needsAttention: boolean;
+}
+
 export interface DataFreshnessDto {
   totalCourses: number;
   sources: SourceFreshnessDto[];
+  /** Từng học phần × 4 nguồn. */
+  courses: CourseFreshnessDto[];
 }
 
 export interface AdminOverviewDto {
@@ -107,33 +125,52 @@ export async function getDataFreshness(scope: DashboardScope): Promise<DataFresh
       ),
     ),
   );
-  return {
-    totalCourses: courses.length,
-    sources: order.map((source, i) => {
-      const rows = perSource[i] ?? [];
-      const dates = new Map(rows.map((r) => [r.course_id, new Date(r.d).getTime()]));
-      const latest = rows.length ? Math.max(...dates.values()) : null;
-      const stale =
-        latest === null || source === 'COURSE_RESULT'
-          ? []
-          : [...dates.entries()]
-              .filter(([, d]) => latest - d > STALE_DAYS * DAY_MS)
-              .map(([courseId, d]) => ({
-                courseId,
-                courseName: name.get(courseId) ?? courseId,
-                latest: new Date(d).toISOString(),
-              }));
-      return {
+  const dates = order.map(
+    (_, i) => new Map((perSource[i] ?? []).map((r) => [r.course_id, new Date(r.d).getTime()])),
+  );
+  const latestOf = (m: Map<string, number>) => (m.size ? Math.max(...m.values()) : null);
+  const isStale = (source: FreshnessSource, latest: number | null, d: number) =>
+    source !== 'COURSE_RESULT' && latest !== null && latest - d > STALE_DAYS * DAY_MS;
+  const sources = order.map((source, i): SourceFreshnessDto => {
+    const byCourse = dates[i] ?? new Map<string, number>();
+    const latest = latestOf(byCourse);
+    return {
+      source,
+      latest: latest === null ? null : new Date(latest).toISOString(),
+      coursesWithData: byCourse.size,
+      stale: [...byCourse.entries()]
+        .filter(([, d]) => isStale(source, latest, d))
+        .map(([courseId, d]) => ({
+          courseId,
+          courseName: name.get(courseId) ?? courseId,
+          latest: new Date(d).toISOString(),
+        })),
+      missing: courses
+        .filter((c) => !byCourse.has(c.course_id))
+        .map((c) => ({ courseId: c.course_id, courseName: name.get(c.course_id) ?? '' })),
+    };
+  });
+  const perCourse = courses.map((c): CourseFreshnessDto => {
+    const cells = order.map((source, i): [FreshnessSource, CourseSourceFreshnessDto] => {
+      const byCourse = dates[i] ?? new Map<string, number>();
+      const d = byCourse.get(c.course_id);
+      return [
         source,
-        latest: latest === null ? null : new Date(latest).toISOString(),
-        coursesWithData: dates.size,
-        stale,
-        missing: courses
-          .filter((c) => !dates.has(c.course_id))
-          .map((c) => ({ courseId: c.course_id, courseName: name.get(c.course_id) ?? '' })),
-      };
-    }),
-  };
+        d === undefined
+          ? { latest: null, stale: false }
+          : { latest: new Date(d).toISOString(), stale: isStale(source, latestOf(byCourse), d) },
+      ];
+    });
+    const s = Object.fromEntries(cells) as Record<FreshnessSource, CourseSourceFreshnessDto>;
+    return {
+      courseId: c.course_id,
+      courseName: name.get(c.course_id) ?? c.course_id,
+      sources: s,
+      needsAttention:
+        s.ATTENDANCE.stale || !s.ATTENDANCE.latest || s.LMS_QUIZ.stale || s.LMS_ASSIGNMENT.stale,
+    };
+  });
+  return { totalCourses: courses.length, sources, courses: perCourse };
 }
 
 /** Học phần cần nhắc: điểm danh cũ hoặc chưa có + LMS cũ (LMS chưa có có thể là không dùng LMS). */

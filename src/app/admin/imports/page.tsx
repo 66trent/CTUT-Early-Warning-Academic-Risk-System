@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Download } from 'lucide-react';
 import { DataPagination } from '@/components/data-table/data-pagination';
+import { BatchesFilter } from '@/components/imports/batches-filter';
 import { BatchesTable } from '@/components/imports/batches-table';
+import { CourseFreshnessTable } from '@/components/imports/course-freshness-table';
 import { UploadForm } from '@/components/imports/upload-form';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -10,9 +12,11 @@ import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { HELP_LINKS } from '@/lib/help-links';
 import { parseListParams, type RawSearchParams } from '@/lib/list-params';
+import { getDataFreshness, STALE_DAYS } from '@/modules/admin/services/overview.service';
 import {
   BATCH_DEFAULT_SORT,
   BATCH_SORT_KEYS,
+  getBatchFilterOptions,
   getImportBatchDetail,
   getImportFormOptions,
   listImportBatches,
@@ -30,10 +34,21 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
   const list = parseListParams(params, BATCH_SORT_KEYS, BATCH_DEFAULT_SORT);
   const parent = typeof params.parent === 'string' ? params.parent : null;
   const parentDetail = parent ? await getImportBatchDetail(parent).catch(() => null) : null;
-  const [options, history] = await Promise.all([
+  const text = (key: string) => (typeof params[key] === 'string' ? params[key] : undefined);
+  const filter = {
+    dataType: text('type'),
+    courseId: text('course'),
+    departmentId: text('department'),
+  };
+  const [options, history, filterOptions] = await Promise.all([
     getImportFormOptions(),
-    listImportBatches({}, list),
+    listImportBatches(filter, list),
+    getBatchFilterOptions(),
   ]);
+  const currentTerm = options.terms.find((t) => t.isCurrent) ?? null;
+  const freshness = currentTerm
+    ? await getDataFreshness({ termId: currentTerm.termId, departmentId: filter.departmentId })
+    : null;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -97,11 +112,32 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
         </CardContent>
       </Card>
 
+      {currentTerm && freshness && (
+        <Card id="do-moi-du-lieu" className="scroll-mt-20 shadow-sm">
+          <CardHeader>
+            <CardTitle>Học phần nào cần nạp dữ liệu — {currentTerm.termName}</CardTitle>
+            <CardDescription>
+              Ngày dữ liệu mới nhất của từng học phần. “Chậm” = cũ hơn {STALE_DAYS} ngày so với ngày
+              dữ liệu mới nhất của cả học kỳ. Học phần không dùng LMS sẽ luôn “chưa có” bài trắc
+              nghiệm / thực hành — không cần nạp.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CourseFreshnessTable courses={freshness.courses} />
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Lịch sử nạp dữ liệu</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          <BatchesFilter
+            types={options.types.map((t) => ({ dataType: t.dataType, label: t.label }))}
+            courses={filterOptions.courses}
+            departments={filterOptions.departments}
+          />
           <BatchesTable batches={history.items} sort={{ sort: list.sort, dir: list.dir }} />
           <DataPagination
             basePath="/admin/imports"

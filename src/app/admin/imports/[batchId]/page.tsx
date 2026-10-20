@@ -3,7 +3,13 @@ import { AlertTriangle, Download, RotateCw } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
-import { AutoRefresh, RollbackAction, StagedActions } from '@/components/imports/batch-actions';
+import {
+  AutoRefresh,
+  RollbackAction,
+  StagedActions,
+  UploadingActions,
+} from '@/components/imports/batch-actions';
+import { BatchFilesTable } from '@/components/imports/batch-files-table';
 import { BatchStatusBadge } from '@/components/imports/batch-status-badge';
 import { DataPagination } from '@/components/data-table/data-pagination';
 import { CourseCards } from '@/components/imports/course-cards';
@@ -23,6 +29,7 @@ import { ImportBatchStatus, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
 import { parseListParams, type RawSearchParams } from '@/lib/list-params';
+import { formatFileSize } from '@/lib/utils';
 import { errorReasonLabel } from '@/modules/data-import/labels';
 import {
   getImportBatchDetail,
@@ -61,20 +68,23 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
     batch.status === ImportBatchStatus.RECONCILED || batch.status === ImportBatchStatus.LOADED;
   const errorHeaders =
     batch.columns ?? (errors.items[0] ? Object.keys(errors.items[0].rawData) : []);
+  const multi = batch.files.length > 1;
+  const courseName = new Map(batch.courses.map((c) => [c.courseId, c.courseName]));
+  const fileLabel = multi ? `${batch.files.length} file` : batch.fileName;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <AutoRefresh active={batch.busy} />
       <div>
         <PageBreadcrumbs
-          items={[{ label: 'Nhập dữ liệu', href: '/admin/imports' }, { label: batch.fileName }]}
+          items={[{ label: 'Nhập dữ liệu', href: '/admin/imports' }, { label: fileLabel }]}
         />
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <h1>{batch.dataTypeLabel}</h1>
           <BatchStatusBadge status={batch.status} />
         </div>
         <p className="mt-1 text-muted-foreground">
-          {batch.fileName}
+          {fileLabel}
           {batch.termName ? ` · ${batch.termName}` : ''}
           {batch.selectedCourseId ? ` · chỉ học phần ${batch.selectedCourseId}` : ''} · tải lên{' '}
           {formatVnDateTime(batch.createdAt)} bởi {batch.performedBy}
@@ -100,8 +110,46 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
 
       {batch.busy && (
         <Card className="shadow-sm">
-          <CardContent className="text-muted-foreground">
-            Hệ thống đang {batch.confirmed ? 'nạp dữ liệu' : 'kiểm tra file'} — trang tự cập nhật.
+          <CardContent className="flex flex-col gap-3 text-muted-foreground">
+            {batch.status === ImportBatchStatus.UPLOADING ? (
+              <>
+                <p>
+                  Đang tải lên — đã nhận {batch.files.length} file. Nếu đã đóng trang giữa chừng,
+                  hãy hủy lần nạp này rồi nạp lại.
+                </p>
+                <div>
+                  <UploadingActions batchId={batch.id} />
+                </div>
+              </>
+            ) : (
+              <p>
+                Hệ thống đang {batch.confirmed ? 'nạp dữ liệu' : 'kiểm tra file'} — trang tự cập
+                nhật.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {multi && (
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Các file trong lần nạp ({batch.files.length})</CardTitle>
+            <CardDescription>
+              Cả {batch.files.length} file được kiểm tra, xác nhận và nạp cùng lúc như 1 lô.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BatchFilesTable
+              files={batch.files.map((f) => ({
+                fileName: f.fileName,
+                sizeLabel: f.sizeBytes > 0 ? formatFileSize(f.sizeBytes) : '',
+                totalRows: f.totalRows,
+                successRows: f.successRows,
+                errorRows: f.errorRows,
+                courses: f.courseIds.map((id) => courseName.get(id) ?? id),
+              }))}
+            />
           </CardContent>
         </Card>
       )}
@@ -140,7 +188,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
             {batch.courses.length > 0 && (
               <section className="flex flex-col gap-2" aria-label="Hệ thống đọc được">
                 <h3 className="text-sm font-semibold">
-                  Hệ thống đọc được {batch.courses.length} học phần trong file
+                  Hệ thống đọc được {batch.courses.length} học phần trong{' '}
+                  {multi ? `${batch.files.length} file` : 'file'}
                 </h3>
                 <CourseCards cards={batch.courses} staged />
               </section>
@@ -215,7 +264,10 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
                     className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
                   />
                   <span>
-                    <span className="font-medium tabular-nums">Dòng {w.row}:</span> {w.message}
+                    <span className="font-medium tabular-nums">
+                      {w.file ? `${w.file} · ` : ''}Dòng {w.row}:
+                    </span>{' '}
+                    {w.message}
                   </span>
                 </li>
               ))}
@@ -249,8 +301,10 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
             </div>
             <ErrorRowsTable
               headers={errorHeaders}
+              showFile={multi}
               rows={errors.items.map((r) => ({
                 sourceRowNumber: r.sourceRowNumber,
+                sourceFileName: r.sourceFileName,
                 reasonLabel: errorReasonLabel(r.errorReason),
                 errorDetail: r.errorDetail,
                 rawData: r.rawData,
