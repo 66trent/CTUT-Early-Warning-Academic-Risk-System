@@ -27,6 +27,7 @@ import {
   listAssignableAdvisors,
   listCohortYears,
   listDepartmentSummaries,
+  listMajors,
   searchClasses,
 } from '@/modules/admin/services/class.service';
 import { classFilterSchema } from '@/modules/admin/validators/class';
@@ -68,17 +69,27 @@ export default async function ClassesPage({
   const params = await searchParams;
   const filter = classFilterSchema.parse(params);
   const list = parseListParams(params, CLASS_SORT_KEYS, CLASS_DEFAULT_SORT);
-  const [departments, result, advisors, cohorts] = await Promise.all([
+  const [departments, result, advisors, cohorts, majors] = await Promise.all([
     listDepartmentSummaries(),
     searchClasses(filter, list),
     listAssignableAdvisors(),
     listCohortYears(),
+    listMajors(),
   ]);
+  const majorsInView = majors.filter(
+    (m) => !filter.department || m.departmentId === filter.department,
+  );
   const totalClasses = departments.reduce((s, d) => s + d.classCount, 0);
   const totalStudents = departments.reduce((s, d) => s + d.studentCount, 0);
   const deptHref = (departmentId: string | null) =>
-    `/admin/classes${withParams(params, { department: departmentId, page: null })}`;
-  const filtered = !!(filter.department || filter.cohort || filter.q || filter.noAdvisor);
+    `/admin/classes${withParams(params, { department: departmentId, major: null, page: null })}`;
+  const filtered = !!(
+    filter.department ||
+    filter.major ||
+    filter.cohort ||
+    filter.q ||
+    filter.noAdvisor
+  );
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -86,7 +97,7 @@ export default async function ClassesPage({
         helpHref={HELP_LINKS.classes}
         title="Khoa và lớp sinh hoạt"
         description="Cố vấn học tập được gán theo lớp sinh hoạt và thấy sinh viên của các lớp mình phụ trách."
-        action={<CreateClassButton departments={departments} advisors={advisors} />}
+        action={<CreateClassButton departments={departments} majors={majors} advisors={advisors} />}
       />
 
       <nav aria-label="Lọc theo khoa" className="flex gap-2 overflow-x-auto pb-1">
@@ -121,11 +132,12 @@ export default async function ClassesPage({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Suspense>
-            <ClassesFilter cohorts={cohorts} />
+            <ClassesFilter cohorts={cohorts} majors={majorsInView} />
           </Suspense>
           <ClassesTable
             classes={result.items}
             departments={departments}
+            majors={majors}
             advisors={advisors}
             sort={{ sort: list.sort, dir: list.dir }}
             filtered={filtered}

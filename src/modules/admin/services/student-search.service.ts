@@ -31,10 +31,14 @@ export interface StudentSearchItemDto {
 /** Ký tự đặc biệt của LIKE → thoát, để tìm đúng chuỗi người dùng gõ. */
 export const escapeLike = (value: string) => value.replace(/[\\%_]/g, (c) => `\\${c}`);
 
-/** Admin tìm sinh viên theo mã / họ tên (chứa chuỗi, không phân biệt hoa thường). */
+/**
+ * Admin tìm sinh viên theo mã / họ tên (chứa chuỗi, không phân biệt hoa thường), lọc theo ngành của
+ * lớp sinh hoạt (docs/rules/09, Phase 9a).
+ */
 export async function searchStudents(
   query: string,
   list: ListParams<StudentSortKey> = firstPage(),
+  filter: { majorId?: string | null } = {},
 ): Promise<Paged<StudentSearchItemDto>> {
   const qb = (await getDataSource())
     .getRepository(Student)
@@ -53,6 +57,13 @@ export async function searchStudents(
       new Brackets((w) => {
         w.where('s.studentId ILIKE :q', { q: `%${escapeLike(q)}%` }).orWhere('s.fullName ILIKE :q');
       }),
+    );
+  }
+  if (filter.majorId) {
+    // Subquery thay vì join: skip/take + join làm TypeORM bọc truy vấn và hỏng ORDER BY (bẫy #24).
+    qb.andWhere(
+      's.classId IN (SELECT class_id FROM administrative_classes WHERE major_id = :majorId)',
+      { majorId: filter.majorId },
     );
   }
   const [students, total] = await qb.getManyAndCount();

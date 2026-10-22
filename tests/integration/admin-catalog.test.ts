@@ -189,6 +189,7 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
           classId: 'TSTCLS_X',
           className: 'Lớp X',
           departmentId: FX.departmentId,
+          majorId: null,
           cohortYear: '2024',
           advisorId: FX.advisorPending,
         },

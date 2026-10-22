@@ -139,7 +139,7 @@ Hệ thống **đã làm đúng hướng bạn đề xuất**: không cần cộ
 
 Ba điều kiện để chạy được với dữ liệu thật:
 
-1. **[HỎI]** Mã học phần ổn định giữa các học kỳ (mục 0.2) — mã lớp học phần `010100240802` có phải = mã học phần `0101002408` + số thứ tự lớp `02` không?
+1. **[HỎI → có bằng chứng 2026-10-22]** Mã học phần ổn định giữa các học kỳ (mục 0.2) — mã lớp học phần `010100240802` có phải = mã học phần `0101002408` + số thứ tự lớp `02` không? Chương trình khung KTPM2311 (người dùng gửi) liệt kê mã học phần 10 số (`0101002408` Logic học, `0101000894` Cơ sở dữ liệu…) — khớp giả định; vẫn chờ xác nhận chính thức.
 2. **[THIẾU]** Kết quả các học kỳ TRƯỚC khi bắt đầu dùng hệ thống: phải nạp (ít nhất các môn F), nếu không học lại ở học kỳ đầu dùng hệ thống bị bỏ sót.
 3. **[HỎI]** "Qua học kỳ sau kiểm tra lại xem đã có chưa": nếu ý bạn là cảnh báo cả sinh viên **rớt mà chưa đăng ký học lại** (nợ môn) — đó là dữ liệu nợ đọng (Điều 11a, > 24 TC), đi cùng ACA-04 tùy chọn.
 

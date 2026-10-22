@@ -198,12 +198,16 @@ async function countHighErrorBatches(termId: string): Promise<number> {
   return Number(row?.n ?? 0);
 }
 
-async function countClassesWithoutAdvisor(departmentId: string | null): Promise<number> {
+async function countClassesWithoutAdvisor(
+  departmentId: string | null,
+  majorId: string | null,
+): Promise<number> {
   const ds = await getDataSource();
   const [row] = await ds.query<{ n: string }[]>(
     `SELECT COUNT(*) AS n FROM administrative_classes
-     WHERE advisor_id IS NULL AND ($1::text IS NULL OR department_id = $1)`,
-    [departmentId],
+     WHERE advisor_id IS NULL AND ($1::text IS NULL OR department_id = $1)
+       AND ($2::text IS NULL OR major_id = $2)`,
+    [departmentId, majorId],
   );
   return Number(row?.n ?? 0);
 }
@@ -219,12 +223,13 @@ async function setupProgress(): Promise<AdminOverviewDto['setup']> {
   };
 }
 
-/** Số liệu trang Tổng quan Admin cho 1 học kỳ (+ khoa) — chỉ số tổng hợp (docs/rules/05, 07). */
+/** Số liệu trang Tổng quan Admin cho 1 học kỳ (+ khoa, ngành) — chỉ số tổng hợp (docs/rules/05, 07). */
 export async function getAdminOverview(
   termId: string,
   departmentId: string | null = null,
+  majorId: string | null = null,
 ): Promise<AdminOverviewDto> {
-  const scope: DashboardScope = { termId, departmentId };
+  const scope: DashboardScope = { termId, departmentId, majorId };
   const [
     lastRun,
     summary,
@@ -245,7 +250,7 @@ export async function getAdminOverview(
     getClassSeverity(scope),
     getDataFreshness(scope),
     countHighErrorBatches(termId),
-    countClassesWithoutAdvisor(departmentId),
+    countClassesWithoutAdvisor(departmentId, majorId),
     setupProgress(),
   ]);
   return {

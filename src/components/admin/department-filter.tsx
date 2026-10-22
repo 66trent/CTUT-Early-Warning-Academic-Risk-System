@@ -32,6 +32,8 @@ export function DepartmentFilter({
         const next = new URLSearchParams(params.toString());
         if (departmentId === ALL) next.delete('department');
         else next.set('department', departmentId);
+        // Ngành thuộc khoa — đổi khoa thì bỏ lọc ngành.
+        next.delete('major');
         next.delete('page');
         next.delete('alert');
         router.push(`${pathname}?${next.toString()}`);

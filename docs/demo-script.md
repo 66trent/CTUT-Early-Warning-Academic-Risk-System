@@ -12,7 +12,7 @@ docker compose --profile dev up -d
 npm run demo:reset -- --yes
 ```
 
-- `demo:reset` xóa dữ liệu, tự sao lưu trước, dựng lại bộ demo: 2 Cố vấn học tập (`GV001` phụ trách `KTPM2411`, `GV002` không phụ trách lớp nào), 20 sinh viên, nạp 6 file `01`–`06`. Chế độ demo **không tự chạy đánh giá** sau khi nạp và **không chạy lịch đêm** — cảnh báo chỉ xuất hiện khi bấm "Chạy đánh giá" lúc trình bày.
+- `demo:reset` xóa dữ liệu, tự sao lưu trước, dựng lại bộ demo: 5 lớp khóa 2024 Khoa CNTT, mỗi lớp 1 Cố vấn học tập (`GV001` phụ trách `KTPM2411`; 4 lớp còn lại chưa có sinh viên đến Phase 9b), 20 sinh viên, nạp 6 file `01`–`06`. Chế độ demo **không tự chạy đánh giá** sau khi nạp và **không chạy lịch đêm** — cảnh báo chỉ xuất hiện khi bấm "Chạy đánh giá" lúc trình bày.
 - Mở sẵn 3 tab: http://localhost:3000 (Admin), cửa sổ ẩn danh (Cố vấn học tập), http://localhost:8025 (MailHog — email cảnh báo gửi Cố vấn học tập).
 - Kiểm tra nhanh (tùy chọn, ~30 giây): `npm run demo:reset -- --yes --evaluate=2` → `npm run test:e2e` (2 luồng) → `npm run demo:reset -- --yes` để trả lại trạng thái ban đầu.
 
@@ -30,7 +30,7 @@ npm run demo:reset -- --yes
 | 5:15 | Tab ẩn danh → GV001 | Đăng nhập nhanh "Cố vấn học tập GV001" → **Tổng quan** → **Cảnh báo cần xử lý** → **Ma trận lớp** | Tổng quan lớp mình; chuông thông báo + email MailHog (mức thấp chỉ báo trong ứng dụng); ma trận sinh viên × học phần, bấm ô mở cảnh báo |
 | 6:15 | Mở **KTPM2411903** (Lê Văn Cường) | Xem bằng chứng: NNLT 1 vắng 10/45 tiết = 22,2% (`ATT-01` Rất cao) + vắng không phép tăng 2 → 8 trong 7 ngày (`ATT-02`) → **Xác nhận đã xem** → ghi can thiệp → Lưu | Cảnh báo là tham khảo, không đổi tình trạng học vụ; can thiệp "nhạy cảm" ẩn với Admin |
 | 7:15 | Đăng nhập nhanh **Sinh viên KTPM2411903** | Trang "Tình hình học tập" | Sinh viên chỉ thấy cảnh báo SAU khi Cố vấn học tập xác nhận, kèm gợi ý; thanh vắng vượt vạch ngưỡng; không nhận email |
-| 7:45 | Đăng nhập nhanh **GV002** | Không thấy cảnh báo nào | Phân quyền theo lớp sinh hoạt — GV002 không phụ trách lớp nên không xem được sinh viên của GV001 |
+| 7:45 | Đăng nhập nhanh **GV002** | Không thấy cảnh báo nào | Phân quyền theo lớp sinh hoạt — GV002 phụ trách lớp khác (CNTT2411) nên không xem được sinh viên của GV001 |
 | 8:15 | Admin → **Chạy đánh giá** mốc **2025-11-20** | Chạy → 13 cảnh báo | Logic học đã khóa điểm → `ACA-01` (điểm F) cho 913, 914, 919; điểm danh 2 môn kia quá hạn → giữ dấu hiệu cũ, không coi là "hết vắng"; 913 giảm mức Rất cao → Cao **không** gửi thông báo |
 | 9:00 | **Cấu hình luật** → ATT-01 | Thêm mức 8% "Thấp" → Lưu bản nháp → Chạy thử mốc 2025-10-10 → thấy sinh viên thêm vào → Bỏ bản nháp | Luật cấu hình được, có phiên bản, bắt buộc chạy thử trước khi kích hoạt, ghi nhật ký |
 | 9:40 | **Nhật ký hệ thống** | Lọc "Xem hồ sơ sinh viên" / "Tải file nhập dữ liệu" | Mọi thao tác quan trọng ghi lại, không sửa/xóa được |

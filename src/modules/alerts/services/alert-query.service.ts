@@ -279,14 +279,17 @@ async function pagedAlerts(
   return { items: await toListItems(alerts, true), total, page: list.page, size: list.size };
 }
 
+/** Lọc theo khoa / ngành của lớp sinh hoạt (docs/rules/07, 09). Chuỗi = mã khoa. */
+export type OrgFilter = string | null | { departmentId?: string | null; majorId?: string | null };
+
 /**
  * Admin — chỉ đọc. `NO_ADVISOR`: cảnh báo của lớp chưa có Cố vấn học tập phụ trách.
- * `departmentId`: lọc theo khoa của lớp sinh hoạt (docs/rules/07).
+ * `org`: lọc theo khoa / ngành của lớp sinh hoạt.
  */
 export async function listAdminAlerts(
   termId: string,
   filter: 'ALL' | 'NO_ADVISOR',
-  departmentId: string | null = null,
+  org: OrgFilter = null,
   list: ListParams<AlertSortKey> = firstPage(ALERT_DEFAULT_SORT),
   extra: AlertExtraFilter = {},
 ): Promise<Paged<AlertListItemDto>> {
@@ -296,7 +299,10 @@ export async function listAdminAlerts(
     .innerJoin(Student, 's', 's.studentId = a.studentId')
     .innerJoin(AdministrativeClass, 'c', 'c.classId = s.classId')
     .where('a.termId = :termId', { termId });
+  const { departmentId, majorId } =
+    typeof org === 'string' || org === null ? { departmentId: org, majorId: null } : org;
   if (departmentId) qb.andWhere('c.departmentId = :departmentId', { departmentId });
+  if (majorId) qb.andWhere('c.majorId = :majorId', { majorId });
   if (filter === 'NO_ADVISOR') {
     qb.andWhere('c.advisorId IS NULL').andWhere('a.status IN (:...open)', {
       open: OPEN_ALERT_STATUSES,

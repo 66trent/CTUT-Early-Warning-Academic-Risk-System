@@ -71,4 +71,5 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 - MUST: dùng đúng 1 tên gọi xuyên suốt app/email/tài liệu cho mỗi vai trò/khái niệm (tên hệ thống trên giao diện, email và báo cáo MUST giống nhau; "Cố vấn học tập" — không đổi thành "CVHT"/"Giảng viên chủ nhiệm"/"Advisor" tùy màn hình; "Cảnh báo sớm" — không đổi tên khác ở nơi khác).
 - MUST: bộ lọc Khoa (suy ra qua lớp sinh hoạt) ở Tổng quan Admin, danh sách cảnh báo Admin và ô chọn học phần khi chạy đánh giá — người dùng chốt 2026-10-15.
+- MUST (Phase 9a, chốt 2026-10-22): bộ lọc **Ngành** (ngành của lớp sinh hoạt, gom mọi khóa) cạnh bộ lọc Khoa ở Tổng quan Admin, Cảnh báo sớm (Admin, kể cả xuất file), Sinh viên, Khoa và lớp (bảng có cột Ngành); danh sách ngành theo khoa đang chọn, đổi khoa thì bỏ lọc ngành; khoa chưa có danh mục ngành thì ẩn ô lọc. Form tạo / sửa lớp chọn ngành của khoa đã chọn.
 - MUST: trang Nhật ký kiểm toán (Admin, chỉ đọc, phân trang) lọc theo khoảng thời gian, loại hành động, người thực hiện (mã/email), đối tượng (MSSV, mã lô…) — người dùng chốt 2026-10-13.

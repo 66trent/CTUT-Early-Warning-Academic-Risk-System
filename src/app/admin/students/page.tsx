@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { GraduationCap, Search, SearchX } from 'lucide-react';
+import { MajorFilter } from '@/components/admin/major-filter';
 import { StudentsTable } from '@/components/admin/students-table';
 import { DataPagination } from '@/components/data-table/data-pagination';
 import { EmptyState } from '@/components/empty-state';
@@ -11,6 +12,7 @@ import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { HELP_LINKS } from '@/lib/help-links';
 import { parseListParams, type RawSearchParams } from '@/lib/list-params';
+import { listMajors } from '@/modules/admin/services/class.service';
 import { searchStudents, STUDENT_SORT_KEYS } from '@/modules/admin/services/student-search.service';
 
 export const metadata: Metadata = { title: 'Sinh viên' };
@@ -25,7 +27,9 @@ export default async function AdminStudentsPage({
   const params = await searchParams;
   const q = (typeof params.q === 'string' ? params.q : '').slice(0, 100);
   const list = parseListParams(params, STUDENT_SORT_KEYS);
-  const result = await searchStudents(q, list);
+  const majors = await listMajors();
+  const major = majors.find((m) => m.majorId === params.major) ?? null;
+  const result = await searchStudents(q, list, { majorId: major?.majorId ?? null });
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
@@ -42,10 +46,12 @@ export default async function AdminStudentsPage({
           aria-label="Tìm sinh viên"
           className="w-80 max-w-full"
         />
+        {major && <input type="hidden" name="major" value={major.majorId} />}
         <Button type="submit" variant="outline">
           <Search aria-hidden />
           Tìm
         </Button>
+        <MajorFilter majors={majors} value={major?.majorId ?? null} />
       </form>
       <Card className="shadow-sm">
         <CardContent className="flex flex-col gap-4">
@@ -53,7 +59,7 @@ export default async function AdminStudentsPage({
             items={result.items}
             sort={{ sort: list.sort, dir: list.dir }}
             emptyMessage={
-              q ? (
+              q || major ? (
                 <EmptyState
                   icon={SearchX}
                   title="Không tìm thấy sinh viên phù hợp"

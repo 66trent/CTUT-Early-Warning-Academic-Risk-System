@@ -151,3 +151,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Rà 3 khổ + tối + bàn phím: sửa tràn ngang form luật (bảng mức cảnh báo).
 - Rules `07`, `12`. Kiểm tra: typecheck, lint, format, migration:check, 402 test, build, e2e (cả image Docker) — xanh.
 - Tự kiểm tra: Admin → Nhập dữ liệu → loại "Điểm danh" → kéo 3 file trong `docs/demo-data/nhieu-file/` → xem bảng từng file → Hủy lô; xem bảng "Học phần nào cần nạp dữ liệu"; lọc lịch sử theo học phần.
+
+## Phase 9a — Danh mục Ngành, 5 lớp, tài khoản demo (2026-10-22)
+
+- Rà trước (người dùng chốt, đối chiếu chương trình khung KTPM2311): toàn Khoa CNTT khóa 2024, 5 lớp theo mẫu `KTPM2411`, danh mục Ngành, mỗi lớp 1 CVHT, làm lại KTPM theo HK4 thật (9b), GDTC/GDQP bỏ qua. Kế hoạch 9a/9b/9c ở `implement.md`.
+- Bảng `majors` + `administrative_classes.major_id` (migration `Phase9aMajors`), seed 5 ngành; lớp chọn ngành cùng khoa (`MAJOR_DEPARTMENT_MISMATCH`, `MAJOR_NOT_FOUND`).
+- Lọc Ngành: Khoa và lớp (cột + lọc), Tổng quan Admin, Cảnh báo sớm (+ xuất file), Sinh viên (`DashboardScope.majorId`, `MajorFilter`).
+- Seed demo: 5 lớp, GV001–GV005, học kỳ `HK3_2024` + `HK1_2025`; đăng nhập nhanh Admin + 5 CVHT + 5 SV gom theo lớp (`src/lib/demo-accounts.ts`).
+- Rules `06`, `07`, `08`, `09`; `KET_QUA_MONG_DOI.md` (dữ liệu nền), `demo-script.md` cập nhật theo seed mới.
+- Kiểm tra: typecheck, lint, format, migration:check, 406 test, build, e2e — xanh.
+- Tự kiểm tra: Admin → Khoa và lớp → lọc Ngành; Tạo lớp → chọn khoa CNTT → chọn ngành; Tổng quan → ô Ngành; trang đăng nhập → tab Cán bộ → nút theo lớp.

@@ -15,8 +15,15 @@ import {
 
 const ALL = 'ALL';
 
-/** Lọc lớp theo khóa, "chưa có CVHT" và tìm kiếm — lưu trên URL, giữ khoa đang chọn. */
-export function ClassesFilter({ cohorts }: { cohorts: string[] }) {
+/** Lọc lớp theo ngành, khóa, "chưa có CVHT" và tìm kiếm — lưu trên URL, giữ khoa đang chọn. */
+export function ClassesFilter({
+  cohorts,
+  majors,
+}: {
+  cohorts: string[];
+  /** Ngành của khoa đang chọn (hoặc mọi khoa). */
+  majors: { majorId: string; majorName: string }[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -54,6 +61,21 @@ export function ClassesFilter({ cohorts }: { cohorts: string[] }) {
           Tìm
         </Button>
       </form>
+      {majors.length > 0 && (
+        <Select value={params.get('major') ?? ALL} onValueChange={(v) => update({ major: v })}>
+          <SelectTrigger className="w-full sm:w-56" aria-label="Lọc theo ngành">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>Mọi ngành</SelectItem>
+            {majors.map((m) => (
+              <SelectItem key={m.majorId} value={m.majorId}>
+                {m.majorName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       <Select value={params.get('cohort') ?? ALL} onValueChange={(v) => update({ cohort: v })}>
         <SelectTrigger className="w-full sm:w-40" aria-label="Lọc theo khóa">
           <SelectValue />

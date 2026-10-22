@@ -2,6 +2,7 @@ import { type DataSource } from 'typeorm';
 import { type Auth } from '@/lib/auth';
 import { vnEndOfDay, vnStartOfDay } from '@/lib/dates';
 import { staffDomainForSamples } from '@/lib/email-domains';
+import { DEMO_ADVISOR_IDS, DEMO_CLASS_ACCOUNTS } from '@/lib/demo-accounts';
 import { type Env } from '@/lib/env';
 import { AdministrativeClass } from '../entities/administrative-class.entity';
 import { Term } from '../entities/term.entity';
@@ -12,26 +13,37 @@ import { ensureStaffAccount } from './base-seed';
  * Dữ liệu nền demo — đúng bảng "Dữ liệu nền" trong docs/demo-data/KET_QUA_MONG_DOI.md.
  * Đổi dữ liệu demo: sửa file kết quả mong đợi trước, rồi mới sửa ở đây.
  */
-export const DEMO_ADVISORS = [
-  { userId: 'GV001', fullName: 'Cố vấn học tập GV001' },
-  { userId: 'GV002', fullName: 'Cố vấn học tập GV002' },
-] as const;
-
-export const DEMO_CLASSES = [
-  {
-    classId: 'KTPM2411',
-    className: 'Kỹ thuật phần mềm K2024',
-    departmentId: 'K.CNTT',
-    cohortYear: '2024',
-    advisorId: 'GV001',
-  },
-] as const;
+export const DEMO_ADVISORS = DEMO_ADVISOR_IDS.map((userId) => ({
+  userId,
+  fullName: `Cố vấn học tập ${userId}`,
+}));
 
 /**
- * Bộ demo v2 (Phase 8a): 1 học kỳ ĐÃ QUA để mọi mốc demo (10/10, 20/11, 31/12) ở quá khứ —
- * chế độ demo không cho chọn mốc tương lai (docs/demo-data/KET_QUA_MONG_DOI.md).
+ * Toàn Khoa CNTT khóa 2024 (Phase 9a, chốt 2026-10-22): 5 lớp — mã theo mẫu `KTPM2411`, tên
+ * "<Ngành> K2024", mỗi lớp 1 Cố vấn học tập.
+ */
+export const DEMO_CLASSES = DEMO_CLASS_ACCOUNTS.map((c) => ({
+  classId: c.classId,
+  className: `${c.majorName} K2024`,
+  departmentId: 'K.CNTT',
+  majorId: c.majorId,
+  cohortYear: '2024',
+  advisorId: c.advisorId,
+}));
+
+/**
+ * Học kỳ ĐÃ QUA để mọi mốc demo (10/10, 20/11, 31/12) ở quá khứ — chế độ demo không cho chọn mốc
+ * tương lai. `HK3_2024` = học kỳ liền trước (HK3 chương trình khung, chỉ nạp kết quả — cho
+ * `ACA-04`, học lại; ngày là giá trị demo). `HK1_2025` = HK4 chương trình khung, học kỳ hiện tại.
  */
 export const DEMO_TERMS = [
+  {
+    termId: 'HK3_2024',
+    termName: 'Học kỳ 3, 2024–2025',
+    academicYear: '2024-2025',
+    startDate: '2025-05-04',
+    endDate: '2025-08-10',
+  },
   {
     termId: 'HK1_2025',
     termName: 'Học kỳ 1, 2025–2026',
@@ -72,7 +84,7 @@ export async function seedDemo(
   }
 
   await dataSource.transaction(async (em) => {
-    await em.getRepository(AdministrativeClass).upsert([...DEMO_CLASSES], ['classId']);
+    await em.getRepository(AdministrativeClass).upsert(DEMO_CLASSES, ['classId']);
     await em.getRepository(Term).upsert(
       DEMO_TERMS.map((t) => ({
         termId: t.termId,

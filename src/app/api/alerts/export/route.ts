@@ -37,6 +37,7 @@ export async function GET(request: Request) {
             role: UserRole.ADMIN,
             userId: user.userId,
             departmentId: query.department || null,
+            majorId: query.major || null,
             noAdvisor: query.filter === 'no-advisor',
           },
       term.termId,

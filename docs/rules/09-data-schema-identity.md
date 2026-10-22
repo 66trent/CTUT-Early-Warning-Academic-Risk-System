@@ -38,13 +38,26 @@ RÀNG BUỘC liên kết Student–User: với mọi `Student`, `User` tương �
 
 Danh sách khoa nạp bằng seed (danh mục chính thức do người dùng cung cấp): `K.CNTT` Khoa Công nghệ thông tin · `K.DDT` Khoa Điện - Điện tử · `K.KTCK` Khoa Kỹ thuật Cơ khí · `K.KTXD` Khoa Kỹ thuật Xây dựng · `K.CNSH` Khoa Công nghệ sinh học - Công nghệ hóa học - Công nghệ thực phẩm · `K.KTQL` Khoa Kinh tế - Quản lý công nghiệp · `K.KHXH` Khoa Khoa học Xã hội. Admin chỉ xem, không có màn hình sửa.
 
+## Major (Ngành) — Phase 9a, chốt 2026-10-22
+
+Lớp nhiều khóa cùng ngành (VD `HTTT2411`, `HTTT2511`) phải gom được để lọc / thống kê theo ngành qua mọi khóa — tên lớp không đủ.
+
+| Field | Kiểu | Null? | Khóa | Ghi chú |
+|---|---|---|---|---|
+| majorId | String(10) | NOT NULL | PK | Mã ngắn, VD `KTPM` (KHÔNG dùng mã ngành của Bộ GD) |
+| majorName | String(150) | NOT NULL | | |
+| departmentId | String(10) | NOT NULL | FK → Department | |
+
+Seed (người dùng cung cấp 2026-10-22, Khoa `K.CNTT`): `CNTT` Công nghệ thông tin · `KTPM` Kỹ thuật phần mềm · `HTTT` Hệ thống thông tin · `KHMT` Khoa học máy tính · `KHDL` Khoa học dữ liệu. Ngành của khoa khác: chưa có danh mục — hỏi người dùng, không tự đặt. Admin chỉ xem (như Khoa).
+
 ## AdministrativeClass (Lớp sinh hoạt) — đơn vị gán CVHT
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
-| classId | String(20) | NOT NULL | PK | VD: `KTPM2311` |
+| classId | String(20) | NOT NULL | PK | VD: `KTPM2311` (mã ngành + 2 số khóa + số thứ tự lớp; MSSV = mã lớp + 3 số, VD `KTPM2311019`) |
 | className | String(100) | NOT NULL | | |
 | departmentId | String(10) | NOT NULL | FK → Department | |
+| majorId | String(10) | NULL | FK → Major | Ngành (Phase 9a). MUST thuộc cùng khoa với lớp. NULL = khoa chưa có danh mục ngành |
 | cohortYear | String(10) | NOT NULL | | Khóa tuyển sinh — năm 4 chữ số (VD `2024`). Xác định "học kỳ đầu khóa" = `HK1_{cohortYear}` cho ngưỡng 0,8 của `ACA-03` (`08`, chốt 2026-10-18) |
 | advisorId | String(20) | NULL | FK → User.userId | CVHT chủ nhiệm. `User` phải có `role = ADVISOR` và `accountStatus = ACTIVE`. NULL = chưa gán |
 

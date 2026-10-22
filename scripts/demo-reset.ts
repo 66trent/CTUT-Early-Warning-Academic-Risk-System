@@ -87,7 +87,10 @@ async function main(): Promise<void> {
   step('Tạo schema auth + bảng Better Auth', 'db:init');
   step('Chạy migration', 'migration:run');
   step('Dữ liệu nền (khoa, Admin, 12 luật)', 'seed');
-  step('Dữ liệu nền demo (GV001, GV002, lớp KTPM2411, học kỳ HK1_2025)', 'seed:demo');
+  step(
+    'Dữ liệu nền demo (GV001–GV005, 5 lớp khóa 2024 Khoa CNTT, học kỳ HK3_2024 + HK1_2025)',
+    'seed:demo',
+  );
   step('Nạp 6 file demo qua worker', 'demo:load', ['--with-students']);
   const evaluate = process.argv.find((a) => a.startsWith('--evaluate'));
   if (evaluate) {

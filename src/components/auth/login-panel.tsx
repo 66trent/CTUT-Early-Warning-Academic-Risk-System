@@ -20,15 +20,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authClient } from '@/lib/auth-client';
+import { DEMO_CLASS_ACCOUNTS, demoStudentOf } from '@/lib/demo-accounts';
 import { signInMessage } from '@/lib/sign-in-messages';
 
-const DEMO_BUTTONS = [
-  { account: 'ADMIN', label: 'Quản trị viên' },
-  { account: 'GV001', label: 'Cố vấn học tập GV001' },
-  { account: 'GV002', label: 'Cố vấn học tập GV002' },
-  { account: 'KTPM2411903', label: 'Sinh viên KTPM2411903' },
-  { account: 'KTPM2411901', label: 'Sinh viên KTPM2411901' },
-] as const;
+/** Đăng nhập nhanh theo lớp demo (Phase 9a): mỗi lớp 1 Cố vấn học tập + 1 sinh viên tiêu biểu. */
+const DEMO_ROWS = DEMO_CLASS_ACCOUNTS.map((c) => ({
+  classId: c.classId,
+  majorName: c.majorName,
+  advisorId: c.advisorId,
+  studentId: demoStudentOf(c.classId),
+}));
 
 interface LoginPanelProps {
   errorCode: string | null;
@@ -95,6 +96,34 @@ const staffSchema = z.object({
   password: z.string().min(1, 'Nhập mật khẩu'),
 });
 type StaffValues = z.infer<typeof staffSchema>;
+
+function DemoButton({
+  account,
+  label,
+  ariaLabel,
+  pending,
+  onClick,
+}: {
+  account: string;
+  label: string;
+  ariaLabel?: string;
+  pending: string | null;
+  onClick: (account: string) => Promise<void>;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      aria-label={ariaLabel}
+      title={ariaLabel}
+      disabled={pending !== null}
+      onClick={() => void onClick(account)}
+    >
+      {pending === account && <Loader2 className="animate-spin" />}
+      {label}
+    </Button>
+  );
+}
 
 function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: string | null }) {
   const router = useRouter();
@@ -183,17 +212,42 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
             Đăng nhập nhanh (chế độ demo)
           </p>
           <div className="flex flex-col gap-2">
-            {DEMO_BUTTONS.map(({ account, label }) => (
-              <Button
-                key={account}
-                variant="outline"
-                disabled={demoPending !== null}
-                onClick={() => void quickLogin(account)}
-              >
-                {demoPending === account && <Loader2 className="animate-spin" />}
-                {label}
-              </Button>
-            ))}
+            <DemoButton
+              account="ADMIN"
+              label="Quản trị viên"
+              pending={demoPending}
+              onClick={quickLogin}
+            />
+            <ul className="flex flex-col gap-2" aria-label="Lớp demo">
+              {DEMO_ROWS.map((row) => (
+                <li
+                  key={row.classId}
+                  className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
+                >
+                  <span className="flex min-w-0 flex-col text-sm">
+                    <span className="font-medium">{row.classId}</span>
+                    <span className="truncate text-xs text-muted-foreground">{row.majorName}</span>
+                  </span>
+                  <DemoButton
+                    account={row.advisorId}
+                    label={row.advisorId}
+                    ariaLabel={`Cố vấn học tập ${row.advisorId}`}
+                    pending={demoPending}
+                    onClick={quickLogin}
+                  />
+                  <DemoButton
+                    account={row.studentId}
+                    label="Sinh viên"
+                    ariaLabel={`Sinh viên ${row.studentId}`}
+                    pending={demoPending}
+                    onClick={quickLogin}
+                  />
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Sinh viên đăng nhập được khi đã có hồ sơ (sau khi nạp danh sách sinh viên).
+            </p>
           </div>
         </div>
       )}
