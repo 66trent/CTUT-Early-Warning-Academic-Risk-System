@@ -20,6 +20,7 @@ import { Intervention } from './entities/intervention.entity';
 import { LmsActivity } from './entities/lms-activity.entity';
 import { LmsAssignmentSubmission } from './entities/lms-assignment-submission.entity';
 import { LmsQuizAttempt } from './entities/lms-quiz-attempt.entity';
+import { Major } from './entities/major.entity';
 import { Notification } from './entities/notification.entity';
 import { RiskScoreLog } from './entities/risk-score-log.entity';
 import { RuleTrigger } from './entities/rule-trigger.entity';
@@ -38,11 +39,13 @@ import { Phase7AlertsSchedule1792054500276 } from './migrations/1792054500276-Ph
 import { Phase7CurrentSignals1792056820711 } from './migrations/1792056820711-Phase7CurrentSignals';
 import { Phase8aSourceRecordsV21792338213883 } from './migrations/1792338213883-Phase8aSourceRecordsV2';
 import { Phase8fImportFiles1792505510980 } from './migrations/1792505510980-Phase8fImportFiles';
+import { Phase9aMajors1792659703130 } from './migrations/1792659703130-Phase9aMajors';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
   User,
   Department,
+  Major,
   AdministrativeClass,
   Student,
   Term,
@@ -78,6 +81,7 @@ const MIGRATIONS = [
   Phase7CurrentSignals1792056820711,
   Phase8aSourceRecordsV21792338213883,
   Phase8fImportFiles1792505510980,
+  Phase9aMajors1792659703130,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

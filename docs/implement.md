@@ -253,6 +253,56 @@ Rà trước khi code (2026-10-20, người dùng chốt): **1 lô thật nhiề
 
 **Kết quả (2026-10-20):** đạt DoD phần tự động — typecheck, lint, format, migration:check, 402 test (thêm `import-multi-file.test.ts`), build xanh; Playwright 2 luồng xanh cả trên dev server lẫn image Docker production (luồng 1 viết lại: nạp 2 file 1 lần có dòng lỗi). Kiểm tay: hoàn tác lô `02` rồi nạp 3 file `docs/demo-data/nhieu-file/` 1 lần → xem trước bảng từng file (mỗi file 1 học phần, 40 dòng), cảnh báo sai tên ghi tên file → nạp 120 dòng mới; lọc lịch sử theo học phần; bảng độ mới hiện 3 học phần × 4 nguồn. Rà 375 / 820 / 1280px mọi trang Admin, CVHT, sinh viên + chế độ tối + Ctrl+K / Esc: sửa 1 lỗi tràn ngang cũ ở form luật (bảng mức cảnh báo, thiếu `min-w-0`), bỏ ô file ẩn khỏi thứ tự Tab; `npm run screenshots` 62 ảnh, 0 tràn ngang. Thêm ngoài kế hoạch: kéo thả file, lô tải lên dở tự hủy sau 1 ngày (+ nút hủy), chặn file trùng tên / trùng nội dung trong lô, viết lại `demo-script.md` theo bộ demo v2 (bản cũ còn số liệu v1). Chưa làm: chưa trình diễn tay trọn 10 phút theo `demo-script.md` (các bước đã kiểm riêng lẻ: 2 mốc đánh giá ra 10 → 13 cảnh báo, xác nhận + can thiệp, nạp nhiều file).
 
-## Phase 9 — Mở rộng dữ liệu demo (chưa lập chi tiết)
+## Phase 9 — Dữ liệu nền toàn Khoa CNTT và bộ demo v3 (chốt 2026-10-22)
 
-- [ ] Từ bộ v2 giai đoạn 1: thêm học kỳ trước (có môn rớt → học lại, nghiệm thu ACA-04, COMB-02), thêm môn, lớp, khoa; viết lại các kịch bản nhỏ từ `_luu-tru-v1/` theo luật mới, mỗi kịch bản 1 test nghiệm thu; cập nhật `docs/demo-script.md`.
+Rà trước khi lập kế hoạch (2026-10-22, đối chiếu chương trình khung KTPM2311 người dùng gửi — trích ở `docs/demo-data/chuong-trinh-khung-ktpm.md`). Người dùng chốt:
+
+- **Toàn bộ Khoa CNTT, khóa 2024**, 5 ngành, mỗi ngành 1 lớp theo mẫu `KTPM2411`: `CNTT2411`, `KTPM2411`, `HTTT2411`, `KHMT2411`, `KHDL2411`; 20 sinh viên / lớp (MSSV giả `<lớp>901`–`920`), tổng 100.
+- **Danh mục Ngành** (bảng mới, thuộc Khoa; lớp chọn ngành) — để lớp khóa sau (VD `HTTT2511`) gom chung ngành, lọc / thống kê theo ngành qua mọi khóa. Ghi `09`.
+- **Mỗi lớp 1 chủ đề tình huống**, **mỗi lớp 1 CVHT** (GV001–GV005), đăng nhập nhanh: Admin + 5 CVHT + 5 sinh viên (1 sinh viên tiêu biểu / lớp).
+- **Làm lại KTPM theo học phần HK4 thật** (bộ v2 cho khóa 2024 học Ngôn ngữ lập trình 1 — môn HK1, sai tín chỉ — và Cơ sở dữ liệu mã giả): giữ 20 sinh viên và các tình huống, đổi sang học phần thật, tính lại kết quả mong đợi.
+- 4 ngành còn lại chưa có chương trình khung → **suy từ chương trình KTPM**: học phần thật (mã, tên, TC, số tiết thật), việc xếp vào HK4 của ngành khác ghi rõ là giả định.
+- **Học kỳ trước `HK3_2024` cho cả 5 lớp** (chỉ kết quả học phần HK3 thật) → `ACA-04` xét được cho mọi sinh viên; rớt / học lại tập trung ở HTTT. `HK3_2024` chỉ nạp kết quả: không chạy đánh giá, không chốt (chốt sẽ chạy lần cuối và tạo cảnh báo học kỳ cũ làm rối demo).
+- **GDTC / GDQP** (không tính TBC): bỏ qua — không nạp, ghi giới hạn ở `08`.
+- Phát hiện khi rà: bộ demo v2 + seed + nút đăng nhập nhanh + 2 test nghiệm thu + helper test + Playwright đều gắn cứng `KTPM2411` → đổi đồng loạt ở 9a/9b; giả định "mã học phần = mã lớp học phần bỏ 2 số cuối" có thêm bằng chứng (ghi `08`, file đối soát).
+
+Phân bổ (lớp học phần = mã học phần + số thứ tự lớp: `01` CNTT, `02` KTPM — `010100240802` là mã thật, `03` HTTT, `04` KHMT, `05` KHDL):
+
+| Lớp | CVHT | Chủ đề — trả lời câu hỏi hội đồng | Học phần HK1_2025 theo dõi (3–4) |
+|---|---|---|---|
+| `CNTT2411` Công nghệ thông tin K2024 | GV002 | **LMS**: không làm trắc nghiệm, điểm thấp, không nộp / nộp trễ bài thực hành, bài chưa tới hạn | Logic học (TN) · Kiến trúc máy tính (TN + TH) · Mạng máy tính (TH)* |
+| `KTPM2411` Kỹ thuật phần mềm K2024 | GV001 | **Điểm danh** (ngưỡng 10/15/20%, đúng 20%, vượt 20%, tăng nhanh) + các tình huống v2 — kịch bản chính 10 phút | Logic học (TN) · Hệ quản trị CSDL (TN + TH) · PTTK hệ thống thông tin (TH) |
+| `HTTT2411` Hệ thống thông tin K2024 | GV003 | **Học lực + học lại**: rớt CSDL ở HK3_2024 → học lại + vắng → `COMB-02`; ĐTB giảm → `ACA-04`; chốt học kỳ → `ACA-01/02/03` cả mức quy chế (ĐTB < 1,0; rớt > 50%) | Logic học · Cơ sở dữ liệu (học lại) · Hệ quản trị CSDL · PTTK HTTT |
+| `KHMT2411` Khoa học máy tính K2024 | GV004 | **Nhiều nguồn + vòng đời cảnh báo**: `COMB-01`; tăng mức gửi thông báo, giảm mức không gửi; đã giải quyết rồi xấu hơn → mở lại; hoàn tác lô → không còn hiệu lực | Logic học · Giải thuật (TN) · Trí tuệ nhân tạo (TN + TH)* |
+| `KHDL2411` Khoa học dữ liệu K2024 | GV005 | **Thiếu dữ liệu + đối chứng + nhập lỗi**: học phần không dùng LMS (không tính là thiếu), sinh viên thiếu nguồn (Một phần / Chưa đủ), rút học phần, file có dòng lỗi (sai MSSV, sai tên, ngày kiểu Mỹ); đa số sinh viên ổn | Xác suất thống kê · Tư tưởng HCM · Phân tích CSDL lớn* |
+
+`*` học phần mượn từ học kỳ sau của KTPM (giả định). Mốc đánh giá giữ như v2: 2025-10-10, 2025-11-20, chốt 2025-12-31. Sinh viên tiêu biểu đăng nhập nhanh = `<lớp>903` của mỗi lớp.
+
+### Phase 9a — Danh mục Ngành, 5 lớp, tài khoản demo
+
+- [x] Entity `Major` + `AdministrativeClass.majorId` (NULL được, cùng khoa) + migration; seed 5 ngành K.CNTT (base seed, idempotent).
+- [x] Khoa và lớp: cột + lọc Ngành; form tạo / sửa lớp chọn ngành (lọc theo khoa). Bộ lọc Ngành cạnh bộ lọc Khoa ở Tổng quan Admin, Cảnh báo sớm (Admin), Sinh viên, xuất Excel (`DashboardScope.majorId`, truy vấn `COUNT … GROUP BY` như cũ).
+- [x] Seed demo: 5 lớp (tên "<Ngành> K2024", khóa 2024, ngành), GV001–GV005 (mỗi người 1 lớp), học kỳ `HK3_2024` + `HK1_2025` (hiện tại). Đăng nhập nhanh: Admin, GV001–GV005, `<lớp>903` × 5 (nút gom theo lớp; sinh viên chỉ khi đã có hồ sơ).
+- [x] Test: lọc ngành khớp danh sách; lớp và ngành khác khoa bị từ chối; CVHT lớp A không thấy lớp B; `expectPlain()`.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` xanh. **Kiểm tra tay:** tạo lớp `HTTT2511` chọn ngành HTTT → lọc ngành HTTT ra cả 2 lớp; đăng nhập nhanh đủ 11 tài khoản.
+
+**Kết quả (2026-10-22):** đạt DoD phần tự động — typecheck, lint, format, migration:check (migration `Phase9aMajors`), 406 test (thêm `tests/integration/majors.test.ts`), build, e2e 2 luồng xanh. Kiểm tay: tạo lớp `HTTT2511` chọn ngành HTTT qua form → lọc ngành HTTT ra `HTTT2411` + `HTTT2511` (đã xóa lớp thử sau đó); Tổng quan / Cảnh báo sớm lọc ngành KTPM ra 13 cảnh báo, HTTT 0; Sinh viên lọc KTPM 20; 375px không cuộn ngang. Đăng nhập nhanh: Admin, GV001–GV005, `KTPM2411903` vào được; sinh viên 4 lớp mới báo "chưa có tài khoản demo" đúng thiết kế vì chưa có hồ sơ — đủ 11 tài khoản sau 9b. `demo:reset --evaluate=2` vẫn ra 10 → 13 cảnh báo (có thêm `HK3_2024` rỗng → `ACA-04` không xét). Thêm ngoài kế hoạch: thông báo trống riêng khi lọc khoa / ngành ở Cảnh báo sớm; danh sách tài khoản demo dùng chung `src/lib/demo-accounts.ts`.
+
+### Phase 9b — Bộ dữ liệu demo v3 + nghiệm thu
+
+- [ ] Lưu trữ v2 vào `docs/demo-data/_luu-tru-v2/`. Viết `KET_QUA_MONG_DOI.md` v3 TRƯỚC (tính tay từng lớp: dấu hiệu PHẢI có / PHẢI không ở 3 lần chạy, cảnh báo sau mỗi lần chạy, thông báo), rồi script sinh dữ liệu `gen_demo_v3.py`.
+- [ ] File như trường xuất: **1 file / lớp học phần / nguồn** (điểm danh, trắc nghiệm, thực hành, kết quả) → nạp bằng lô nhiều file (8f); `01_sinh_vien.csv` 100 sinh viên; kết quả `HK3_2024` 5 lớp × 6 học phần HK3.
+- [ ] `demo:load` / `demo:reset` nạp theo lô nhiều file; `--evaluate` / `--evaluate=2` như cũ.
+- [ ] Test nghiệm thu (`rule-engine-acceptance`, `alerts`) theo v3 cho cả 5 lớp, gồm `ACA-04` và `COMB-02`; helper đổi mã sang `TST…` cho mọi lớp (tránh trùng lớp thử `TSTH2411` hiện có).
+- [ ] Mỗi tình huống trong cột "chủ đề" có ít nhất 1 sinh viên + 1 dòng trong kết quả mong đợi.
+
+**DoD:** test + `build` xanh; nghiệm thu khớp 100%; `npm run demo:reset -- --yes --evaluate` ra đúng số cảnh báo của `KET_QUA_MONG_DOI.md` v3. **Kiểm tra tay:** đăng nhập lần lượt GV001–GV005 thấy đúng lớp mình và đúng chủ đề.
+
+### Phase 9c — Kịch bản trình diễn theo lớp
+
+- [ ] Viết lại `docs/demo-script.md`: kịch bản chính 10 phút (KTPM + tổng quan toàn khoa, lọc theo ngành) + bảng "hội đồng hỏi X → đăng nhập CVHT lớp Y, mở sinh viên Z" phủ đủ 12 luật; kịch bản thao tác vòng đời cảnh báo (KHMT: giải quyết → chạy mốc sau → mở lại).
+- [ ] Playwright 2 luồng + `npm run screenshots` theo v3; README, HANDOFF.
+- [ ] Bỏ `docs/demo-data/_luu-tru-v1/kich-ban` khỏi tài liệu đang dùng (đã gộp vào chủ đề các lớp); `npm run demo:scenario` gỡ hoặc ghi rõ chỉ dùng bộ v1.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build`, e2e xanh. **Kiểm tra tay:** trình diễn trọn kịch bản chính theo `demo-script.md`; mỗi câu hỏi trong bảng mở được đúng màn hình.

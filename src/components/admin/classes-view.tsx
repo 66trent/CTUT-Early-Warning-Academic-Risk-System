@@ -10,6 +10,7 @@ import type {
   AdvisorOptionDto,
   ClassListItemDto,
   DepartmentDto,
+  MajorDto,
 } from '@/modules/admin/services/class.service';
 import { ChangeAdvisorDialog } from './change-advisor-dialog';
 import { ClassFormDialog } from './class-form-dialog';
@@ -17,13 +18,19 @@ import { ClassFormDialog } from './class-form-dialog';
 interface ClassesViewProps {
   classes: ClassListItemDto[];
   departments: DepartmentDto[];
+  majors: MajorDto[];
   advisors: AdvisorOptionDto[];
 }
 
-export function CreateClassButton({ departments, advisors }: Omit<ClassesViewProps, 'classes'>) {
+export function CreateClassButton({
+  departments,
+  majors,
+  advisors,
+}: Omit<ClassesViewProps, 'classes'>) {
   return (
     <ClassFormDialog
       departments={departments}
+      majors={majors}
       advisors={advisors}
       trigger={
         <Button>
@@ -38,6 +45,7 @@ export function CreateClassButton({ departments, advisors }: Omit<ClassesViewPro
 export function ClassesTable({
   classes,
   departments,
+  majors,
   advisors,
   sort,
   filtered,
@@ -64,6 +72,13 @@ export function ClassesTable({
       accessorKey: 'departmentName',
       header: 'Khoa',
       meta: { sortKey: 'departmentId' },
+    },
+    {
+      accessorKey: 'majorName',
+      header: 'Ngành',
+      meta: { sortKey: 'majorId' },
+      cell: ({ row }) =>
+        row.original.majorName ?? <span className="text-muted-foreground">Chưa chọn</span>,
     },
     {
       accessorKey: 'advisorName',
@@ -111,6 +126,7 @@ export function ClassesTable({
           <ClassFormDialog
             editing={row.original}
             departments={departments}
+            majors={majors}
             advisors={advisors}
             trigger={
               <Button size="sm" variant="ghost" aria-label={`Sửa lớp ${row.original.classId}`}>

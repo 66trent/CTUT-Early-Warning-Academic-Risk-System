@@ -3,6 +3,7 @@ import { ShieldCheck, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { DepartmentFilter } from '@/components/admin/department-filter';
+import { MajorFilter } from '@/components/admin/major-filter';
 import { DataPagination } from '@/components/data-table/data-pagination';
 import { ActiveAlertFilters } from '@/components/alerts/active-alert-filters';
 import { AlertListFilter } from '@/components/alerts/alert-list-filter';
@@ -18,7 +19,7 @@ import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { HELP_LINKS } from '@/lib/help-links';
 import { parseListParams, type RawSearchParams } from '@/lib/list-params';
-import { listDepartments } from '@/modules/admin/services/class.service';
+import { listDepartments, listMajors } from '@/modules/admin/services/class.service';
 import {
   ALERT_DEFAULT_SORT,
   ALERT_SORT_KEYS,
@@ -39,16 +40,25 @@ export default async function AdminAlertsPage({
   const params = await searchParams;
   const str = (k: string) => (typeof params[k] === 'string' ? params[k] : undefined);
   const list = parseListParams(params, ALERT_SORT_KEYS, ALERT_DEFAULT_SORT);
-  const [terms, departments] = await Promise.all([listTermOptions(), listDepartments()]);
+  const [terms, departments, majors] = await Promise.all([
+    listTermOptions(),
+    listDepartments(),
+    listMajors(),
+  ]);
   const term = pickTerm(terms, str('term'));
   const department = departments.find((d) => d.departmentId === str('department')) ?? null;
+  // Ngành lọc theo khoa đang chọn (docs/rules/09).
+  const majorsInView = majors.filter(
+    (m) => !department || m.departmentId === department.departmentId,
+  );
+  const major = majorsInView.find((m) => m.majorId === str('major')) ?? null;
   const noAdvisor = str('filter') === 'no-advisor';
   const extra = alertExtraFilterSchema.parse(params);
   const result = term
     ? await listAdminAlerts(
         term.termId,
         noAdvisor ? 'NO_ADVISOR' : 'ALL',
-        department?.departmentId ?? null,
+        { departmentId: department?.departmentId ?? null, majorId: major?.majorId ?? null },
         list,
         extra,
       )
@@ -57,6 +67,7 @@ export default async function AdminAlertsPage({
     const query = new URLSearchParams();
     if (term) query.set('term', term.termId);
     if (department) query.set('department', department.departmentId);
+    if (major) query.set('major', major.majorId);
     if (filter) query.set('filter', filter);
     return `/admin/alerts?${query.toString()}`;
   };
@@ -72,6 +83,7 @@ export default async function AdminAlertsPage({
       <div className="flex flex-wrap items-center gap-3">
         {term && <TermFilter terms={terms} value={term.termId} />}
         <DepartmentFilter departments={departments} value={department?.departmentId ?? null} />
+        <MajorFilter majors={majorsInView} value={major?.majorId ?? null} />
         <div className="flex gap-1">
           <Button asChild size="sm" variant={noAdvisor ? 'outline' : 'default'}>
             <Link href={link(null)}>Tất cả</Link>
@@ -97,6 +109,12 @@ export default async function AdminAlertsPage({
                 <EmptyState
                   icon={UserCheck}
                   title="Mọi cảnh báo đang mở đều đã có Cố vấn học tập phụ trách"
+                />
+              ) : department || major ? (
+                <EmptyState
+                  icon={ShieldCheck}
+                  title="Không có cảnh báo nào của khoa / ngành đã chọn"
+                  description="Bỏ lọc khoa hoặc ngành để xem toàn bộ cảnh báo của học kỳ."
                 />
               ) : (
                 <EmptyState

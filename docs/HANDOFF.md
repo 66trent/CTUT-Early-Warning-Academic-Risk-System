@@ -1,6 +1,6 @@
 # Bàn giao ngữ cảnh — CTUT-EWARS
 
-> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-20 (sau Phase 8f).
+> Đọc file này đầu tiên khi bắt đầu phiên mới. Cập nhật lần cuối: 2026-10-22 (lập kế hoạch Phase 9).
 > Nguồn sự thật nghiệp vụ/kỹ thuật vẫn là `CLAUDE.md` + `docs/rules/00–12`; file này chỉ ghi **trạng thái, quyết định đã chốt với người dùng, và bẫy đã gặp** — những thứ không đọc được từ code.
 
 ## 1. Trạng thái
@@ -21,7 +21,9 @@
 | 8c Trang quản trị (Bắt đầu, Tài khoản, Lớp, Kết quả đánh giá) | Xong | `phase-8c` | #12 → `phase-8b` | — |
 | 8d Hai trang tổng quan (Admin + CVHT) | Xong | `phase-8d` | #13 → `phase-8c` | — |
 | 8e Màn hình CVHT và sinh viên (lọc, xuất Excel, thông báo, ma trận, hồ sơ) | Xong | `phase-8e` | #14 → `phase-8d` | — |
-| 8f Nạp nhiều file, bảng độ mới, ảnh/Playwright/demo-script, rà giao diện | Xong | `phase-8f` (đang checkout) | → `phase-8e` | — |
+| 8f Nạp nhiều file, bảng độ mới, ảnh/Playwright/demo-script, rà giao diện | Xong | `phase-8f` | #15 → `phase-8e` | — |
+| 9a Danh mục Ngành, 5 lớp, tài khoản demo | Xong | `phase-9` (đang checkout, từ `phase-8f`) | → `phase-8f` | — |
+| 9b Bộ demo v3 + nghiệm thu · 9c Kịch bản theo lớp | Chưa làm | — | — | — |
 
 - Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **đã merge #1–#8 vào `main` (merge commit, 2026-10-15)**. Từ Phase 7 PR đi thẳng vào `main`.
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
@@ -43,6 +45,7 @@
 - `src/modules/alerts`: quyết định gộp/mở lại thuần `services/alert-decision.ts`, gộp vào DB `alert-sync.service.ts`, máy trạng thái + can thiệp + chuyển người phụ trách `alert-lifecycle.service.ts`, truy vấn `alert-query.service.ts`, hồ sơ/trang sinh viên `student-profile.service.ts`, thông báo `notification.service.ts`, Server Action `actions/alert.actions.ts`.
 - Giao diện: `src/app/{admin,advisor,student}/**`, component `src/components/{alerts,evaluations,imports,admin,domain}/*`. Menu `src/components/layout/nav-config.ts`. Phase 6: `src/app/admin/{rules,audit-logs,getting-started,students}`, `/legal/privacy-policy`, component `src/components/{rules,admin}/*`, service `src/modules/admin/services/{overview,getting-started,setup-steps,audit-log,enrollment,student-search}*`, `rule-engine/services/rule-query.service.ts`, form luật tự sinh `rule-engine/condition-schema.ts` + `components/rules/condition-editor.tsx`, biểu đồ `components/ui/chart.tsx` (shadcn).
 - Phase 7: dấu hiệu hiện tại `alerts/services/current-signals.ts` + gộp `alert-sync.service.ts` (giữ dấu hiệu điểm danh quá hạn), lịch đêm `SCHEDULED_EVALUATION_JOB`, bộ lọc Khoa `components/admin/department-filter.tsx`; script `scripts/{demo-reset,load-scenario,db-backup,perf-seed,perf-measure,screenshots}.ts`; kịch bản `docs/demo-data/kich-ban/*` (+ `tests/integration/demo-scenarios.test.ts`); Playwright `tests/e2e/*`; báo cáo `docs/bao-cao/*`.
+- Phase 9a: ngành `db/entities/major.entity.ts` (migration `Phase9aMajors`, seed `MAJORS` trong `seeds/departments.ts`), `listMajors` + kiểm ngành cùng khoa trong `class.service.ts`, lọc ngành `DashboardScope.majorId` / `listAdminAlerts(…, OrgFilter)` / `searchStudents(…, { majorId })`, `components/admin/major-filter.tsx`; tài khoản + lớp demo `src/lib/demo-accounts.ts` (dùng chung seed, Better Auth, màn đăng nhập).
 - Phase 8f: file của lô `db/entities/import-batch-file.entity.ts` (migration `Phase8fImportFiles`); tải lên từng file `beginImportUpload` / `addImportFile` / `finishImportUpload` (`import-batch.service.ts`); đọc nhiều file `runPass` (`import-processor.service.ts`); bảng độ mới theo học phần `getDataFreshness().courses` + `components/imports/course-freshness-table.tsx`; demo nhiều file `docs/demo-data/nhieu-file/`.
 - Worker: `src/workers/index.ts` + `processors/{import-batch,evaluation-run,notification}.processor.ts`; 3 queue ở `src/lib/queue/queues.ts`.
 - Test: `tests/unit/**`, `tests/integration/**` (Postgres thật); helper dữ liệu demo `tests/helpers/demo-setup.ts`, `import-helpers.ts`, `evaluator-fixtures.ts`. Nghiệm thu: `rule-engine-acceptance.test.ts` (trigger), `alerts.test.ts` (cảnh báo).
@@ -60,6 +63,7 @@
 - Màn hình CVHT / sinh viên (chốt 2026-10-19, Phase 8e): ma trận = sinh viên × học phần của 1 lớp; dòng thời gian hồ sơ = cảnh báo + can thiệp (chỉ loại) + ngày chốt dữ liệu; vạch vắng đọc từ ATT-01 đang áp dụng.
 - Tổng quan (chốt 2026-10-19, Phase 8d): xu hướng theo các lần đánh giá (mốc dữ liệu), không theo tuần lịch; "học phần chậm dữ liệu" so với ngày dữ liệu mới nhất của học kỳ, không so với hôm nay; CVHT: `/advisor` = tổng quan, danh sách cảnh báo `/advisor/alerts` (email + chuông đổi link, link cũ tự chuyển). DB `ewars_perf` đã tạo lại theo cấu trúc 8a (5.000 SV giả).
 - Nạp nhiều file (chốt 2026-10-20, Phase 8f, ghi `07`, `12`): 1 lô thật nhiều file (KHÔNG nhóm lô), ≤ 50 file / lô, cùng loại + học kỳ; trình duyệt gửi từng file (Server Action 21MB/lần); rate-limit 30 LÔ / giờ; bảng độ mới ở trang nhập theo cách 8d (so với ngày mới nhất của học kỳ).
+- Phase 9 (chốt 2026-10-22, chi tiết `docs/implement.md`, ghi `08`, `09`): toàn Khoa CNTT khóa 2024, 5 lớp `CNTT2411`/`KTPM2411`/`HTTT2411`/`KHMT2411`/`KHDL2411` (mã theo mẫu KTPM2411, người dùng xác nhận dùng cho demo), 20 SV/lớp; danh mục **Ngành** (bảng mới, mã ngắn CNTT/KTPM/HTTT/KHMT/KHDL); mỗi lớp 1 chủ đề tình huống, mỗi lớp 1 CVHT GV001–GV005; đăng nhập nhanh Admin + 5 CVHT + 5 SV (`<lớp>903`); làm lại KTPM theo học phần HK4 THẬT của chương trình khung (`docs/demo-data/chuong-trinh-khung-ktpm.md`); ngành khác suy từ CT KTPM (giả định); `HK3_2024` kết quả cho cả 5 lớp (chỉ nạp, không chạy, không chốt); GDTC/GDQP bỏ qua (giới hạn `08`).
 - Giao diện (chốt 2026-10-19, ghi `03`): họ tên sắp theo tên rồi họ; RiskScore hiển thị 0–1 (dấu phẩy) + thanh; danh mục khoa = chip lọc + mục thu gọn; giữ shadcn, chỉ thêm thành phần; kế hoạch giao diện chia 8b–8f.
 
 ## 4. Câu hỏi còn mở (hỏi người dùng đúng lúc)
@@ -112,7 +116,7 @@ un\dockerInference` → tắt Docker, xóa file, `wsl --shutdown`, mở lại (K
 
 ## 6. Việc tiếp theo
 
-Phase 8a–8f xong (chờ merge PR #10–#14 + PR 8f). Tiếp: Phase 9 (mở rộng dữ liệu demo: học kỳ trước có rớt → học lại, nghiệm thu ACA-04 / COMB-02, thêm môn/lớp/khoa; viết lại kịch bản nhỏ từ `_luu-tru-v1/` theo 12 luật, mỗi kịch bản 1 test; cập nhật mục "hội đồng hỏi" của `docs/demo-script.md`). Còn treo: chạy tay trọn kịch bản 10 phút theo `docs/demo-script.md` (viết lại 8f). Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/` — tên ảnh đổi ở 8f), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
+Phase 8a–8f xong (chờ merge PR #10–#15). Phase 9a xong (2026-10-22). Tiếp: **9b** (bộ demo v3: viết `KET_QUA_MONG_DOI.md` v3 trước, rồi `gen_demo_v3.py`, nghiệm thu) → **9c** (demo-script theo lớp, e2e, ảnh). Còn treo: chạy tay trọn kịch bản 10 phút (sẽ viết lại ở 9c). Việc có thể làm khi người dùng yêu cầu: ẩn danh hóa sinh viên (hoãn), viết báo cáo đồ án (số liệu ở `docs/bao-cao/`, ảnh ở `docs/screenshots/`), triển khai thật (README mục 4). Lưu ý: chạy `npm test` liên tiếp < 1 phút có thể đỏ test đăng nhập do giới hạn 5 lần/phút. Trước buổi bảo vệ: `npm run demo:reset -- --yes` rồi theo `docs/demo-script.md`.
 
 **Báo cáo tiến độ với giảng viên:** `docs/BAO_CAO_TIEN_DO.md` (checklist A–G + nhật ký báo cáo). Mỗi khi người dùng hỏi "báo cáo tiến độ" hoặc xong một việc trong danh sách: tick `[x]` kèm ngày, cập nhật bảng Tổng hợp (đếm lại), thêm 1 dòng Nhật ký báo cáo — không xóa mục cũ. Báo cáo Word cho hội đồng: `docs/bao-cao/Bao-cao-do-an-CTUT-EWARS.docx` (bìa "Đồ án Kỹ thuật phần mềm 3" — người dùng chốt), bản kỹ thuật: `docs/bao-cao/CTUT-EWARS_Bao-cao-yeu-cau-va-thiet-ke-ky-thuat.docx` (cả 2 chưa commit).
 

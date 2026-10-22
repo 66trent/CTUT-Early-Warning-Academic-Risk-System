@@ -13,6 +13,8 @@ export { OVERDUE_DAYS };
 export interface DashboardScope {
   termId: string;
   departmentId?: string | null;
+  /** Ngành của lớp sinh hoạt (docs/rules/09, Phase 9a). */
+  majorId?: string | null;
   advisorId?: string | null;
 }
 
@@ -30,6 +32,7 @@ export function scopeSql(
   const where: string[] = [];
   if (scope.departmentId)
     where.push(`c.department_id = $${start + args.push(scope.departmentId) - 1}`);
+  if (scope.majorId) where.push(`c.major_id = $${start + args.push(scope.majorId) - 1}`);
   if (scope.advisorId) where.push(`c.advisor_id = $${start + args.push(scope.advisorId) - 1}`);
   return {
     join: 'JOIN administrative_classes c ON c.class_id = s.class_id',

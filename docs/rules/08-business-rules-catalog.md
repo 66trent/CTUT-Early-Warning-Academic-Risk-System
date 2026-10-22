@@ -138,7 +138,8 @@ Lấy mức cao nhất của (a), (b).
 ## Giới hạn đã biết — ghi vào báo cáo, MUST NOT tự "vá" bằng logic đoán
 
 - Không có file Excel thật của trường (chỉ ảnh màn hình) → mẫu file thiết kế theo cột trong ảnh, tiêu đề 1 dòng; file xuất của trường (tiêu đề nhiều tầng) phải chép sang mẫu.
-- Mã học phần suy từ mã lớp học phần bằng cách bỏ 2 số cuối (giả định, chưa xác nhận chính thức) — sai thì học lại (`COMB-02`) không nhận ra; Admin điền `ma_hoc_phan` riêng khi biết.
+- Mã học phần suy từ mã lớp học phần bằng cách bỏ 2 số cuối (giả định; chương trình khung KTPM2311 — 2026-10-22 — cho thấy mã học phần 10 số `0101002408` khớp phần đầu mã lớp học phần `010100240802`, nhưng chưa có xác nhận chính thức của phòng Đào tạo) — sai thì học lại (`COMB-02`) không nhận ra; Admin điền `ma_hoc_phan` riêng khi biết.
+- Học phần Giáo dục thể chất, Giáo dục quốc phòng (dấu `*` trong chương trình khung) KHÔNG tính vào điểm trung bình theo quy chế. Hệ thống không phân biệt loại học phần này (người dùng chốt 2026-10-22: bỏ qua) → KHÔNG nạp kết quả GDTC/GDQP; nếu lỡ nạp, `ACA-02/03/04` và RiskScore sẽ tính cả chúng.
 - Bài trắc nghiệm không có hạn nộp → `LMS-01` chỉ bắt được bài đa số lớp đã làm.
 - Điểm danh là số tổng hợp → không phát hiện "vắng liên tiếp" chính xác; `ATT-02` xấp xỉ theo mức tăng giữa 2 lần nhập.
 - Không biết sinh viên rút học phần từ dữ liệu nguồn → Admin đánh dấu tay.

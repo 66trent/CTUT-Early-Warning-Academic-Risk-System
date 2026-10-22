@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { toast } from '@/lib/notify';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,21 +37,31 @@ import type {
   AdvisorOptionDto,
   ClassDto,
   DepartmentDto,
+  MajorDto,
 } from '@/modules/admin/services/class.service';
 import { type CreateClassInput, createClassSchema } from '@/modules/admin/validators/class';
 
 /** Giá trị Select cho "chưa gán" (Radix Select không nhận chuỗi rỗng). */
 export const NO_ADVISOR = '__none__';
+/** Giá trị Select cho "chưa có ngành" (khoa chưa có danh mục ngành). */
+const NO_MAJOR = '__none__';
 
 interface ClassFormDialogProps {
   trigger: ReactNode;
   departments: DepartmentDto[];
+  majors: MajorDto[];
   advisors: AdvisorOptionDto[];
   /** Có giá trị = sửa lớp (không đổi mã lớp, không đổi CVHT ở form này). */
   editing?: ClassDto;
 }
 
-export function ClassFormDialog({ trigger, departments, advisors, editing }: ClassFormDialogProps) {
+export function ClassFormDialog({
+  trigger,
+  departments,
+  majors,
+  advisors,
+  editing,
+}: ClassFormDialogProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateClassInput>({
     resolver: zodResolver(createClassSchema),
@@ -59,10 +69,14 @@ export function ClassFormDialog({ trigger, departments, advisors, editing }: Cla
       classId: editing?.classId ?? '',
       className: editing?.className ?? '',
       departmentId: editing?.departmentId ?? '',
+      majorId: editing?.majorId ?? '',
       cohortYear: editing?.cohortYear ?? '',
       advisorId: editing?.advisorId ?? '',
     },
   });
+
+  const departmentId = useWatch({ control: form.control, name: 'departmentId' });
+  const majorsOfDepartment = majors.filter((m) => m.departmentId === departmentId);
 
   const onSubmit = async (values: CreateClassInput) => {
     const result = editing
@@ -70,6 +84,7 @@ export function ClassFormDialog({ trigger, departments, advisors, editing }: Cla
           classId: values.classId,
           className: values.className,
           departmentId: values.departmentId,
+          majorId: values.majorId,
           cohortYear: values.cohortYear,
         })
       : await createClassAction(values);
@@ -139,7 +154,14 @@ export function ClassFormDialog({ trigger, departments, advisors, editing }: Cla
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Khoa</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      // Ngành thuộc khoa — đổi khoa thì chọn lại ngành.
+                      form.setValue('majorId', '');
+                    }}
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Chọn khoa" />
@@ -149,6 +171,39 @@ export function ClassFormDialog({ trigger, departments, advisors, editing }: Cla
                       {departments.map((d) => (
                         <SelectItem key={d.departmentId} value={d.departmentId}>
                           {d.departmentName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="majorId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ngành</FormLabel>
+                  <Select
+                    value={field.value || NO_MAJOR}
+                    onValueChange={(v) => field.onChange(v === NO_MAJOR ? '' : v)}
+                    disabled={majorsOfDepartment.length === 0}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_MAJOR}>
+                        {majorsOfDepartment.length === 0
+                          ? 'Khoa này chưa có danh mục ngành'
+                          : 'Chưa chọn ngành'}
+                      </SelectItem>
+                      {majorsOfDepartment.map((m) => (
+                        <SelectItem key={m.majorId} value={m.majorId}>
+                          {m.majorName}
                         </SelectItem>
                       ))}
                     </SelectContent>

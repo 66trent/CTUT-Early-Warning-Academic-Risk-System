@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { DepartmentFilter } from '@/components/admin/department-filter';
+import { MajorFilter } from '@/components/admin/major-filter';
 import { TermFilter } from '@/components/alerts/term-filter';
 import {
   type AttentionItem,
@@ -35,7 +36,7 @@ import { formatVnDate } from '@/lib/dates';
 import { SEVERITY_LABELS } from '@/lib/labels';
 import { type RawSearchParams, withParams } from '@/lib/list-params';
 import { cn } from '@/lib/utils';
-import { listDepartments } from '@/modules/admin/services/class.service';
+import { listDepartments, listMajors } from '@/modules/admin/services/class.service';
 import {
   type FreshnessSource,
   getAdminOverview,
@@ -72,9 +73,18 @@ export default async function AdminHomePage({
   await requireUser([UserRole.ADMIN]);
   const params = await searchParams;
   const str = (k: string) => (typeof params[k] === 'string' ? params[k] : undefined);
-  const [terms, departments] = await Promise.all([listTermOptions(), listDepartments()]);
+  const [terms, departments, majors] = await Promise.all([
+    listTermOptions(),
+    listDepartments(),
+    listMajors(),
+  ]);
   const term = pickTerm(terms, str('term'));
   const department = departments.find((d) => d.departmentId === str('department')) ?? null;
+  // Ngành lọc theo khoa đang chọn (docs/rules/09).
+  const majorsInView = majors.filter(
+    (m) => !department || m.departmentId === department.departmentId,
+  );
+  const major = majorsInView.find((m) => m.majorId === str('major')) ?? null;
 
   if (!term) {
     return (
@@ -90,14 +100,21 @@ export default async function AdminHomePage({
     );
   }
 
-  const o = await getAdminOverview(term.termId, department?.departmentId ?? null);
+  const o = await getAdminOverview(
+    term.termId,
+    department?.departmentId ?? null,
+    major?.majorId ?? null,
+  );
   const s = o.summary;
   const active = s.waiting + s.following;
   const totalAlerts = active + s.done;
   const latest = o.trend.at(-1) ?? null;
   const previous = o.trend.at(-2) ?? null;
   const alertsHref = (extra: Record<string, string | null>) =>
-    `/admin/alerts${withParams({ term: term.termId, department: department?.departmentId }, extra)}`;
+    `/admin/alerts${withParams(
+      { term: term.termId, department: department?.departmentId, major: major?.majorId },
+      extra,
+    )}`;
 
   const attention: AttentionItem[] = [
     {
@@ -169,6 +186,7 @@ export default async function AdminHomePage({
           <div className="flex flex-wrap gap-2">
             <TermFilter terms={terms} value={term.termId} />
             <DepartmentFilter departments={departments} value={department?.departmentId ?? null} />
+            <MajorFilter majors={majorsInView} value={major?.majorId ?? null} />
           </div>
         }
       />

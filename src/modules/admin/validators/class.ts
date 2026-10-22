@@ -16,6 +16,14 @@ export const createClassSchema = z.object({
     .regex(/^[A-Z0-9]{2,20}$/, 'Mã lớp gồm 2–20 chữ in hoa hoặc số, VD KTPM2311'),
   className: z.string().trim().min(2, 'Nhập tên lớp').max(100, 'Tên lớp tối đa 100 ký tự'),
   departmentId: z.string().trim().min(1, 'Chọn khoa').max(10),
+  /** Ngành (docs/rules/09, Phase 9a) — phải thuộc khoa đã chọn; trống = khoa chưa có danh mục ngành. */
+  majorId: z
+    .string()
+    .trim()
+    .max(10)
+    .transform((v) => (v === '' ? null : v))
+    .nullable()
+    .default(null),
   cohortYear: z
     .string()
     .trim()
@@ -38,6 +46,7 @@ export type ChangeAdvisor = z.output<typeof changeAdvisorSchema>;
 /** Bộ lọc trang Khoa và lớp — đọc từ URL; giá trị sai bị bỏ qua (trang chỉ đọc). */
 export const classFilterSchema = z.object({
   department: z.string().trim().max(10).optional().catch(undefined),
+  major: z.string().trim().max(10).optional().catch(undefined),
   cohort: z
     .string()
     .regex(/^\d{4}$/)

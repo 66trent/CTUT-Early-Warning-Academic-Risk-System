@@ -8,6 +8,7 @@ import {
   type Relation,
 } from 'typeorm';
 import { Department } from './department.entity';
+import { Major } from './major.entity';
 import { User } from './user.entity';
 
 /** Lớp sinh hoạt — đơn vị gán Cố vấn học tập (docs/rules/09). */
@@ -22,6 +23,11 @@ export class AdministrativeClass {
   @Column({ type: 'varchar', length: 10 })
   departmentId!: string;
 
+  /** Ngành (docs/rules/09, Phase 9a) — cùng khoa với lớp. NULL = khoa chưa có danh mục ngành. */
+  @Index()
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  majorId!: string | null;
+
   @Column({ type: 'varchar', length: 10 })
   cohortYear!: string;
 
@@ -33,6 +39,10 @@ export class AdministrativeClass {
   @ManyToOne(() => Department, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'department_id' })
   department?: Relation<Department>;
+
+  @ManyToOne(() => Major, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'major_id' })
+  major?: Relation<Major> | null;
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'advisor_id' })

@@ -3,6 +3,7 @@ import { getDataSource } from '@/db/data-source';
 import { AdministrativeClass } from '@/db/entities/administrative-class.entity';
 import { Alert } from '@/db/entities/alert.entity';
 import { Department } from '@/db/entities/department.entity';
+import { Major } from '@/db/entities/major.entity';
 import { Student } from '@/db/entities/student.entity';
 import { Term } from '@/db/entities/term.entity';
 import { User } from '@/db/entities/user.entity';
@@ -36,11 +37,19 @@ export interface DepartmentDto {
   classCount: number;
 }
 
+export interface MajorDto {
+  majorId: string;
+  majorName: string;
+  departmentId: string;
+}
+
 export interface ClassDto {
   classId: string;
   className: string;
   departmentId: string;
   departmentName: string;
+  majorId: string | null;
+  majorName: string | null;
   cohortYear: string;
   advisorId: string | null;
   advisorName: string | null;
@@ -56,13 +65,20 @@ export interface ClassListItemDto extends ClassDto {
   openAlerts: number | null;
 }
 
-export const CLASS_SORT_KEYS = ['classId', 'cohortYear', 'departmentId', 'advisorName'] as const;
+export const CLASS_SORT_KEYS = [
+  'classId',
+  'cohortYear',
+  'departmentId',
+  'majorId',
+  'advisorName',
+] as const;
 export type ClassSortKey = (typeof CLASS_SORT_KEYS)[number];
 export const CLASS_DEFAULT_SORT = { sort: 'cohortYear', dir: 'desc' } as const;
 const CLASS_SORT_COLUMNS: Record<ClassSortKey, string> = {
   classId: 'c.classId',
   cohortYear: 'c.cohortYear',
   departmentId: 'c.departmentId',
+  majorId: 'c.majorId',
   advisorName: 'u.fullName',
 };
 
@@ -100,11 +116,23 @@ export async function listDepartments(): Promise<DepartmentDto[]> {
   }));
 }
 
+/** Danh mục ngành (docs/rules/09) — theo khoa rồi tên ngành. */
+export async function listMajors(): Promise<MajorDto[]> {
+  const majors = await (await getDataSource()).getRepository(Major).find({
+    order: { departmentId: 'ASC', majorName: 'ASC' },
+  });
+  return majors.map((m) => ({
+    majorId: m.majorId,
+    majorName: m.majorName,
+    departmentId: m.departmentId,
+  }));
+}
+
 export async function listClasses(): Promise<ClassDto[]> {
   const { manager } = await getDataSource();
   const [classes, studentCounts] = await Promise.all([
     manager.find(AdministrativeClass, {
-      relations: { department: true, advisor: true },
+      relations: { department: true, major: true, advisor: true },
       order: { classId: 'ASC' },
       take: 500,
     }),
@@ -115,6 +143,8 @@ export async function listClasses(): Promise<ClassDto[]> {
     className: c.className,
     departmentId: c.departmentId,
     departmentName: c.department?.departmentName ?? c.departmentId,
+    majorId: c.majorId,
+    majorName: c.major?.majorName ?? null,
     cohortYear: c.cohortYear,
     advisorId: c.advisorId,
     advisorName: c.advisor?.fullName ?? null,
@@ -152,6 +182,20 @@ async function assertDepartmentExists(em: EntityManager, departmentId: string): 
   }
 }
 
+/** Ngành phải có trong danh mục và thuộc đúng khoa của lớp (docs/rules/09). */
+async function assertMajorOfDepartment(
+  em: EntityManager,
+  majorId: string | null,
+  departmentId: string,
+): Promise<void> {
+  if (majorId === null) return;
+  const major = await em.findOneBy(Major, { majorId });
+  if (!major) throw new AppError('MAJOR_NOT_FOUND', 'Ngành không có trong danh mục.');
+  if (major.departmentId !== departmentId) {
+    throw new AppError('MAJOR_DEPARTMENT_MISMATCH', 'Ngành đã chọn không thuộc khoa của lớp.');
+  }
+}
+
 export async function createClass(input: CreateClass, actorId: string): Promise<void> {
   const dataSource = await getDataSource();
   await dataSource.transaction(async (em) => {
@@ -159,6 +203,7 @@ export async function createClass(input: CreateClass, actorId: string): Promise<
       throw new AppError('CLASS_EXISTS', `Lớp ${input.classId} đã có trong hệ thống.`);
     }
     await assertDepartmentExists(em, input.departmentId);
+    await assertMajorOfDepartment(em, input.majorId, input.departmentId);
     await assertAssignableAdvisor(em, input.advisorId);
     await em.insert(AdministrativeClass, input);
     await writeAuditLog(
@@ -167,7 +212,11 @@ export async function createClass(input: CreateClass, actorId: string): Promise<
         action: 'CLASS_CREATED',
         targetType: 'AdministrativeClass',
         targetId: input.classId,
-        detail: { departmentId: input.departmentId, advisorId: input.advisorId },
+        detail: {
+          departmentId: input.departmentId,
+          majorId: input.majorId,
+          advisorId: input.advisorId,
+        },
       },
       em,
     );
@@ -178,6 +227,7 @@ export async function updateClass(input: UpdateClass, actorId: string): Promise<
   const dataSource = await getDataSource();
   await dataSource.transaction(async (em) => {
     await assertDepartmentExists(em, input.departmentId);
+    await assertMajorOfDepartment(em, input.majorId, input.departmentId);
     const { classId, ...changes } = input;
     const result = await em.update(AdministrativeClass, { classId }, changes);
     if (!result.affected) throw new AppError('CLASS_NOT_FOUND', 'Không tìm thấy lớp.');
@@ -300,8 +350,10 @@ export async function searchClasses(
     .getRepository(AdministrativeClass)
     .createQueryBuilder('c')
     .leftJoinAndSelect('c.department', 'd')
+    .leftJoinAndSelect('c.major', 'm')
     .leftJoinAndSelect('c.advisor', 'u');
   if (filter.department) qb.andWhere('c.departmentId = :dep', { dep: filter.department });
+  if (filter.major) qb.andWhere('c.majorId = :major', { major: filter.major });
   if (filter.cohort) qb.andWhere('c.cohortYear = :cohort', { cohort: filter.cohort });
   if (filter.noAdvisor) qb.andWhere('c.advisorId IS NULL');
   if (filter.q) {
@@ -325,6 +377,8 @@ export async function searchClasses(
       className: c.className,
       departmentId: c.departmentId,
       departmentName: c.department?.departmentName ?? c.departmentId,
+      majorId: c.majorId,
+      majorName: c.major?.majorName ?? null,
       cohortYear: c.cohortYear,
       advisorId: c.advisorId,
       advisorName: c.advisor?.fullName ?? null,

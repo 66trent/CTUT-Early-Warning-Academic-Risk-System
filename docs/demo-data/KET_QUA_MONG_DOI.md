@@ -8,9 +8,9 @@ Mọi con số dưới đây tính tay theo `08` với ngưỡng mặc định. 
 
 | Loại | Giá trị |
 |---|---|
-| CVHT | `GV001`, `GV002` — `ACTIVE`, mật khẩu đọc từ biến môi trường. `GV002` không phụ trách lớp nào (để kiểm tra phân quyền) |
-| Lớp sinh hoạt | `KTPM2411` (Kỹ thuật phần mềm K2024, khoa `K.CNTT`, khóa `2024`, CVHT `GV001`) |
-| Học kỳ | `HK1_2025` (Học kỳ 1, 2025–2026, 2025-08-18 → 2025-12-28, **hiện tại** — học kỳ đã qua để mọi mốc demo đều ở quá khứ; chế độ demo không cho chọn mốc tương lai). Khóa 2024 → học kỳ đầu khóa là `HK1_2024` (không phải học kỳ này → ngưỡng ĐTB thường 1,0) |
+| CVHT | `GV001`–`GV005` — `ACTIVE`, mật khẩu đọc từ biến môi trường, mỗi người 1 lớp (Phase 9a). Đến khi có bộ v3 (Phase 9b) chỉ lớp của `GV001` có sinh viên → `GV002`–`GV005` không thấy cảnh báo nào (kiểm tra phân quyền) |
+| Lớp sinh hoạt | `KTPM2411` (Kỹ thuật phần mềm K2024, khoa `K.CNTT`, ngành `KTPM`, khóa `2024`, CVHT `GV001`) + 4 lớp chưa có sinh viên: `CNTT2411` (`GV002`), `HTTT2411` (`GV003`), `KHMT2411` (`GV004`), `KHDL2411` (`GV005`) |
+| Học kỳ | `HK1_2025` (Học kỳ 1, 2025–2026, 2025-08-18 → 2025-12-28, **hiện tại** — học kỳ đã qua để mọi mốc demo đều ở quá khứ; chế độ demo không cho chọn mốc tương lai). Khóa 2024 → học kỳ đầu khóa là `HK1_2024` (không phải học kỳ này → ngưỡng ĐTB thường 1,0). Thêm `HK3_2024` (học kỳ liền trước, chưa có dữ liệu → `ACA-04` không xét) |
 
 ## Học phần (mã học phần để trống trong file → tự suy = mã lớp học phần bỏ 2 số cuối)
 
@@ -142,7 +142,7 @@ Sau chạy 3: `HK1_2025` đã chốt — không nạp thêm, không chạy đán
 ## Kiểm tra phân quyền bằng tay
 
 - Đăng nhập `GV001`: thấy cảnh báo của sinh viên `KTPM2411*`.
-- Đăng nhập `GV002`: không thấy cảnh báo nào (không phụ trách lớp).
+- Đăng nhập `GV002`: không thấy cảnh báo nào (lớp `CNTT2411` chưa có sinh viên).
 - Admin đổi CVHT lớp `KTPM2411` sang `GV002` → mọi cảnh báo đang mở chuyển sang `GV002`; `GV001` mất quyền xem ngay.
 - Sinh viên chưa có trong `01_sinh_vien.csv` đăng nhập Google → trang "Chưa có hồ sơ".
 - Đăng nhập nhanh sinh viên demo: `KTPM2411903` (có cảnh báo), `KTPM2411901` (không cảnh báo) — chỉ thấy cảnh báo sau khi CVHT xác nhận.

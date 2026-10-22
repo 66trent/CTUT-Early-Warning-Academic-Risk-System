@@ -24,6 +24,7 @@ export type ExportScope =
       role: UserRole.ADMIN;
       userId: string;
       departmentId: string | null;
+      majorId?: string | null;
       noAdvisor: boolean;
     };
 
@@ -84,7 +85,7 @@ export async function exportAlerts(
       : await listAdminAlerts(
           termId,
           scope.noAdvisor ? 'NO_ADVISOR' : 'ALL',
-          scope.departmentId,
+          { departmentId: scope.departmentId, majorId: scope.majorId ?? null },
           list,
           extra,
         );
