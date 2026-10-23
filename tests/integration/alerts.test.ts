@@ -40,7 +40,7 @@ import {
   useMemoryStorage,
 } from '../helpers/import-helpers';
 
-/** Bảng "Cảnh báo mong đợi — sau chạy 1" trong docs/demo-data/KET_QUA_MONG_DOI.md (bộ v2). */
+/** Bảng "Cảnh báo mong đợi — sau chạy 1" trong docs/demo-data/_luu-tru-v2/KET_QUA_MONG_DOI.md (fixture bộ v2). */
 let ds: DataSource;
 const sent: string[] = [];
 

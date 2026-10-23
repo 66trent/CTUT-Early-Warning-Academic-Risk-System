@@ -64,7 +64,7 @@ npm run seed
 
 Mở http://localhost:3000 → tab **Cán bộ** → đăng nhập bằng `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD`. Trang **Bắt đầu** hướng dẫn từng bước vận hành.
 
-**Nạp sẵn bộ dữ liệu demo** (tùy chọn, cần `DEMO_MODE=true`): tạo GV001/GV002, lớp KTPM2411 (20 sinh viên), học kỳ 1 2025–2026, nạp 6 file demo (thêm `--evaluate=2` để chạy luôn 2 mốc đánh giá).
+**Nạp sẵn bộ dữ liệu demo** (tùy chọn, cần `DEMO_MODE=true`): tạo 5 lớp khóa 2024 Khoa CNTT (100 sinh viên, CVHT GV001–GV005), học kỳ 3 2024–2025 + học kỳ 1 2025–2026, nạp bộ demo v3 (7 lô nhiều file — `docs/demo-data/KET_QUA_MONG_DOI.md`; thêm `--evaluate=2` để chạy luôn 2 mốc đánh giá).
 
 ```bash
 npm run demo:reset -- --yes

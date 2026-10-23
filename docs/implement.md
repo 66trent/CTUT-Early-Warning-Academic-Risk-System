@@ -291,13 +291,26 @@ Phân bổ (lớp học phần = mã học phần + số thứ tự lớp: `01` 
 
 ### Phase 9b — Bộ dữ liệu demo v3 + nghiệm thu
 
-- [ ] Lưu trữ v2 vào `docs/demo-data/_luu-tru-v2/`. Viết `KET_QUA_MONG_DOI.md` v3 TRƯỚC (tính tay từng lớp: dấu hiệu PHẢI có / PHẢI không ở 3 lần chạy, cảnh báo sau mỗi lần chạy, thông báo), rồi script sinh dữ liệu `gen_demo_v3.py`.
-- [ ] File như trường xuất: **1 file / lớp học phần / nguồn** (điểm danh, trắc nghiệm, thực hành, kết quả) → nạp bằng lô nhiều file (8f); `01_sinh_vien.csv` 100 sinh viên; kết quả `HK3_2024` 5 lớp × 6 học phần HK3.
-- [ ] `demo:load` / `demo:reset` nạp theo lô nhiều file; `--evaluate` / `--evaluate=2` như cũ.
-- [ ] Test nghiệm thu (`rule-engine-acceptance`, `alerts`) theo v3 cho cả 5 lớp, gồm `ACA-04` và `COMB-02`; helper đổi mã sang `TST…` cho mọi lớp (tránh trùng lớp thử `TSTH2411` hiện có).
-- [ ] Mỗi tình huống trong cột "chủ đề" có ít nhất 1 sinh viên + 1 dòng trong kết quả mong đợi.
+Rà rủi ro giả định (2026-10-23, người dùng chốt) — mỗi mục: giả định sai thì phần nào sụp → cách thiết kế để không phụ thuộc:
+
+1. **HK3_2024 cho mọi SV làm mất "Chưa đủ dữ liệu"** (RiskScore học lực giữa kỳ = ĐTB học kỳ trước luôn có) → **2–3 SV KHDL chuyển đến**, không có kết quả HK3: giữ mức Chưa đủ / Một phần + thêm tình huống "ACA-04 không xét vì thiếu học kỳ trước".
+2. **Mã học phần = mã lớp học phần bỏ 2 số cuối** (chưa xác nhận) — sai thì học lại / `COMB-02` của HTTT không nhận ra → **ghi rõ `ma_hoc_phan`** ở file kết quả HK3 và file của học phần học lại; các file khác để trống (vẫn trình diễn tự suy). Test: mã tự suy = mã ghi tay.
+3. **Tính tay 100 SV dễ sai; để script tự sinh kết quả mong đợi thì vòng tròn** → mỗi lớp 6–8 SV có tình huống (tính tay chi tiết) + 12–14 SV **sạch tuyệt đối theo thiết kế** (vắng 0, nộp đủ đúng hạn, điểm ≥ B cả 2 học kỳ → hiển nhiên không dấu hiệu). Test vẫn so khớp TOÀN BỘ tập dấu hiệu 100 SV (thừa / thiếu đều lỗi).
+4. **Vòng đời KHMT cần CVHT thao tác giữa 2 lần chạy** — `demo:reset` không được giả làm CVHT (Nhật ký ghi thao tác không có thật) → test tự động chạy chuỗi chạy 1 → giải quyết → chạy 2 → mở lại; trình diễn là kịch bản thao tác tay (9c).
+5. **Chỉ 3–4 học phần / lớp (≈ 8–11 TC, HK4 thật 17 TC)** làm `ACA-02`/`ACA-03` khác thực tế → giữ 3–4 học phần, **ngưỡng tình huống học lực thiết kế theo số tín chỉ thực có**, ghi giới hạn "demo mô phỏng một phần học kỳ" ở `KET_QUA_MONG_DOI.md` và `demo-script.md`.
+6. **"Giữ tình huống KTPM" khi đổi học phần** — số tiết đổi (45 → 60) phá các ca sát ngưỡng (đúng 20%, tăng < 10%) → giữ Ý ĐỒ từng tình huống, tính lại số tiết vắng theo học phần mới, viết `KET_QUA_MONG_DOI.md` trước.
+7. **`LMS-01` "đa số lớp" tính theo lớp học phần** — lớp học lại ít SV làm lệch tỷ lệ → học phần học lại không có bài trắc nghiệm (chỉ điểm danh + thực hành).
+8. Học phần 4 ngành mượn CT KTPM — sai chỉ ảnh hưởng tính "giống thật", không ảnh hưởng luật / nghiệm thu (đã ghi giả định).
+
+- [x] Lưu trữ v2 vào `docs/demo-data/_luu-tru-v2/`. Viết `KET_QUA_MONG_DOI.md` v3 TRƯỚC (tính tay từng lớp: dấu hiệu PHẢI có / PHẢI không ở 3 lần chạy, cảnh báo sau mỗi lần chạy, thông báo), rồi script sinh dữ liệu `gen_demo_v3.py`.
+- [x] File như trường xuất: **1 file / lớp học phần / nguồn** (điểm danh, trắc nghiệm, thực hành, kết quả) → nạp bằng lô nhiều file (8f); `01_sinh_vien.csv` 100 sinh viên; kết quả `HK3_2024` 5 lớp × 6 học phần HK3.
+- [x] `demo:load` / `demo:reset` nạp theo lô nhiều file; `--evaluate` / `--evaluate=2` như cũ.
+- [x] Test nghiệm thu theo v3 cho cả 5 lớp (file mới `demo-v3-acceptance.test.ts`; `rule-engine-acceptance`, `alerts` giữ fixture v2 làm test tính năng), gồm `ACA-04` và `COMB-02`; helper đổi mã sang `TST…` cho mọi lớp (tránh trùng lớp thử `TSTH2411` hiện có).
+- [x] Mỗi tình huống trong cột "chủ đề" có ít nhất 1 sinh viên + 1 dòng trong kết quả mong đợi.
 
 **DoD:** test + `build` xanh; nghiệm thu khớp 100%; `npm run demo:reset -- --yes --evaluate` ra đúng số cảnh báo của `KET_QUA_MONG_DOI.md` v3. **Kiểm tra tay:** đăng nhập lần lượt GV001–GV005 thấy đúng lớp mình và đúng chủ đề.
+
+**Kết quả (2026-10-23):** đạt DoD — typecheck, lint, format, migration:check, 415 test (thêm `tests/integration/demo-v3-acceptance.test.ts` 9 ca), build xanh. `KET_QUA_MONG_DOI.md` v3 viết và được duyệt TRƯỚC khi sinh dữ liệu; engine khớp 100% bảng tính tay ngay lần chạy đầu: 41 → 27 → 29 dấu hiệu, 24 → 29 → 35 cảnh báo, thông báo 24/22 · 6/6 · 7/7; mức đủ dữ liệu KHDL (Đủ / Một phần / Chưa đủ); học lại tự đếm (HTTT 903–905 lần 2); vòng đời KHMT 905 (giải quyết → mở lại); rút học phần KHDL 903. `demo:reset --evaluate` ra đúng 24 → 29 → 35. Kiểm tay: GV001–GV005 mỗi người chỉ thấy lớp mình (sau chạy 2: KTPM 13, CNTT 6, HTTT 3, KHMT 5, KHDL 2); 5 sinh viên tiêu biểu đăng nhập nhanh được (hoàn tất DoD 9a). Đổi so với kế hoạch: nạp HẾT file rồi mới chạy 3 mốc (khớp `demo:reset`, chứng minh chống rò rỉ thời gian, cần cho SV `KHDL2411919`); test tính năng cũ giữ bộ v2 làm fixture (`_luu-tru-v2/`), chỉ 2 test nghiệm thu mới dùng v3; file minh họa lỗi tách `minh-hoa-loi/`.
 
 ### Phase 9c — Kịch bản trình diễn theo lớp
 

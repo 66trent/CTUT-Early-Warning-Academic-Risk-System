@@ -1,7 +1,7 @@
 /**
  * npm run demo:reset -- --yes — đưa DB về trạng thái demo chuẩn trước giờ bảo vệ:
  *   sao lưu (npm run backup) → XÓA toàn bộ dữ liệu (schema public + auth) → db:init →
- *   migration:run → seed → seed:demo → nạp 6 file demo qua quy trình nhập thật (worker xử lý).
+ *   migration:run → seed → seed:demo → nạp bộ demo v3 (7 lô, nhiều file) qua quy trình nhập thật (worker xử lý).
  * Chỉ khi DEMO_MODE=true; bắt buộc `--yes`. Cần container postgres, redis, minio, worker đang chạy.
  * `--evaluate`: chạy luôn 3 mốc chính thức của KET_QUA_MONG_DOI.md (HK1_2025: 10/10, 20/11 và chốt
  * học kỳ 31/12) — dùng để tập dượt / chụp ảnh; khi trình bày thật nên bấm chạy trước hội đồng.
@@ -91,7 +91,7 @@ async function main(): Promise<void> {
     'Dữ liệu nền demo (GV001–GV005, 5 lớp khóa 2024 Khoa CNTT, học kỳ HK3_2024 + HK1_2025)',
     'seed:demo',
   );
-  step('Nạp 6 file demo qua worker', 'demo:load', ['--with-students']);
+  step('Nạp bộ demo v3 qua worker (7 lô nhiều file)', 'demo:load', ['--with-students']);
   const evaluate = process.argv.find((a) => a.startsWith('--evaluate'));
   if (evaluate) {
     const count = evaluate === '--evaluate=2' ? 2 : OFFICIAL_RUNS.length;

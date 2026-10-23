@@ -23,11 +23,17 @@ export function useMemoryStorage(): MemoryStorage {
 }
 
 /**
+ * Bộ demo v2 (1 lớp KTPM2411) — giữ làm FIXTURE ổn định cho các test tính năng (tổng quan, màn
+ * Cố vấn học tập, Phase 7…). Nghiệm thu bộ demo hiện hành v3: `tests/helpers/demo-v3.ts`.
+ */
+export const DEMO_V2_DIR = 'docs/demo-data/_luu-tru-v2';
+
+/**
  * Bản sao file demo đổi sang mã `TST…` — test không đụng dữ liệu thật trong DB:
  * KTPM2411 → TSTK2411 (cả mssv, lớp, email).
  */
 export function demoStudentsCsv(): string {
-  return readFileSync('docs/demo-data/01_sinh_vien.csv', 'utf8')
+  return readFileSync(`${DEMO_V2_DIR}/01_sinh_vien.csv`, 'utf8')
     .replace(/KTPM2411/g, 'TSTK2411')
     .replace(/ktpm2411/g, 'tstk2411');
 }
@@ -40,7 +46,7 @@ export const TEST_CLASSES = ['TSTK2411', 'TSTH2411'] as const;
  * phần 010100xxxxxx → TST010xxxxxx (mã học phần tự suy → TST0102408… — dọn được theo tiền tố).
  */
 export function demoAcademicCsv(fileName: string): string {
-  return readFileSync(`docs/demo-data/${fileName}`, 'utf8')
+  return readFileSync(`${DEMO_V2_DIR}/${fileName}`, 'utf8')
     .replace(/KTPM2411/g, 'TSTK2411')
     .replace(/010100(\d{6})/g, 'TST010$1');
 }

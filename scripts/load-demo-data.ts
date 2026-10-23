@@ -1,11 +1,12 @@
 /**
- * npm run demo:load — nạp file của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md, qua
- * ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
- * Mặc định nạp 02–06 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
+ * npm run demo:load — nạp bộ demo v3 của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md,
+ * qua ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
+ * Mỗi thư mục = 1 lô nhiều file (1 file / lớp học phần như trường xuất — Phase 8f).
+ * Mặc định nạp 02–07 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
  * nạp cả 01 trước (dùng trong `demo:reset`).
  */
 import 'dotenv/config';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { closeDataSource, getDataSource } from '../src/db/data-source';
 import { ImportBatch } from '../src/db/entities/import-batch.entity';
 import { ImportBatchStatus } from '../src/db/enums';
@@ -17,14 +18,31 @@ import {
   createImportBatch,
 } from '../src/modules/data-import/services/import-batch.service';
 
+const DIR = 'docs/demo-data';
 const STUDENTS_FILE = ['01_sinh_vien.csv', 'STUDENT', null] as const;
 const FILES = [
-  ['02_HK1_2025_diem_danh.csv', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
-  ['03_HK1_2025_lms_trac_nghiem.csv', 'LMS_QUIZ', 'HK1_2025'],
-  ['04_HK1_2025_lms_thuc_hanh.csv', 'LMS_ASSIGNMENT', 'HK1_2025'],
-  ['05_HK1_2025_ket_qua_logic_hoc.csv', 'COURSE_RESULT', 'HK1_2025'],
-  ['06_HK1_2025_ket_qua_cuoi_ky.csv', 'COURSE_RESULT', 'HK1_2025'],
+  ['02_HK3_2024_ket_qua', 'COURSE_RESULT', 'HK3_2024'],
+  ['03_HK1_2025_diem_danh', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
+  ['04_HK1_2025_trac_nghiem', 'LMS_QUIZ', 'HK1_2025'],
+  ['05_HK1_2025_thuc_hanh', 'LMS_ASSIGNMENT', 'HK1_2025'],
+  ['06_HK1_2025_ket_qua_logic_hoc', 'COURSE_RESULT', 'HK1_2025'],
+  ['07_HK1_2025_ket_qua_cuoi_ky', 'COURSE_RESULT', 'HK1_2025'],
 ] as const;
+
+/** File của 1 bước: thư mục → mọi file `.csv` (theo tên); file → chính nó. */
+function filesOf(entry: string): { fileName: string; data: Buffer }[] {
+  const path = `${DIR}/${entry}`;
+  const names = statSync(path).isDirectory()
+    ? readdirSync(path)
+        .filter((f) => f.endsWith('.csv'))
+        .sort()
+        .map((f) => `${entry}/${f}`)
+    : [entry];
+  return names.map((name) => ({
+    fileName: name.split('/').at(-1) ?? name,
+    data: readFileSync(`${DIR}/${name}`),
+  }));
+}
 
 /** Chờ worker xử lý lô tới trạng thái mong muốn (tối đa 60 giây). */
 async function waitFor(batchId: string, done: (b: ImportBatch) => boolean): Promise<ImportBatch> {
@@ -41,9 +59,8 @@ async function main(): Promise<void> {
   if (!getEnv().DEMO_MODE) throw new Error('demo:load chỉ chạy khi DEMO_MODE=true.');
   const files = process.argv.includes('--with-students') ? [STUDENTS_FILE, ...FILES] : FILES;
   for (const [file, dataType, termId] of files) {
-    const data = readFileSync(`docs/demo-data/${file}`);
     const { batchId } = await createImportBatch(
-      { dataType, termId, parentBatchId: null, fileName: file, data },
+      { dataType, termId, parentBatchId: null, files: filesOf(file) },
       SEED_ADMIN_USER_ID,
     );
     const staged = await waitFor(batchId, (b) => b.status !== ImportBatchStatus.VALIDATING);
