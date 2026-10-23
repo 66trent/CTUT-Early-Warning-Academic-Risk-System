@@ -20,7 +20,7 @@ import {
   uploadAndValidate,
 } from './import-helpers';
 
-/** Bộ dữ liệu demo v2 (bản sao mã TST) dùng chung cho test tích hợp — docs/demo-data/KET_QUA_MONG_DOI.md. */
+/** Bộ dữ liệu demo v2 (bản sao mã TST) dùng chung cho test tích hợp — docs/demo-data/_luu-tru-v2/KET_QUA_MONG_DOI.md (fixture). */
 export const DEMO = {
   hk1: 'TSTHK1_25',
   /** CVHT của lớp TSTK2411 (vai GV001) và TSTH2411 (vai GV002, chưa có sinh viên). */
@@ -43,7 +43,7 @@ export async function cleanupDemo(ds: DataSource): Promise<void> {
 }
 
 /**
- * Tạo CVHT, lớp, học kỳ thử rồi nạp 6 file demo theo thứ tự KET_QUA_MONG_DOI.md.
+ * Tạo CVHT, lớp, học kỳ thử rồi nạp 6 file của bộ demo v2 (fixture, `_luu-tru-v2/`).
  * `withResults: false`: bỏ 2 file kết quả học phần (học phần còn "đang học" trong DB — VD để
  * đánh dấu rút học phần).
  */
@@ -96,7 +96,7 @@ export async function loadCsv(
   return confirmAndLoad(ds, staged.id);
 }
 
-/** 5 file học tập của bộ demo v2, đúng thứ tự nạp. */
+/** 5 file học tập của bộ demo v2 (fixture cho test tính năng), đúng thứ tự nạp. */
 export const DEMO_FILES = [
   ['02_HK1_2025_diem_danh.csv', 'ATTENDANCE_SUMMARY'],
   ['03_HK1_2025_lms_trac_nghiem.csv', 'LMS_QUIZ'],

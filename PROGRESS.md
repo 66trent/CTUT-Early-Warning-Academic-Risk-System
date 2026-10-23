@@ -161,3 +161,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Rules `06`, `07`, `08`, `09`; `KET_QUA_MONG_DOI.md` (dữ liệu nền), `demo-script.md` cập nhật theo seed mới.
 - Kiểm tra: typecheck, lint, format, migration:check, 406 test, build, e2e — xanh.
 - Tự kiểm tra: Admin → Khoa và lớp → lọc Ngành; Tạo lớp → chọn khoa CNTT → chọn ngành; Tổng quan → ô Ngành; trang đăng nhập → tab Cán bộ → nút theo lớp.
+
+## Phase 9b — Bộ demo v3 + nghiệm thu (2026-10-23)
+
+- Rà rủi ro giả định trước (người dùng chốt): SV KHDL chuyển đến, ghi `ma_hoc_phan` ở file học lại / HK3, SV sạch theo thiết kế, vòng đời chỉ trong test + thao tác tay, 3–4 học phần / lớp.
+- `KET_QUA_MONG_DOI.md` v3 (5 lớp × 1 chủ đề, học phần HK4 thật, `HK3_2024`) viết và duyệt trước; bộ v2 + `nhieu-file` lưu `_luu-tru-v2/`.
+- `gen_demo_v3.py`: 100 SV, 1 file / lớp học phần / nguồn (30 + 32 + 10 + 9 + 4 + 12 file), `minh-hoa-loi/`; `demo:load` nạp mỗi thư mục thành 1 lô nhiều file.
+- Test nghiệm thu mới `demo-v3-acceptance.test.ts` (helper `tests/helpers/demo-v3.ts`): khớp 100% bảng tính tay ngay lần đầu; test tính năng cũ giữ fixture v2.
+- Kiểm tra: typecheck, lint, format, migration:check, 415 test, build — xanh; `demo:reset --evaluate` 24 → 29 → 35.
+- Phát hiện: `npm audit` báo Next.js 16.4.0 có lỗ hổng critical (RCE Image Optimization, DoS Server Actions) — chưa nâng cấp, chờ người dùng quyết.
+- Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → đăng nhập nhanh từng CVHT GV001–GV005 → Cảnh báo cần xử lý; sinh viên `<lớp>903`.
