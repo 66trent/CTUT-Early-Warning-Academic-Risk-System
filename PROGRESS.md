@@ -171,3 +171,10 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra: typecheck, lint, format, migration:check, 415 test, build — xanh; `demo:reset --evaluate` 24 → 29 → 35.
 - Phát hiện: `npm audit` báo Next.js 16.4.0 có lỗ hổng critical (RCE Image Optimization, DoS Server Actions) — chưa nâng cấp, chờ người dùng quyết.
 - Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → đăng nhập nhanh từng CVHT GV001–GV005 → Cảnh báo cần xử lý; sinh viên `<lớp>903`.
+
+## Nâng cấp bảo mật Next.js 16.4.3 (2026-10-23)
+
+- `next` + `eslint-config-next` 16.4.0 → 16.4.3 (bản vá mới nhất dòng 16.x), không đổi tính năng; sửa phát hiện ở Phase 9b (RCE Image Optimization API với SVG, DoS App Router qua Server Actions).
+- `npm audit --omit=dev --audit-level=high`: 0 high/critical. Còn 6 moderate gián tiếp, chưa có bản vá không phá vỡ: `minio` (qua `query-string`/`decode-uri-component`, `stream-json`) và `exceljs` (qua `uuid` < 11.1.1) — theo dõi lại mỗi phase.
+- Kiểm tra: typecheck, lint, format, migration:check, 415 test, build — xanh; image Docker app/worker build lại (Next 16.4.3); `demo:reset --evaluate=2` + e2e 2/2 — xanh.
+- Lưu ý: chạy `demo:reset` từ worktree cần `COMPOSE_PROJECT_NAME=ewars` (script gọi `docker compose exec postgres`).
