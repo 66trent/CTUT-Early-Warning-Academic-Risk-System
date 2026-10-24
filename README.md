@@ -70,7 +70,7 @@ Mở http://localhost:3000 → tab **Cán bộ** → đăng nhập bằng `ADMIN
 npm run demo:reset -- --yes
 ```
 
-`demo:reset` **XÓA toàn bộ dữ liệu** rồi dựng lại bộ demo chuẩn (tự sao lưu vào `backups/` trước khi xóa).
+`demo:reset` **XÓA toàn bộ dữ liệu** rồi dựng lại bộ demo chuẩn (tự sao lưu vào `backups/` trước khi xóa). Trình diễn: `docs/demo-script.md` (kịch bản 10 phút + "hội đồng hỏi gì → mở gì"); lời nói cho người trình bày: `docs/bao-cao/kich-ban-thuyet-trinh.md`.
 
 | Địa chỉ | Dùng để |
 |---|---|
@@ -162,3 +162,13 @@ npm run screenshots
 ```
 
 Lệnh báo trang nào bị tràn ngang (kiểm tra giao diện điện thoại).
+
+Bộ ảnh sau chốt học kỳ (`light-desktop-30…33`: cảnh báo ngành HTTT, luật học lực, sa sút qua học kỳ, điểm A = 3,8) — chạy đủ 3 mốc rồi chụp:
+
+```bash
+npm run demo:reset -- --yes --evaluate
+```
+
+```bash
+npm run screenshots -- --closed
+```
