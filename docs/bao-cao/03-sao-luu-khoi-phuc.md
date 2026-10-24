@@ -1,4 +1,4 @@
-# Sao lưu và khôi phục (Phase 7, 2026-10-15)
+# Sao lưu và khôi phục (Phase 7, 2026-10-15; diễn tập lại Phase 9c, 2026-10-24)
 
 Đối chiếu `docs/rules/01` (Backup & Restore): RPO ≤ 24 giờ, RTO ≤ 4 giờ, diễn tập ít nhất 1 lần.
 
@@ -16,7 +16,8 @@ Người dùng chốt (2026-10-15): lệnh chạy tay + hướng dẫn đặt l�
 
 | DB | Kích thước bản sao lưu | Thời gian sao lưu | Thời gian khôi phục | Kiểm tra |
 |---|---|---|---|---|
-| DB demo `ewars` (13 sinh viên, 12 cảnh báo) | 112 KB | 0,5 giây | 1,9 giây | Số dòng 28 bảng (`public` + `auth`) khớp 100% |
+| DB demo `ewars` — bộ v3 sau chốt học kỳ (100 sinh viên, 35 cảnh báo; 2026-10-24) | 309 KB | 0,6 giây | 2,0 giây | Số dòng 32 bảng (`public` + `auth`) khớp 100% |
+| DB demo `ewars` — bộ v1 (13 sinh viên, 12 cảnh báo; Phase 7) | 112 KB | 0,5 giây | 1,9 giây | Số dòng 28 bảng khớp 100% |
 | DB hiệu năng `ewars_perf` (5.000 sinh viên, ~230.000 dòng dữ liệu nguồn) | 10,7 MB | 1,4 giây | 3,7 giây | Số dòng mọi bảng khớp 100% |
 
 → Khôi phục ở quy mô 5.000 sinh viên mất vài giây; cộng thời gian dừng/chạy lại container (~1 phút) vẫn **RTO ≪ 4 giờ**.

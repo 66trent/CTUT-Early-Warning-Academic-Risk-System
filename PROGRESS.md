@@ -171,3 +171,14 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra: typecheck, lint, format, migration:check, 415 test, build — xanh; `demo:reset --evaluate` 24 → 29 → 35.
 - Phát hiện: `npm audit` báo Next.js 16.4.0 có lỗ hổng critical (RCE Image Optimization, DoS Server Actions) — chưa nâng cấp, chờ người dùng quyết.
 - Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → đăng nhập nhanh từng CVHT GV001–GV005 → Cảnh báo cần xử lý; sinh viên `<lớp>903`.
+
+## Phase 9c — Kịch bản trình diễn theo lớp (2026-10-24)
+
+- Rà rủi ro giả định trước (người dùng chốt 8 phương án): vòng đời KHMT lồng vào kịch bản chính trước Chạy 2; chốt học kỳ là bước cuối; kịch bản phụ ghi "số nào đổi"; video dự phòng; mỗi vai 1 cửa sổ (giới hạn đăng nhập nhanh 10/phút); bảng câu hỏi theo lời đời thường; gỡ `demo:scenario`; thêm bộ ảnh sau chốt.
+- `docs/demo-script.md` viết lại theo v3 (12 bước, bảng hỏi phủ 12 luật + cột "khi nào", kịch bản phụ A–F); lời nói `docs/bao-cao/kich-ban-thuyet-trinh.md`.
+- Gỡ `npm run demo:scenario` + `scripts/load-scenario.ts`; `_luu-tru-v1/README.md` ghi lưu trữ.
+- `npm run screenshots` chụp lại theo v3 (62 ảnh) + `-- --closed` (4 ảnh luật học lực sau chốt); README mục 6.
+- Báo cáo Word cập nhật theo trạng thái sau 9b (12 luật, bộ v3, 6 sơ đồ vẽ lại, ảnh v3, Hình 8.11–8.13, độ phủ + diễn tập khôi phục đo lại); `docs/bao-cao/03`, `04` cập nhật số đo.
+- Kiểm tra: typecheck, lint, format, migration:check, 415 test (độ phủ rule-engine 92,3%, data-import 89,3%), build, e2e 2/2 (image Docker) — xanh.
+- Chạy tay trên giao diện: 24 → 29 → 35 cảnh báo, KHMT2411905 mở lại + email, hộp thoại chốt 2 SV, GV002 bị chặn hồ sơ KTPM.
+- Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md` từ bước 1 đến 12.

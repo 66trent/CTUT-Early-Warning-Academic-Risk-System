@@ -37,7 +37,6 @@
     "restore": "tsx scripts/db-backup.ts restore",
     "demo:reset": "tsx scripts/demo-reset.ts",
     "test:e2e": "playwright test",
-    "demo:scenario": "tsx scripts/load-scenario.ts",
     "screenshots": "tsx scripts/screenshots.ts"
   },
   "lint-staged": {

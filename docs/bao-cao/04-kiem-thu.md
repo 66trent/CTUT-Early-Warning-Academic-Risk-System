@@ -1,4 +1,4 @@
-# Kiểm thử (Phase 7, 2026-10-15)
+# Kiểm thử (Phase 7, 2026-10-15; cập nhật Phase 9c, 2026-10-24)
 
 Đối chiếu `docs/rules/02-code-quality.md`.
 
@@ -6,22 +6,24 @@
 
 | Loại | Số lượng | Lệnh | Ghi chú |
 |---|---|---|---|
-| Unit + tích hợp (Vitest, PostgreSQL thật) | 356 test | `npm test` | CI chạy mỗi PR |
-| Nghiệm thu bộ demo chính | 2 file | `rule-engine-acceptance.test.ts`, `alerts.test.ts` | Đúng và đủ 17 dấu hiệu, 12 cảnh báo của `KET_QUA_MONG_DOI.md` |
-| Nghiệm thu 8 kịch bản nhỏ | 8 test | `demo-scenarios.test.ts` | Đọc `docs/demo-data/kich-ban/*/scenario.json`; thừa/thiếu 1 dấu hiệu là đỏ (đã thử cố ý sửa sai → test đỏ) |
-| End-to-end (Playwright, trên máy) | 2 luồng | `npm run test:e2e` | (1) nhập file lỗi → xem dòng lỗi → tải file lỗi → nạp lại → hoàn tác; (2) Cố vấn học tập xác nhận + ghi can thiệp |
-| Responsive + chế độ tối | 40 ảnh | `npm run screenshots` | 3 khổ (1440, 768, 390 px) × sáng; khổ desktop × tối; tự kiểm tràn ngang — **0 trang tràn** (đã sửa 1 lỗi biểu đồ Tổng quan trên điện thoại). Ảnh ở `docs/screenshots/` |
+| Unit + tích hợp (Vitest, PostgreSQL thật) | 415 test, 36 file | `npm test` | CI chạy mỗi PR |
+| Nghiệm thu bộ demo v3 (5 lớp, 100 sinh viên) | 9 ca | `demo-v3-acceptance.test.ts` | Đúng và đủ 41 / 27 / 29 dấu hiệu, 24 → 29 → 35 cảnh báo, thông báo 24/22 · 6/6 · 7/7 của `KET_QUA_MONG_DOI.md`; so khớp TOÀN BỘ tập dấu hiệu 100 sinh viên |
+| Kiểm thử tính năng trên bộ v2 | 2 file | `rule-engine-acceptance.test.ts`, `alerts.test.ts` | Fixture `docs/demo-data/_luu-tru-v2/` |
+| End-to-end (Playwright, trên máy) | 2 luồng | `npm run test:e2e` | (1) nạp 2 file 1 lần có dòng lỗi → tải file lỗi → sửa → nạp lại → hoàn tác; (2) Cố vấn học tập xác nhận + ghi can thiệp. Xanh trên image Docker production (2026-10-24) |
+| Responsive + chế độ tối | 62 ảnh + 4 ảnh sau chốt | `npm run screenshots` (`-- --closed`) | 3 khổ (1440, 768, 390 px) × sáng; khổ desktop × tối; tự kiểm tràn ngang — **0 trang tràn**. Ảnh ở `docs/screenshots/` |
 
-## Độ phủ (dòng lệnh)
+8 kịch bản nhỏ của Phase 7 (`demo-scenarios.test.ts`) đã gỡ ở Phase 9c — tình huống gộp vào chủ đề 5 lớp của bộ v3.
+
+## Độ phủ (dòng lệnh, đo lại 2026-10-24)
 
 | Module | Đạt | Ngưỡng (`02`) |
 |---|---|---|
-| `modules/rule-engine` | **91,4%** | ≥ 90% |
-| `modules/data-import` | **89,2%** | ≥ 80% |
-| `modules/alerts` | 76,5% | ≥ 60% |
-| `modules/admin` | 74,0% | ≥ 60% |
-| `lib` | 60,8% | ≥ 60% |
-| Toàn bộ | 83,1% | — |
+| `modules/rule-engine` | **92,3%** | ≥ 90% |
+| `modules/data-import` | **89,3%** | ≥ 80% |
+| `modules/alerts` | 82,6% | ≥ 60% |
+| `modules/admin` | 79,0% | ≥ 60% |
+| `lib` | 67,8% | ≥ 60% |
+| Toàn bộ | 85,7% | — |
 
 Lệnh: `npm run test:coverage`.
 

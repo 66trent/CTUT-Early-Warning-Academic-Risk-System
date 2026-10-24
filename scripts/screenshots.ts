@@ -1,7 +1,9 @@
 /**
- * npm run screenshots — chụp màn hình cho báo cáo + kiểm tra responsive (Phase 7, cập nhật 8f).
- * Cần app ở http://localhost:3000 (DEMO_MODE=true) và bộ demo v2 đã chạy 2 mốc chính thức:
- *   npm run demo:reset -- --yes --evaluate=2
+ * npm run screenshots — chụp màn hình cho báo cáo + kiểm tra responsive (Phase 7, cập nhật 9c).
+ * Cần app ở http://localhost:3000 (DEMO_MODE=true) và bộ demo v3 đã chạy 2 mốc (học kỳ còn mở):
+ *   npm run demo:reset -- --yes --evaluate=2 && npm run screenshots
+ * Bộ ảnh sau chốt học kỳ (luật học lực ACA-02/03/04 — chỉ có sau chốt, bẫy #31):
+ *   npm run demo:reset -- --yes --evaluate && npm run screenshots -- --closed
  * Ảnh lưu `docs/screenshots/<chủ đề>-<khổ màn hình>-<tên>.jpg`; báo trang nào bị tràn ngang.
  */
 import { mkdirSync } from 'node:fs';
@@ -41,10 +43,11 @@ const openAlert = (studentId: string) => async (page: Page) => {
   await page.waitForTimeout(800);
 };
 
-/** Sinh viên demo có nhiều dấu hiệu nhất (bộ demo v2 — KET_QUA_MONG_DOI.md). */
+/** Sinh viên demo có nhiều dấu hiệu nhất (bộ demo v3 — KET_QUA_MONG_DOI.md). */
 const DEMO_STUDENT = 'KTPM2411903';
 const ADMIN = 'Quản trị viên';
 const GV001 = 'Cố vấn học tập GV001';
+const GV003 = 'Cố vấn học tập GV003';
 
 const SHOTS: Shot[] = [
   { name: '01-dang-nhap', account: null, url: '/login', viewports: ALL },
@@ -99,6 +102,19 @@ const SHOTS: Shot[] = [
   { name: '22-chinh-sach', account: null, url: '/legal/privacy-policy' },
 ];
 
+/** Sau chốt học kỳ: luật học lực của lớp HTTT (học lại, sa sút qua học kỳ) và KTPM (A = 3,8). */
+const CLOSED_SHOTS: Shot[] = [
+  { name: '30-canh-bao-nganh-httt', account: ADMIN, url: '/admin/alerts?major=HTTT' },
+  {
+    name: '31-cvht-chi-tiet-hoc-luc',
+    account: GV003,
+    url: '/advisor/alerts',
+    before: openAlert('HTTT2411908'),
+  },
+  { name: '32-ho-so-sa-sut', account: GV003, url: '/advisor/students/HTTT2411908' },
+  { name: '33-ho-so-diem-a', account: ADMIN, url: '/admin/students/KTPM2411918' },
+];
+
 async function login(page: Page, account: string): Promise<void> {
   await page.goto(`${BASE}/login`);
   await page.getByRole('tab', { name: 'Cán bộ' }).click();
@@ -121,8 +137,13 @@ async function sessionOf(browser: Browser, account: string): Promise<Session> {
   return state;
 }
 
-async function capture(browser: Browser, theme: 'light' | 'dark', overflow: string[]) {
-  for (const shot of SHOTS) {
+async function capture(
+  browser: Browser,
+  shots: Shot[],
+  theme: 'light' | 'dark',
+  overflow: string[],
+) {
+  for (const shot of shots) {
     for (const vp of shot.viewports ?? ['desktop']) {
       if (theme === 'dark' && vp !== 'desktop') continue; // chế độ tối: chụp khổ desktop
       const context = await browser.newContext({
@@ -158,8 +179,12 @@ async function main(): Promise<void> {
   const browser = await chromium.launch();
   const overflow: string[] = [];
   try {
-    await capture(browser, 'light', overflow);
-    await capture(browser, 'dark', overflow);
+    if (process.argv.includes('--closed')) {
+      await capture(browser, CLOSED_SHOTS, 'light', overflow);
+    } else {
+      await capture(browser, SHOTS, 'light', overflow);
+      await capture(browser, SHOTS, 'dark', overflow);
+    }
   } finally {
     await browser.close();
   }

@@ -314,8 +314,23 @@ Rà rủi ro giả định (2026-10-23, người dùng chốt) — mỗi mục: 
 
 ### Phase 9c — Kịch bản trình diễn theo lớp
 
-- [ ] Viết lại `docs/demo-script.md`: kịch bản chính 10 phút (KTPM + tổng quan toàn khoa, lọc theo ngành) + bảng "hội đồng hỏi X → đăng nhập CVHT lớp Y, mở sinh viên Z" phủ đủ 12 luật; kịch bản thao tác vòng đời cảnh báo (KHMT: giải quyết → chạy mốc sau → mở lại).
-- [ ] Playwright 2 luồng + `npm run screenshots` theo v3; README, HANDOFF.
-- [ ] Bỏ `docs/demo-data/_luu-tru-v1/kich-ban` khỏi tài liệu đang dùng (đã gộp vào chủ đề các lớp); `npm run demo:scenario` gỡ hoặc ghi rõ chỉ dùng bộ v1.
+Rà rủi ro giả định (2026-10-24, **người dùng chốt: làm theo cả 8 phương án**). Mỗi mục: giả định → sai thì sụp gì → phương án chọn:
+
+1. **"Vòng đời KHMT là kịch bản phụ, làm khi hội đồng hỏi"** — sai: trạng thái chỉ đi 1 chiều; sau Chạy 2 (20/11) không quay lại được (lần chạy `asOf` cũ hơn chỉ gắn bằng chứng, `08`), CVHT giải quyết `KHMT2411905` lúc đó không còn gì để mở lại → chỉ còn cách `demo:reset`. → **Lồng vào kịch bản chính TRƯỚC Chạy 2**: GV004 xác nhận + can thiệp + giải quyết 905 (thay bước GV002 — vẫn chứng minh phân quyền: GV004 chỉ thấy 5 cảnh báo KHMT); sau Chạy 2 mở GV004 thấy 905 "Mở lại" + chuông + email MailHog.
+2. **"Chốt học kỳ làm lúc nào cũng được"** — sai: chốt khóa nạp và chạy học kỳ đó; mà `ACA-02/03/04` (4/12 luật, cả chủ đề HTTT, ví dụ A = 3,8 của KTPM 918) chỉ hiện sau chốt. → **Chốt là bước cuối kịch bản chính**; bảng "hội đồng hỏi" thêm cột *trước chốt / sau chốt*; mọi thao tác cần học kỳ mở (nạp lỗi, vòng đời, chạy thử luật, rút học phần) đặt trước.
+3. **"Kịch bản phụ không làm lệch số"** — sai: rút học phần KHDL 903 → hộp thoại chốt còn 1 SV thiếu (không phải 2); kích hoạt luật 8% → thêm cảnh báo; đổi CVHT → GV002 thấy 22; chạy theo học phần với mốc mới → đổi mức. Mọi con số đã kiểm thử (24 → 29 → 35) chỉ đúng khi không làm các bước này. → Kịch bản chính chỉ **chạy thử** luật rồi bỏ nháp; mỗi kịch bản phụ ghi "làm thì số nào đổi"; rút học phần chỉ làm khi được hỏi, nói trước "hộp thoại chốt sẽ còn 1 sinh viên".
+4. **"Máy trình diễn chạy ổn"** — sai (Docker treo, cổng 3000 bị chiếm — bẫy #0, mất mạng) → cả buổi demo sụp. → **Quay video trọn kịch bản chính** + giữ 62 ảnh `docs/screenshots/` làm phương án B; chạy `demo:reset` + mở sẵn tab ≥ 15 phút trước.
+5. **"Đổi tài khoản thoải mái"** — đăng nhập nhanh giới hạn 10 lần/phút; kịch bản chính đổi 5–6 lần + trả lời câu hỏi có thể chạm giới hạn. → Mỗi vai 1 cửa sổ riêng, đăng nhập 1 lần: Admin (Chrome thường), CVHT (trình duyệt thứ 2 — đổi GV001 ↔ GV004), sinh viên (Chrome ẩn danh).
+6. **"Hội đồng hỏi theo mã luật"** — sai: hỏi bằng lời nghiệp vụ ("rớt môn thì sao?"). → Bảng câu hỏi xếp theo câu hỏi đời thường, cột phụ ghi mã luật; phủ đủ 12 luật (ATT-01/02 KTPM 903–904 · LMS-01..04 CNTT 903/905/907 · ACA-01..03 KTPM 913/915/918 · ACA-04 HTTT 906–908 · COMB-01 KHMT 903 · COMB-02 HTTT 903–904).
+7. **"`demo:scenario` còn dùng được với bộ v1"** — sai: thư mục `docs/demo-data/kich-ban/` đã không còn, test `demo-scenarios` đã bỏ, định dạng v1 không hợp 12 luật. → **Gỡ hẳn** lệnh `demo:scenario` + `scripts/load-scenario.ts` (không ghi "chỉ dùng v1").
+8. **"Ảnh `screenshots` theo v3 đủ minh họa"** — ảnh chụp ở trạng thái 2 mốc (bẫy #31) nên không có màn hình `ACA-*`. → Giữ `--evaluate=2` cho ảnh chính, thêm vài ảnh sau chốt (HTTT 908, KTPM 918) cho báo cáo.
+
+Kịch bản nói (thuyết trình + demo + trả lời câu hỏi) theo các phương án trên: `docs/bao-cao/kich-ban-thuyet-trinh.md`.
+
+- [x] Viết lại `docs/demo-script.md`: kịch bản chính 10 phút (KTPM + tổng quan toàn khoa, lọc theo ngành) + bảng "hội đồng hỏi X → đăng nhập CVHT lớp Y, mở sinh viên Z" phủ đủ 12 luật; kịch bản thao tác vòng đời cảnh báo (KHMT: giải quyết → chạy mốc sau → mở lại).
+- [x] Playwright 2 luồng + `npm run screenshots` theo v3; README, HANDOFF.
+- [x] Bỏ `docs/demo-data/_luu-tru-v1/kich-ban` khỏi tài liệu đang dùng (đã gộp vào chủ đề các lớp); `npm run demo:scenario` gỡ hoặc ghi rõ chỉ dùng bộ v1.
 
 **DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build`, e2e xanh. **Kiểm tra tay:** trình diễn trọn kịch bản chính theo `demo-script.md`; mỗi câu hỏi trong bảng mở được đúng màn hình.
+
+**Kết quả (2026-10-24):** đạt DoD — typecheck, lint, format, migration:check, 415 test, build xanh; độ phủ đo lại (rule-engine 92,3%, data-import 89,3%, alerts 82,6%, admin 79,0%, toàn bộ 85,7%); e2e 2/2 xanh trên image Docker production. Kiểm tay trên giao diện (từ `demo:reset -- --yes`): mốc 10/10 → 41 dấu hiệu, 24 cảnh báo, KHDL 901/918/919 = Đủ / Một phần / Chưa đủ; lọc ngành KTPM 10; GV004 chỉ thấy 5, giải quyết KHMT2411905 → mốc 20/11 → 27 dấu hiệu, 29 cảnh báo, 905 **Mở lại** + thông báo "cảnh báo đã đóng có dấu hiệu mới" + email MailHog; hộp thoại chốt liệt kê đúng 2 sinh viên → 29 dấu hiệu, 35 cảnh báo; lọc HTTT 6; GV002 mở hồ sơ KTPM2411903 → bị chặn. Ảnh chụp lại theo v3 (62 ảnh + 4 ảnh sau chốt `--closed`, 0 tràn ngang); diễn tập khôi phục bộ v3 (32 bảng khớp). Gỡ `demo:scenario` + `scripts/load-scenario.ts`. Thêm ngoài kế hoạch: kịch bản nói `docs/bao-cao/kich-ban-thuyet-trinh.md`; cập nhật báo cáo Word theo trạng thái sau 9b (12 luật, bộ v3, 6 sơ đồ vẽ lại, ảnh mới, số đo mới). Phát hiện khi chạy tay: hộp thoại chốt có ô mốc dữ liệu riêng — phải điền 2025-12-31 (đã ghi vào kịch bản).
