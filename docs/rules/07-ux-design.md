@@ -36,6 +36,8 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 - MUST: sau khi kích hoạt luật mới, hiển thị lời gợi ý "Chạy đánh giá trên dữ liệu hiện có" ngay trên màn hình xác nhận.
 - SHOULD: trang tổng quan Admin hiển thị thống kê chất lượng nhập liệu (tỷ lệ dòng lỗi theo batch, số sinh viên `INSUFFICIENT`) ở vị trí dễ thấy.
 
+- Trang **Kết nối Moodle** (`/admin/moodle`, Phase 10b): thẻ trạng thái kết nối (tên site, phiên bản, số hàm được cấp — hoặc hướng dẫn cấu hình / lỗi dễ hiểu), chip chọn học kỳ, khung Đồng bộ (Đồng bộ ngay; lần gần nhất: 3 lô với trạng thái + số dòng + link chi tiết, file không đổi, ghi chú theo khóa; "Xác nhận nạp cả 3" / "Hủy" có xác nhận lần 2; tự làm mới khi đang chạy), bảng khóa học Moodle (Course ID number sai hiện rõ lý do; Bật/Tắt có xác nhận; Sửa mã/tên học phần + tổng tiết; danh sách sinh viên Moodle chưa có trong EWARS). Lịch sử nạp gắn nhãn "Moodle" cho lô do đồng bộ sinh.
+
 ## Trạng thái rỗng, lỗi, đang tải
 
 - MUST: mọi danh sách có thể rỗng có empty state có ý nghĩa (không chỉ "Không có dữ liệu") — ví dụ danh sách `Alert` rỗng: "Chưa có sinh viên nào cần chú ý trong học kỳ này". Dùng `EmptyState` (biểu tượng + tiêu đề + 1 câu giải thích + nút việc làm tiếp) khi có việc cụ thể để làm.

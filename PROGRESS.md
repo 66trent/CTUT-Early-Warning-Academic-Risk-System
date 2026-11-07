@@ -200,3 +200,14 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Rà soát sau phase (2026-11-08): (1) dữ liệu demo neo ngày cố định → quá 24/11 cả lớp bị báo bỏ bài chương 3 → viết lại bộ sinh bằng TypeScript `scripts/lib/moodle-demo-spec.ts` neo theo ngày chốt (`moodle:setup --cutoff`, mặc định hôm qua), bỏ bản Python; (2) fixture ghi đủ 20 sinh viên + `_meta.json` ở ngày chốt 06/11; (3) container app/worker gọi Moodle bằng `http://moodle`; (4) phát hiện ATT-02 so 2 ngày chốt liền nhau → đồng bộ liên tục làm ATT-02 không bao giờ báo — cần chốt ở 10b.
 - Việc còn lại: Phase 10b (đồng bộ kéo + chế độ Chạy tay + trang Kết nối Moodle + kết quả mong đợi chính thức).
 - Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → mở http://localhost:8080, đăng nhập `gv.moodle` (mật khẩu `MOODLE_DEMO_PASSWORD` trong `.env`) → 2 khóa học HK1 2026–2027, mục Điểm danh có 15 buổi (12 đã điểm danh), 3 bài trắc nghiệm, 3 bài thực hành; đăng nhập `ktpm2411905` thấy chưa làm 2 bài trắc nghiệm Hệ điều hành.
+
+## Phase 10b — Đồng bộ Moodle, chế độ Chạy tay (2026-11-08)
+
+- Chốt trước code (`docs/tich-hop-moodle.md` 9b): ATT-02 so với ngày chốt cũ nhất trong 14 ngày; Admin bật từng khóa; SV Moodle chưa có trong EWARS bỏ qua + đếm riêng; 1 lần đồng bộ = 3 lô + Xác nhận nạp cả 3. Kết quả mong đợi viết trước: `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`.
+- Làm: bảng `moodle_course_links`, `moodle_sync_runs`, `ImportSource.MOODLE`, cột `lms_assignment_submissions.extended_due_at` (2 migration); `data-import/moodle/{schemas,fetch-course,mappers}.ts` (mapper thuần → CSV đúng mẫu), `services/moodle-{link,sync}.service.ts`, queue `moodle-sync` + processor, Server Action `moodle.actions.ts`, trang `/admin/moodle` (`components/moodle/*`), nhãn "Moodle" ở lịch sử nạp; cột tùy chọn `han_rieng` (gia hạn) cho file thực hành + LMS-03/04 dùng hạn riêng; client thử lại lỗi tạm thời.
+- Kiểm tra: typecheck, lint, format, migration:check, test (unit + nghiệm thu `moodle-sync-acceptance` + v3/v2 không đổi), build — xanh. Kiểm tay trên giao diện với Moodle 5.3 Docker: bật 2 khóa → Đồng bộ ngay → 480 · 121 · 120 dòng, 0 lỗi → Xác nhận nạp cả 3 → Chạy đánh giá mốc 07/11 → 9/20 SV, 12 dấu hiệu (đúng bảng mong đợi); Hủy chạy đúng; điện thoại không tràn ngang.
+- Phát hiện khi làm: Moodle giấu Course ID number nếu thiếu `moodle/course:update`; gọi song song → "Unable to acquire a lock for caching" (đổi sang tuần tự + thử lại); luật suy ra "không nộp" khi thiếu dòng → bỏ dòng gia hạn không đủ, phải lưu hạn riêng.
+- Dữ liệu DB dev: học kỳ `HK1_2026` có 3 lô Moodle đã nạp + 9 cảnh báo của lần chạy thử (dọn: `demo:reset` rồi `moodle:setup`).
+- Việc còn lại: Phase 10c (plugin `local_ewars` đẩy sự kiện, chế độ Tự động, job hẹn giờ hết hạn, lịch 10 phút/đêm).
+- Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → đăng nhập Admin EWARS → Kết nối Moodle → làm theo `docs/huong-dan-moodle.md` mục 5.
+

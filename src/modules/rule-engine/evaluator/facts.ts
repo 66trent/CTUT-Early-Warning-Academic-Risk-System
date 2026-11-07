@@ -30,13 +30,16 @@ function attendanceFacts(
   const visible = snapshots.filter((s) => s.snapshotDate <= asOf).sort(byDate);
   const latest = visible.at(-1) ?? null;
   const previous = visible.at(-2) ?? null;
-  if (!latest) return { status: DataStatus.MISSING, latest, previous };
-  if (isInvalidSnapshot(latest)) return { status: DataStatus.INVALID, latest, previous };
+  if (!latest) return { status: DataStatus.MISSING, latest, previous, history: visible };
+  if (isInvalidSnapshot(latest)) {
+    return { status: DataStatus.INVALID, latest, previous, history: visible };
+  }
   const ageDays = (asOf.getTime() - latest.snapshotDate.getTime()) / DAY_MS;
   return {
     status: ageDays > freshnessDays ? DataStatus.STALE : DataStatus.AVAILABLE,
     latest,
     previous,
+    history: visible,
   };
 }
 
@@ -84,6 +87,16 @@ export function buildEnrollmentFacts(
       dueAssignments: input.lms.dueAssignments,
       submittedAt: submittedByAsOf(input, asOf),
       dueAt: input.lms.assignmentDueAt,
+      extendedDueAt: new Map(
+        input.submissions.flatMap((s) =>
+          s.extendedDueAt ? [[s.activityId, s.extendedDueAt]] : [],
+        ),
+      ),
+      stillExtended: new Set(
+        input.submissions
+          .filter((s) => s.extendedDueAt && s.extendedDueAt > asOf)
+          .map((s) => s.activityId),
+      ),
     },
     result,
   };

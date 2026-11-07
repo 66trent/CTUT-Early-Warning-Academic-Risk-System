@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   type LucideIcon,
   MessageCircle,
+  PlugZap,
   ScrollText,
   ShieldAlert,
   SlidersHorizontal,
@@ -53,6 +54,7 @@ export const NAV_GROUPS: Record<UserRole, NavGroup[]> = {
       title: 'Hằng tuần',
       items: [
         { title: 'Nhập dữ liệu', href: '/admin/imports', icon: FileUp },
+        { title: 'Kết nối Moodle', href: '/admin/moodle', icon: PlugZap },
         { title: 'Chạy đánh giá', href: '/admin/evaluations', icon: Activity },
         { title: 'Cảnh báo sớm', href: '/admin/alerts', icon: ShieldAlert },
       ],

@@ -135,6 +135,20 @@ describe('LMS-03: không nộp bài thực hành', () => {
     expect(triggersOf('LMS-03', [e])[0]?.severity).toBe(Severity.HIGH);
   });
 
+  it('gia hạn riêng (han_rieng, Moodle Grant extension): hạn riêng chưa qua → chưa tính "không nộp"; đã qua → tính', () => {
+    const notSubmitted = (extendedDueAt: Date) =>
+      enrollment({
+        submissions: [
+          submission('TH01', vn('2025-09-15', '10:00')),
+          submission('TH02', null, SubmissionStatus.NOT_SUBMITTED, extendedDueAt),
+        ],
+      });
+    expect(triggersOf('LMS-03', [notSubmitted(vn('2025-10-15', '23:59'))])).toEqual([]);
+    expect(triggersOf('LMS-03', [notSubmitted(vn('2025-10-05', '23:59'))])[0]?.severity).toBe(
+      Severity.MEDIUM,
+    );
+  });
+
   it('ngoại lệ: lớp học phần không có bài thực hành (NOT_APPLICABLE) → không chạy LMS-03/04', () => {
     const e = enrollment({
       submissions: [],
@@ -163,6 +177,26 @@ describe('LMS-04: nộp trễ bài thực hành nhiều', () => {
   it('sát ngưỡng: 1 bài trễ → không kích hoạt; nộp đúng hạn (trước hạn 1 phút) không tính trễ', () => {
     const e = enrollment({
       submissions: [afterDue('TH01', 5), afterDue('TH02', -1 / 60)],
+    });
+    expect(triggersOf('LMS-04', [e])).toEqual([]);
+  });
+
+  it('nộp sau hạn chung nhưng trong hạn riêng (gia hạn) → không tính trễ', () => {
+    const e = enrollment({
+      submissions: [
+        submission(
+          'TH01',
+          vn('2025-09-22', '10:00'),
+          SubmissionStatus.ON_TIME,
+          vn('2025-09-25', '23:59'),
+        ),
+        submission(
+          'TH02',
+          vn('2025-09-29', '10:00'),
+          SubmissionStatus.ON_TIME,
+          vn('2025-09-30', '23:59'),
+        ),
+      ],
     });
     expect(triggersOf('LMS-04', [e])).toEqual([]);
   });

@@ -1,12 +1,12 @@
 [
   {
     "params": {
-      "attendanceid": 8
+      "attendanceid": 12
     },
     "response": [
       {
-        "id": 106,
-        "attendanceid": 8,
+        "id": 166,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1787011200,
         "duration": 12000,
@@ -23,11 +23,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -36,8 +36,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -46,8 +46,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -56,8 +56,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -69,123 +69,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1681"
+            "id": "2641"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1682"
+            "id": "2642"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1683"
+            "id": "2643"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1684"
+            "id": "2644"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1685"
+            "id": "2645"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1686"
+            "id": "2646"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1687"
+            "id": "2647"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1688"
+            "id": "2648"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1689"
+            "id": "2649"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1690"
+            "id": "2650"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1691"
+            "id": "2651"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1692"
+            "id": "2652"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1693"
+            "id": "2653"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1694"
+            "id": "2654"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1695"
+            "id": "2655"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1696"
+            "id": "2656"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1697"
+            "id": "2657"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1698"
+            "id": "2658"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1699"
+            "id": "2659"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1700"
+            "id": "2660"
           }
         ],
         "users": [
@@ -292,8 +292,8 @@
         ]
       },
       {
-        "id": 107,
-        "attendanceid": 8,
+        "id": 167,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1787616000,
         "duration": 12000,
@@ -310,11 +310,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -323,8 +323,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -333,8 +333,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -343,8 +343,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -356,123 +356,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1701"
+            "id": "2661"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1702"
+            "id": "2662"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1703"
+            "id": "2663"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1704"
+            "id": "2664"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1705"
+            "id": "2665"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1706"
+            "id": "2666"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1707"
+            "id": "2667"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1708"
+            "id": "2668"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1709"
+            "id": "2669"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1710"
+            "id": "2670"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1711"
+            "id": "2671"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1712"
+            "id": "2672"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1713"
+            "id": "2673"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1714"
+            "id": "2674"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1715"
+            "id": "2675"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1716"
+            "id": "2676"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1717"
+            "id": "2677"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1718"
+            "id": "2678"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1719"
+            "id": "2679"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1720"
+            "id": "2680"
           }
         ],
         "users": [
@@ -579,8 +579,8 @@
         ]
       },
       {
-        "id": 108,
-        "attendanceid": 8,
+        "id": 168,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1788220800,
         "duration": 12000,
@@ -597,11 +597,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -610,8 +610,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -620,8 +620,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -630,8 +630,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -643,123 +643,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1721"
+            "id": "2681"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1722"
+            "id": "2682"
           },
           {
             "studentid": 7,
-            "statusid": "34",
+            "statusid": "50",
             "remarks": "",
-            "id": "1723"
+            "id": "2683"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1724"
+            "id": "2684"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1725"
+            "id": "2685"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1726"
+            "id": "2686"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1727"
+            "id": "2687"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1728"
+            "id": "2688"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1729"
+            "id": "2689"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1730"
+            "id": "2690"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1731"
+            "id": "2691"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1732"
+            "id": "2692"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1733"
+            "id": "2693"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1734"
+            "id": "2694"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1735"
+            "id": "2695"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1736"
+            "id": "2696"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1737"
+            "id": "2697"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1738"
+            "id": "2698"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1739"
+            "id": "2699"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1740"
+            "id": "2700"
           }
         ],
         "users": [
@@ -866,8 +866,8 @@
         ]
       },
       {
-        "id": 109,
-        "attendanceid": 8,
+        "id": 169,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1788825600,
         "duration": 12000,
@@ -884,11 +884,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -897,8 +897,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -907,8 +907,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -917,8 +917,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -930,123 +930,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1741"
+            "id": "2701"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1742"
+            "id": "2702"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1743"
+            "id": "2703"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1744"
+            "id": "2704"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1745"
+            "id": "2705"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1746"
+            "id": "2706"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1747"
+            "id": "2707"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1748"
+            "id": "2708"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1749"
+            "id": "2709"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1750"
+            "id": "2710"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1751"
+            "id": "2711"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1752"
+            "id": "2712"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1753"
+            "id": "2713"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1754"
+            "id": "2714"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1755"
+            "id": "2715"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1756"
+            "id": "2716"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1757"
+            "id": "2717"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1758"
+            "id": "2718"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1759"
+            "id": "2719"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1760"
+            "id": "2720"
           }
         ],
         "users": [
@@ -1153,8 +1153,8 @@
         ]
       },
       {
-        "id": 110,
-        "attendanceid": 8,
+        "id": 170,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1789430400,
         "duration": 12000,
@@ -1171,11 +1171,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -1184,8 +1184,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -1194,8 +1194,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -1204,8 +1204,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -1217,123 +1217,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1761"
+            "id": "2721"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1762"
+            "id": "2722"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1763"
+            "id": "2723"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1764"
+            "id": "2724"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1765"
+            "id": "2725"
           },
           {
             "studentid": 10,
-            "statusid": "36",
+            "statusid": "52",
             "remarks": "",
-            "id": "1766"
+            "id": "2726"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1767"
+            "id": "2727"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1768"
+            "id": "2728"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1769"
+            "id": "2729"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1770"
+            "id": "2730"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1771"
+            "id": "2731"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1772"
+            "id": "2732"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1773"
+            "id": "2733"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1774"
+            "id": "2734"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1775"
+            "id": "2735"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1776"
+            "id": "2736"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1777"
+            "id": "2737"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1778"
+            "id": "2738"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1779"
+            "id": "2739"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1780"
+            "id": "2740"
           }
         ],
         "users": [
@@ -1440,8 +1440,8 @@
         ]
       },
       {
-        "id": 111,
-        "attendanceid": 8,
+        "id": 171,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1790035200,
         "duration": 12000,
@@ -1458,11 +1458,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -1471,8 +1471,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -1481,8 +1481,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -1491,8 +1491,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -1504,123 +1504,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1781"
+            "id": "2741"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1782"
+            "id": "2742"
           },
           {
             "studentid": 7,
-            "statusid": "34",
+            "statusid": "50",
             "remarks": "",
-            "id": "1783"
+            "id": "2743"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1784"
+            "id": "2744"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1785"
+            "id": "2745"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1786"
+            "id": "2746"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1787"
+            "id": "2747"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1788"
+            "id": "2748"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1789"
+            "id": "2749"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1790"
+            "id": "2750"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1791"
+            "id": "2751"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1792"
+            "id": "2752"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1793"
+            "id": "2753"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1794"
+            "id": "2754"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1795"
+            "id": "2755"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1796"
+            "id": "2756"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1797"
+            "id": "2757"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1798"
+            "id": "2758"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1799"
+            "id": "2759"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1800"
+            "id": "2760"
           }
         ],
         "users": [
@@ -1727,8 +1727,8 @@
         ]
       },
       {
-        "id": 112,
-        "attendanceid": 8,
+        "id": 172,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1790640000,
         "duration": 12000,
@@ -1745,11 +1745,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -1758,8 +1758,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -1768,8 +1768,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -1778,8 +1778,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -1791,123 +1791,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1801"
+            "id": "2761"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1802"
+            "id": "2762"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1803"
+            "id": "2763"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1804"
+            "id": "2764"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1805"
+            "id": "2765"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1806"
+            "id": "2766"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1807"
+            "id": "2767"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1808"
+            "id": "2768"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1809"
+            "id": "2769"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1810"
+            "id": "2770"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1811"
+            "id": "2771"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1812"
+            "id": "2772"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1813"
+            "id": "2773"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1814"
+            "id": "2774"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1815"
+            "id": "2775"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1816"
+            "id": "2776"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1817"
+            "id": "2777"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1818"
+            "id": "2778"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1819"
+            "id": "2779"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1820"
+            "id": "2780"
           }
         ],
         "users": [
@@ -2014,8 +2014,8 @@
         ]
       },
       {
-        "id": 113,
-        "attendanceid": 8,
+        "id": 173,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1791244800,
         "duration": 12000,
@@ -2032,11 +2032,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -2045,8 +2045,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -2055,8 +2055,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -2065,8 +2065,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -2078,123 +2078,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1821"
+            "id": "2781"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1822"
+            "id": "2782"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1823"
+            "id": "2783"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1824"
+            "id": "2784"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1825"
+            "id": "2785"
           },
           {
             "studentid": 10,
-            "statusid": "36",
+            "statusid": "52",
             "remarks": "",
-            "id": "1826"
+            "id": "2786"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1827"
+            "id": "2787"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1828"
+            "id": "2788"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1829"
+            "id": "2789"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1830"
+            "id": "2790"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1831"
+            "id": "2791"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1832"
+            "id": "2792"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1833"
+            "id": "2793"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1834"
+            "id": "2794"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1835"
+            "id": "2795"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1836"
+            "id": "2796"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1837"
+            "id": "2797"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1838"
+            "id": "2798"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1839"
+            "id": "2799"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1840"
+            "id": "2800"
           }
         ],
         "users": [
@@ -2301,8 +2301,8 @@
         ]
       },
       {
-        "id": 114,
-        "attendanceid": 8,
+        "id": 174,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1791849600,
         "duration": 12000,
@@ -2319,11 +2319,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -2332,8 +2332,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -2342,8 +2342,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -2352,8 +2352,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -2365,123 +2365,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1841"
+            "id": "2801"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1842"
+            "id": "2802"
           },
           {
             "studentid": 7,
-            "statusid": "34",
+            "statusid": "50",
             "remarks": "",
-            "id": "1843"
+            "id": "2803"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1844"
+            "id": "2804"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1845"
+            "id": "2805"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1846"
+            "id": "2806"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1847"
+            "id": "2807"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1848"
+            "id": "2808"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1849"
+            "id": "2809"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1850"
+            "id": "2810"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1851"
+            "id": "2811"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1852"
+            "id": "2812"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1853"
+            "id": "2813"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1854"
+            "id": "2814"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1855"
+            "id": "2815"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1856"
+            "id": "2816"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1857"
+            "id": "2817"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1858"
+            "id": "2818"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1859"
+            "id": "2819"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1860"
+            "id": "2820"
           }
         ],
         "users": [
@@ -2588,8 +2588,8 @@
         ]
       },
       {
-        "id": 115,
-        "attendanceid": 8,
+        "id": 175,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1792454400,
         "duration": 12000,
@@ -2606,11 +2606,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -2619,8 +2619,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -2629,8 +2629,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -2639,8 +2639,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -2652,123 +2652,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1861"
+            "id": "2821"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1862"
+            "id": "2822"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1863"
+            "id": "2823"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1864"
+            "id": "2824"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1865"
+            "id": "2825"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1866"
+            "id": "2826"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1867"
+            "id": "2827"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1868"
+            "id": "2828"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1869"
+            "id": "2829"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1870"
+            "id": "2830"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1871"
+            "id": "2831"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1872"
+            "id": "2832"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1873"
+            "id": "2833"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1874"
+            "id": "2834"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1875"
+            "id": "2835"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1876"
+            "id": "2836"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1877"
+            "id": "2837"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1878"
+            "id": "2838"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1879"
+            "id": "2839"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1880"
+            "id": "2840"
           }
         ],
         "users": [
@@ -2875,8 +2875,8 @@
         ]
       },
       {
-        "id": 116,
-        "attendanceid": 8,
+        "id": 176,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1793059200,
         "duration": 12000,
@@ -2893,11 +2893,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -2906,8 +2906,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -2916,8 +2916,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -2926,8 +2926,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -2939,123 +2939,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1881"
+            "id": "2841"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1882"
+            "id": "2842"
           },
           {
             "studentid": 7,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1883"
+            "id": "2843"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1884"
+            "id": "2844"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1885"
+            "id": "2845"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1886"
+            "id": "2846"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1887"
+            "id": "2847"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1888"
+            "id": "2848"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1889"
+            "id": "2849"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1890"
+            "id": "2850"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1891"
+            "id": "2851"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1892"
+            "id": "2852"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1893"
+            "id": "2853"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1894"
+            "id": "2854"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1895"
+            "id": "2855"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1896"
+            "id": "2856"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1897"
+            "id": "2857"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1898"
+            "id": "2858"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1899"
+            "id": "2859"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1900"
+            "id": "2860"
           }
         ],
         "users": [
@@ -3162,8 +3162,8 @@
         ]
       },
       {
-        "id": 117,
-        "attendanceid": 8,
+        "id": 177,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1793664000,
         "duration": 12000,
@@ -3180,11 +3180,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -3193,8 +3193,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -3203,8 +3203,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -3213,8 +3213,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -3226,123 +3226,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1901"
+            "id": "2861"
           },
           {
             "studentid": 6,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1902"
+            "id": "2862"
           },
           {
             "studentid": 7,
-            "statusid": "34",
+            "statusid": "50",
             "remarks": "",
-            "id": "1903"
+            "id": "2863"
           },
           {
             "studentid": 8,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1904"
+            "id": "2864"
           },
           {
             "studentid": 9,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1905"
+            "id": "2865"
           },
           {
             "studentid": 10,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1906"
+            "id": "2866"
           },
           {
             "studentid": 11,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1907"
+            "id": "2867"
           },
           {
             "studentid": 12,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1908"
+            "id": "2868"
           },
           {
             "studentid": 13,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1909"
+            "id": "2869"
           },
           {
             "studentid": 14,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1910"
+            "id": "2870"
           },
           {
             "studentid": 15,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1911"
+            "id": "2871"
           },
           {
             "studentid": 16,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1912"
+            "id": "2872"
           },
           {
             "studentid": 17,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1913"
+            "id": "2873"
           },
           {
             "studentid": 18,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1914"
+            "id": "2874"
           },
           {
             "studentid": 19,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1915"
+            "id": "2875"
           },
           {
             "studentid": 20,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1916"
+            "id": "2876"
           },
           {
             "studentid": 21,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1917"
+            "id": "2877"
           },
           {
             "studentid": 22,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1918"
+            "id": "2878"
           },
           {
             "studentid": 23,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1919"
+            "id": "2879"
           },
           {
             "studentid": 24,
-            "statusid": "33",
+            "statusid": "49",
             "remarks": "",
-            "id": "1920"
+            "id": "2880"
           }
         ],
         "users": [
@@ -3449,8 +3449,8 @@
         ]
       },
       {
-        "id": 118,
-        "attendanceid": 8,
+        "id": 178,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1794268800,
         "duration": 12000,
@@ -3467,11 +3467,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -3480,8 +3480,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -3490,8 +3490,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -3500,8 +3500,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -3615,8 +3615,8 @@
         ]
       },
       {
-        "id": 119,
-        "attendanceid": 8,
+        "id": 179,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1794873600,
         "duration": 12000,
@@ -3633,11 +3633,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -3646,8 +3646,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -3656,8 +3656,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -3666,8 +3666,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -3781,8 +3781,8 @@
         ]
       },
       {
-        "id": 120,
-        "attendanceid": 8,
+        "id": 180,
+        "attendanceid": 12,
         "groupid": 0,
         "sessdate": 1795478400,
         "duration": 12000,
@@ -3799,11 +3799,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 10,
+        "courseid": 14,
         "statuses": [
           {
-            "id": 33,
-            "attendanceid": 8,
+            "id": 49,
+            "attendanceid": 12,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -3812,8 +3812,8 @@
             "setnumber": 0
           },
           {
-            "id": 35,
-            "attendanceid": 8,
+            "id": 51,
+            "attendanceid": 12,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -3822,8 +3822,8 @@
             "setnumber": 0
           },
           {
-            "id": 36,
-            "attendanceid": 8,
+            "id": 52,
+            "attendanceid": 12,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -3832,8 +3832,8 @@
             "setnumber": 0
           },
           {
-            "id": 34,
-            "attendanceid": 8,
+            "id": 50,
+            "attendanceid": 12,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -3950,12 +3950,12 @@
   },
   {
     "params": {
-      "attendanceid": 9
+      "attendanceid": 13
     },
     "response": [
       {
-        "id": 121,
-        "attendanceid": 9,
+        "id": 181,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1787205600,
         "duration": 12000,
@@ -3972,11 +3972,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -3985,8 +3985,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -3995,8 +3995,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -4005,8 +4005,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -4018,123 +4018,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1921"
+            "id": "2881"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1922"
+            "id": "2882"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1923"
+            "id": "2883"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1924"
+            "id": "2884"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1925"
+            "id": "2885"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1926"
+            "id": "2886"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1927"
+            "id": "2887"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1928"
+            "id": "2888"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1929"
+            "id": "2889"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1930"
+            "id": "2890"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1931"
+            "id": "2891"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1932"
+            "id": "2892"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1933"
+            "id": "2893"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1934"
+            "id": "2894"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1935"
+            "id": "2895"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1936"
+            "id": "2896"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1937"
+            "id": "2897"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1938"
+            "id": "2898"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1939"
+            "id": "2899"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1940"
+            "id": "2900"
           }
         ],
         "users": [
@@ -4241,8 +4241,8 @@
         ]
       },
       {
-        "id": 122,
-        "attendanceid": 9,
+        "id": 182,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1787810400,
         "duration": 12000,
@@ -4259,11 +4259,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -4272,8 +4272,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -4282,8 +4282,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -4292,8 +4292,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -4305,123 +4305,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1941"
+            "id": "2901"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1942"
+            "id": "2902"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1943"
+            "id": "2903"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1944"
+            "id": "2904"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1945"
+            "id": "2905"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1946"
+            "id": "2906"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1947"
+            "id": "2907"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1948"
+            "id": "2908"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1949"
+            "id": "2909"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1950"
+            "id": "2910"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1951"
+            "id": "2911"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1952"
+            "id": "2912"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1953"
+            "id": "2913"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1954"
+            "id": "2914"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1955"
+            "id": "2915"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1956"
+            "id": "2916"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1957"
+            "id": "2917"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1958"
+            "id": "2918"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1959"
+            "id": "2919"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1960"
+            "id": "2920"
           }
         ],
         "users": [
@@ -4528,8 +4528,8 @@
         ]
       },
       {
-        "id": 123,
-        "attendanceid": 9,
+        "id": 183,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1788415200,
         "duration": 12000,
@@ -4546,11 +4546,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -4559,8 +4559,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -4569,8 +4569,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -4579,8 +4579,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -4592,123 +4592,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1961"
+            "id": "2921"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1962"
+            "id": "2922"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1963"
+            "id": "2923"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1964"
+            "id": "2924"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1965"
+            "id": "2925"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1966"
+            "id": "2926"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1967"
+            "id": "2927"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1968"
+            "id": "2928"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1969"
+            "id": "2929"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1970"
+            "id": "2930"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1971"
+            "id": "2931"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1972"
+            "id": "2932"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1973"
+            "id": "2933"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1974"
+            "id": "2934"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1975"
+            "id": "2935"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1976"
+            "id": "2936"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1977"
+            "id": "2937"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1978"
+            "id": "2938"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1979"
+            "id": "2939"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1980"
+            "id": "2940"
           }
         ],
         "users": [
@@ -4815,8 +4815,8 @@
         ]
       },
       {
-        "id": 124,
-        "attendanceid": 9,
+        "id": 184,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1789020000,
         "duration": 12000,
@@ -4833,11 +4833,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -4846,8 +4846,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -4856,8 +4856,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -4866,8 +4866,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -4879,123 +4879,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1981"
+            "id": "2941"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1982"
+            "id": "2942"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1983"
+            "id": "2943"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1984"
+            "id": "2944"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1985"
+            "id": "2945"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1986"
+            "id": "2946"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1987"
+            "id": "2947"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1988"
+            "id": "2948"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1989"
+            "id": "2949"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1990"
+            "id": "2950"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1991"
+            "id": "2951"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1992"
+            "id": "2952"
           },
           {
             "studentid": 17,
-            "statusid": "38",
+            "statusid": "54",
             "remarks": "",
-            "id": "1993"
+            "id": "2953"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1994"
+            "id": "2954"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1995"
+            "id": "2955"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1996"
+            "id": "2956"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1997"
+            "id": "2957"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1998"
+            "id": "2958"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "1999"
+            "id": "2959"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2000"
+            "id": "2960"
           }
         ],
         "users": [
@@ -5102,8 +5102,8 @@
         ]
       },
       {
-        "id": 125,
-        "attendanceid": 9,
+        "id": 185,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1789624800,
         "duration": 12000,
@@ -5120,11 +5120,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -5133,8 +5133,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -5143,8 +5143,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -5153,8 +5153,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -5166,123 +5166,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2001"
+            "id": "2961"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2002"
+            "id": "2962"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2003"
+            "id": "2963"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2004"
+            "id": "2964"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2005"
+            "id": "2965"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2006"
+            "id": "2966"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2007"
+            "id": "2967"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2008"
+            "id": "2968"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2009"
+            "id": "2969"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2010"
+            "id": "2970"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2011"
+            "id": "2971"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2012"
+            "id": "2972"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2013"
+            "id": "2973"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2014"
+            "id": "2974"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2015"
+            "id": "2975"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2016"
+            "id": "2976"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2017"
+            "id": "2977"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2018"
+            "id": "2978"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2019"
+            "id": "2979"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2020"
+            "id": "2980"
           }
         ],
         "users": [
@@ -5389,8 +5389,8 @@
         ]
       },
       {
-        "id": 126,
-        "attendanceid": 9,
+        "id": 186,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1790229600,
         "duration": 12000,
@@ -5407,11 +5407,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -5420,8 +5420,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -5430,8 +5430,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -5440,8 +5440,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -5453,123 +5453,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2021"
+            "id": "2981"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2022"
+            "id": "2982"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2023"
+            "id": "2983"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2024"
+            "id": "2984"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2025"
+            "id": "2985"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2026"
+            "id": "2986"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2027"
+            "id": "2987"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2028"
+            "id": "2988"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2029"
+            "id": "2989"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2030"
+            "id": "2990"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2031"
+            "id": "2991"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2032"
+            "id": "2992"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2033"
+            "id": "2993"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2034"
+            "id": "2994"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2035"
+            "id": "2995"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2036"
+            "id": "2996"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2037"
+            "id": "2997"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2038"
+            "id": "2998"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2039"
+            "id": "2999"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2040"
+            "id": "3000"
           }
         ],
         "users": [
@@ -5676,8 +5676,8 @@
         ]
       },
       {
-        "id": 127,
-        "attendanceid": 9,
+        "id": 187,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1790834400,
         "duration": 12000,
@@ -5694,11 +5694,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -5707,8 +5707,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -5717,8 +5717,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -5727,8 +5727,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -5740,123 +5740,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2041"
+            "id": "3001"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2042"
+            "id": "3002"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2043"
+            "id": "3003"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2044"
+            "id": "3004"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2045"
+            "id": "3005"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2046"
+            "id": "3006"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2047"
+            "id": "3007"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2048"
+            "id": "3008"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2049"
+            "id": "3009"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2050"
+            "id": "3010"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2051"
+            "id": "3011"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2052"
+            "id": "3012"
           },
           {
             "studentid": 17,
-            "statusid": "38",
+            "statusid": "54",
             "remarks": "",
-            "id": "2053"
+            "id": "3013"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2054"
+            "id": "3014"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2055"
+            "id": "3015"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2056"
+            "id": "3016"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2057"
+            "id": "3017"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2058"
+            "id": "3018"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2059"
+            "id": "3019"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2060"
+            "id": "3020"
           }
         ],
         "users": [
@@ -5963,8 +5963,8 @@
         ]
       },
       {
-        "id": 128,
-        "attendanceid": 9,
+        "id": 188,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1791439200,
         "duration": 12000,
@@ -5981,11 +5981,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -5994,8 +5994,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -6004,8 +6004,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -6014,8 +6014,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -6027,123 +6027,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2061"
+            "id": "3021"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2062"
+            "id": "3022"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2063"
+            "id": "3023"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2064"
+            "id": "3024"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2065"
+            "id": "3025"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2066"
+            "id": "3026"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2067"
+            "id": "3027"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2068"
+            "id": "3028"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2069"
+            "id": "3029"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2070"
+            "id": "3030"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2071"
+            "id": "3031"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2072"
+            "id": "3032"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2073"
+            "id": "3033"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2074"
+            "id": "3034"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2075"
+            "id": "3035"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2076"
+            "id": "3036"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2077"
+            "id": "3037"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2078"
+            "id": "3038"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2079"
+            "id": "3039"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2080"
+            "id": "3040"
           }
         ],
         "users": [
@@ -6250,8 +6250,8 @@
         ]
       },
       {
-        "id": 129,
-        "attendanceid": 9,
+        "id": 189,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1792044000,
         "duration": 12000,
@@ -6268,11 +6268,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -6281,8 +6281,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -6291,8 +6291,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -6301,8 +6301,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -6314,123 +6314,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2081"
+            "id": "3041"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2082"
+            "id": "3042"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2083"
+            "id": "3043"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2084"
+            "id": "3044"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2085"
+            "id": "3045"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2086"
+            "id": "3046"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2087"
+            "id": "3047"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2088"
+            "id": "3048"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2089"
+            "id": "3049"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2090"
+            "id": "3050"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2091"
+            "id": "3051"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2092"
+            "id": "3052"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2093"
+            "id": "3053"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2094"
+            "id": "3054"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2095"
+            "id": "3055"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2096"
+            "id": "3056"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2097"
+            "id": "3057"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2098"
+            "id": "3058"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2099"
+            "id": "3059"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2100"
+            "id": "3060"
           }
         ],
         "users": [
@@ -6537,8 +6537,8 @@
         ]
       },
       {
-        "id": 130,
-        "attendanceid": 9,
+        "id": 190,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1792648800,
         "duration": 12000,
@@ -6555,11 +6555,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -6568,8 +6568,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -6578,8 +6578,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -6588,8 +6588,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -6601,123 +6601,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2101"
+            "id": "3061"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2102"
+            "id": "3062"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2103"
+            "id": "3063"
           },
           {
             "studentid": 8,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2104"
+            "id": "3064"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2105"
+            "id": "3065"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2106"
+            "id": "3066"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2107"
+            "id": "3067"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2108"
+            "id": "3068"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2109"
+            "id": "3069"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2110"
+            "id": "3070"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2111"
+            "id": "3071"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2112"
+            "id": "3072"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2113"
+            "id": "3073"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2114"
+            "id": "3074"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2115"
+            "id": "3075"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2116"
+            "id": "3076"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2117"
+            "id": "3077"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2118"
+            "id": "3078"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2119"
+            "id": "3079"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2120"
+            "id": "3080"
           }
         ],
         "users": [
@@ -6824,8 +6824,8 @@
         ]
       },
       {
-        "id": 131,
-        "attendanceid": 9,
+        "id": 191,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1793253600,
         "duration": 12000,
@@ -6842,11 +6842,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -6855,8 +6855,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -6865,8 +6865,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -6875,8 +6875,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -6888,123 +6888,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2121"
+            "id": "3081"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2122"
+            "id": "3082"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2123"
+            "id": "3083"
           },
           {
             "studentid": 8,
-            "statusid": "38",
+            "statusid": "54",
             "remarks": "",
-            "id": "2124"
+            "id": "3084"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2125"
+            "id": "3085"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2126"
+            "id": "3086"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2127"
+            "id": "3087"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2128"
+            "id": "3088"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2129"
+            "id": "3089"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2130"
+            "id": "3090"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2131"
+            "id": "3091"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2132"
+            "id": "3092"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2133"
+            "id": "3093"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2134"
+            "id": "3094"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2135"
+            "id": "3095"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2136"
+            "id": "3096"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2137"
+            "id": "3097"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2138"
+            "id": "3098"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2139"
+            "id": "3099"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2140"
+            "id": "3100"
           }
         ],
         "users": [
@@ -7111,8 +7111,8 @@
         ]
       },
       {
-        "id": 132,
-        "attendanceid": 9,
+        "id": 192,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1793858400,
         "duration": 12000,
@@ -7129,11 +7129,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -7142,8 +7142,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -7152,8 +7152,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -7162,8 +7162,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -7175,123 +7175,123 @@
         "attendance_log": [
           {
             "studentid": 5,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2141"
+            "id": "3101"
           },
           {
             "studentid": 6,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2142"
+            "id": "3102"
           },
           {
             "studentid": 7,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2143"
+            "id": "3103"
           },
           {
             "studentid": 8,
-            "statusid": "38",
+            "statusid": "54",
             "remarks": "",
-            "id": "2144"
+            "id": "3104"
           },
           {
             "studentid": 9,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2145"
+            "id": "3105"
           },
           {
             "studentid": 10,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2146"
+            "id": "3106"
           },
           {
             "studentid": 11,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2147"
+            "id": "3107"
           },
           {
             "studentid": 12,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2148"
+            "id": "3108"
           },
           {
             "studentid": 13,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2149"
+            "id": "3109"
           },
           {
             "studentid": 14,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2150"
+            "id": "3110"
           },
           {
             "studentid": 15,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2151"
+            "id": "3111"
           },
           {
             "studentid": 16,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2152"
+            "id": "3112"
           },
           {
             "studentid": 17,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2153"
+            "id": "3113"
           },
           {
             "studentid": 18,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2154"
+            "id": "3114"
           },
           {
             "studentid": 19,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2155"
+            "id": "3115"
           },
           {
             "studentid": 20,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2156"
+            "id": "3116"
           },
           {
             "studentid": 21,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2157"
+            "id": "3117"
           },
           {
             "studentid": 22,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2158"
+            "id": "3118"
           },
           {
             "studentid": 23,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2159"
+            "id": "3119"
           },
           {
             "studentid": 24,
-            "statusid": "37",
+            "statusid": "53",
             "remarks": "",
-            "id": "2160"
+            "id": "3120"
           }
         ],
         "users": [
@@ -7398,8 +7398,8 @@
         ]
       },
       {
-        "id": 133,
-        "attendanceid": 9,
+        "id": 193,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1794463200,
         "duration": 12000,
@@ -7416,11 +7416,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -7429,8 +7429,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -7439,8 +7439,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -7449,8 +7449,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -7564,8 +7564,8 @@
         ]
       },
       {
-        "id": 134,
-        "attendanceid": 9,
+        "id": 194,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1795068000,
         "duration": 12000,
@@ -7582,11 +7582,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -7595,8 +7595,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -7605,8 +7605,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -7615,8 +7615,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,
@@ -7730,8 +7730,8 @@
         ]
       },
       {
-        "id": 135,
-        "attendanceid": 9,
+        "id": 195,
+        "attendanceid": 13,
         "groupid": 0,
         "sessdate": 1795672800,
         "duration": 12000,
@@ -7748,11 +7748,11 @@
         "statusset": 0,
         "includeqrcode": 0,
         "studentsearlyopentime": 0,
-        "courseid": 11,
+        "courseid": 15,
         "statuses": [
           {
-            "id": 37,
-            "attendanceid": 9,
+            "id": 53,
+            "attendanceid": 13,
             "acronym": "P",
             "description": "Present",
             "grade": 2,
@@ -7761,8 +7761,8 @@
             "setnumber": 0
           },
           {
-            "id": 39,
-            "attendanceid": 9,
+            "id": 55,
+            "attendanceid": 13,
             "acronym": "L",
             "description": "Late",
             "grade": 1,
@@ -7771,8 +7771,8 @@
             "setnumber": 0
           },
           {
-            "id": 40,
-            "attendanceid": 9,
+            "id": 56,
+            "attendanceid": 13,
             "acronym": "E",
             "description": "Excused",
             "grade": 1,
@@ -7781,8 +7781,8 @@
             "setnumber": 0
           },
           {
-            "id": 38,
-            "attendanceid": 9,
+            "id": 54,
+            "attendanceid": 13,
             "acronym": "A",
             "description": "Absent",
             "grade": 0,

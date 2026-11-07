@@ -38,4 +38,8 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   INTERVENTION_RECORDED: 'Ghi can thiệp',
   STUDENT_PROFILE_VIEWED: 'Xem hồ sơ sinh viên',
   ALERT_EXPORT: 'Xuất danh sách cảnh báo',
+  MOODLE_LINK_UPDATED: 'Đổi liên kết khóa học Moodle',
+  MOODLE_SYNC_REQUESTED: 'Đồng bộ Moodle',
+  MOODLE_SYNC_CONFIRMED: 'Xác nhận nạp dữ liệu Moodle',
+  MOODLE_SYNC_DISCARDED: 'Hủy lần đồng bộ Moodle',
 };

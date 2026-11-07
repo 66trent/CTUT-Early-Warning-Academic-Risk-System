@@ -4,7 +4,7 @@ import { DAY_MS, formatVnDate, severitySchema, vnDateKey } from '../helpers';
 import { type CourseRule } from '../types';
 
 const conditionSchema = z.object({
-  /** Chỉ so 2 snapshot cách nhau không quá số ngày này. */
+  /** So snapshot mới nhất với snapshot CŨ NHẤT cách nó không quá số ngày này. */
   windowDays: z.number().int().min(1).max(60),
   /** Mức tăng tiết vắng không phép, theo % tổng số tiết của học phần. */
   minIncreasePercent: z.number().int().min(1).max(100),
@@ -13,8 +13,9 @@ const conditionSchema = z.object({
 export type Att02Condition = z.infer<typeof conditionSchema>;
 
 /**
- * ATT-02 — Vắng tăng nhanh (docs/rules/08): so snapshot mới nhất với snapshot liền trước, mức tăng
- * tiết vắng không phép ≥ % tổng số tiết (so sánh số nguyên). Giảm (dữ liệu bị sửa) → cảnh báo.
+ * ATT-02 — Vắng tăng nhanh (docs/rules/08): so snapshot mới nhất với snapshot CŨ NHẤT trong cửa sổ
+ * `windowDays` (đổi 2026-11-08 — đồng bộ Moodle chốt sau mỗi buổi, so liền trước thì mỗi lần chỉ
+ * tăng 1 buổi), mức tăng tiết vắng không phép ≥ % tổng số tiết (so sánh số nguyên). Giảm → cảnh báo.
  */
 export const att02: CourseRule<Att02Condition> = {
   kind: 'PER_COURSE',
@@ -34,10 +35,14 @@ export const att02: CourseRule<Att02Condition> = {
   maxSeverity: (c) => c.severity,
 
   evaluate({ facts }, c) {
-    const { latest: s2, previous: s1 } = facts.attendance;
-    if (!s2 || !s1) return { hit: null };
-    const days = (s2.snapshotDate.getTime() - s1.snapshotDate.getTime()) / DAY_MS;
-    if (days > c.windowDays) return { hit: null };
+    const { latest: s2, history } = facts.attendance;
+    if (!s2) return { hit: null };
+    const daysBefore = (s: { snapshotDate: Date }) =>
+      (s2.snapshotDate.getTime() - s.snapshotDate.getTime()) / DAY_MS;
+    // history tăng dần theo ngày → phần tử đầu tiên trong cửa sổ là snapshot cũ nhất.
+    const s1 = history.find((s) => s !== s2 && daysBefore(s) > 0 && daysBefore(s) <= c.windowDays);
+    if (!s1) return { hit: null };
+    const days = daysBefore(s1);
     const increase = s2.unexcusedAbsence - s1.unexcusedAbsence;
     if (increase < 0) {
       return {

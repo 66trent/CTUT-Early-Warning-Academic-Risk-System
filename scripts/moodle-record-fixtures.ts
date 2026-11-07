@@ -74,6 +74,11 @@ async function main(): Promise<void> {
       value: idnumber,
     });
     const course = found.courses[0];
+    if (course && course.idnumber !== idnumber) {
+      throw new Error(
+        `Moodle không trả Course ID number của ${idnumber} — thiếu quyền moodle/course:update`,
+      );
+    }
     if (!course)
       throw new Error(`Moodle không có khóa học ${idnumber} — chạy npm run moodle:setup`);
     const sections = await call<{ modules: Module[] }[]>('core_course_get_contents', {

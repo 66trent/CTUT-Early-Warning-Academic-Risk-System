@@ -244,7 +244,12 @@ export async function loadStudentInputs(
         })),
       submissions: submissions
         .filter((s) => s.enrollmentId === e.enrollmentId)
-        .map((s) => ({ activityId: s.activityId, status: s.status, submittedAt: s.submittedAt })),
+        .map((s) => ({
+          activityId: s.activityId,
+          status: s.status,
+          submittedAt: s.submittedAt,
+          extendedDueAt: s.extendedDueAt,
+        })),
       result: r
         ? {
             letterGrade: r.letterGrade,

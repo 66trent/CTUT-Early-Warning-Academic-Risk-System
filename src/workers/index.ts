@@ -1,6 +1,6 @@
 /**
  * Entry point của BullMQ worker — chạy container riêng, tự khởi tạo DataSource riêng (pool 10).
- * Processor: nhập dữ liệu (Phase 3), đánh giá luật (Phase 4), thông báo (Phase 5).
+ * Processor: nhập dữ liệu (Phase 3), đánh giá luật (Phase 4), thông báo (Phase 5), đồng bộ Moodle (10b).
  */
 import 'dotenv/config';
 import { Worker, type Job } from 'bullmq';
@@ -13,6 +13,7 @@ import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
 import { SCHEDULED_EVALUATION_JOB } from '@/modules/rule-engine/services/evaluation-queue';
 import { onEvaluationJobFailed, processEvaluationJob } from './processors/evaluation-run.processor';
 import { onImportJobFailed, processImportJob } from './processors/import-batch.processor';
+import { onMoodleSyncJobFailed, processMoodleSyncJob } from './processors/moodle-sync.processor';
 import {
   onNotificationJobFailed,
   processNotificationJob,
@@ -29,12 +30,22 @@ type Processor = (job: Job) => Promise<unknown>;
 const CONCURRENCY: Partial<Record<QueueName, number>> = {
   [QUEUE_NAMES.importBatchProcess]: 1,
   [QUEUE_NAMES.evaluationRun]: 1,
+  // Mỗi lần đồng bộ gọi Moodle hàng trăm lần — chạy lần lượt để không dồn tải lên Moodle.
+  [QUEUE_NAMES.moodleSync]: 1,
 };
 
 const PROCESSORS: Record<QueueName, Processor> = {
   [QUEUE_NAMES.importBatchProcess]: processImportJob,
   [QUEUE_NAMES.evaluationRun]: processEvaluationJob,
   [QUEUE_NAMES.sendNotifications]: processNotificationJob,
+  [QUEUE_NAMES.moodleSync]: processMoodleSyncJob,
+};
+
+const ON_FAILED: Record<QueueName, (job: Job | undefined) => Promise<void>> = {
+  [QUEUE_NAMES.importBatchProcess]: onImportJobFailed,
+  [QUEUE_NAMES.evaluationRun]: onEvaluationJobFailed,
+  [QUEUE_NAMES.sendNotifications]: onNotificationJobFailed,
+  [QUEUE_NAMES.moodleSync]: onMoodleSyncJobFailed,
 };
 
 async function main(): Promise<void> {
@@ -51,13 +62,7 @@ async function main(): Promise<void> {
     );
     worker.on('failed', (job, error) => {
       logger.error({ queue: name, jobId: job?.id, err: error.message }, 'job lỗi');
-      const onFailed =
-        name === QUEUE_NAMES.importBatchProcess
-          ? onImportJobFailed
-          : name === QUEUE_NAMES.evaluationRun
-            ? onEvaluationJobFailed
-            : onNotificationJobFailed;
-      onFailed?.(job).catch((e: unknown) =>
+      ON_FAILED[name as QueueName](job).catch((e: unknown) =>
         logger.error({ queue: name, err: String(e) }, 'không đánh dấu được job lỗi'),
       );
     });

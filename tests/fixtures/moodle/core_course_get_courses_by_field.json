@@ -7,11 +7,11 @@
     "response": {
       "courses": [
         {
-          "id": 10,
+          "id": 14,
           "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
           "displayname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
           "shortname": "MMT-01-HK1-2026",
-          "courseimage": "http://localhost:8080/pluginfile.php/96/course/generated/course.svg",
+          "courseimage": "http://localhost:8080/pluginfile.php/132/course/generated/course.svg",
           "categoryid": 2,
           "categoryname": "HK1 2026–2027",
           "sortorder": 10002,
@@ -28,6 +28,7 @@
             }
           ],
           "enrollmentmethods": ["manual"],
+          "idnumber": "010100089201",
           "format": "topics",
           "showgrades": 1,
           "newsitems": 0,
@@ -44,6 +45,12 @@
           "lang": "",
           "theme": "",
           "marker": 0,
+          "legacyfiles": 0,
+          "calendartype": "",
+          "timecreated": 1794091028,
+          "timemodified": 1794091028,
+          "requested": 0,
+          "cacherev": 1794091056,
           "filters": [
             {
               "filter": "displayh5p",
@@ -103,11 +110,11 @@
     "response": {
       "courses": [
         {
-          "id": 11,
+          "id": 15,
           "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
           "displayname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
           "shortname": "HDH-01-HK1-2026",
-          "courseimage": "http://localhost:8080/pluginfile.php/105/course/generated/course.svg",
+          "courseimage": "http://localhost:8080/pluginfile.php/141/course/generated/course.svg",
           "categoryid": 2,
           "categoryname": "HK1 2026–2027",
           "sortorder": 10001,
@@ -124,6 +131,7 @@
             }
           ],
           "enrollmentmethods": ["manual"],
+          "idnumber": "010100089101",
           "format": "topics",
           "showgrades": 1,
           "newsitems": 0,
@@ -140,6 +148,12 @@
           "lang": "",
           "theme": "",
           "marker": 0,
+          "legacyfiles": 0,
+          "calendartype": "",
+          "timecreated": 1794091039,
+          "timemodified": 1794091039,
+          "requested": 0,
+          "cacherev": 1794091067,
           "filters": [
             {
               "filter": "displayh5p",

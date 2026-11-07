@@ -150,6 +150,9 @@ Lô nguồn Moodle **không hoàn tác** (Moodle là nguồn sự thật, lần 
 4. Moodle cũ hơn 5.3 không có `duedate` của trắc nghiệm → dùng `timeclose`; hỗ trợ tối thiểu 4.5 LTS (bản cũ dùng `mod_quiz_get_user_attempts`).
 5. Kết quả học phần vẫn nạp file (điểm chính thức không nằm trong Moodle).
 6. "Thời gian thực" = ~1 phút (cron Moodle) với plugin, 5–10 phút nếu chỉ kéo định kỳ.
+7. Buổi điểm danh theo nhóm (groupid ≠ 0) tính cho cả lớp — chưa đọc danh sách nhóm.
+8. Lượt trắc nghiệm "đã nộp" nhưng chưa có điểm (câu tự luận chờ chấm) → dòng lỗi "thiếu điểm" ở lô trắc nghiệm.
+9. Đọc lượt làm trắc nghiệm = 1 lần gọi / (bài, sinh viên) — hàm Moodle không có dạng cả lớp; 10c dùng sổ điểm (`gradereport_user_get_grade_items`) để chỉ gọi cho sinh viên có thay đổi.
 
 ## 9. Đã chốt với người dùng (2026-11-07)
 
@@ -160,6 +163,13 @@ Lô nguồn Moodle **không hoàn tác** (Moodle là nguồn sự thật, lần 
 5. Học kỳ demo Moodle **theo ngày thật** (giá trị demo, đề xuất `HK1_2026` 17/08–27/12/2026, `isCurrent`), tách khỏi bộ v3 (`HK1_2025`).
 6. Dữ liệu Moodle demo có **2 cách**: (a) script tự dựng; (b) **người dùng tự làm tay** trên giao diện Moodle (tạo khóa học = lớp học phần, ghi danh, buổi điểm danh, bài trắc nghiệm, bài thực hành) theo hướng dẫn từng bước — EWARS nhận như nhau.
 7. Mã học phần / mã lớp học phần: **tự thiết kế, không xác minh với trường** (giảng viên hướng dẫn: do Phòng Đào tạo quản lý). Quy ước: **Course ID number** của khóa Moodle = mã lớp học phần 12 số như mẫu hiện có (VD `010100240802`); mã học phần = bỏ 2 số cuối (như hiện nay); Admin sửa được ở màn liên kết. Ghi vào "Giới hạn đã biết" của báo cáo.
+
+### 9b. Chốt thêm trước Phase 10b (2026-11-08)
+
+1. **ATT-02 so với ngày chốt cũ nhất trong 14 ngày** (không còn "liền trước") — ghi `08`. Đồng bộ Moodle tạo 1 ngày chốt cho MỖI NGÀY có buổi đã điểm danh (cộng dồn đến hết ngày đó).
+2. **Admin bật từng khóa học** ở trang Kết nối Moodle (mặc định tắt); chỉ khóa có Course ID number 12 chữ số.
+3. **Sinh viên Moodle chưa có trong EWARS: bỏ qua, đếm riêng** — không ghi `ImportErrorRow`, hiện số lượng + danh sách MSSV/email ở trang Kết nối (ngoại lệ của `00`, `12` chỉ cho nguồn Moodle).
+4. **Chạy tay: 1 lần đồng bộ = 3 lô** (điểm danh / trắc nghiệm / thực hành, mỗi lô 1 file sinh tự động cho mỗi khóa) + nút **Xác nhận nạp cả 3** / **Hủy cả 3**; chi tiết từng lô vẫn xem ở trang Nhập dữ liệu. File không đổi so với lần nạp trước (cùng checksum) bị bỏ qua; cả 3 không đổi → "Không có thay đổi".
 
 ## 10. Kế hoạch dự kiến (sau khi chốt)
 

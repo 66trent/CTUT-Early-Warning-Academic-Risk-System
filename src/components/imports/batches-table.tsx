@@ -5,6 +5,7 @@ import { FileUp } from 'lucide-react';
 import Link from 'next/link';
 import { DataTable } from '@/components/data-table/data-table';
 import { EmptyState } from '@/components/empty-state';
+import { Badge } from '@/components/ui/badge';
 import { formatVnDateTime } from '@/lib/dates';
 import type { SortDir } from '@/lib/list-params';
 import type { ImportBatchListItemDto } from '@/modules/data-import/services/import-query.service';
@@ -44,6 +45,11 @@ const columns: ColumnDef<ImportBatchListItemDto>[] = [
           <span className="text-xs text-muted-foreground">
             + {row.original.fileCount - 1} file khác
           </span>
+        )}
+        {row.original.fromMoodle && (
+          <Badge variant="outline" className="text-xs">
+            Moodle
+          </Badge>
         )}
       </span>
     ),

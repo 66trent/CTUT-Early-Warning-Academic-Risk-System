@@ -81,8 +81,9 @@ Căn cứ quy chế: nghỉ **vượt quá 20%** tổng số tiết của học 
 Dải: `≥ 10%` → `MEDIUM`; `≥ 15%` → `HIGH`; `> 20%` → `CRITICAL` ("đã vượt ngưỡng cấm thi"). Đúng 20% là `HIGH`. Cài dạng nhánh, lấy dải cao nhất. MUST so sánh bằng số nguyên (`tiết vắng × 100 > 20 × totalPeriods`).
 
 **ATT-02 — Vắng tăng nhanh**
-So snapshot mới nhất S2 với snapshot liền trước S1 của cùng `Enrollment`, khi `S2.snapshotDate − S1.snapshotDate ≤ windowDays` (mặc định 14). `(S2.unexcusedAbsence − S1.unexcusedAbsence) × 100 ≥ minIncreasePercent × S2.totalPeriods` (mặc định 10%) → `HIGH`. Ví dụ môn 45 tiết: tăng ≥ 5 tiết.
-Chênh lệch âm (dữ liệu bị sửa) → không kích hoạt, ghi cảnh báo chất lượng dữ liệu. Chỉ có 1 snapshot → không xét.
+So snapshot mới nhất S2 với snapshot **CŨ NHẤT trong cửa sổ** S1 của cùng `Enrollment`: S1 = snapshot sớm nhất (khác S2) có `S2.snapshotDate − S1.snapshotDate ≤ windowDays` (mặc định 14). `(S2.unexcusedAbsence − S1.unexcusedAbsence) × 100 ≥ minIncreasePercent × S2.totalPeriods` (mặc định 10%) → `HIGH`. Ví dụ môn 45 tiết: tăng ≥ 5 tiết trong 14 ngày.
+Chênh lệch âm (dữ liệu bị sửa) → không kích hoạt, ghi cảnh báo chất lượng dữ liệu. Chỉ có 1 snapshot, hoặc không có snapshot nào khác trong cửa sổ → không xét.
+Đổi 2026-11-08 (Phase 10b, người dùng chốt): trước đây so với snapshot LIỀN TRƯỚC — đồng bộ Moodle tạo snapshot sau mỗi buổi học nên mỗi lần chỉ tăng 1 buổi (4/60 tiết = 6,7%) và luật không bao giờ báo. So với snapshot cũ nhất trong cửa sổ đúng nghĩa "tăng nhanh trong 14 ngày" với mọi tần suất nạp; bộ demo v3 (2 snapshot cách 7 ngày) cho kết quả không đổi.
 
 ## Nhóm LMS — bài trắc nghiệm (nguồn: `LmsActivity` QUIZ + `LmsQuizAttempt`)
 
@@ -98,9 +99,9 @@ Bài trắc nghiệm Q **đến hạn** tại `asOf`:
 
 Chỉ dựa trạng thái nộp (giảng viên có thể chưa chấm điểm). Trạng thái tại `asOf` của 1 bài: có `submittedAt ≤ asOf` → đã nộp (trễ nếu `submittedAt > dueAt`); chưa nộp và `dueAt ≤ asOf` → **không nộp**; chưa nộp và chưa đến hạn → bình thường, không xét. Sinh viên không có dòng nào cho 1 bài của lớp học phần mình → coi là chưa nộp.
 
-**LMS-03 — Không nộp bài thực hành**: số bài không nộp: 1 → `MEDIUM`; ≥ 2 → `HIGH`.
+**LMS-03 — Không nộp bài thực hành**: số bài không nộp: 1 → `MEDIUM`; ≥ 2 → `HIGH`. Sinh viên có hạn nộp riêng (gia hạn, `extendedDueAt`) chưa qua tại `asOf` → bài đó CHƯA tính không nộp (Phase 10b).
 
-**LMS-04 — Nộp trễ nhiều**: ≥ 2 bài nộp trễ trong 1 học phần → `LOW` (chỉ trong ứng dụng).
+**LMS-04 — Nộp trễ nhiều**: ≥ 2 bài nộp trễ trong 1 học phần → `LOW` (chỉ trong ứng dụng). Trễ = nộp sau hạn riêng nếu được gia hạn, không thì sau hạn chung.
 
 ## Nhóm học lực (nguồn: `CourseResult` — chỉ nạp khi học phần đã khóa điểm)
 
@@ -141,7 +142,7 @@ Lấy mức cao nhất của (a), (b).
 - Mã học phần suy từ mã lớp học phần bằng cách bỏ 2 số cuối (giả định; chương trình khung KTPM2311 — 2026-10-22 — cho thấy mã học phần 10 số `0101002408` khớp phần đầu mã lớp học phần `010100240802`, nhưng chưa có xác nhận chính thức của phòng Đào tạo) — sai thì học lại (`COMB-02`) không nhận ra; Admin điền `ma_hoc_phan` riêng khi biết.
 - Học phần Giáo dục thể chất, Giáo dục quốc phòng (dấu `*` trong chương trình khung) KHÔNG tính vào điểm trung bình theo quy chế. Hệ thống không phân biệt loại học phần này (người dùng chốt 2026-10-22: bỏ qua) → KHÔNG nạp kết quả GDTC/GDQP; nếu lỡ nạp, `ACA-02/03/04` và RiskScore sẽ tính cả chúng.
 - Bài trắc nghiệm không có hạn nộp → `LMS-01` chỉ bắt được bài đa số lớp đã làm.
-- Điểm danh là số tổng hợp → không phát hiện "vắng liên tiếp" chính xác; `ATT-02` xấp xỉ theo mức tăng giữa 2 lần nhập.
+- Điểm danh là số tổng hợp → không phát hiện "vắng liên tiếp" chính xác; `ATT-02` xấp xỉ theo mức tăng trong cửa sổ 14 ngày giữa các lần nhập.
 - Không biết sinh viên rút học phần từ dữ liệu nguồn → Admin đánh dấu tay.
 - Không có danh sách đăng ký học phần: sinh viên không xuất hiện trong file nào của học phần thì hệ thống không biết; "tín chỉ đăng ký" của ACA-02 = tín chỉ các học phần có kết quả.
 - `ACA-04` "học kỳ liền trước" theo lịch học kỳ của hệ thống — sinh viên bảo lưu 1 học kỳ thì không so sánh.

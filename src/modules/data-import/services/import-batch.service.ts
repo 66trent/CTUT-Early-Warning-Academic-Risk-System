@@ -40,6 +40,8 @@ export interface ImportBatchMeta {
   /** Học phần Admin chọn (tùy chọn) — dòng thuộc học phần khác → `COURSE_MISMATCH`. */
   courseId?: string | null;
   parentBatchId: string | null;
+  /** Mặc định `FILE`; `MOODLE` = file do bộ đồng bộ Moodle sinh (Phase 10b). */
+  source?: ImportSource;
 }
 
 /** Lô 1 file (`fileName` + `data`) hoặc nhiều file (`files`). */
@@ -90,6 +92,32 @@ function checkFile(file: ImportFileInput): string {
     throw error;
   }
   return sha256(file.data);
+}
+
+export const fileChecksum = sha256;
+
+/**
+ * Checksum nào trong danh sách đã nằm trong 1 lô còn hiệu lực cùng loại, cùng học kỳ — bộ đồng bộ
+ * Moodle bỏ qua file không đổi thay vì để bị từ chối "đã nạp" (docs/rules/12).
+ */
+export async function findLiveChecksums(
+  checksums: readonly string[],
+  dataType: string,
+  termId: string | null,
+): Promise<Set<string>> {
+  if (checksums.length === 0) return new Set();
+  const rows = await (
+    await getDataSource()
+  )
+    .createQueryBuilder(ImportBatchFile, 'f')
+    .innerJoin(ImportBatch, 'b', 'b.id = f.import_batch_id')
+    .select('f.source_checksum', 'checksum')
+    .where('f.source_checksum IN (:...checksums)', { checksums })
+    .andWhere('b.data_type = :dataType', { dataType })
+    .andWhere("COALESCE(b.term_id, '') = :termId", { termId: termId ?? '' })
+    .andWhere('b.status IN (:...live)', { live: LIVE_STATUSES })
+    .getRawMany<{ checksum: string }>();
+  return new Set(rows.map((r) => r.checksum));
 }
 
 /** Chống nạp trùng TỪNG file: file đã nằm trong 1 lô còn hiệu lực cùng loại, cùng học kỳ. */
@@ -146,7 +174,7 @@ export async function beginImportUpload(
       dataType: meta.dataType,
       termId,
       courseId,
-      source: ImportSource.FILE,
+      source: meta.source ?? ImportSource.FILE,
       fileName,
       sourceChecksum: checksum,
       performedBy: actorId,
@@ -409,6 +437,13 @@ export type RollbackEligibility = { allowed: true } | { allowed: false; reason: 
 export async function getRollbackEligibility(batch: ImportBatch): Promise<RollbackEligibility> {
   if (batch.status !== ImportBatchStatus.LOADED && batch.status !== ImportBatchStatus.RECONCILED) {
     return { allowed: false, reason: 'Chỉ hoàn tác được lô đã nạp.' };
+  }
+  if (batch.source === ImportSource.MOODLE) {
+    return {
+      allowed: false,
+      reason:
+        'Lô đồng bộ từ Moodle không hoàn tác — Moodle là nguồn gốc: sửa trên Moodle rồi đồng bộ lại.',
+    };
   }
   const summary = readSummary(batch.summary);
   if (summary.retried || summary.createdKeys === undefined) {

@@ -76,8 +76,9 @@ export function submission(
   activityId: string,
   submittedAt: Date | null,
   status: SubmissionStatus = SubmissionStatus.ON_TIME,
+  extendedDueAt: Date | null = null,
 ): SubmissionInput {
-  return { activityId, status, submittedAt };
+  return { activityId, status, submittedAt, extendedDueAt };
 }
 
 const onTimeSubmissions = () =>

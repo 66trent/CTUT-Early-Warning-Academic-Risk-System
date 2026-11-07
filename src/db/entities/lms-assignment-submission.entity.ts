@@ -38,6 +38,13 @@ export class LmsAssignmentSubmission {
   @Column({ type: 'timestamptz', nullable: true })
   submittedAt!: Date | null;
 
+  /**
+   * Hạn nộp riêng của sinh viên này (gia hạn — cột `han_rieng`, Phase 10b). NULL = theo hạn chung
+   * `LmsActivity.dueAt`. LMS-03 không tính "không nộp" khi hạn riêng chưa qua; LMS-04 so với hạn riêng.
+   */
+  @Column({ type: 'timestamptz', nullable: true })
+  extendedDueAt!: Date | null;
+
   /** Lô cập nhật gần nhất. */
   @Column({ type: 'uuid' })
   importBatchId!: string;

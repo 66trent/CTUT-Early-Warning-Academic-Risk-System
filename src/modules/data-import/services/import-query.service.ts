@@ -4,7 +4,7 @@ import { ImportBatchFile } from '@/db/entities/import-batch-file.entity';
 import { ImportBatch, type ImportCourseCard } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
-import { type ImportBatchStatus, IMPORT_DATA_TYPES } from '@/db/enums';
+import { type ImportBatchStatus, IMPORT_DATA_TYPES, ImportSource } from '@/db/enums';
 import {
   applyOrder,
   firstPage,
@@ -29,6 +29,8 @@ export interface ImportBatchListItemDto {
   fileName: string;
   /** Số file của lô (Phase 8f — nạp nhiều file 1 lần). */
   fileCount: number;
+  /** `true` = file do bộ đồng bộ Moodle sinh (Phase 10b), không phải người dùng tải lên. */
+  fromMoodle: boolean;
   /** Học phần của lô (1 học phần → tên; nhiều → "N học phần"; chưa đọc → null). */
   courseLabel: string | null;
   status: ImportBatchStatus;
@@ -110,6 +112,7 @@ function toListItem(batch: ImportBatch, fileCount = 1): ImportBatchListItemDto {
     termName: batch.term?.termName ?? null,
     fileName: batch.fileName,
     fileCount,
+    fromMoodle: batch.source === ImportSource.MOODLE,
     courseLabel: courseLabelOf(batch),
     status: batch.status,
     totalRows: batch.totalRows,

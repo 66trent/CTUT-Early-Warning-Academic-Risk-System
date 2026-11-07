@@ -71,6 +71,7 @@ RÀNG BUỘC: UNIQUE `(enrollmentId, activityId, attemptNumber)`. Dòng `trang_t
 | activityId | String (uuid) | NOT NULL | FK → LmsActivity | Bài `ASSIGNMENT` |
 | status | SubmissionStatus (enum) | NOT NULL | | `ON_TIME` (Đã nộp) / `LATE` (Nộp trễ) / `NOT_SUBMITTED` (Chưa nộp) — theo file |
 | submittedAt | DateTime | NULL | | BẮT BUỘC khi `ON_TIME`/`LATE` (chống rò rỉ thời gian: biết đã nộp TẠI `asOf`) |
+| extendedDueAt | DateTime | NULL | | Hạn nộp riêng (gia hạn) — cột tùy chọn `han_rieng` (Phase 10b). NULL = theo `LmsActivity.dueAt`. Trễ/đúng hạn và cảnh báo `SUBMISSION_STATUS_MISMATCH` so với hạn riêng nếu có |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 
 RÀNG BUỘC: UNIQUE `(enrollmentId, activityId)` — nạp lại cập nhật trạng thái (Chưa nộp → Nộp trễ). `ON_TIME` mà `submittedAt > dueAt`, hoặc `LATE` mà `submittedAt ≤ dueAt` → cảnh báo `SUBMISSION_STATUS_MISMATCH` (nạp theo thời điểm nộp). KHÔNG lưu điểm (giảng viên có thể chưa chấm).
