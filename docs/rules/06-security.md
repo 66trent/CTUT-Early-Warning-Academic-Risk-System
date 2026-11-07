@@ -61,4 +61,5 @@ Xem `00-project-context.md` cho glossary và bảng phạm vi role.
 ## Dependency & Container
 
 - MUST: chạy `npm audit --omit=dev --audit-level=high` trong CI, chặn merge nếu dependency production có lỗ hổng mức `high`/`critical`. Lỗ hổng chỉ nằm trong devDependencies (công cụ lint/test, không vào image production) mà chưa có bản vá: ghi vào `PROGRESS.md`, kiểm tra lại mỗi phase.
-- MUST: build Docker image multi-stage, MUST NOT chạy container với user `root`, image production không chứa devDependencies.
+- MUST: build Docker image multi-stage, MUST NOT chạy container với user `root`, image production không chứa devDependencies. Ngoại lệ ghi nhận (Phase 10a): image **Moodle demo** (`integrations/moodle/docker`, profile `moodle`) dựng trên ảnh chính thức `moodlehq/moodle-php-apache` — tiến trình chính Apache chạy root rồi hạ quyền `www-data`; KHÔNG phải image của EWARS, chỉ chạy ở máy để giả lập Moodle trường. Mã nguồn tải về được ghim phiên bản + kiểm SHA-256 (Moodle) / commit (plugin).
+- MUST (Phase 10): token web service Moodle chỉ nằm trong biến môi trường `MOODLE_WS_TOKEN` (không lưu DB, không ghi log, không đặt trên URL — gửi trong thân POST); external service phía Moodle chỉ chứa hàm loại `read` (script `ewars_setup.php` từ chối hàm khác).

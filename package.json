@@ -37,7 +37,12 @@
     "restore": "tsx scripts/db-backup.ts restore",
     "demo:reset": "tsx scripts/demo-reset.ts",
     "test:e2e": "playwright test",
-    "screenshots": "tsx scripts/screenshots.ts"
+    "screenshots": "tsx scripts/screenshots.ts",
+    "moodle:up": "docker compose --profile moodle up -d --build moodle-db moodle",
+    "moodle:down": "docker compose --profile moodle stop moodle moodle-db",
+    "moodle:setup": "tsx scripts/moodle-setup.ts",
+    "moodle:spec": "tsx scripts/moodle-spec.ts",
+    "moodle:fixtures": "tsx scripts/moodle-record-fixtures.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [
@@ -105,5 +110,10 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.3"
+  },
+  "overrides": {
+    "query-string": {
+      "decode-uri-component": "0.5.1"
+    }
   }
 }

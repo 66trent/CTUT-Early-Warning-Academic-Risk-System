@@ -1,0 +1,618 @@
+[
+  {
+    "params": {
+      "courseid": 10
+    },
+    "response": [
+      {
+        "id": 33,
+        "name": "General",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 0,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": [
+          {
+            "id": 42,
+            "url": "http://localhost:8080/mod/attendance/view.php?id=42",
+            "name": "Điểm danh",
+            "instance": 8,
+            "lang": "",
+            "contextid": 97,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/attendance/1794089194/monologo?filtericon=1",
+            "modname": "attendance",
+            "purpose": "administration",
+            "branded": false,
+            "modplural": "Attendances",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "\"\"",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [],
+            "groupmode": 0
+          },
+          {
+            "id": 44,
+            "url": "http://localhost:8080/mod/quiz/view.php?id=44",
+            "name": "Trắc nghiệm chương 1",
+            "instance": 16,
+            "lang": "",
+            "contextid": 99,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/quiz/1794089194/monologo?filtericon=1",
+            "modname": "quiz",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Quizzes",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"timeopen\":\"1788800400\",\"duedate\":\"1789491540\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1788800400,
+                "dataid": "timeopen"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1789491540,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 45,
+            "url": "http://localhost:8080/mod/quiz/view.php?id=45",
+            "name": "Trắc nghiệm chương 2",
+            "instance": 17,
+            "lang": "",
+            "contextid": 100,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/quiz/1794089194/monologo?filtericon=1",
+            "modname": "quiz",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Quizzes",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"timeopen\":\"1791219600\",\"duedate\":\"1791910740\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1791219600,
+                "dataid": "timeopen"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1791910740,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 46,
+            "url": "http://localhost:8080/mod/quiz/view.php?id=46",
+            "name": "Trắc nghiệm chương 3",
+            "instance": 18,
+            "lang": "",
+            "contextid": 101,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/quiz/1794089194/monologo?filtericon=1",
+            "modname": "quiz",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Quizzes",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"timeopen\":\"1794157200\",\"duedate\":\"1794848340\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opens:",
+                "timestamp": 1794157200,
+                "dataid": "timeopen"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1794848340,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 47,
+            "url": "http://localhost:8080/mod/assign/view.php?id=47",
+            "name": "Thực hành 1",
+            "instance": 13,
+            "lang": "",
+            "contextid": 102,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/assign/1794089194/monologo?filtericon=1",
+            "modname": "assign",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Assignments",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"duedate\":1790096340,\"allowsubmissionsfromdate\":\"1788800400\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1788800400,
+                "dataid": "allowsubmissionsfromdate"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1790096340,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 48,
+            "url": "http://localhost:8080/mod/assign/view.php?id=48",
+            "name": "Thực hành 2",
+            "instance": 14,
+            "lang": "",
+            "contextid": 103,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/assign/1794089194/monologo?filtericon=1",
+            "modname": "assign",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Assignments",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"duedate\":1792515540,\"allowsubmissionsfromdate\":\"1791219600\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1791219600,
+                "dataid": "allowsubmissionsfromdate"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1792515540,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 49,
+            "url": "http://localhost:8080/mod/assign/view.php?id=49",
+            "name": "Thực hành 3",
+            "instance": 15,
+            "lang": "",
+            "contextid": 104,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/assign/1794089194/monologo?filtericon=1",
+            "modname": "assign",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Assignments",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"duedate\":1795193940,\"allowsubmissionsfromdate\":\"1793552400\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1793552400,
+                "dataid": "allowsubmissionsfromdate"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1795193940,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "name": "New section",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 1,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": []
+      },
+      {
+        "id": 35,
+        "name": "New section",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 2,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": []
+      },
+      {
+        "id": 36,
+        "name": "New section",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 3,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": []
+      }
+    ]
+  },
+  {
+    "params": {
+      "courseid": 11
+    },
+    "response": [
+      {
+        "id": 37,
+        "name": "General",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 0,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": [
+          {
+            "id": 50,
+            "url": "http://localhost:8080/mod/attendance/view.php?id=50",
+            "name": "Điểm danh",
+            "instance": 9,
+            "lang": "",
+            "contextid": 106,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/attendance/1794089194/monologo?filtericon=1",
+            "modname": "attendance",
+            "purpose": "administration",
+            "branded": false,
+            "modplural": "Attendances",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "\"\"",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [],
+            "groupmode": 0
+          },
+          {
+            "id": 52,
+            "url": "http://localhost:8080/mod/quiz/view.php?id=52",
+            "name": "Trắc nghiệm chương 1",
+            "instance": 19,
+            "lang": "",
+            "contextid": 108,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/quiz/1794089194/monologo?filtericon=1",
+            "modname": "quiz",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Quizzes",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"timeopen\":\"1788800400\",\"duedate\":\"1789491540\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1788800400,
+                "dataid": "timeopen"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1789491540,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 53,
+            "url": "http://localhost:8080/mod/quiz/view.php?id=53",
+            "name": "Trắc nghiệm chương 2",
+            "instance": 20,
+            "lang": "",
+            "contextid": 109,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/quiz/1794089194/monologo?filtericon=1",
+            "modname": "quiz",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Quizzes",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"timeopen\":\"1791219600\",\"duedate\":\"1791910740\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1791219600,
+                "dataid": "timeopen"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1791910740,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 54,
+            "url": "http://localhost:8080/mod/quiz/view.php?id=54",
+            "name": "Trắc nghiệm chương 3",
+            "instance": 21,
+            "lang": "",
+            "contextid": 110,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/quiz/1794089194/monologo?filtericon=1",
+            "modname": "quiz",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Quizzes",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"timeopen\":\"1794157200\",\"duedate\":\"1794848340\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opens:",
+                "timestamp": 1794157200,
+                "dataid": "timeopen"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1794848340,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 55,
+            "url": "http://localhost:8080/mod/assign/view.php?id=55",
+            "name": "Thực hành 1",
+            "instance": 16,
+            "lang": "",
+            "contextid": 111,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/assign/1794089194/monologo?filtericon=1",
+            "modname": "assign",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Assignments",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"duedate\":1790096340,\"allowsubmissionsfromdate\":\"1788800400\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1788800400,
+                "dataid": "allowsubmissionsfromdate"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1790096340,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 56,
+            "url": "http://localhost:8080/mod/assign/view.php?id=56",
+            "name": "Thực hành 2",
+            "instance": 17,
+            "lang": "",
+            "contextid": 112,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/assign/1794089194/monologo?filtericon=1",
+            "modname": "assign",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Assignments",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"duedate\":1792515540,\"allowsubmissionsfromdate\":\"1791219600\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1791219600,
+                "dataid": "allowsubmissionsfromdate"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1792515540,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          },
+          {
+            "id": 57,
+            "url": "http://localhost:8080/mod/assign/view.php?id=57",
+            "name": "Thực hành 3",
+            "instance": 18,
+            "lang": "",
+            "contextid": 113,
+            "visible": 1,
+            "uservisible": true,
+            "visibleoncoursepage": 1,
+            "modicon": "http://localhost:8080/theme/image.php/boost/assign/1794089194/monologo?filtericon=1",
+            "modname": "assign",
+            "purpose": "assessment",
+            "branded": false,
+            "modplural": "Assignments",
+            "indent": 0,
+            "onclick": "",
+            "afterlink": null,
+            "customdata": "{\"duedate\":1795193940,\"allowsubmissionsfromdate\":\"1793552400\"}",
+            "noviewlink": false,
+            "candisplay": true,
+            "completion": 0,
+            "downloadcontent": 1,
+            "dates": [
+              {
+                "label": "Opened:",
+                "timestamp": 1793552400,
+                "dataid": "allowsubmissionsfromdate"
+              },
+              {
+                "label": "Due:",
+                "timestamp": 1795193940,
+                "dataid": "duedate"
+              }
+            ],
+            "groupmode": 0
+          }
+        ]
+      },
+      {
+        "id": 38,
+        "name": "New section",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 1,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": []
+      },
+      {
+        "id": 39,
+        "name": "New section",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 2,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": []
+      },
+      {
+        "id": 40,
+        "name": "New section",
+        "visible": 1,
+        "summary": "",
+        "summaryformat": 1,
+        "section": 3,
+        "hiddenbynumsections": 0,
+        "uservisible": true,
+        "component": null,
+        "itemid": null,
+        "modules": []
+      }
+    ]
+  }
+]
