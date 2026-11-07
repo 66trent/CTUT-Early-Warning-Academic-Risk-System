@@ -146,6 +146,7 @@ npm run restore -- backups/<file>.dump
 | `npm run perf:seed`, `npm run perf:measure` | Đo hiệu năng trên DB riêng `*_perf` (`docs/bao-cao/02-hieu-nang.md`) |
 | `npm run backup`, `npm run restore` | Sao lưu / khôi phục |
 | `npm run screenshots` | Chụp lại ảnh màn hình (mục 6) |
+| `npm run moodle:up`, `npm run moodle:setup` | Moodle 5.3 demo ở http://localhost:8080 + web service chỉ đọc + dữ liệu demo (`docs/huong-dan-moodle.md`) |
 
 ## 6. Ảnh màn hình
 

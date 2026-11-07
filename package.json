@@ -37,7 +37,11 @@
     "restore": "tsx scripts/db-backup.ts restore",
     "demo:reset": "tsx scripts/demo-reset.ts",
     "test:e2e": "playwright test",
-    "screenshots": "tsx scripts/screenshots.ts"
+    "screenshots": "tsx scripts/screenshots.ts",
+    "moodle:up": "docker compose --profile moodle up -d --build moodle-db moodle",
+    "moodle:down": "docker compose --profile moodle stop moodle moodle-db",
+    "moodle:setup": "tsx scripts/moodle-setup.ts",
+    "moodle:fixtures": "tsx scripts/moodle-record-fixtures.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [

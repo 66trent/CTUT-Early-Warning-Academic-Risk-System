@@ -6,6 +6,8 @@ Nguồn sự thật duy nhất về nghiệp vụ và mô hình dữ liệu củ
 
 CTUT-EWARS (Early Warning Academic Risk System): hệ thống phát hiện dấu hiệu rủi ro học tập của sinh viên dựa trên luật nghiệp vụ có thể cấu hình, tổng hợp từ các nguồn: điểm danh tổng hợp (theo tiết), LMS (bài trắc nghiệm + trạng thái nộp bài thực hành), kết quả học phần đã khóa điểm. 12 luật (Phase 8a, chốt 2026-10-18 theo ảnh hệ thống trường + Quy chế 336/QĐ-ĐHKTCN). Bộ luật: `08-business-rules-catalog.md`.
 
+Nguồn điểm danh + LMS từ Phase 10 (chốt hướng 2026-11-07, chưa làm): ngoài nạp file, đồng bộ CHỈ ĐỌC từ Moodle (Web service REST + plugin `local_ewars` đẩy sự kiện; chế độ Tự động / Chạy tay) — thiết kế ở `docs/tich-hop-moodle.md`. Kết quả học phần vẫn chỉ nạp file.
+
 Tên hiển thị của hệ thống (giao diện, email, tiêu đề trang) đọc từ biến môi trường `NEXT_PUBLIC_APP_NAME` — MUST NOT ghi cứng ở nhiều nơi.
 
 ## Ranh giới phạm vi — bất biến, không được vi phạm dưới bất kỳ lý do nào

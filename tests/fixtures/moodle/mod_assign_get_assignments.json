@@ -1,0 +1,460 @@
+[
+  {
+    "params": {
+      "courseids": [8],
+      "includenotenrolledcourses": true
+    },
+    "response": {
+      "courses": [
+        {
+          "id": 8,
+          "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+          "shortname": "MMT-01-HK1-2026",
+          "timemodified": 1794065217,
+          "assignments": [
+            {
+              "id": 7,
+              "coursemodule": 31,
+              "course": 8,
+              "name": "Thực hành 1",
+              "intro": "Test assign 1",
+              "introformat": 1,
+              "introfiles": [],
+              "lang": "",
+              "cmid": 31,
+              "nosubmissions": 0,
+              "submissiondrafts": 0,
+              "sendnotifications": 0,
+              "sendlatenotifications": 0,
+              "sendstudentnotifications": 1,
+              "duedate": 1790096340,
+              "allowsubmissionsfromdate": 1788800400,
+              "grade": 10,
+              "gradepenalty": 0,
+              "timemodified": 1794065221,
+              "completionsubmit": 0,
+              "cutoffdate": 0,
+              "gradingduedate": 0,
+              "teamsubmission": 0,
+              "requireallteammemberssubmit": 0,
+              "teamsubmissiongroupingid": 0,
+              "blindmarking": 0,
+              "hidegrader": 0,
+              "revealidentities": 0,
+              "attemptreopenmethod": "untilpass",
+              "maxattempts": 1,
+              "markingworkflow": 0,
+              "markingallocation": 0,
+              "markercount": 0,
+              "optionalmarkercount": 0,
+              "multimarkmethod": null,
+              "multimarkrounding": null,
+              "markinganonymous": 0,
+              "requiresubmissionstatement": 0,
+              "preventsubmissionnotingroup": 0,
+              "configs": [
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "1"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimit",
+                  "value": "0"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimitenabled",
+                  "value": "0"
+                },
+                {
+                  "plugin": "comments",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "0"
+                }
+              ],
+              "introattachments": [],
+              "timelimit": 0,
+              "submissionattachments": 0
+            },
+            {
+              "id": 8,
+              "coursemodule": 32,
+              "course": 8,
+              "name": "Thực hành 2",
+              "intro": "Test assign 2",
+              "introformat": 1,
+              "introfiles": [],
+              "lang": "",
+              "cmid": 32,
+              "nosubmissions": 0,
+              "submissiondrafts": 0,
+              "sendnotifications": 0,
+              "sendlatenotifications": 0,
+              "sendstudentnotifications": 1,
+              "duedate": 1792515540,
+              "allowsubmissionsfromdate": 1791219600,
+              "grade": 10,
+              "gradepenalty": 0,
+              "timemodified": 1794065222,
+              "completionsubmit": 0,
+              "cutoffdate": 0,
+              "gradingduedate": 0,
+              "teamsubmission": 0,
+              "requireallteammemberssubmit": 0,
+              "teamsubmissiongroupingid": 0,
+              "blindmarking": 0,
+              "hidegrader": 0,
+              "revealidentities": 0,
+              "attemptreopenmethod": "untilpass",
+              "maxattempts": 1,
+              "markingworkflow": 0,
+              "markingallocation": 0,
+              "markercount": 0,
+              "optionalmarkercount": 0,
+              "multimarkmethod": null,
+              "multimarkrounding": null,
+              "markinganonymous": 0,
+              "requiresubmissionstatement": 0,
+              "preventsubmissionnotingroup": 0,
+              "configs": [
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "1"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimit",
+                  "value": "0"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimitenabled",
+                  "value": "0"
+                },
+                {
+                  "plugin": "comments",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "0"
+                }
+              ],
+              "introattachments": [],
+              "timelimit": 0,
+              "submissionattachments": 0
+            },
+            {
+              "id": 9,
+              "coursemodule": 33,
+              "course": 8,
+              "name": "Thực hành 3",
+              "intro": "Test assign 3",
+              "introformat": 1,
+              "introfiles": [],
+              "lang": "",
+              "cmid": 33,
+              "nosubmissions": 0,
+              "submissiondrafts": 0,
+              "sendnotifications": 0,
+              "sendlatenotifications": 0,
+              "sendstudentnotifications": 1,
+              "duedate": 1796057940,
+              "allowsubmissionsfromdate": 1793552400,
+              "grade": 10,
+              "gradepenalty": 0,
+              "timemodified": 1794065223,
+              "completionsubmit": 0,
+              "cutoffdate": 0,
+              "gradingduedate": 0,
+              "teamsubmission": 0,
+              "requireallteammemberssubmit": 0,
+              "teamsubmissiongroupingid": 0,
+              "blindmarking": 0,
+              "hidegrader": 0,
+              "revealidentities": 0,
+              "attemptreopenmethod": "untilpass",
+              "maxattempts": 1,
+              "markingworkflow": 0,
+              "markingallocation": 0,
+              "markercount": 0,
+              "optionalmarkercount": 0,
+              "multimarkmethod": null,
+              "multimarkrounding": null,
+              "markinganonymous": 0,
+              "requiresubmissionstatement": 0,
+              "preventsubmissionnotingroup": 0,
+              "configs": [
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "1"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimit",
+                  "value": "0"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimitenabled",
+                  "value": "0"
+                },
+                {
+                  "plugin": "comments",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "0"
+                }
+              ],
+              "introattachments": [],
+              "timelimit": 0,
+              "submissionattachments": 0
+            }
+          ]
+        }
+      ],
+      "warnings": []
+    }
+  },
+  {
+    "params": {
+      "courseids": [9],
+      "includenotenrolledcourses": true
+    },
+    "response": {
+      "courses": [
+        {
+          "id": 9,
+          "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+          "shortname": "HDH-01-HK1-2026",
+          "timemodified": 1794065225,
+          "assignments": [
+            {
+              "id": 10,
+              "coursemodule": 39,
+              "course": 9,
+              "name": "Thực hành 1",
+              "intro": "Test assign 4",
+              "introformat": 1,
+              "introfiles": [],
+              "lang": "",
+              "cmid": 39,
+              "nosubmissions": 0,
+              "submissiondrafts": 0,
+              "sendnotifications": 0,
+              "sendlatenotifications": 0,
+              "sendstudentnotifications": 1,
+              "duedate": 1790096340,
+              "allowsubmissionsfromdate": 1788800400,
+              "grade": 10,
+              "gradepenalty": 0,
+              "timemodified": 1794065229,
+              "completionsubmit": 0,
+              "cutoffdate": 0,
+              "gradingduedate": 0,
+              "teamsubmission": 0,
+              "requireallteammemberssubmit": 0,
+              "teamsubmissiongroupingid": 0,
+              "blindmarking": 0,
+              "hidegrader": 0,
+              "revealidentities": 0,
+              "attemptreopenmethod": "untilpass",
+              "maxattempts": 1,
+              "markingworkflow": 0,
+              "markingallocation": 0,
+              "markercount": 0,
+              "optionalmarkercount": 0,
+              "multimarkmethod": null,
+              "multimarkrounding": null,
+              "markinganonymous": 0,
+              "requiresubmissionstatement": 0,
+              "preventsubmissionnotingroup": 0,
+              "configs": [
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "1"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimit",
+                  "value": "0"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimitenabled",
+                  "value": "0"
+                },
+                {
+                  "plugin": "comments",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "0"
+                }
+              ],
+              "introattachments": [],
+              "timelimit": 0,
+              "submissionattachments": 0
+            },
+            {
+              "id": 11,
+              "coursemodule": 40,
+              "course": 9,
+              "name": "Thực hành 2",
+              "intro": "Test assign 5",
+              "introformat": 1,
+              "introfiles": [],
+              "lang": "",
+              "cmid": 40,
+              "nosubmissions": 0,
+              "submissiondrafts": 0,
+              "sendnotifications": 0,
+              "sendlatenotifications": 0,
+              "sendstudentnotifications": 1,
+              "duedate": 1792515540,
+              "allowsubmissionsfromdate": 1791219600,
+              "grade": 10,
+              "gradepenalty": 0,
+              "timemodified": 1794065230,
+              "completionsubmit": 0,
+              "cutoffdate": 0,
+              "gradingduedate": 0,
+              "teamsubmission": 0,
+              "requireallteammemberssubmit": 0,
+              "teamsubmissiongroupingid": 0,
+              "blindmarking": 0,
+              "hidegrader": 0,
+              "revealidentities": 0,
+              "attemptreopenmethod": "untilpass",
+              "maxattempts": 1,
+              "markingworkflow": 0,
+              "markingallocation": 0,
+              "markercount": 0,
+              "optionalmarkercount": 0,
+              "multimarkmethod": null,
+              "multimarkrounding": null,
+              "markinganonymous": 0,
+              "requiresubmissionstatement": 0,
+              "preventsubmissionnotingroup": 0,
+              "configs": [
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "1"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimit",
+                  "value": "0"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimitenabled",
+                  "value": "0"
+                },
+                {
+                  "plugin": "comments",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "0"
+                }
+              ],
+              "introattachments": [],
+              "timelimit": 0,
+              "submissionattachments": 0
+            },
+            {
+              "id": 12,
+              "coursemodule": 41,
+              "course": 9,
+              "name": "Thực hành 3",
+              "intro": "Test assign 6",
+              "introformat": 1,
+              "introfiles": [],
+              "lang": "",
+              "cmid": 41,
+              "nosubmissions": 0,
+              "submissiondrafts": 0,
+              "sendnotifications": 0,
+              "sendlatenotifications": 0,
+              "sendstudentnotifications": 1,
+              "duedate": 1796057940,
+              "allowsubmissionsfromdate": 1793552400,
+              "grade": 10,
+              "gradepenalty": 0,
+              "timemodified": 1794065230,
+              "completionsubmit": 0,
+              "cutoffdate": 0,
+              "gradingduedate": 0,
+              "teamsubmission": 0,
+              "requireallteammemberssubmit": 0,
+              "teamsubmissiongroupingid": 0,
+              "blindmarking": 0,
+              "hidegrader": 0,
+              "revealidentities": 0,
+              "attemptreopenmethod": "untilpass",
+              "maxattempts": 1,
+              "markingworkflow": 0,
+              "markingallocation": 0,
+              "markercount": 0,
+              "optionalmarkercount": 0,
+              "multimarkmethod": null,
+              "multimarkrounding": null,
+              "markinganonymous": 0,
+              "requiresubmissionstatement": 0,
+              "preventsubmissionnotingroup": 0,
+              "configs": [
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "1"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimit",
+                  "value": "0"
+                },
+                {
+                  "plugin": "onlinetext",
+                  "subtype": "assignsubmission",
+                  "name": "wordlimitenabled",
+                  "value": "0"
+                },
+                {
+                  "plugin": "comments",
+                  "subtype": "assignsubmission",
+                  "name": "enabled",
+                  "value": "0"
+                }
+              ],
+              "introattachments": [],
+              "timelimit": 0,
+              "submissionattachments": 0
+            }
+          ]
+        }
+      ],
+      "warnings": []
+    }
+  }
+]

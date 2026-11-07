@@ -189,3 +189,12 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra: typecheck, lint, format, migration:check, 415 test (độ phủ rule-engine 92,3%, data-import 89,3%), build, e2e 2/2 (image Docker) — xanh.
 - Chạy tay trên giao diện: 24 → 29 → 35 cảnh báo, KHMT2411905 mở lại + email, hộp thoại chốt 2 SV, GV002 bị chặn hồ sơ KTPM.
 - Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md` từ bước 1 đến 12.
+
+## Phase 10a — Moodle 5.3 Docker + dữ liệu demo (2026-11-07)
+
+- Làm: nghiên cứu + chốt hướng tích hợp (`docs/tich-hop-moodle.md`); profile Docker `moodle` (Moodle 5.3 LTS ghim SHA-256 + `mod_attendance` ghim commit, PostgreSQL 17 riêng, cổng 127.0.0.1:8080); script PHP `integrations/moodle/cli/{ewars_setup,ewars_seed_demo}.php` (web service chỉ đọc 11 hàm + token; dựng khóa học / điểm danh / trắc nghiệm / thực hành theo JSON); bộ sinh `docs/demo-data/moodle/gen_moodle_demo.py`; lệnh `moodle:up|down|setup|fixtures`; client REST `src/modules/data-import/moodle/client.ts`; env tùy chọn `MOODLE_BASE_URL`, `MOODLE_WS_TOKEN`; học kỳ `HK1_2026` (không đặt hiện tại).
+- File chính: `integrations/moodle/**`, `scripts/moodle-{setup,record-fixtures}.ts`, `docs/huong-dan-moodle.md`, `tests/fixtures/moodle/*.json`, `tests/unit/data-import/moodle-client.test.ts`.
+- Kiểm tra: typecheck, lint, format, test (+5 test client), build — xanh. `moodle:fixtures` xác nhận tài khoản dịch vụ đọc được dữ liệu cả 20 sinh viên, khớp tình huống thiết kế.
+- Ghi chú: thêm commit riêng cho chế độ tự nhập demo (`demo:reset --no-data`, `demo:load --only`) làm từ trước, chưa commit.
+- Việc còn lại: Phase 10b (đồng bộ kéo + chế độ Chạy tay + trang Kết nối Moodle + kết quả mong đợi chính thức).
+- Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → mở http://localhost:8080, đăng nhập `gv.moodle` (mật khẩu `MOODLE_DEMO_PASSWORD` trong `.env`) → 2 khóa học HK1 2026–2027, mục Điểm danh có 15 buổi (12 đã điểm danh), 3 bài trắc nghiệm, 3 bài thực hành; đăng nhập `ktpm2411905` thấy chưa làm 2 bài trắc nghiệm Hệ điều hành.

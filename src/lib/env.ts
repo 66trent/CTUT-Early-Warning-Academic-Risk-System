@@ -66,6 +66,12 @@ const envSchema = z
     PRIVACY_CONTROLLER_NAME: optionalString,
     PRIVACY_CONTACT: optionalString,
     PRIVACY_RETENTION: optionalString,
+    /**
+     * Đồng bộ Moodle (Phase 10 — docs/tich-hop-moodle.md). Trống = tắt tính năng (như Google OAuth).
+     * Token web service CHỈ ĐỌC — bí mật, không ghi log.
+     */
+    MOODLE_BASE_URL: optionalString.pipe(z.url().optional()),
+    MOODLE_WS_TOKEN: optionalString,
   })
   .superRefine((env, ctx) => {
     if (!isStaffEmail(env.ADMIN_SEED_EMAIL, env.STAFF_EMAIL_DOMAIN)) {
@@ -101,6 +107,11 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
 export function getEnv(): Env {
   cached ??= parseEnv(process.env);
   return cached;
+}
+
+/** Kết nối Moodle chỉ bật khi đủ địa chỉ + token. */
+export function isMoodleConfigured(env: Env = getEnv()): boolean {
+  return Boolean(env.MOODLE_BASE_URL && env.MOODLE_WS_TOKEN);
 }
 
 /** Google OAuth chỉ bật khi đủ cả 2 biến (tránh lỗi PROVIDER_NOT_FOUND). */

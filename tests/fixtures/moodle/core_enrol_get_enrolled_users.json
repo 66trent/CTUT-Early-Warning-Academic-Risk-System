@@ -1,0 +1,1442 @@
+[
+  {
+    "params": {
+      "courseid": 8
+    },
+    "response": [
+      {
+        "id": 4,
+        "firstname": "Demo",
+        "lastname": "Giảng viên",
+        "initials": "DG",
+        "fullname": "Demo Giảng viên",
+        "email": "gv.moodle@moodle.local",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 3,
+            "name": "",
+            "shortname": "editingteacher",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "firstname": "An",
+        "lastname": "Nguyễn Minh",
+        "initials": "AN",
+        "fullname": "An Nguyễn Minh",
+        "email": "an.ktpm2411901@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411901",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "firstname": "Bích",
+        "lastname": "Trần Thị",
+        "initials": "BT",
+        "fullname": "Bích Trần Thị",
+        "email": "bich.ktpm2411902@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411902",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "firstname": "Cường",
+        "lastname": "Lê Văn",
+        "initials": "CL",
+        "fullname": "Cường Lê Văn",
+        "email": "cuong.ktpm2411903@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411903",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "firstname": "Dung",
+        "lastname": "Phạm Thị",
+        "initials": "DP",
+        "fullname": "Dung Phạm Thị",
+        "email": "dung.ktpm2411904@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411904",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "firstname": "Em",
+        "lastname": "Hoàng Văn",
+        "initials": "EH",
+        "fullname": "Em Hoàng Văn",
+        "email": "em.ktpm2411905@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411905",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "firstname": "Giang",
+        "lastname": "Võ Thị",
+        "initials": "GV",
+        "fullname": "Giang Võ Thị",
+        "email": "giang.ktpm2411906@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411906",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "firstname": "Hải",
+        "lastname": "Đặng Văn",
+        "initials": "HĐ",
+        "fullname": "Hải Đặng Văn",
+        "email": "hai.ktpm2411907@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411907",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "firstname": "Hoa",
+        "lastname": "Bùi Thị",
+        "initials": "HB",
+        "fullname": "Hoa Bùi Thị",
+        "email": "hoa.ktpm2411908@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411908",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "firstname": "Khánh",
+        "lastname": "Đỗ Văn",
+        "initials": "KĐ",
+        "fullname": "Khánh Đỗ Văn",
+        "email": "khanh.ktpm2411909@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411909",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "firstname": "Lan",
+        "lastname": "Ngô Thị",
+        "initials": "LN",
+        "fullname": "Lan Ngô Thị",
+        "email": "lan.ktpm2411910@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411910",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "firstname": "Long",
+        "lastname": "Dương Văn",
+        "initials": "LD",
+        "fullname": "Long Dương Văn",
+        "email": "long.ktpm2411911@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411911",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "firstname": "Mai",
+        "lastname": "Lý Thị",
+        "initials": "ML",
+        "fullname": "Mai Lý Thị",
+        "email": "mai.ktpm2411912@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411912",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "firstname": "Nam",
+        "lastname": "Huỳnh Văn",
+        "initials": "NH",
+        "fullname": "Nam Huỳnh Văn",
+        "email": "nam.ktpm2411913@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411913",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "firstname": "Oanh",
+        "lastname": "Phan Thị",
+        "initials": "OP",
+        "fullname": "Oanh Phan Thị",
+        "email": "oanh.ktpm2411914@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411914",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "firstname": "Phúc",
+        "lastname": "Vũ Văn",
+        "initials": "PV",
+        "fullname": "Phúc Vũ Văn",
+        "email": "phuc.ktpm2411915@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411915",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "firstname": "Quỳnh",
+        "lastname": "Trương Thị",
+        "initials": "QT",
+        "fullname": "Quỳnh Trương Thị",
+        "email": "quynh.ktpm2411916@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411916",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "firstname": "Sơn",
+        "lastname": "Mai Văn",
+        "initials": "SM",
+        "fullname": "Sơn Mai Văn",
+        "email": "son.ktpm2411917@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411917",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "firstname": "Thảo",
+        "lastname": "Hồ Thị",
+        "initials": "TH",
+        "fullname": "Thảo Hồ Thị",
+        "email": "thao.ktpm2411918@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411918",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "firstname": "Uy",
+        "lastname": "Tạ Văn",
+        "initials": "UT",
+        "fullname": "Uy Tạ Văn",
+        "email": "uy.ktpm2411919@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411919",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "firstname": "Tú",
+        "lastname": "Đặng Minh",
+        "initials": "TĐ",
+        "fullname": "Tú Đặng Minh",
+        "email": "tu.ktpm2411920@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411920",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "params": {
+      "courseid": 9
+    },
+    "response": [
+      {
+        "id": 4,
+        "firstname": "Demo",
+        "lastname": "Giảng viên",
+        "initials": "DG",
+        "fullname": "Demo Giảng viên",
+        "email": "gv.moodle@moodle.local",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 3,
+            "name": "",
+            "shortname": "editingteacher",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "firstname": "An",
+        "lastname": "Nguyễn Minh",
+        "initials": "AN",
+        "fullname": "An Nguyễn Minh",
+        "email": "an.ktpm2411901@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411901",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "firstname": "Bích",
+        "lastname": "Trần Thị",
+        "initials": "BT",
+        "fullname": "Bích Trần Thị",
+        "email": "bich.ktpm2411902@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411902",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "firstname": "Cường",
+        "lastname": "Lê Văn",
+        "initials": "CL",
+        "fullname": "Cường Lê Văn",
+        "email": "cuong.ktpm2411903@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411903",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "firstname": "Dung",
+        "lastname": "Phạm Thị",
+        "initials": "DP",
+        "fullname": "Dung Phạm Thị",
+        "email": "dung.ktpm2411904@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411904",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "firstname": "Em",
+        "lastname": "Hoàng Văn",
+        "initials": "EH",
+        "fullname": "Em Hoàng Văn",
+        "email": "em.ktpm2411905@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411905",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "firstname": "Giang",
+        "lastname": "Võ Thị",
+        "initials": "GV",
+        "fullname": "Giang Võ Thị",
+        "email": "giang.ktpm2411906@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411906",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "firstname": "Hải",
+        "lastname": "Đặng Văn",
+        "initials": "HĐ",
+        "fullname": "Hải Đặng Văn",
+        "email": "hai.ktpm2411907@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411907",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "firstname": "Hoa",
+        "lastname": "Bùi Thị",
+        "initials": "HB",
+        "fullname": "Hoa Bùi Thị",
+        "email": "hoa.ktpm2411908@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411908",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "firstname": "Khánh",
+        "lastname": "Đỗ Văn",
+        "initials": "KĐ",
+        "fullname": "Khánh Đỗ Văn",
+        "email": "khanh.ktpm2411909@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411909",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "firstname": "Lan",
+        "lastname": "Ngô Thị",
+        "initials": "LN",
+        "fullname": "Lan Ngô Thị",
+        "email": "lan.ktpm2411910@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411910",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "firstname": "Long",
+        "lastname": "Dương Văn",
+        "initials": "LD",
+        "fullname": "Long Dương Văn",
+        "email": "long.ktpm2411911@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411911",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "firstname": "Mai",
+        "lastname": "Lý Thị",
+        "initials": "ML",
+        "fullname": "Mai Lý Thị",
+        "email": "mai.ktpm2411912@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411912",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "firstname": "Nam",
+        "lastname": "Huỳnh Văn",
+        "initials": "NH",
+        "fullname": "Nam Huỳnh Văn",
+        "email": "nam.ktpm2411913@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411913",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "firstname": "Oanh",
+        "lastname": "Phan Thị",
+        "initials": "OP",
+        "fullname": "Oanh Phan Thị",
+        "email": "oanh.ktpm2411914@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411914",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "firstname": "Phúc",
+        "lastname": "Vũ Văn",
+        "initials": "PV",
+        "fullname": "Phúc Vũ Văn",
+        "email": "phuc.ktpm2411915@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411915",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "firstname": "Quỳnh",
+        "lastname": "Trương Thị",
+        "initials": "QT",
+        "fullname": "Quỳnh Trương Thị",
+        "email": "quynh.ktpm2411916@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411916",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "firstname": "Sơn",
+        "lastname": "Mai Văn",
+        "initials": "SM",
+        "fullname": "Sơn Mai Văn",
+        "email": "son.ktpm2411917@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411917",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "firstname": "Thảo",
+        "lastname": "Hồ Thị",
+        "initials": "TH",
+        "fullname": "Thảo Hồ Thị",
+        "email": "thao.ktpm2411918@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411918",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "firstname": "Uy",
+        "lastname": "Tạ Văn",
+        "initials": "UT",
+        "fullname": "Uy Tạ Văn",
+        "email": "uy.ktpm2411919@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411919",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "firstname": "Tú",
+        "lastname": "Đặng Minh",
+        "initials": "TĐ",
+        "fullname": "Tú Đặng Minh",
+        "email": "tu.ktpm2411920@student.ctuet.edu.vn",
+        "idnumber": "KTPM2411920",
+        "firstaccess": 0,
+        "lastaccess": 0,
+        "lastcourseaccess": 0,
+        "profileimageurlsmall": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f2",
+        "profileimageurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+        "roles": [
+          {
+            "roleid": 5,
+            "name": "",
+            "shortname": "student",
+            "sortorder": 0
+          }
+        ],
+        "enrolledcourses": [
+          {
+            "id": 9,
+            "fullname": "Hệ điều hành (nhóm 01) — HK1 2026–2027",
+            "shortname": "HDH-01-HK1-2026"
+          },
+          {
+            "id": 8,
+            "fullname": "Mạng máy tính (nhóm 01) — HK1 2026–2027",
+            "shortname": "MMT-01-HK1-2026"
+          }
+        ]
+      }
+    ]
+  }
+]

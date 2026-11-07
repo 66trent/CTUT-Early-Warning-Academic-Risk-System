@@ -1,0 +1,7900 @@
+[
+  {
+    "params": {
+      "attendanceid": 6
+    },
+    "response": [
+      {
+        "id": 76,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1787011200,
+        "duration": 12000,
+        "lasttaken": 1787023200,
+        "lasttakenby": 4,
+        "timemodified": 1787011200,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1201"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1202"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1203"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1204"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1205"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1206"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1207"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1208"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1209"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1210"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1211"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1212"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1213"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1214"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1215"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1216"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1217"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1218"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1219"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1220"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 77,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1787616000,
+        "duration": 12000,
+        "lasttaken": 1787628000,
+        "lasttakenby": 4,
+        "timemodified": 1787616000,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1221"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1222"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1223"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1224"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1225"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1226"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1227"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1228"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1229"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1230"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1231"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1232"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1233"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1234"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1235"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1236"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1237"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1238"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1239"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1240"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 78,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1788220800,
+        "duration": 12000,
+        "lasttaken": 1788232800,
+        "lasttakenby": 4,
+        "timemodified": 1788220800,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1241"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1242"
+          },
+          {
+            "studentid": 7,
+            "statusid": "26",
+            "remarks": "",
+            "id": "1243"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1244"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1245"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1246"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1247"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1248"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1249"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1250"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1251"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1252"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1253"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1254"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1255"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1256"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1257"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1258"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1259"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1260"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 79,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1788825600,
+        "duration": 12000,
+        "lasttaken": 1788837600,
+        "lasttakenby": 4,
+        "timemodified": 1788825600,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1261"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1262"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1263"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1264"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1265"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1266"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1267"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1268"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1269"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1270"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1271"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1272"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1273"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1274"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1275"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1276"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1277"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1278"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1279"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1280"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 80,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1789430400,
+        "duration": 12000,
+        "lasttaken": 1789442400,
+        "lasttakenby": 4,
+        "timemodified": 1789430400,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1281"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1282"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1283"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1284"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1285"
+          },
+          {
+            "studentid": 10,
+            "statusid": "28",
+            "remarks": "",
+            "id": "1286"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1287"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1288"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1289"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1290"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1291"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1292"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1293"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1294"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1295"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1296"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1297"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1298"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1299"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1300"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 81,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1790035200,
+        "duration": 12000,
+        "lasttaken": 1790047200,
+        "lasttakenby": 4,
+        "timemodified": 1790035200,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1301"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1302"
+          },
+          {
+            "studentid": 7,
+            "statusid": "26",
+            "remarks": "",
+            "id": "1303"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1304"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1305"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1306"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1307"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1308"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1309"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1310"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1311"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1312"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1313"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1314"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1315"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1316"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1317"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1318"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1319"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1320"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 82,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1790640000,
+        "duration": 12000,
+        "lasttaken": 1790652000,
+        "lasttakenby": 4,
+        "timemodified": 1790640000,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1321"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1322"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1323"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1324"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1325"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1326"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1327"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1328"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1329"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1330"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1331"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1332"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1333"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1334"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1335"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1336"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1337"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1338"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1339"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1340"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 83,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1791244800,
+        "duration": 12000,
+        "lasttaken": 1791256800,
+        "lasttakenby": 4,
+        "timemodified": 1791244800,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1341"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1342"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1343"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1344"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1345"
+          },
+          {
+            "studentid": 10,
+            "statusid": "28",
+            "remarks": "",
+            "id": "1346"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1347"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1348"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1349"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1350"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1351"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1352"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1353"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1354"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1355"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1356"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1357"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1358"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1359"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1360"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 84,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1791849600,
+        "duration": 12000,
+        "lasttaken": 1791861600,
+        "lasttakenby": 4,
+        "timemodified": 1791849600,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1361"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1362"
+          },
+          {
+            "studentid": 7,
+            "statusid": "26",
+            "remarks": "",
+            "id": "1363"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1364"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1365"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1366"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1367"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1368"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1369"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1370"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1371"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1372"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1373"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1374"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1375"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1376"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1377"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1378"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1379"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1380"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 85,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1792454400,
+        "duration": 12000,
+        "lasttaken": 1792466400,
+        "lasttakenby": 4,
+        "timemodified": 1792454400,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1381"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1382"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1383"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1384"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1385"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1386"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1387"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1388"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1389"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1390"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1391"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1392"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1393"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1394"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1395"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1396"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1397"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1398"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1399"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1400"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 86,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1793059200,
+        "duration": 12000,
+        "lasttaken": 1793071200,
+        "lasttakenby": 4,
+        "timemodified": 1793059200,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1401"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1402"
+          },
+          {
+            "studentid": 7,
+            "statusid": "26",
+            "remarks": "",
+            "id": "1403"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1404"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1405"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1406"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1407"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1408"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1409"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1410"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1411"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1412"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1413"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1414"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1415"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1416"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1417"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1418"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1419"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1420"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 87,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1793664000,
+        "duration": 12000,
+        "lasttaken": 1793676000,
+        "lasttakenby": 4,
+        "timemodified": 1793664000,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1421"
+          },
+          {
+            "studentid": 6,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1422"
+          },
+          {
+            "studentid": 7,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1423"
+          },
+          {
+            "studentid": 8,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1424"
+          },
+          {
+            "studentid": 9,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1425"
+          },
+          {
+            "studentid": 10,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1426"
+          },
+          {
+            "studentid": 11,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1427"
+          },
+          {
+            "studentid": 12,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1428"
+          },
+          {
+            "studentid": 13,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1429"
+          },
+          {
+            "studentid": 14,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1430"
+          },
+          {
+            "studentid": 15,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1431"
+          },
+          {
+            "studentid": 16,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1432"
+          },
+          {
+            "studentid": 17,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1433"
+          },
+          {
+            "studentid": 18,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1434"
+          },
+          {
+            "studentid": 19,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1435"
+          },
+          {
+            "studentid": 20,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1436"
+          },
+          {
+            "studentid": 21,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1437"
+          },
+          {
+            "studentid": 22,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1438"
+          },
+          {
+            "studentid": 23,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1439"
+          },
+          {
+            "studentid": 24,
+            "statusid": "25",
+            "remarks": "",
+            "id": "1440"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 88,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1794268800,
+        "duration": 12000,
+        "lasttaken": null,
+        "lasttakenby": 0,
+        "timemodified": 1794268800,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 89,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1794873600,
+        "duration": 12000,
+        "lasttaken": null,
+        "lasttakenby": 0,
+        "timemodified": 1794873600,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 90,
+        "attendanceid": 6,
+        "groupid": 0,
+        "sessdate": 1795478400,
+        "duration": 12000,
+        "lasttaken": null,
+        "lasttakenby": 0,
+        "timemodified": 1795478400,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 8,
+        "statuses": [
+          {
+            "id": 25,
+            "attendanceid": 6,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 27,
+            "attendanceid": 6,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 28,
+            "attendanceid": 6,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 26,
+            "attendanceid": 6,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "params": {
+      "attendanceid": 7
+    },
+    "response": [
+      {
+        "id": 91,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1787205600,
+        "duration": 12000,
+        "lasttaken": 1787217600,
+        "lasttakenby": 4,
+        "timemodified": 1787205600,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1441"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1442"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1443"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1444"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1445"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1446"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1447"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1448"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1449"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1450"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1451"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1452"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1453"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1454"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1455"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1456"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1457"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1458"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1459"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1460"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 92,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1787810400,
+        "duration": 12000,
+        "lasttaken": 1787822400,
+        "lasttakenby": 4,
+        "timemodified": 1787810400,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1461"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1462"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1463"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1464"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1465"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1466"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1467"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1468"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1469"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1470"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1471"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1472"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1473"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1474"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1475"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1476"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1477"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1478"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1479"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1480"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 93,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1788415200,
+        "duration": 12000,
+        "lasttaken": 1788427200,
+        "lasttakenby": 4,
+        "timemodified": 1788415200,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1481"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1482"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1483"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1484"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1485"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1486"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1487"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1488"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1489"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1490"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1491"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1492"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1493"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1494"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1495"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1496"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1497"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1498"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1499"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1500"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 94,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1789020000,
+        "duration": 12000,
+        "lasttaken": 1789032000,
+        "lasttakenby": 4,
+        "timemodified": 1789020000,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1501"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1502"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1503"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1504"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1505"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1506"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1507"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1508"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1509"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1510"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1511"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1512"
+          },
+          {
+            "studentid": 17,
+            "statusid": "30",
+            "remarks": "",
+            "id": "1513"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1514"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1515"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1516"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1517"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1518"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1519"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1520"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 95,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1789624800,
+        "duration": 12000,
+        "lasttaken": 1789636800,
+        "lasttakenby": 4,
+        "timemodified": 1789624800,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1521"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1522"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1523"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1524"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1525"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1526"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1527"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1528"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1529"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1530"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1531"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1532"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1533"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1534"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1535"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1536"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1537"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1538"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1539"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1540"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 96,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1790229600,
+        "duration": 12000,
+        "lasttaken": 1790241600,
+        "lasttakenby": 4,
+        "timemodified": 1790229600,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1541"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1542"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1543"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1544"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1545"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1546"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1547"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1548"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1549"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1550"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1551"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1552"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1553"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1554"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1555"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1556"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1557"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1558"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1559"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1560"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 97,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1790834400,
+        "duration": 12000,
+        "lasttaken": 1790846400,
+        "lasttakenby": 4,
+        "timemodified": 1790834400,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1561"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1562"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1563"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1564"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1565"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1566"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1567"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1568"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1569"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1570"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1571"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1572"
+          },
+          {
+            "studentid": 17,
+            "statusid": "30",
+            "remarks": "",
+            "id": "1573"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1574"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1575"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1576"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1577"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1578"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1579"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1580"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 98,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1791439200,
+        "duration": 12000,
+        "lasttaken": 1791451200,
+        "lasttakenby": 4,
+        "timemodified": 1791439200,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1581"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1582"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1583"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1584"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1585"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1586"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1587"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1588"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1589"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1590"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1591"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1592"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1593"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1594"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1595"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1596"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1597"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1598"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1599"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1600"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 99,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1792044000,
+        "duration": 12000,
+        "lasttaken": 1792056000,
+        "lasttakenby": 4,
+        "timemodified": 1792044000,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1601"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1602"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1603"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1604"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1605"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1606"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1607"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1608"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1609"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1610"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1611"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1612"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1613"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1614"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1615"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1616"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1617"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1618"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1619"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1620"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 100,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1792648800,
+        "duration": 12000,
+        "lasttaken": 1792660800,
+        "lasttakenby": 4,
+        "timemodified": 1792648800,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1621"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1622"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1623"
+          },
+          {
+            "studentid": 8,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1624"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1625"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1626"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1627"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1628"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1629"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1630"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1631"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1632"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1633"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1634"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1635"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1636"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1637"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1638"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1639"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1640"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 101,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1793253600,
+        "duration": 12000,
+        "lasttaken": 1793265600,
+        "lasttakenby": 4,
+        "timemodified": 1793253600,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1641"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1642"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1643"
+          },
+          {
+            "studentid": 8,
+            "statusid": "30",
+            "remarks": "",
+            "id": "1644"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1645"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1646"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1647"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1648"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1649"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1650"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1651"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1652"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1653"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1654"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1655"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1656"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1657"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1658"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1659"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1660"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 102,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1793858400,
+        "duration": 12000,
+        "lasttaken": 1793870400,
+        "lasttakenby": 4,
+        "timemodified": 1793858400,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [
+          {
+            "studentid": 5,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1661"
+          },
+          {
+            "studentid": 6,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1662"
+          },
+          {
+            "studentid": 7,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1663"
+          },
+          {
+            "studentid": 8,
+            "statusid": "30",
+            "remarks": "",
+            "id": "1664"
+          },
+          {
+            "studentid": 9,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1665"
+          },
+          {
+            "studentid": 10,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1666"
+          },
+          {
+            "studentid": 11,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1667"
+          },
+          {
+            "studentid": 12,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1668"
+          },
+          {
+            "studentid": 13,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1669"
+          },
+          {
+            "studentid": 14,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1670"
+          },
+          {
+            "studentid": 15,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1671"
+          },
+          {
+            "studentid": 16,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1672"
+          },
+          {
+            "studentid": 17,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1673"
+          },
+          {
+            "studentid": 18,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1674"
+          },
+          {
+            "studentid": 19,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1675"
+          },
+          {
+            "studentid": 20,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1676"
+          },
+          {
+            "studentid": 21,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1677"
+          },
+          {
+            "studentid": 22,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1678"
+          },
+          {
+            "studentid": 23,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1679"
+          },
+          {
+            "studentid": 24,
+            "statusid": "29",
+            "remarks": "",
+            "id": "1680"
+          }
+        ],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 103,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1794463200,
+        "duration": 12000,
+        "lasttaken": null,
+        "lasttakenby": 0,
+        "timemodified": 1794463200,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 104,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1795068000,
+        "duration": 12000,
+        "lasttaken": null,
+        "lasttakenby": 0,
+        "timemodified": 1795068000,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      },
+      {
+        "id": 105,
+        "attendanceid": 7,
+        "groupid": 0,
+        "sessdate": 1795672800,
+        "duration": 12000,
+        "lasttaken": null,
+        "lasttakenby": 0,
+        "timemodified": 1795672800,
+        "description": "Buổi học",
+        "descriptionformat": 1,
+        "studentscanmark": 0,
+        "absenteereport": 1,
+        "autoassignstatus": 0,
+        "preventsharedip": 0,
+        "preventsharediptime": null,
+        "statusset": 0,
+        "includeqrcode": 0,
+        "studentsearlyopentime": 0,
+        "courseid": 9,
+        "statuses": [
+          {
+            "id": 29,
+            "attendanceid": 7,
+            "acronym": "P",
+            "description": "Present",
+            "grade": 2,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 31,
+            "attendanceid": 7,
+            "acronym": "L",
+            "description": "Late",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 32,
+            "attendanceid": 7,
+            "acronym": "E",
+            "description": "Excused",
+            "grade": 1,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          },
+          {
+            "id": 30,
+            "attendanceid": 7,
+            "acronym": "A",
+            "description": "Absent",
+            "grade": 0,
+            "visible": 1,
+            "deleted": 0,
+            "setnumber": 0
+          }
+        ],
+        "attendance_log": [],
+        "users": [
+          {
+            "id": 12,
+            "firstname": "Hoa",
+            "lastname": "Bùi Thị"
+          },
+          {
+            "id": 15,
+            "firstname": "Long",
+            "lastname": "Dương Văn"
+          },
+          {
+            "id": 9,
+            "firstname": "Em",
+            "lastname": "Hoàng Văn"
+          },
+          {
+            "id": 17,
+            "firstname": "Nam",
+            "lastname": "Huỳnh Văn"
+          },
+          {
+            "id": 22,
+            "firstname": "Thảo",
+            "lastname": "Hồ Thị"
+          },
+          {
+            "id": 7,
+            "firstname": "Cường",
+            "lastname": "Lê Văn"
+          },
+          {
+            "id": 16,
+            "firstname": "Mai",
+            "lastname": "Lý Thị"
+          },
+          {
+            "id": 21,
+            "firstname": "Sơn",
+            "lastname": "Mai Văn"
+          },
+          {
+            "id": 5,
+            "firstname": "An",
+            "lastname": "Nguyễn Minh"
+          },
+          {
+            "id": 14,
+            "firstname": "Lan",
+            "lastname": "Ngô Thị"
+          },
+          {
+            "id": 18,
+            "firstname": "Oanh",
+            "lastname": "Phan Thị"
+          },
+          {
+            "id": 8,
+            "firstname": "Dung",
+            "lastname": "Phạm Thị"
+          },
+          {
+            "id": 20,
+            "firstname": "Quỳnh",
+            "lastname": "Trương Thị"
+          },
+          {
+            "id": 6,
+            "firstname": "Bích",
+            "lastname": "Trần Thị"
+          },
+          {
+            "id": 23,
+            "firstname": "Uy",
+            "lastname": "Tạ Văn"
+          },
+          {
+            "id": 10,
+            "firstname": "Giang",
+            "lastname": "Võ Thị"
+          },
+          {
+            "id": 19,
+            "firstname": "Phúc",
+            "lastname": "Vũ Văn"
+          },
+          {
+            "id": 24,
+            "firstname": "Tú",
+            "lastname": "Đặng Minh"
+          },
+          {
+            "id": 11,
+            "firstname": "Hải",
+            "lastname": "Đặng Văn"
+          },
+          {
+            "id": 13,
+            "firstname": "Khánh",
+            "lastname": "Đỗ Văn"
+          }
+        ]
+      }
+    ]
+  }
+]

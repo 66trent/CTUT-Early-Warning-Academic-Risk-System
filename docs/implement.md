@@ -4,7 +4,7 @@
 >
 > Nguồn sự thật: `docs/rules/00`–`12`. Bộ dữ liệu nghiệm thu: `docs/demo-data/` + `KET_QUA_MONG_DOI.md`. Bài học từ dự án cũ: `docs/bai-hoc-du-an-cu.md` — đọc trước Phase 0.
 >
-> Phạm vi: 3 role; nhập CSV từ 3 nguồn (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần) + danh sách sinh viên; 10 luật trong `08` (từ Phase 8a: 12 luật, LMS tách bài trắc nghiệm / bài thực hành). Ngoài phạm vi: API đồng bộ SIS/LMS, SMS, lịch học từng buổi, đăng ký học phần riêng.
+> Phạm vi: 3 role; nhập CSV từ 3 nguồn (điểm danh tổng hợp, bài kiểm tra LMS, kết quả học phần) + danh sách sinh viên; 10 luật trong `08` (từ Phase 8a: 12 luật, LMS tách bài trắc nghiệm / bài thực hành). Ngoài phạm vi: API đồng bộ SIS, SMS, lịch học từng buổi, đăng ký học phần riêng. Đồng bộ LMS **Moodle** đưa vào phạm vi từ Phase 10 (giảng viên yêu cầu, chốt 2026-11-07 — `docs/tich-hop-moodle.md`).
 
 ## Nguyên tắc mỗi vòng lặp
 
@@ -30,6 +30,7 @@
 | 8a | Điều chỉnh theo dữ liệu thật: quy chế 336, mẫu file, 12 luật | 7 |
 | 8b | Giao diện trực quan + nạp nhiều file | 8a |
 | 9 | Mở rộng dữ liệu demo: thêm môn, lớp, khoa, học kỳ trước; kịch bản nhỏ | 8b |
+| 10 | Đồng bộ Moodle (điểm danh, trắc nghiệm, thực hành) — Tự động + Chạy tay | 9c |
 
 ---
 
@@ -334,3 +335,33 @@ Kịch bản nói (thuyết trình + demo + trả lời câu hỏi) theo các ph
 **DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build`, e2e xanh. **Kiểm tra tay:** trình diễn trọn kịch bản chính theo `demo-script.md`; mỗi câu hỏi trong bảng mở được đúng màn hình.
 
 **Kết quả (2026-10-24):** đạt DoD — typecheck, lint, format, migration:check, 415 test, build xanh; độ phủ đo lại (rule-engine 92,3%, data-import 89,3%, alerts 82,6%, admin 79,0%, toàn bộ 85,7%); e2e 2/2 xanh trên image Docker production. Kiểm tay trên giao diện (từ `demo:reset -- --yes`): mốc 10/10 → 41 dấu hiệu, 24 cảnh báo, KHDL 901/918/919 = Đủ / Một phần / Chưa đủ; lọc ngành KTPM 10; GV004 chỉ thấy 5, giải quyết KHMT2411905 → mốc 20/11 → 27 dấu hiệu, 29 cảnh báo, 905 **Mở lại** + thông báo "cảnh báo đã đóng có dấu hiệu mới" + email MailHog; hộp thoại chốt liệt kê đúng 2 sinh viên → 29 dấu hiệu, 35 cảnh báo; lọc HTTT 6; GV002 mở hồ sơ KTPM2411903 → bị chặn. Ảnh chụp lại theo v3 (62 ảnh + 4 ảnh sau chốt `--closed`, 0 tràn ngang); diễn tập khôi phục bộ v3 (32 bảng khớp). Gỡ `demo:scenario` + `scripts/load-scenario.ts`. Thêm ngoài kế hoạch: kịch bản nói `docs/bao-cao/kich-ban-thuyet-trinh.md`; cập nhật báo cáo Word theo trạng thái sau 9b (12 luật, bộ v3, 6 sơ đồ vẽ lại, ảnh mới, số đo mới). Phát hiện khi chạy tay: hộp thoại chốt có ô mốc dữ liệu riêng — phải điền 2025-12-31 (đã ghi vào kịch bản).
+
+---
+
+## Phase 10 — Đồng bộ Moodle (chốt hướng 2026-11-07, chưa làm)
+
+Nghiên cứu + thiết kế: `docs/tich-hop-moodle.md` (mục 9 = quyết định đã chốt). Rule engine, 12 luật, cảnh báo, giao diện CVHT/sinh viên KHÔNG đổi; bộ đồng bộ sinh CSV đúng mẫu → đi qua đường nạp nhiều file có sẵn (nguồn `MOODLE`). Kết quả học phần vẫn nạp file. Đã chốt thêm (2026-11-07): 1 tiết = 50 phút; học kỳ demo theo ngày thật `HK1_2026` 17/08–27/12/2026 (giá trị demo); Course ID number = mã lớp học phần, mã học phần = bỏ 2 số cuối, không xác minh với trường; dữ liệu Moodle demo dựng bằng script HOẶC người dùng tự làm tay. Khi code: cập nhật rules `00`, `01`, `04`, `05`, `06`, `07`, `10`, `12`.
+
+### Phase 10a — Moodle 5.3 Docker + dữ liệu demo
+- [x] `docker-compose.yml` profile `moodle`: Moodle 5.3 LTS + `mod_attendance` (nhánh `MOODLE_503_STABLE`), cổng `127.0.0.1`.
+- [x] Script dựng dữ liệu Moodle demo (khóa học = lớp học phần, sinh viên ID number = MSSV, bài trắc nghiệm/thực hành có hạn nộp, buổi điểm danh) + học kỳ demo riêng theo ngày thật trong EWARS.
+- [x] Hướng dẫn tự làm tay `docs/huong-dan-moodle.md` (tạo khóa học, sinh viên, ghi danh, điểm danh, trắc nghiệm, thực hành trên Moodle → liên kết + đồng bộ bên EWARS).
+- [x] External service chỉ hàm đọc + tài khoản dịch vụ + token; ghi lại JSON mẫu làm fixture test.
+
+**Kết quả 10a (2026-11-07):** `npm run moodle:up` dựng Moodle 5.3 (Build 20261005) + `mod_attendance` 2026090300 trên PostgreSQL 17 (Moodle 5.3 đòi ≥ 17); `npm run moodle:setup` cấu hình web service chỉ đọc (11 hàm, tài khoản `ewars_sync`, token ghi `.env`), tạo học kỳ `HK1_2026` (không phải học kỳ hiện tại — bộ v3 giữ `HK1_2025`), dựng 2 khóa học KTPM2411 (Mạng máy tính `010100089201`, Hệ điều hành `010100089101`: 30 buổi, 79 lượt trắc nghiệm, 6 bài thực hành) từ `docs/demo-data/moodle/moodle-demo.json`; `--manual` chỉ tạo tài khoản để tự làm tay. `npm run moodle:fixtures` gọi đủ 11 hàm, so khớp tình huống (vắng A/E, lượt làm dở, 2 lượt, nộp trễ, gia hạn) → `tests/fixtures/moodle/`. Client REST `data-import/moodle/client.ts` + 5 test. Phát hiện: `mod_assign_get_assignments` cần `includenotenrolledcourses`; bộ sinh câu hỏi/lượt làm của Moodle chỉ chạy trong unit test → script tự gọi API lưu câu hỏi + `quiz_attempt`. Typecheck, lint, format, test, build xanh. Kiểm tay giao diện Moodle: người dùng tự đăng nhập (`docs/huong-dan-moodle.md`).
+
+### Phase 10b — Đồng bộ kéo + chế độ Chạy tay
+- [ ] `ImportSource.MOODLE` (migration), `MoodleCourseLink`, tài khoản hệ thống "Đồng bộ Moodle".
+- [ ] `data-import/moodle/`: client REST (POST, timeout, retry), 3 mapper thuần (điểm danh quy đổi phút → tiết, trắc nghiệm, thực hành), sinh CSV → lô `STAGED` → xem trước → xác nhận.
+- [ ] Queue `moodle-sync`; trang **Kết nối Moodle** (trạng thái, liên kết khóa học, chế độ, Đồng bộ ngay, lỗi gần nhất); nhãn nguồn Moodle ở lịch sử nạp + bảng độ mới; Audit Log.
+- [ ] Test mapper (fixture JSON) + tích hợp đồng bộ với máy chủ Moodle giả.
+
+### Phase 10c — Chế độ Tự động (thời gian thực)
+- [ ] Plugin `integrations/moodle/local_ewars` (observer + adhoc task + HMAC) theo bảng sự kiện mục 4b.
+- [ ] `POST /api/integrations/moodle/events` (HMAC, chống gửi lại, idempotent `MoodleEventInbox`) → gom job theo khóa → tự xác nhận → tự đánh giá.
+- [ ] Job hẹn giờ lúc hết hạn nộp (mục 4c) + lịch 10 phút + đồng bộ đầy đủ mỗi đêm.
+
+### Phase 10d — Trình diễn + báo cáo
+- [ ] Kịch bản demo Moodle (giảng viên điểm danh / sinh viên nộp bài → CVHT thấy cảnh báo), sơ đồ tích hợp cho báo cáo, ảnh chụp.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` xanh; bộ demo v3 + test nghiệm thu không đổi. **Kiểm tra tay:** điểm danh vắng / nộp bài trên Moodle local → ≤ 2 phút CVHT thấy thay đổi; bài quá hạn chưa nộp → cảnh báo ≤ 10 phút sau hạn; chế độ Chạy tay hiện xem trước trước khi nạp.
