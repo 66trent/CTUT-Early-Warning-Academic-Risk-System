@@ -23,6 +23,28 @@ npm run demo:reset -- --yes
 - **Phương án B:** video quay sẵn trọn kịch bản chính + ảnh `docs/screenshots/`. Máy trục trặc → mở video, nói như dưới.
 - Kiểm tra nhanh (tùy chọn): `npm run demo:reset -- --yes --evaluate=2` → `npm run test:e2e` → `npm run demo:reset -- --yes` để trả lại trạng thái ban đầu.
 
+## Chế độ tự nhập dữ liệu (người trình bày nạp 7 lô trước hội đồng)
+
+```bash
+npm run demo:reset -- --yes --no-data
+```
+
+Hệ thống chỉ có khoa, ngành, 5 lớp, GV001–GV005, 2 học kỳ — chưa có sinh viên. Thay **bước 2** bên dưới bằng: Admin → **Nhập dữ liệu**, nạp lần lượt 7 lô (chọn **Loại dữ liệu** + **Học kỳ** trước, rồi Ctrl + A chọn hết file trong thư mục → **Tải lên và kiểm tra** → **Xác nhận nạp**). Lời nói từng lô: `docs/bao-cao/kich-ban-thuyet-trinh.md` mục D2.
+
+| Lô | Thư mục | Loại dữ liệu | Học kỳ | Xem trước |
+|---|---|---|---|---|
+| 1 | `01_sinh_vien.csv` | Danh sách sinh viên | — | 100 dòng |
+| 2 | `02_HK3_2024_ket_qua` (30 file) | Kết quả học phần | Học kỳ 3, 2024–2025 | 582 dòng |
+| 3 | `03_HK1_2025_diem_danh` (32 file) | Điểm danh | Học kỳ 1, 2025–2026 | 600 dòng + 1 cảnh báo tên (Tuấn ≠ Tú) |
+| 4 | `04_HK1_2025_trac_nghiem` (10 file) | Bài trắc nghiệm LMS | Học kỳ 1, 2025–2026 | 400 dòng |
+| 5 | `05_HK1_2025_thuc_hanh` (9 file) | Bài thực hành LMS | Học kỳ 1, 2025–2026 | 404 dòng |
+| 6 | `06_HK1_2025_ket_qua_logic_hoc` (4 file) | Kết quả học phần | Học kỳ 1, 2025–2026 | 80 dòng |
+| 7 | `07_HK1_2025_ket_qua_cuoi_ky` (12 file) | Kết quả học phần | Học kỳ 1, 2025–2026 | 219 dòng |
+
+- **Nạp đủ 7 lô rồi mới chạy đánh giá** (thứ tự đã kiểm thử → 24 → 29 → 35). Chạy mốc 10/10 khi chưa có lô 07 thì `KHDL2411919` chưa có trong học kỳ (chỉ học XSTK — không điểm danh, không LMS) → mất ví dụ "Chưa đủ dữ liệu" (xét 99 thay vì 100 sinh viên; số cảnh báo không đổi).
+- Thêm ≈ 5 phút (cả demo ≈ 15 phút). Lô lỗi / quá giờ: `npm run demo:load -- --only=04,05,06,07` (các số lô chưa nạp).
+- **Không mở rồi lưu file CSV bằng Excel** (mất số 0 đầu mã, ngày đổi kiểu Mỹ). Lỡ lưu: `git checkout -- docs/demo-data`.
+
 **Thứ tự KHÔNG đảo được** — trạng thái chỉ đi 1 chiều:
 1. Vòng đời KHMT (bước 7) phải làm **trước** Chạy 2 — sau Chạy 2 không quay lại được (lần chạy mốc cũ hơn chỉ gắn bằng chứng).
 2. Chốt học kỳ (bước 10) là **bước cuối** — sau chốt không nạp, không chạy học kỳ đó nữa. Mọi thao tác cần học kỳ mở (nạp file lỗi, chạy thử luật, rút học phần, chạy theo học phần) làm trước.

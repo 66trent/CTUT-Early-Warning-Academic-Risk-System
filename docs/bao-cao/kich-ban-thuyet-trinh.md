@@ -177,7 +177,7 @@ Nếu bị hỏi bất ngờ "tóm lại hệ thống làm gì?", đọc đúng 
 
 ---
 
-## Phần 3 — Lời nói khi demo (~10 phút)
+## Phần 3 — Lời nói khi demo (~10 phút; tự nhập dữ liệu ≈ 15 phút)
 
 ### Chuẩn bị trước giờ bảo vệ (≥ 15 phút trước)
 
@@ -186,9 +186,12 @@ docker compose --profile dev up -d
 ```
 
 ```bash
-npm run demo:reset -- --yes
+npm run demo:reset -- --yes --no-data
 ```
 
+- `--no-data`: hệ thống chỉ có khoa, ngành, 5 lớp, 5 cố vấn, 2 học kỳ — **chưa có sinh viên, chưa có dữ liệu**. Bạn tự nhập 7 lô ở bước D2. (Muốn bỏ phần tự nhập thì dùng `npm run demo:reset -- --yes` — hệ thống nạp sẵn 7 lô, làm theo bản D2 cũ trong `docs/demo-script.md`.)
+- **TUYỆT ĐỐI không mở rồi bấm Lưu các file CSV bằng Excel.** Excel sẽ xóa số 0 đầu mã (`010100240802` → `10100240802`) và đổi ngày sang kiểu Mỹ (`2025-08-15` → `8/15/2025`) — nạp vào sẽ sai. Đã từng xảy ra với 9 file (bản hỏng cất ở `backups/demo-data-excel-hong-20261031/`). Lỡ mở rồi: đóng **không lưu**, hoặc chạy `git checkout -- docs/demo-data`.
+- Tập trước ít nhất 1 lần **có bấm giờ** phần D2 — mục tiêu ≤ 6 phút.
 - Ba cửa sổ, **mỗi vai đăng nhập 1 lần** (đăng nhập nhanh giới hạn 10 lần/phút):
   - Chrome thường → Quản trị viên.
   - Trình duyệt thứ hai (Edge) → Cố vấn học tập (đổi GV001 ↔ GV004 trong cửa sổ này).
@@ -203,23 +206,47 @@ npm run demo:reset -- --yes
 
 *"Đây là màn hình đăng nhập. Sinh viên chỉ có nút Google, cán bộ đăng nhập bằng email và mật khẩu. Ở dưới có liên kết chính sách bảo vệ dữ liệu cá nhân. Vì đang ở chế độ demo, em có nút đăng nhập nhanh — chế độ này tắt khi triển khai thật."*
 
-### D2 — Quản trị: Bắt đầu và Nhập dữ liệu (0:30 → 2:15)
+### D2 — Quản trị: tự nhập dữ liệu (0:30 → 6:30)
 
 [Đăng nhập nhanh Quản trị viên → trang **Bắt đầu**.]
 
-*"Trang Bắt đầu hướng dẫn quản trị viên làm theo đúng thứ tự: thiết lập khoa, lớp, sinh viên; rồi mỗi học kỳ; rồi hằng tuần. Bước nào chưa đủ dữ liệu thì bị khóa."*
+*"Trang Bắt đầu hướng dẫn quản trị viên làm theo đúng thứ tự: thiết lập khoa, lớp, sinh viên; rồi mỗi học kỳ; rồi hằng tuần. Hiện hệ thống mới có khoa, lớp và cố vấn — chưa có sinh viên nào. Em sẽ tự nhập toàn bộ dữ liệu, đúng như phòng Đào tạo làm hằng tuần."*
 
-[Mở **Nhập dữ liệu** → lô Điểm danh.]
+[Mở **Nhập dữ liệu**.]
 
-*"Đây là một lần nhập điểm danh gồm 32 file — đúng như trường xuất, mỗi lớp học phần một file. Hệ thống tự nhận ra 16 lớp học phần. Có một cảnh báo ở đây:"* [chỉ] *"tên trong file ghi 'Tuấn', còn hồ sơ là 'Tú' — hệ thống không tự sửa, chỉ nhắc người nhập kiểm tra."*
+**Cách làm mỗi lô (lặp 7 lần):**
+1. Chọn **Loại dữ liệu** → chọn **Học kỳ** (lô 01 không có ô này) → để **Học phần (tùy chọn)** là "Tự nhận diện từ file".
+2. Bấm **chọn file** → mở đúng thư mục trong `docs/demo-data/` → **Ctrl + A** chọn hết file trong thư mục → Open. (Hoặc kéo cả nhóm file thả vào khung.)
+3. Bấm **Tải lên và kiểm tra** → chờ màn **Xem trước** → đọc to con số → bấm **Xác nhận nạp N dòng** → chờ "Đã nạp".
+4. Bấm **Nhập dữ liệu** ở thanh bên để quay lại, làm lô tiếp theo.
 
-[Quay lại, chỉ bảng **Học phần nào cần nạp dữ liệu**.]
+| Lô | Thư mục / file | Loại dữ liệu | Học kỳ | Xem trước phải thấy |
+|---|---|---|---|---|
+| 1 | `01_sinh_vien.csv` (1 file) | Danh sách sinh viên | — | 100 dòng, 0 lỗi |
+| 2 | `02_HK3_2024_ket_qua` (30 file) | Kết quả học phần | **Học kỳ 3, 2024–2025** | 582 dòng, 0 lỗi |
+| 3 | `03_HK1_2025_diem_danh` (32 file) | Điểm danh | Học kỳ 1, 2025–2026 | 600 dòng, 0 lỗi, **1 cảnh báo tên** (Tuấn ≠ Tú) |
+| 4 | `04_HK1_2025_trac_nghiem` (10 file) | Bài trắc nghiệm LMS | Học kỳ 1, 2025–2026 | 400 dòng, 0 lỗi |
+| 5 | `05_HK1_2025_thuc_hanh` (9 file) | Bài thực hành LMS | Học kỳ 1, 2025–2026 | 404 dòng, 0 lỗi |
+| 6 | `06_HK1_2025_ket_qua_logic_hoc` (4 file) | Kết quả học phần | Học kỳ 1, 2025–2026 | 80 dòng, 0 lỗi |
+| 7 | `07_HK1_2025_ket_qua_cuoi_ky` (12 file) | Kết quả học phần | Học kỳ 1, 2025–2026 | 219 dòng, 0 lỗi |
 
-*"Bảng này cho biết học phần nào đã có dữ liệu, học phần nào chậm."*
+**Lời nói khi nhập** (không cần nói hết — nói trong lúc chờ màn xem trước):
 
-[Chọn loại Điểm danh → kéo file trong `docs/demo-data/minh-hoa-loi/`.]
+- Lô 1: *"Đầu tiên là danh sách sinh viên — 100 bạn của 5 lớp khóa 2024. Mọi dữ liệu sau đều phải khớp với danh sách này; mã sinh viên lạ sẽ bị đánh dấu lỗi, hệ thống không tự tạo sinh viên."* [Xem trước:] *"100 dòng hợp lệ, 0 lỗi. Dữ liệu **chưa được ghi** cho tới khi em bấm xác nhận — đây là nhập hai bước."*
+- Lô 2: *"Tiếp theo là điểm của học kỳ **trước** — em chọn đúng Học kỳ 3. Hệ thống cần điểm kỳ trước để biết ai đang **học lại** và ai **sa sút** so với kỳ trước."*
+- Lô 3: *"Đây là điểm danh: 32 file, đúng như trường xuất — mỗi lớp học phần một file, mỗi ngày chốt một file. Em chọn cả 32 file một lần."* [Xem trước, chỉ bảng từng file:] *"Hệ thống tự nhận ra 16 lớp học phần. Có một cảnh báo:"* [chỉ] *"tên trong file ghi 'Tuấn', hồ sơ là 'Tú' — hệ thống không tự sửa, chỉ nhắc người nhập kiểm tra có nhầm mã sinh viên không."*
+- Lô 4–5: *"Hai lô này lấy từ hệ thống học trực tuyến: bài trắc nghiệm và trạng thái nộp bài thực hành, có hạn nộp từng bài."*
+- Lô 6–7: *"Cuối cùng là kết quả các môn đã khóa điểm — môn Logic học công bố ngày 16/11, các môn còn lại ngày 28/12. Em nạp hết bây giờ để thầy cô thấy: khi chạy đánh giá ở mốc tháng 10, hệ thống sẽ **không** dùng các điểm này."*
+
+[Sau lô 7, ở trang Nhập dữ liệu, chỉ bảng **Học phần nào cần nạp dữ liệu** và **Lịch sử nạp dữ liệu**.]
+
+*"Bảng này cho biết học phần nào đã có dữ liệu, học phần nào chậm. Lịch sử ghi lại mọi lô, file gốc được lưu để đối chiếu; nạp nhầm thì hoàn tác được."*
+
+[Chọn loại Điểm danh, học kỳ 1 2025–2026 → chọn file `docs/demo-data/minh-hoa-loi/010100077305_2025-10-16_co_loi.csv`.]
 
 *"Giờ em thử nạp một file có lỗi."* [chờ] *"Hệ thống chỉ ra hai dòng lỗi: một mã sinh viên không tồn tại, một ngày viết kiểu Mỹ. Ngày không rõ thì hệ thống **từ chối chứ không đoán**. Người nhập tải file lỗi về sửa rồi nạp lại. Ở đây em hủy lô này."* [Bấm **Hủy lô**.]
+
+> Từ đây trở xuống, mốc giờ ghi trong tiêu đề là của bản không tự nhập — khi tự nhập, **cộng thêm khoảng 5 phút** (cả phần demo ≈ 15 phút).
 
 ### D3 — Chạy đánh giá mốc 10/10 (2:15 → 3:00)
 
@@ -329,6 +356,7 @@ npm run demo:reset -- --yes
 
 ### Nếu đang trễ giờ — bỏ theo thứ tự này
 
+0. Ở phần tự nhập (D2): chỉ nói ở lô 1, 2, 3; lô 4–7 nhập im lặng. Vẫn trễ thì nạp các lô còn lại bằng lệnh dự phòng (Phần 5).
 1. Bỏ câu so sánh sinh viên 904 (D5).
 2. Bỏ D9 (cấu hình luật) — chỉ nói một câu: *"Ngưỡng đổi được trên giao diện, có phiên bản và chạy thử."*
 3. Bỏ D4 lọc ngành — chỉ nói câu "Chưa đủ dữ liệu".
@@ -443,6 +471,10 @@ npm run demo:reset -- --yes
 | Lỗi / trắng trang | *"Dạ, máy demo đang gặp sự cố, em xin phép chuyển sang video em đã quay sẵn từ đúng dữ liệu này."* | Mở video, nói theo Phần 3 |
 | Bấm nhầm, kích hoạt luật | *"Em vừa kích hoạt nhầm; số liệu phía sau sẽ khác một chút, phần còn lại không đổi."* | Đi tiếp, không cố sửa trước hội đồng |
 | Quên bước tiếp theo | *"Tiếp theo em xin trình bày phần…"* | Nhìn bản in Phần 3 (để sẵn trên bàn) |
+| Chọn nhầm loại dữ liệu / học kỳ khi nhập (xem trước báo lỗi hàng loạt) | *"Em chọn nhầm học kỳ — đây cũng là lý do hệ thống cho xem trước rồi mới ghi."* | Bấm **Hủy lô**, chọn lại cho đúng, tải lại |
+| Đã lỡ xác nhận nạp sai | *"Lô này nạp nhầm, em hoàn tác."* | Mở lô → **Hoàn tác lô** → nạp lại đúng |
+| Một lô tải lên bị treo / lỗi | *"Phần nhập này em đã chuẩn bị sẵn lệnh dự phòng."* | Ở terminal: `npm run demo:load -- --only=03` (thay `03` bằng số lô đang lỗi; nạp nhiều lô: `--only=03,04,05`) rồi tải lại trang |
+| Quá giờ ở phần nhập | *"Các lô còn lại làm giống hệt, em xin phép nạp nhanh."* | Terminal: `npm run demo:load -- --only=04,05,06,07` (các lô chưa nạp) |
 
 ---
 
@@ -450,5 +482,6 @@ npm run demo:reset -- --yes
 
 - **Câu một dòng:** gom 4 nguồn → 12 luật → cảnh báo cố vấn → chỉ tham khảo.
 - **Số cần nhớ:** 5 lớp × 20 SV · 41 dấu hiệu → **24** cảnh báo (10/10) → **29** (20/11) → **35** (chốt) · vắng **> 20%** cấm thi · A = **3,8** · trọng số 0,4/0,3/0,3 · >400 test · 5.000 SV ~27 giây.
-- **Thứ tự demo:** Đăng nhập → Bắt đầu → Nhập (32 file, Tuấn/Tú, file lỗi) → Chạy 10/10 → Tổng quan (KHDL 919) → GV001 ma trận, 903, xác nhận → SV 903 → GV004 giải quyết 905 → Chạy 20/11 → 905 mở lại + MailHog → Chạy thử luật 8% (bỏ) → Chốt → HTTT 908, KTPM 918 → Nhật ký.
+- **Thứ tự nhập (D2):** 01 sinh viên → 02 kết quả **HK3** → 03 điểm danh → 04 trắc nghiệm → 05 thực hành → 06 Logic → 07 cuối kỳ (6 lô sau chọn Học kỳ 1, 2025–2026). Chọn **loại + học kỳ trước**, rồi Ctrl + A chọn hết file.
+- **Thứ tự demo:** Đăng nhập → Bắt đầu → Tự nhập 7 lô (Tuấn/Tú) → file lỗi → Chạy 10/10 → Tổng quan (KHDL 919) → GV001 ma trận, 903, xác nhận → SV 903 → GV004 giải quyết 905 → Chạy 20/11 → 905 mở lại + MailHog → Chạy thử luật 8% (bỏ) → Chốt → HTTT 908, KTPM 918 → Nhật ký.
 - **Ba điều phải nói bằng được:** (1) không tự quyết học vụ; (2) thiếu dữ liệu ≠ an toàn; (3) đã giải quyết mà xấu hơn thì tự mở lại.

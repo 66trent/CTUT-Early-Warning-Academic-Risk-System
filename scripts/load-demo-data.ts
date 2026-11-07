@@ -3,7 +3,7 @@
  * qua ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
  * Mỗi thư mục = 1 lô nhiều file (1 file / lớp học phần như trường xuất — Phase 8f).
  * Mặc định nạp 02–07 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
- * nạp cả 01 trước (dùng trong `demo:reset`).
+ * nạp cả 01 trước (dùng trong `demo:reset`). `--only=02,03` chỉ nạp các bước đó (VD sau `demo:reset --no-data`).
  */
 import 'dotenv/config';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -57,7 +57,13 @@ async function waitFor(batchId: string, done: (b: ImportBatch) => boolean): Prom
 
 async function main(): Promise<void> {
   if (!getEnv().DEMO_MODE) throw new Error('demo:load chỉ chạy khi DEMO_MODE=true.');
-  const files = process.argv.includes('--with-students') ? [STUDENTS_FILE, ...FILES] : FILES;
+  const all = process.argv.includes('--with-students') ? [STUDENTS_FILE, ...FILES] : FILES;
+  // `--only=03,04`: chỉ nạp các thư mục / file có tiền tố số đó (cứu nhanh khi nạp tay trên giao diện lỗi).
+  const only = process.argv
+    .find((a) => a.startsWith('--only='))
+    ?.slice('--only='.length)
+    .split(',');
+  const files = only ? all.filter(([file]) => only.some((n) => file.startsWith(n))) : all;
   for (const [file, dataType, termId] of files) {
     const { batchId } = await createImportBatch(
       { dataType, termId, parentBatchId: null, files: filesOf(file) },
