@@ -1,505 +1,15 @@
 [
   {
     "params": {
-      "assignmentids": [7, 8, 9]
+      "assignmentids": [13, 14, 15]
     },
     "response": {
       "assignments": [
         {
-          "assignmentid": 7,
+          "assignmentid": 13,
           "submissions": [
             {
-              "id": 89,
-              "userid": 14,
-              "attemptnumber": 0,
-              "timecreated": 1789906140,
-              "timemodified": 1789906140,
-              "timestarted": 1789906140,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411910",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 90,
-              "userid": 15,
-              "attemptnumber": 0,
-              "timecreated": 1789819800,
-              "timemodified": 1789819800,
-              "timestarted": 1789819800,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411911",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 91,
-              "userid": 16,
-              "attemptnumber": 0,
-              "timecreated": 1789733460,
-              "timemodified": 1789733460,
-              "timestarted": 1789733460,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411912",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 92,
-              "userid": 17,
-              "attemptnumber": 0,
-              "timecreated": 1789992720,
-              "timemodified": 1789992720,
-              "timestarted": 1789992720,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411913",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 93,
-              "userid": 18,
-              "attemptnumber": 0,
-              "timecreated": 1789906380,
-              "timemodified": 1789906380,
-              "timestarted": 1789906380,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411914",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 81,
-              "userid": 5,
-              "attemptnumber": 0,
-              "timecreated": 1789992000,
-              "timemodified": 1789992000,
-              "timestarted": 1789992000,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411901",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 82,
-              "userid": 6,
-              "attemptnumber": 0,
-              "timecreated": 1789905660,
-              "timemodified": 1789905660,
-              "timestarted": 1789905660,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411902",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 94,
-              "userid": 19,
-              "attemptnumber": 0,
-              "timecreated": 1789820040,
-              "timemodified": 1789820040,
-              "timestarted": 1789820040,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411915",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 83,
-              "userid": 7,
-              "attemptnumber": 0,
-              "timecreated": 1789819320,
-              "timemodified": 1789819320,
-              "timestarted": 1789819320,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411903",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 84,
-              "userid": 8,
-              "attemptnumber": 0,
-              "timecreated": 1789732980,
-              "timemodified": 1789732980,
-              "timestarted": 1789732980,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411904",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 85,
-              "userid": 9,
-              "attemptnumber": 0,
-              "timecreated": 1789992240,
-              "timemodified": 1789992240,
-              "timestarted": 1789992240,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411905",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 95,
-              "userid": 20,
-              "attemptnumber": 0,
-              "timecreated": 1789733700,
-              "timemodified": 1789733700,
-              "timestarted": 1789733700,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411916",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 86,
-              "userid": 10,
-              "attemptnumber": 0,
-              "timecreated": 1789905900,
-              "timemodified": 1789905900,
-              "timestarted": 1789905900,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411906",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 87,
-              "userid": 12,
-              "attemptnumber": 0,
-              "timecreated": 1789733220,
-              "timemodified": 1789733220,
-              "timestarted": 1789733220,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411908",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 88,
+              "id": 174,
               "userid": 13,
               "attemptnumber": 0,
               "timecreated": 1790258400,
@@ -534,7 +44,497 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 96,
+              "id": 167,
+              "userid": 5,
+              "attemptnumber": 0,
+              "timecreated": 1789992000,
+              "timemodified": 1789992000,
+              "timestarted": 1789992000,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411901",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 168,
+              "userid": 6,
+              "attemptnumber": 0,
+              "timecreated": 1789905660,
+              "timemodified": 1789905660,
+              "timestarted": 1789905660,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411902",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 175,
+              "userid": 14,
+              "attemptnumber": 0,
+              "timecreated": 1789906140,
+              "timemodified": 1789906140,
+              "timestarted": 1789906140,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411910",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 169,
+              "userid": 7,
+              "attemptnumber": 0,
+              "timecreated": 1789819320,
+              "timemodified": 1789819320,
+              "timestarted": 1789819320,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411903",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 170,
+              "userid": 8,
+              "attemptnumber": 0,
+              "timecreated": 1789732980,
+              "timemodified": 1789732980,
+              "timestarted": 1789732980,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411904",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 176,
+              "userid": 15,
+              "attemptnumber": 0,
+              "timecreated": 1789819800,
+              "timemodified": 1789819800,
+              "timestarted": 1789819800,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411911",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 171,
+              "userid": 9,
+              "attemptnumber": 0,
+              "timecreated": 1789992240,
+              "timemodified": 1789992240,
+              "timestarted": 1789992240,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411905",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 177,
+              "userid": 16,
+              "attemptnumber": 0,
+              "timecreated": 1789733460,
+              "timemodified": 1789733460,
+              "timestarted": 1789733460,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411912",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 172,
+              "userid": 10,
+              "attemptnumber": 0,
+              "timecreated": 1789905900,
+              "timemodified": 1789905900,
+              "timestarted": 1789905900,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411906",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 173,
+              "userid": 12,
+              "attemptnumber": 0,
+              "timecreated": 1789733220,
+              "timemodified": 1789733220,
+              "timestarted": 1789733220,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411908",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 178,
+              "userid": 17,
+              "attemptnumber": 0,
+              "timecreated": 1789992720,
+              "timemodified": 1789992720,
+              "timestarted": 1789992720,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411913",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 179,
+              "userid": 18,
+              "attemptnumber": 0,
+              "timecreated": 1789906380,
+              "timemodified": 1789906380,
+              "timestarted": 1789906380,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411914",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 180,
+              "userid": 19,
+              "attemptnumber": 0,
+              "timecreated": 1789820040,
+              "timemodified": 1789820040,
+              "timestarted": 1789820040,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411915",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 181,
+              "userid": 20,
+              "attemptnumber": 0,
+              "timecreated": 1789733700,
+              "timemodified": 1789733700,
+              "timestarted": 1789733700,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411916",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 182,
               "userid": 21,
               "attemptnumber": 0,
               "timecreated": 1789992960,
@@ -569,7 +569,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 97,
+              "id": 183,
               "userid": 22,
               "attemptnumber": 0,
               "timecreated": 1789906620,
@@ -604,7 +604,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 98,
+              "id": 184,
               "userid": 23,
               "attemptnumber": 0,
               "timecreated": 1789820280,
@@ -639,7 +639,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 99,
+              "id": 185,
               "userid": 24,
               "attemptnumber": 0,
               "timecreated": 1789733940,
@@ -676,150 +676,10 @@
           ]
         },
         {
-          "assignmentid": 8,
+          "assignmentid": 14,
           "submissions": [
             {
-              "id": 103,
-              "userid": 8,
-              "attemptnumber": 0,
-              "timecreated": 1792152180,
-              "timemodified": 1792152180,
-              "timestarted": 1792152180,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411904",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 112,
-              "userid": 18,
-              "attemptnumber": 0,
-              "timecreated": 1792325580,
-              "timemodified": 1792325580,
-              "timestarted": 1792325580,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411914",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 104,
-              "userid": 9,
-              "attemptnumber": 0,
-              "timecreated": 1792411440,
-              "timemodified": 1792411440,
-              "timestarted": 1792411440,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411905",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 105,
-              "userid": 10,
-              "attemptnumber": 0,
-              "timecreated": 1792325100,
-              "timemodified": 1792325100,
-              "timestarted": 1792325100,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411906",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 106,
+              "id": 192,
               "userid": 12,
               "attemptnumber": 0,
               "timecreated": 1792152420,
@@ -854,77 +714,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 113,
-              "userid": 20,
-              "attemptnumber": 0,
-              "timecreated": 1792152900,
-              "timemodified": 1792152900,
-              "timestarted": 1792152900,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411916",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 100,
-              "userid": 5,
-              "attemptnumber": 0,
-              "timecreated": 1792411200,
-              "timemodified": 1792411200,
-              "timestarted": 1792411200,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411901",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 107,
+              "id": 193,
               "userid": 13,
               "attemptnumber": 0,
               "timecreated": 1792677600,
@@ -959,77 +749,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 101,
-              "userid": 6,
-              "attemptnumber": 0,
-              "timecreated": 1792324860,
-              "timemodified": 1792324860,
-              "timestarted": 1792324860,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411902",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 102,
-              "userid": 7,
-              "attemptnumber": 0,
-              "timecreated": 1792238520,
-              "timemodified": 1792238520,
-              "timestarted": 1792238520,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411903",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 108,
+              "id": 194,
               "userid": 14,
               "attemptnumber": 0,
               "timecreated": 1792325340,
@@ -1064,42 +784,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 114,
-              "userid": 21,
-              "attemptnumber": 0,
-              "timecreated": 1792412160,
-              "timemodified": 1792412160,
-              "timestarted": 1792412160,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411917",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 109,
+              "id": 195,
               "userid": 15,
               "attemptnumber": 0,
               "timecreated": 1792239000,
@@ -1134,7 +819,42 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 110,
+              "id": 186,
+              "userid": 5,
+              "attemptnumber": 0,
+              "timecreated": 1792411200,
+              "timemodified": 1792411200,
+              "timestarted": 1792411200,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411901",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 196,
               "userid": 16,
               "attemptnumber": 0,
               "timecreated": 1792152660,
@@ -1169,7 +889,112 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 111,
+              "id": 187,
+              "userid": 6,
+              "attemptnumber": 0,
+              "timecreated": 1792324860,
+              "timemodified": 1792324860,
+              "timestarted": 1792324860,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411902",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 188,
+              "userid": 7,
+              "attemptnumber": 0,
+              "timecreated": 1792238520,
+              "timemodified": 1792238520,
+              "timestarted": 1792238520,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411903",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 189,
+              "userid": 8,
+              "attemptnumber": 0,
+              "timecreated": 1792152180,
+              "timemodified": 1792152180,
+              "timestarted": 1792152180,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411904",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 197,
               "userid": 17,
               "attemptnumber": 0,
               "timecreated": 1792411920,
@@ -1204,7 +1029,182 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 115,
+              "id": 190,
+              "userid": 9,
+              "attemptnumber": 0,
+              "timecreated": 1792411440,
+              "timemodified": 1792411440,
+              "timestarted": 1792411440,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411905",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 191,
+              "userid": 10,
+              "attemptnumber": 0,
+              "timecreated": 1792325100,
+              "timemodified": 1792325100,
+              "timestarted": 1792325100,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411906",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 198,
+              "userid": 18,
+              "attemptnumber": 0,
+              "timecreated": 1792325580,
+              "timemodified": 1792325580,
+              "timestarted": 1792325580,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411914",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 199,
+              "userid": 20,
+              "attemptnumber": 0,
+              "timecreated": 1792152900,
+              "timemodified": 1792152900,
+              "timestarted": 1792152900,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411916",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 200,
+              "userid": 21,
+              "attemptnumber": 0,
+              "timecreated": 1792412160,
+              "timemodified": 1792412160,
+              "timestarted": 1792412160,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411917",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 201,
               "userid": 22,
               "attemptnumber": 0,
               "timecreated": 1792325820,
@@ -1239,7 +1239,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 116,
+              "id": 202,
               "userid": 23,
               "attemptnumber": 0,
               "timecreated": 1792239480,
@@ -1274,7 +1274,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 117,
+              "id": 203,
               "userid": 24,
               "attemptnumber": 0,
               "timecreated": 1792153140,
@@ -1311,10 +1311,10 @@
           ]
         },
         {
-          "assignmentid": 9,
+          "assignmentid": 15,
           "submissions": [
             {
-              "id": 118,
+              "id": 204,
               "userid": 5,
               "attemptnumber": 0,
               "timecreated": 1793887200,
@@ -1349,7 +1349,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 119,
+              "id": 205,
               "userid": 6,
               "attemptnumber": 0,
               "timecreated": 1793887200,
@@ -1391,190 +1391,15 @@
   },
   {
     "params": {
-      "assignmentids": [10, 11, 12]
+      "assignmentids": [16, 17, 18]
     },
     "response": {
       "assignments": [
         {
-          "assignmentid": 10,
+          "assignmentid": 16,
           "submissions": [
             {
-              "id": 120,
-              "userid": 5,
-              "attemptnumber": 0,
-              "timecreated": 1789992000,
-              "timemodified": 1789992000,
-              "timestarted": 1789992000,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411901",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 121,
-              "userid": 6,
-              "attemptnumber": 0,
-              "timecreated": 1789905660,
-              "timemodified": 1789905660,
-              "timestarted": 1789905660,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411902",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 122,
-              "userid": 7,
-              "attemptnumber": 0,
-              "timecreated": 1789819320,
-              "timemodified": 1789819320,
-              "timestarted": 1789819320,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411903",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 123,
-              "userid": 8,
-              "attemptnumber": 0,
-              "timecreated": 1789732980,
-              "timemodified": 1789732980,
-              "timestarted": 1789732980,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411904",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 124,
-              "userid": 9,
-              "attemptnumber": 0,
-              "timecreated": 1789992240,
-              "timemodified": 1789992240,
-              "timestarted": 1789992240,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411905",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 125,
+              "id": 211,
               "userid": 10,
               "attemptnumber": 0,
               "timecreated": 1789905900,
@@ -1609,7 +1434,42 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 126,
+              "id": 206,
+              "userid": 5,
+              "attemptnumber": 0,
+              "timecreated": 1789992000,
+              "timemodified": 1789992000,
+              "timestarted": 1789992000,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411901",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 212,
               "userid": 11,
               "attemptnumber": 0,
               "timecreated": 1789819560,
@@ -1644,12 +1504,12 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 127,
-              "userid": 12,
+              "id": 207,
+              "userid": 6,
               "attemptnumber": 0,
-              "timecreated": 1789733220,
-              "timemodified": 1789733220,
-              "timestarted": 1789733220,
+              "timecreated": 1789905660,
+              "timemodified": 1789905660,
+              "timestarted": 1789905660,
               "status": "submitted",
               "groupid": 0,
               "plugins": [
@@ -1666,7 +1526,7 @@
                     {
                       "name": "onlinetext",
                       "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411908",
+                      "text": "Bài làm TH01 của KTPM2411902",
                       "format": 1
                     }
                   ]
@@ -1679,12 +1539,12 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 128,
-              "userid": 13,
+              "id": 208,
+              "userid": 7,
               "attemptnumber": 0,
-              "timecreated": 1789992480,
-              "timemodified": 1789992480,
-              "timestarted": 1789992480,
+              "timecreated": 1789819320,
+              "timemodified": 1789819320,
+              "timestarted": 1789819320,
               "status": "submitted",
               "groupid": 0,
               "plugins": [
@@ -1701,7 +1561,7 @@
                     {
                       "name": "onlinetext",
                       "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411909",
+                      "text": "Bài làm TH01 của KTPM2411903",
                       "format": 1
                     }
                   ]
@@ -1714,182 +1574,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 129,
-              "userid": 14,
-              "attemptnumber": 0,
-              "timecreated": 1789906140,
-              "timemodified": 1789906140,
-              "timestarted": 1789906140,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411910",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 130,
-              "userid": 15,
-              "attemptnumber": 0,
-              "timecreated": 1789819800,
-              "timemodified": 1789819800,
-              "timestarted": 1789819800,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411911",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 131,
-              "userid": 16,
-              "attemptnumber": 0,
-              "timecreated": 1789733460,
-              "timemodified": 1789733460,
-              "timestarted": 1789733460,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411912",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 132,
-              "userid": 18,
-              "attemptnumber": 0,
-              "timecreated": 1789906380,
-              "timemodified": 1789906380,
-              "timestarted": 1789906380,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411914",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 133,
-              "userid": 19,
-              "attemptnumber": 0,
-              "timecreated": 1789820040,
-              "timemodified": 1789820040,
-              "timestarted": 1789820040,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411915",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 134,
+              "id": 220,
               "userid": 20,
               "attemptnumber": 0,
               "timecreated": 1789733700,
@@ -1924,7 +1609,357 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 135,
+              "id": 209,
+              "userid": 8,
+              "attemptnumber": 0,
+              "timecreated": 1789732980,
+              "timemodified": 1789732980,
+              "timestarted": 1789732980,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411904",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 213,
+              "userid": 12,
+              "attemptnumber": 0,
+              "timecreated": 1789733220,
+              "timemodified": 1789733220,
+              "timestarted": 1789733220,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411908",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 210,
+              "userid": 9,
+              "attemptnumber": 0,
+              "timecreated": 1789992240,
+              "timemodified": 1789992240,
+              "timestarted": 1789992240,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411905",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 217,
+              "userid": 16,
+              "attemptnumber": 0,
+              "timecreated": 1789733460,
+              "timemodified": 1789733460,
+              "timestarted": 1789733460,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411912",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 214,
+              "userid": 13,
+              "attemptnumber": 0,
+              "timecreated": 1789992480,
+              "timemodified": 1789992480,
+              "timestarted": 1789992480,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411909",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 215,
+              "userid": 14,
+              "attemptnumber": 0,
+              "timecreated": 1789906140,
+              "timemodified": 1789906140,
+              "timestarted": 1789906140,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411910",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 218,
+              "userid": 18,
+              "attemptnumber": 0,
+              "timecreated": 1789906380,
+              "timemodified": 1789906380,
+              "timestarted": 1789906380,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411914",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 216,
+              "userid": 15,
+              "attemptnumber": 0,
+              "timecreated": 1789819800,
+              "timemodified": 1789819800,
+              "timestarted": 1789819800,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411911",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 219,
+              "userid": 19,
+              "attemptnumber": 0,
+              "timecreated": 1789820040,
+              "timemodified": 1789820040,
+              "timestarted": 1789820040,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411915",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 224,
+              "userid": 24,
+              "attemptnumber": 0,
+              "timecreated": 1789733940,
+              "timemodified": 1789733940,
+              "timestarted": 1789733940,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH01 của KTPM2411920",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 221,
               "userid": 21,
               "attemptnumber": 0,
               "timecreated": 1789992960,
@@ -1959,42 +1994,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 136,
-              "userid": 22,
-              "attemptnumber": 0,
-              "timecreated": 1789906620,
-              "timemodified": 1789906620,
-              "timestarted": 1789906620,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411918",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 137,
+              "id": 223,
               "userid": 23,
               "attemptnumber": 0,
               "timecreated": 1789820280,
@@ -2029,12 +2029,12 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 138,
-              "userid": 24,
+              "id": 222,
+              "userid": 22,
               "attemptnumber": 0,
-              "timecreated": 1789733940,
-              "timemodified": 1789733940,
-              "timestarted": 1789733940,
+              "timecreated": 1789906620,
+              "timemodified": 1789906620,
+              "timestarted": 1789906620,
               "status": "submitted",
               "groupid": 0,
               "plugins": [
@@ -2051,7 +2051,7 @@
                     {
                       "name": "onlinetext",
                       "description": "Online text submissions",
-                      "text": "Bài làm TH01 của KTPM2411920",
+                      "text": "Bài làm TH01 của KTPM2411918",
                       "format": 1
                     }
                   ]
@@ -2066,465 +2066,10 @@
           ]
         },
         {
-          "assignmentid": 11,
+          "assignmentid": 17,
           "submissions": [
             {
-              "id": 141,
-              "userid": 7,
-              "attemptnumber": 0,
-              "timecreated": 1792238520,
-              "timemodified": 1792238520,
-              "timestarted": 1792238520,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411903",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 155,
-              "userid": 21,
-              "attemptnumber": 0,
-              "timecreated": 1792412160,
-              "timemodified": 1792412160,
-              "timestarted": 1792412160,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411917",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 142,
-              "userid": 8,
-              "attemptnumber": 0,
-              "timecreated": 1792152180,
-              "timemodified": 1792152180,
-              "timestarted": 1792152180,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411904",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 143,
-              "userid": 9,
-              "attemptnumber": 0,
-              "timecreated": 1792411440,
-              "timemodified": 1792411440,
-              "timestarted": 1792411440,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411905",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 144,
-              "userid": 10,
-              "attemptnumber": 0,
-              "timecreated": 1792325100,
-              "timemodified": 1792325100,
-              "timestarted": 1792325100,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411906",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 156,
-              "userid": 22,
-              "attemptnumber": 0,
-              "timecreated": 1792325820,
-              "timemodified": 1792325820,
-              "timestarted": 1792325820,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411918",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 145,
-              "userid": 11,
-              "attemptnumber": 0,
-              "timecreated": 1792238760,
-              "timemodified": 1792238760,
-              "timestarted": 1792238760,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411907",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 146,
-              "userid": 12,
-              "attemptnumber": 0,
-              "timecreated": 1792152420,
-              "timemodified": 1792152420,
-              "timestarted": 1792152420,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411908",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 147,
-              "userid": 13,
-              "attemptnumber": 0,
-              "timecreated": 1792411680,
-              "timemodified": 1792411680,
-              "timestarted": 1792411680,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411909",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 139,
-              "userid": 5,
-              "attemptnumber": 0,
-              "timecreated": 1792411200,
-              "timemodified": 1792411200,
-              "timestarted": 1792411200,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411901",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 157,
-              "userid": 23,
-              "attemptnumber": 0,
-              "timecreated": 1792239480,
-              "timemodified": 1792239480,
-              "timestarted": 1792239480,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411919",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 140,
-              "userid": 6,
-              "attemptnumber": 0,
-              "timecreated": 1792324860,
-              "timemodified": 1792324860,
-              "timestarted": 1792324860,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411902",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 148,
-              "userid": 14,
-              "attemptnumber": 0,
-              "timecreated": 1792325340,
-              "timemodified": 1792325340,
-              "timestarted": 1792325340,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411910",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 149,
+              "id": 235,
               "userid": 15,
               "attemptnumber": 0,
               "timecreated": 1792239000,
@@ -2559,42 +2104,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 158,
-              "userid": 24,
-              "attemptnumber": 0,
-              "timecreated": 1792153140,
-              "timemodified": 1792153140,
-              "timestarted": 1792153140,
-              "status": "submitted",
-              "groupid": 0,
-              "plugins": [
-                {
-                  "type": "onlinetext",
-                  "name": "Online text",
-                  "fileareas": [
-                    {
-                      "area": "submissions_onlinetext",
-                      "files": []
-                    }
-                  ],
-                  "editorfields": [
-                    {
-                      "name": "onlinetext",
-                      "description": "Online text submissions",
-                      "text": "Bài làm TH02 của KTPM2411920",
-                      "format": 1
-                    }
-                  ]
-                },
-                {
-                  "type": "comments",
-                  "name": "Submission comments"
-                }
-              ],
-              "gradingstatus": "notgraded"
-            },
-            {
-              "id": 150,
+              "id": 236,
               "userid": 16,
               "attemptnumber": 0,
               "timecreated": 1792152660,
@@ -2629,7 +2139,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 151,
+              "id": 237,
               "userid": 17,
               "attemptnumber": 0,
               "timecreated": 1792411920,
@@ -2664,7 +2174,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 152,
+              "id": 238,
               "userid": 18,
               "attemptnumber": 0,
               "timecreated": 1792325580,
@@ -2699,7 +2209,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 153,
+              "id": 239,
               "userid": 19,
               "attemptnumber": 0,
               "timecreated": 1792239240,
@@ -2734,7 +2244,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 154,
+              "id": 240,
               "userid": 20,
               "attemptnumber": 0,
               "timecreated": 1792152900,
@@ -2767,14 +2277,504 @@
                 }
               ],
               "gradingstatus": "notgraded"
+            },
+            {
+              "id": 241,
+              "userid": 21,
+              "attemptnumber": 0,
+              "timecreated": 1792412160,
+              "timemodified": 1792412160,
+              "timestarted": 1792412160,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411917",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 242,
+              "userid": 22,
+              "attemptnumber": 0,
+              "timecreated": 1792325820,
+              "timemodified": 1792325820,
+              "timestarted": 1792325820,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411918",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 243,
+              "userid": 23,
+              "attemptnumber": 0,
+              "timecreated": 1792239480,
+              "timemodified": 1792239480,
+              "timestarted": 1792239480,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411919",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 244,
+              "userid": 24,
+              "attemptnumber": 0,
+              "timecreated": 1792153140,
+              "timemodified": 1792153140,
+              "timestarted": 1792153140,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411920",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 232,
+              "userid": 12,
+              "attemptnumber": 0,
+              "timecreated": 1792152420,
+              "timemodified": 1792152420,
+              "timestarted": 1792152420,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411908",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 233,
+              "userid": 13,
+              "attemptnumber": 0,
+              "timecreated": 1792411680,
+              "timemodified": 1792411680,
+              "timestarted": 1792411680,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411909",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 234,
+              "userid": 14,
+              "attemptnumber": 0,
+              "timecreated": 1792325340,
+              "timemodified": 1792325340,
+              "timestarted": 1792325340,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411910",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 225,
+              "userid": 5,
+              "attemptnumber": 0,
+              "timecreated": 1792411200,
+              "timemodified": 1792411200,
+              "timestarted": 1792411200,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411901",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 226,
+              "userid": 6,
+              "attemptnumber": 0,
+              "timecreated": 1792324860,
+              "timemodified": 1792324860,
+              "timestarted": 1792324860,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411902",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 227,
+              "userid": 7,
+              "attemptnumber": 0,
+              "timecreated": 1792238520,
+              "timemodified": 1792238520,
+              "timestarted": 1792238520,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411903",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 228,
+              "userid": 8,
+              "attemptnumber": 0,
+              "timecreated": 1792152180,
+              "timemodified": 1792152180,
+              "timestarted": 1792152180,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411904",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 229,
+              "userid": 9,
+              "attemptnumber": 0,
+              "timecreated": 1792411440,
+              "timemodified": 1792411440,
+              "timestarted": 1792411440,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411905",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 230,
+              "userid": 10,
+              "attemptnumber": 0,
+              "timecreated": 1792325100,
+              "timemodified": 1792325100,
+              "timestarted": 1792325100,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411906",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
+            },
+            {
+              "id": 231,
+              "userid": 11,
+              "attemptnumber": 0,
+              "timecreated": 1792238760,
+              "timemodified": 1792238760,
+              "timestarted": 1792238760,
+              "status": "submitted",
+              "groupid": 0,
+              "plugins": [
+                {
+                  "type": "onlinetext",
+                  "name": "Online text",
+                  "fileareas": [
+                    {
+                      "area": "submissions_onlinetext",
+                      "files": []
+                    }
+                  ],
+                  "editorfields": [
+                    {
+                      "name": "onlinetext",
+                      "description": "Online text submissions",
+                      "text": "Bài làm TH02 của KTPM2411907",
+                      "format": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "comments",
+                  "name": "Submission comments"
+                }
+              ],
+              "gradingstatus": "notgraded"
             }
           ]
         },
         {
-          "assignmentid": 12,
+          "assignmentid": 18,
           "submissions": [
             {
-              "id": 159,
+              "id": 245,
               "userid": 5,
               "attemptnumber": 0,
               "timecreated": 1793887200,
@@ -2809,7 +2809,7 @@
               "gradingstatus": "notgraded"
             },
             {
-              "id": 160,
+              "id": 246,
               "userid": 6,
               "attemptnumber": 0,
               "timecreated": 1793887200,

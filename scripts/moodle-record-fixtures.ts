@@ -2,17 +2,22 @@
  * `npm run moodle:fixtures` — gọi đủ 11 hàm web service chỉ đọc trên Moodle demo và ghi phản hồi JSON
  * vào tests/fixtures/moodle/ (test Phase 10b chạy với máy chủ Moodle giả, KHÔNG cần Moodle thật).
  * Đồng thời là bài kiểm tra quyền: tài khoản dịch vụ phải đọc được dữ liệu của MỌI sinh viên.
- * Cần: `npm run moodle:setup` đã chạy (token trong .env), Moodle có 2 khóa học demo.
+ * Cần: Moodle dựng ĐÚNG ngày chốt của fixture: `npm run moodle:setup -- --reset --cutoff=2026-11-06`
+ * (FIXTURE_CUTOFF) — kết quả mong đợi của test tính theo ngày đó. Ghi thêm `_meta.json` (ngày chốt).
  */
 import 'dotenv/config';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createMoodleClient, type MoodleParams } from '../src/modules/data-import/moodle/client';
+import { FIXTURE_CUTOFF } from './lib/moodle-demo-spec';
 
 const OUT_DIR = 'tests/fixtures/moodle';
 const SPEC_PATH = 'docs/demo-data/moodle/moodle-demo.json';
+/** Bản Moodle đang chạy được dựng từ đó (scripts/moodle-setup.ts). */
+const LOCAL_SPEC_PATH = 'docs/demo-data/moodle/moodle-demo.local.json';
 
 interface Spec {
+  dataCutoff: string;
   students: { mssv: string }[];
   courses: { idnumber: string }[];
 }
@@ -52,11 +57,15 @@ async function call<T>(fn: string, params: MoodleParams = {}): Promise<T> {
   return response;
 }
 
-/** Sinh viên trong tình huống trắc nghiệm (docs/demo-data/moodle/gen_moodle_demo.py) + 1 sinh viên sạch. */
-const QUIZ_SAMPLE_SUFFIXES = ['901', '905', '911', '917', '919'];
-
 async function main(): Promise<void> {
   const spec = JSON.parse(readFileSync(SPEC_PATH, 'utf8')) as Spec;
+  const seeded = JSON.parse(readFileSync(LOCAL_SPEC_PATH, 'utf8')) as Spec;
+  if (seeded.dataCutoff !== FIXTURE_CUTOFF) {
+    throw new Error(
+      `Moodle đang dựng theo ngày chốt ${seeded.dataCutoff}, fixture cần ${FIXTURE_CUTOFF}: ` +
+        `npm run moodle:setup -- --reset --cutoff=${FIXTURE_CUTOFF}`,
+    );
+  }
   await call('core_webservice_get_site_info');
 
   for (const { idnumber } of spec.courses) {
@@ -90,12 +99,14 @@ async function main(): Promise<void> {
       },
     );
     await call('gradereport_user_get_grade_items', { courseid: course.id, userid: 0 });
-    const byMssv = new Map(users.map((u) => [u.idnumber ?? '', u.id]));
+    // Đủ mọi (bài, sinh viên) — test đồng bộ Phase 10b chạy trọn 20 sinh viên trên máy chủ giả.
     for (const quiz of quizzes.quizzes) {
-      for (const suffix of QUIZ_SAMPLE_SUFFIXES) {
-        const userid = [...byMssv].find(([mssv]) => mssv.endsWith(suffix))?.[1];
-        if (userid)
-          await call('mod_quiz_get_user_quiz_attempts', { quizid: quiz.id, userid, status: 'all' });
+      for (const student of students) {
+        await call('mod_quiz_get_user_quiz_attempts', {
+          quizid: quiz.id,
+          userid: student.id,
+          status: 'all',
+        });
       }
     }
 
@@ -123,6 +134,9 @@ async function main(): Promise<void> {
   }
 
   mkdirSync(OUT_DIR, { recursive: true });
+  recorded.set('_meta', [
+    { params: {}, response: { dataCutoff: FIXTURE_CUTOFF, recordedAt: new Date().toISOString() } },
+  ]);
   for (const [fn, calls] of recorded) {
     writeFileSync(join(OUT_DIR, `${fn}.json`), `${JSON.stringify(calls, null, 2)}\n`);
   }

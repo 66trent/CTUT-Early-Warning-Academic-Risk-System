@@ -16,7 +16,7 @@ Chọn **1 trong 2 cách** chuẩn bị dữ liệu:
 npm run moodle:setup
 ```
 
-**Cách A — dựng sẵn**: web service chỉ đọc + token (ghi vào `.env`), học kỳ `HK1_2026` trong EWARS, và 2 khóa học demo đủ dữ liệu đến 06/11/2026 (mục 3).
+**Cách A — dựng sẵn**: web service chỉ đọc + token (ghi vào `.env`), học kỳ `HK1_2026` trong EWARS, và 2 khóa học demo có dữ liệu đến **ngày chốt** (mặc định hôm qua; chọn ngày khác: `-- --cutoff=YYYY-MM-DD`, trong khoảng 05/11–20/12/2026) — mục 3.
 
 ```bash
 npm run moodle:setup -- --manual
@@ -24,7 +24,7 @@ npm run moodle:setup -- --manual
 
 **Cách B — tự làm tay**: như trên nhưng chỉ tạo tài khoản (1 giảng viên + 20 sinh viên KTPM2411); khóa học, buổi điểm danh, bài trắc nghiệm, bài thực hành bạn tự tạo theo mục 4.
 
-Khác: `-- --reset` xóa 2 khóa học demo rồi dựng lại · `-- --rotate-token` đổi token · `npm run moodle:down` tắt Moodle (giữ dữ liệu). Chạy `npm run demo:reset` của EWARS xong thì chạy lại `npm run moodle:setup` (tạo lại học kỳ `HK1_2026`; khóa học có rồi sẽ được giữ nguyên).
+**Trước buổi trình diễn: `npm run moodle:setup -- --reset`** (dựng lại theo ngày chốt mới — nếu để bản dựng cũ, bài "chương 3" có thể đã quá hạn và cả lớp bị báo bỏ bài). Khác: `-- --reset` xóa 2 khóa học demo rồi dựng lại · `-- --rotate-token` đổi token · `npm run moodle:down` tắt Moodle (giữ dữ liệu). Chạy `npm run demo:reset` của EWARS xong thì chạy lại `npm run moodle:setup` (tạo lại học kỳ `HK1_2026`; khóa học có rồi sẽ được giữ nguyên).
 
 ## 2. Tài khoản
 
@@ -39,7 +39,7 @@ Mỗi vai 1 cửa sổ trình duyệt (cửa sổ ẩn danh cho sinh viên) đ�
 
 ## 3. Dữ liệu dựng sẵn (cách A)
 
-Học kỳ `HK1_2026` (17/08–27/12/2026, giá trị demo), danh mục Moodle "HK1 2026–2027", lớp KTPM2411 (20 sinh viên bộ v3). Mỗi khóa học: 15 buổi × 200 phút (4 tiết) = 60 tiết, đã điểm danh 12 buổi đến 06/11; 3 bài trắc nghiệm (10 câu Đúng/Sai, hạn 15/09, 13/10, 24/11); 3 bài thực hành (hạn 22/09, 20/10, 30/11).
+Học kỳ `HK1_2026` (17/08–27/12/2026, giá trị demo), danh mục Moodle "HK1 2026–2027", lớp KTPM2411 (20 sinh viên bộ v3). Mọi mốc đặt **tương đối với ngày chốt** để kết quả mong đợi không đổi dù dựng ngày nào. Mỗi khóa học: 15 buổi × 200 phút (4 tiết) = 60 tiết, đã điểm danh 12 buổi đến 06/11; 3 bài trắc nghiệm (10 câu Đúng/Sai, hạn 15/09, 13/10, 24/11); 3 bài thực hành (hạn 22/09, 20/10, 30/11).
 
 | Khóa học (Course ID number) | Sinh viên tình huống | Dự kiến EWARS báo (khi có Phase 10b) |
 |---|---|---|
@@ -47,17 +47,17 @@ Học kỳ `HK1_2026` (17/08–27/12/2026, giá trị demo), danh mục Moodle "
 | | 906 vắng có phép 2 buổi (8/60) | ATT-01 Trung bình |
 | | 907 không nộp Thực hành 1, 2 | LMS-03 Cao |
 | | 909 nộp trễ Thực hành 1, 2 | LMS-04 Thấp |
-| | 915 được gia hạn Thực hành 2 tới 20/11, chưa nộp | Không cảnh báo |
+| | 915 được gia hạn Thực hành 2 tới ngày chốt + 7 ngày, chưa nộp | Không cảnh báo |
 | | 917 làm dở Trắc nghiệm 2, quá hạn không nộp | LMS-01 Trung bình |
-| Hệ điều hành `010100089101` | 904 vắng không phép 2 buổi cuối (29/10, 05/11) | ATT-01 TB + ATT-02 Cao |
+| Hệ điều hành `010100089101` | 904 vắng không phép 2 buổi gần ngày chốt nhất | ATT-01 TB + ATT-02 Cao (cần chốt ở Phase 10b cách ATT-02 so ngày chốt) |
 | | 905 không làm Trắc nghiệm 1, 2 | LMS-01 Cao |
 | | 911 điểm Trắc nghiệm 1, 2 = 4 và 3 / 10 | LMS-02 Trung bình |
 | | 913 vắng 2 buổi + không nộp Thực hành 1 | ATT-01 TB + LMS-03 TB → COMB-01 Rất cao |
 | | 919 làm Trắc nghiệm 1 hai lần (5 rồi 9 điểm) | Không cảnh báo (lấy lượt cao nhất) |
 
-Sinh viên khác: đi học đủ, trắc nghiệm 7–10 điểm, nộp đúng hạn. Sinh nội dung: `python -I docs/demo-data/moodle/gen_moodle_demo.py .` → `moodle-demo.json` (đừng sửa tay JSON). Bảng "dự kiến" sẽ thành kết quả mong đợi chính thức ở Phase 10b.
+Sinh viên khác: đi học đủ, trắc nghiệm 7–10 điểm, nộp đúng hạn. Nội dung sinh bởi `scripts/lib/moodle-demo-spec.ts` (đừng sửa tay JSON): `moodle:setup` ghi bản theo ngày chốt vào `docs/demo-data/moodle/moodle-demo.local.json` (không commit); `npm run moodle:spec` ghi bản trong repo `moodle-demo.json` (ngày chốt 06/11/2026 — dùng cho fixture/test). Bảng "dự kiến" sẽ thành kết quả mong đợi chính thức ở Phase 10b.
 
-## 4. Tự làm tay trên Moodle (cách B, hoặc thêm dữ liệu sau 06/11)
+## 4. Tự làm tay trên Moodle (cách B, hoặc thêm dữ liệu sau ngày chốt)
 
 **4 quy ước bắt buộc để EWARS nhận đúng** (đã chốt 2026-11-07, không xác minh với trường):
 
@@ -98,7 +98,7 @@ EWARS lấy **tổng số tiết** = tổng thời lượng mọi buổi đã t�
 ## 5. Kiểm tra nhanh
 
 - Web service + token: `npm run moodle:setup` in dòng "Moodle 5.3 …, tài khoản ewars_sync, 11 hàm được cấp".
-- Ghi lại JSON mẫu cho test (chỉ 2 khóa demo): `npm run moodle:fixtures` → `tests/fixtures/moodle/` (kiểm luôn quyền đọc dữ liệu mọi sinh viên).
+- Ghi lại JSON mẫu cho test: `npm run moodle:setup -- --reset --cutoff=2026-11-06` rồi `npm run moodle:fixtures` → `tests/fixtures/moodle/` (đủ 20 sinh viên + `_meta.json`; kiểm luôn quyền đọc dữ liệu mọi sinh viên). Xong thì `npm run moodle:setup -- --reset` để về ngày chốt hôm qua.
 - Đồng bộ sang EWARS (trang "Kết nối Moodle", Đồng bộ ngay / Tự động) — Phase 10b, 10c.
 
 ## 6. Giới hạn của Moodle demo

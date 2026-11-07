@@ -1,14 +1,14 @@
 [
   {
     "params": {
-      "courseids": [8]
+      "courseids": [10]
     },
     "response": {
       "quizzes": [
         {
-          "id": 10,
-          "coursemodule": 28,
-          "course": 8,
+          "id": 16,
+          "coursemodule": 44,
+          "course": 10,
           "name": "Trắc nghiệm chương 1",
           "intro": "Test quiz 1",
           "introformat": 1,
@@ -58,9 +58,9 @@
           "duedate": 1789491540
         },
         {
-          "id": 11,
-          "coursemodule": 29,
-          "course": 8,
+          "id": 17,
+          "coursemodule": 45,
+          "course": 10,
           "name": "Trắc nghiệm chương 2",
           "intro": "Test quiz 2",
           "introformat": 1,
@@ -110,9 +110,9 @@
           "duedate": 1791910740
         },
         {
-          "id": 12,
-          "coursemodule": 30,
-          "course": 8,
+          "id": 18,
+          "coursemodule": 46,
+          "course": 10,
           "name": "Trắc nghiệm chương 3",
           "intro": "Test quiz 3",
           "introformat": 1,
@@ -124,7 +124,7 @@
           "lang": "",
           "enableaitools": null,
           "enabledaiactions": null,
-          "timeopen": 1794848400,
+          "timeopen": 1794157200,
           "timeclose": 0,
           "timelimit": 0,
           "preferredbehaviour": "deferredfeedback",
@@ -135,7 +135,7 @@
           "sumgrades": 10,
           "grade": 10,
           "hasfeedback": 0,
-          "duedate": 1795539540
+          "duedate": 1794848340
         }
       ],
       "warnings": []
@@ -143,14 +143,14 @@
   },
   {
     "params": {
-      "courseids": [9]
+      "courseids": [11]
     },
     "response": {
       "quizzes": [
         {
-          "id": 13,
-          "coursemodule": 36,
-          "course": 9,
+          "id": 19,
+          "coursemodule": 52,
+          "course": 11,
           "name": "Trắc nghiệm chương 1",
           "intro": "Test quiz 4",
           "introformat": 1,
@@ -200,9 +200,9 @@
           "duedate": 1789491540
         },
         {
-          "id": 14,
-          "coursemodule": 37,
-          "course": 9,
+          "id": 20,
+          "coursemodule": 53,
+          "course": 11,
           "name": "Trắc nghiệm chương 2",
           "intro": "Test quiz 5",
           "introformat": 1,
@@ -252,9 +252,9 @@
           "duedate": 1791910740
         },
         {
-          "id": 15,
-          "coursemodule": 38,
-          "course": 9,
+          "id": 21,
+          "coursemodule": 54,
+          "course": 11,
           "name": "Trắc nghiệm chương 3",
           "intro": "Test quiz 6",
           "introformat": 1,
@@ -266,7 +266,7 @@
           "lang": "",
           "enableaitools": null,
           "enabledaiactions": null,
-          "timeopen": 1794848400,
+          "timeopen": 1794157200,
           "timeclose": 0,
           "timelimit": 0,
           "preferredbehaviour": "deferredfeedback",
@@ -277,7 +277,7 @@
           "sumgrades": 10,
           "grade": 10,
           "hasfeedback": 0,
-          "duedate": 1795539540
+          "duedate": 1794848340
         }
       ],
       "warnings": []

@@ -11,6 +11,8 @@ x-app-env: &app-env
   MINIO_PORT: '9000'
   SMTP_HOST: mailhog
   SMTP_PORT: '1025'
+  # Đồng bộ Moodle (Phase 10): trong mạng Docker gọi thẳng service `moodle` (ở máy dùng localhost:8080 trong .env).
+  MOODLE_BASE_URL: http://moodle
 
 services:
   app:

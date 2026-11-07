@@ -1,6 +1,6 @@
 <?php
-// CTUT-EWARS — dựng dữ liệu Moodle demo từ docs/demo-data/moodle/moodle-demo.json (Phase 10a).
-// Chạy trong container (do scripts/moodle-setup.ts gọi):
+// CTUT-EWARS — dựng dữ liệu Moodle demo từ JSON kịch bản (scripts/lib/moodle-demo-spec.ts, Phase 10a).
+// Chạy trong container (do scripts/moodle-setup.ts gọi, kèm --spec=<bản theo ngày chốt>):
 //   MOODLE_DEMO_PASSWORD=... php /var/www/html/ewars-cli/ewars_seed_demo.php [--accounts-only]
 // --accounts-only: chỉ tạo tài khoản giảng viên + sinh viên (để người dùng TỰ tạo khóa học, bài,
 // buổi điểm danh trên giao diện — docs/huong-dan-moodle.md).
@@ -23,7 +23,8 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
     ['h' => 'help']
 );
 if ($options['help']) {
-    echo "Dựng dữ liệu Moodle demo cho EWARS. --accounts-only: chỉ tạo tài khoản.\n";
+    echo "Dựng dữ liệu Moodle demo cho EWARS. --spec=<json> · --accounts-only: chỉ tạo tài khoản"
+        . " · --reset: xóa khóa học demo rồi dựng lại.\n";
     exit(0);
 }
 $password = getenv('MOODLE_DEMO_PASSWORD');

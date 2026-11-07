@@ -27,3 +27,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+
+# Moodle demo theo ngày chốt của lần dựng (scripts/moodle-setup.ts)
+docs/demo-data/moodle/*.local.json

@@ -3,10 +3,12 @@
  * Cần Moodle đang chạy: `npm run moodle:up` (http://localhost:8080). Idempotent — chạy lại an toàn.
  *   1. Cấu hình web service CHỈ ĐỌC trên Moodle, ghi token vào `.env` (MOODLE_BASE_URL, MOODLE_WS_TOKEN).
  *   2. Tạo học kỳ demo theo ngày thật trong EWARS (HK1_2026, KHÔNG đặt làm học kỳ hiện tại — bộ v3 giữ HK1_2025).
- *   3. Dựng dữ liệu demo trên Moodle từ docs/demo-data/moodle/moodle-demo.json.
+ *   3. Dựng dữ liệu demo trên Moodle theo ngày chốt (`--cutoff=YYYY-MM-DD`, mặc định HÔM QUA): sinh
+ *      docs/demo-data/moodle/moodle-demo.local.json (không commit) từ scripts/lib/moodle-demo-spec.ts.
  *   4. Gọi thử web service bằng token.
  * Tùy chọn: `--manual` chỉ tạo tài khoản (tự làm khóa học, bài, điểm danh trên Moodle) ·
- * `--reset` xóa 2 khóa học demo rồi dựng lại · `--rotate-token` thu hồi token cũ, tạo token mới.
+ * `--reset` xóa 2 khóa học demo rồi dựng lại (BẮT BUỘC sát buổi trình diễn để bài "chương 3" còn hạn) ·
+ * `--rotate-token` thu hồi token cũ, tạo token mới.
  */
 import 'dotenv/config';
 import { spawnSync } from 'node:child_process';
@@ -15,22 +17,17 @@ import { closeDataSource, getDataSource } from '../src/db/data-source';
 import { Term } from '../src/db/entities/term.entity';
 import { vnEndOfDay, vnStartOfDay } from '../src/lib/dates';
 import { createMoodleClient } from '../src/modules/data-import/moodle/client';
+import { buildMoodleDemoSpec, type MoodleDemoSpec, yesterdayVn } from './lib/moodle-demo-spec';
 
-const SPEC_PATH = 'docs/demo-data/moodle/moodle-demo.json';
+/** Bản theo ngày chốt của lần dựng này (gitignore) — thư mục gắn vào container ở /var/www/html/ewars-demo. */
+const LOCAL_SPEC = 'docs/demo-data/moodle/moodle-demo.local.json';
+const LOCAL_SPEC_IN_CONTAINER = '/var/www/html/ewars-demo/moodle-demo.local.json';
 const ENV_PATH = '.env';
 const BASE_URL = process.env.MOODLE_BASE_URL || 'http://localhost:8080';
 
-interface DemoSpec {
-  term: {
-    termId: string;
-    termName: string;
-    academicYear: string;
-    startDate: string;
-    endDate: string;
-  };
-}
-
-const args = new Set(process.argv.slice(2));
+const argv = process.argv.slice(2);
+const args = new Set(argv);
+const cutoff = argv.find((a) => a.startsWith('--cutoff='))?.split('=')[1] ?? yesterdayVn();
 
 function moodlePhp(script: string, extra: string[] = []): string {
   const result = spawnSync(
@@ -67,7 +64,7 @@ function setEnvVar(content: string, key: string, value: string): string {
     : `${content.replace(/\n?$/, '\n')}${line}\n`;
 }
 
-async function ensureTerm(spec: DemoSpec): Promise<void> {
+async function ensureTerm(spec: MoodleDemoSpec): Promise<void> {
   const repo = (await getDataSource()).getRepository(Term);
   const existing = await repo.findOneBy({ termId: spec.term.termId });
   if (existing) {
@@ -89,7 +86,8 @@ async function ensureTerm(spec: DemoSpec): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const spec = JSON.parse(readFileSync(SPEC_PATH, 'utf8')) as DemoSpec;
+  const spec = buildMoodleDemoSpec(cutoff);
+  writeFileSync(LOCAL_SPEC, `${JSON.stringify(spec, null, 2)}\n`);
 
   process.stdout.write('\n▶ 1. Web service chỉ đọc trên Moodle\n');
   const out = moodlePhp('ewars_setup.php', args.has('--rotate-token') ? ['--rotate'] : []);
@@ -106,9 +104,10 @@ async function main(): Promise<void> {
   await closeDataSource();
 
   process.stdout.write(
-    `\n▶ 3. Dữ liệu demo trên Moodle${args.has('--manual') ? ' (chỉ tài khoản — tự làm tay)' : ''}\n`,
+    `\n▶ 3. Dữ liệu demo trên Moodle${args.has('--manual') ? ' (chỉ tài khoản — tự làm tay)' : ` (ngày chốt ${cutoff})`}\n`,
   );
   const seedArgs = [
+    `--spec=${LOCAL_SPEC_IN_CONTAINER}`,
     args.has('--manual') ? '--accounts-only' : '',
     args.has('--reset') ? '--reset' : '',
   ].filter(Boolean);

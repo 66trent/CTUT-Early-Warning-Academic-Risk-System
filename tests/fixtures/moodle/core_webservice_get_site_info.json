@@ -10,7 +10,7 @@
       "lang": "en",
       "userid": 3,
       "siteurl": "http://localhost:8080",
-      "userpictureurl": "http://localhost:8080/theme/image.php/boost/core/1794065231/u/f1",
+      "userpictureurl": "http://localhost:8080/theme/image.php/boost/core/1794089194/u/f1",
       "functions": [
         {
           "name": "core_webservice_get_site_info",
