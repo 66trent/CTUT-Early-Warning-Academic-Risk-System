@@ -42,6 +42,8 @@ export interface LmsAssignmentRow extends AcademicRowBase {
   dueAt: string;
   status: SubmissionStatus;
   submittedAt: string | null;
+  /** Hạn nộp riêng (gia hạn) — cột tùy chọn `han_rieng`, ISO +07:00. */
+  extendedDueAt: string | null;
 }
 
 /** Trạng thái nộp — mã chuẩn, nhãn tiếng Việt hoặc nhãn Moodle (docs/rules/12). */
@@ -73,7 +75,7 @@ function activityRef(row: LmsAssignmentRow): ActivityRef {
 /** Trạng thái trong file lệch thời điểm nộp so với hạn → cảnh báo, nạp theo thời điểm nộp. */
 function statusWarning(row: Omit<LmsAssignmentRow, keyof AcademicRowBase>): RowWarning | null {
   if (!row.submittedAt) return null;
-  const late = new Date(row.submittedAt) > new Date(row.dueAt);
+  const late = new Date(row.submittedAt) > new Date(row.extendedDueAt ?? row.dueAt);
   if (late === (row.status === SubmissionStatus.LATE)) return null;
   return {
     code: 'SUBMISSION_STATUS_MISMATCH',
@@ -85,7 +87,9 @@ function sameValues(a: LmsAssignmentSubmission, row: LmsAssignmentRow): boolean 
   return (
     a.status === row.status &&
     (a.submittedAt?.getTime() ?? null) ===
-      (row.submittedAt ? new Date(row.submittedAt).getTime() : null)
+      (row.submittedAt ? new Date(row.submittedAt).getTime() : null) &&
+    (a.extendedDueAt?.getTime() ?? null) ===
+      (row.extendedDueAt ? new Date(row.extendedDueAt).getTime() : null)
   );
 }
 
@@ -98,7 +102,7 @@ export const lmsAssignmentImport: ImportTypeDefinition<LmsAssignmentRow> = {
   label: 'Bài thực hành LMS',
   requiresTerm: true,
   requiredColumns: [...ACADEMIC_REQUIRED_COLUMNS, 'ma_bai', 'ten_bai', 'han_nop', 'trang_thai_nop'],
-  optionalColumns: [...ACADEMIC_OPTIONAL_COLUMNS, 'ten_hoc_phan', 'thoi_diem_nop'],
+  optionalColumns: [...ACADEMIC_OPTIONAL_COLUMNS, 'ten_hoc_phan', 'thoi_diem_nop', 'han_rieng'],
   templatePath: '/templates/mau_lms_thuc_hanh.csv',
 
   parseRow(record) {
@@ -121,12 +125,17 @@ export const lmsAssignmentImport: ImportTypeDefinition<LmsAssignmentRow> = {
     if (status !== SubmissionStatus.NOT_SUBMITTED && !submittedAt) {
       return invalid('Bài đã nộp phải có thời điểm nộp.');
     }
+    const extendedText = (record.han_rieng ?? '').trim();
+    const extendedDueAt = extendedText ? parseDueAt(extendedText) : null;
+    if (extendedDueAt && !extendedDueAt.ok)
+      return invalid(`Hạn nộp riêng: ${extendedDueAt.message}`);
     const value = {
       activityKey,
       activityName,
       dueAt: dueAt.value,
       status,
       submittedAt: status === SubmissionStatus.NOT_SUBMITTED ? null : (submittedAt?.value ?? null),
+      extendedDueAt: extendedDueAt?.value ?? null,
     };
     const warning = statusWarning(value);
     return { ok: true, value: { ...base.value, ...value }, warnings: warning ? [warning] : [] };
@@ -185,6 +194,7 @@ export const lmsAssignmentImport: ImportTypeDefinition<LmsAssignmentRow> = {
       const values = {
         status: row.status,
         submittedAt: row.submittedAt ? new Date(row.submittedAt) : null,
+        extendedDueAt: row.extendedDueAt ? new Date(row.extendedDueAt) : null,
       };
       const current = byKey.get(`${enrollmentId}|${activityId}`);
       if (!current) {

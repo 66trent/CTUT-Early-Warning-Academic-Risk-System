@@ -37,6 +37,8 @@ export interface SubmissionInput {
   activityId: string;
   status: SubmissionStatus;
   submittedAt: Date | null;
+  /** Hạn nộp riêng (gia hạn) — NULL = hạn chung. */
+  extendedDueAt: Date | null;
 }
 
 export interface CourseResultInput {
@@ -137,6 +139,8 @@ export interface EnrollmentFacts {
     status: DataStatus;
     latest: AttendanceSnapshotInput | null;
     previous: AttendanceSnapshotInput | null;
+    /** Mọi snapshot đến `asOf`, tăng dần theo ngày (ATT-02 chọn snapshot cũ nhất trong cửa sổ). */
+    history: readonly AttendanceSnapshotInput[];
   };
   quiz: { status: DataStatus; dueQuizzes: DueQuiz[]; attempts: QuizAttemptInput[] };
   assignment: {
@@ -145,6 +149,10 @@ export interface EnrollmentFacts {
     /** Bài đã nộp tại asOf (`submittedAt ≤ asOf`) → thời điểm nộp. */
     submittedAt: ReadonlyMap<string, Date>;
     dueAt: ReadonlyMap<string, Date>;
+    /** Bài có hạn nộp riêng (gia hạn) của sinh viên → hạn riêng. */
+    extendedDueAt: ReadonlyMap<string, Date>;
+    /** Bài sinh viên đang trong hạn gia hạn tại asOf (hạn riêng > asOf) — chưa tính "không nộp". */
+    stillExtended: ReadonlySet<string>;
   };
   result: CourseResultInput | null;
 }

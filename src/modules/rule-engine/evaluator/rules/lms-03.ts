@@ -7,10 +7,12 @@ import { countBandsSchema, matchCountBands } from './lms-01';
 const conditionSchema = z.object({ bands: countBandsSchema });
 export type Lms03Condition = z.infer<typeof conditionSchema>;
 
-/** Bài thực hành đã quá hạn mà sinh viên chưa nộp (tại asOf). */
+/** Bài thực hành đã quá hạn mà sinh viên chưa nộp (tại asOf) — trừ bài đang trong hạn gia hạn riêng. */
 export function missingAssignments(facts: EnrollmentFacts) {
   return facts.assignment.dueAssignments.filter(
-    (a) => !facts.assignment.submittedAt.has(a.activityId),
+    (a) =>
+      !facts.assignment.submittedAt.has(a.activityId) &&
+      !facts.assignment.stillExtended.has(a.activityId),
   );
 }
 

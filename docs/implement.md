@@ -351,10 +351,16 @@ Nghiên cứu + thiết kế: `docs/tich-hop-moodle.md` (mục 9 = quyết đị
 **Kết quả 10a (2026-11-07):** `npm run moodle:up` dựng Moodle 5.3 (Build 20261005) + `mod_attendance` 2026090300 trên PostgreSQL 17 (Moodle 5.3 đòi ≥ 17); `npm run moodle:setup` cấu hình web service chỉ đọc (11 hàm, tài khoản `ewars_sync`, token ghi `.env`), tạo học kỳ `HK1_2026` (không phải học kỳ hiện tại — bộ v3 giữ `HK1_2025`), dựng 2 khóa học KTPM2411 (Mạng máy tính `010100089201`, Hệ điều hành `010100089101`: 30 buổi, 79 lượt trắc nghiệm, 6 bài thực hành) từ `docs/demo-data/moodle/moodle-demo.json`; `--manual` chỉ tạo tài khoản để tự làm tay. `npm run moodle:fixtures` gọi đủ 11 hàm, so khớp tình huống (vắng A/E, lượt làm dở, 2 lượt, nộp trễ, gia hạn) → `tests/fixtures/moodle/`. Client REST `data-import/moodle/client.ts` + 5 test. Phát hiện: `mod_assign_get_assignments` cần `includenotenrolledcourses`; bộ sinh câu hỏi/lượt làm của Moodle chỉ chạy trong unit test → script tự gọi API lưu câu hỏi + `quiz_attempt`. Typecheck, lint, format, test, build xanh. Kiểm tay giao diện Moodle: người dùng tự đăng nhập (`docs/huong-dan-moodle.md`).
 
 ### Phase 10b — Đồng bộ kéo + chế độ Chạy tay
-- [ ] `ImportSource.MOODLE` (migration), `MoodleCourseLink`, tài khoản hệ thống "Đồng bộ Moodle".
-- [ ] `data-import/moodle/`: client REST (POST, timeout, retry), 3 mapper thuần (điểm danh quy đổi phút → tiết, trắc nghiệm, thực hành), sinh CSV → lô `STAGED` → xem trước → xác nhận.
-- [ ] Queue `moodle-sync`; trang **Kết nối Moodle** (trạng thái, liên kết khóa học, chế độ, Đồng bộ ngay, lỗi gần nhất); nhãn nguồn Moodle ở lịch sử nạp + bảng độ mới; Audit Log.
-- [ ] Test mapper (fixture JSON) + tích hợp đồng bộ với máy chủ Moodle giả.
+
+Chốt 2026-11-08 (`docs/tich-hop-moodle.md` mục 9b): ATT-02 so với ngày chốt cũ nhất trong 14 ngày; Admin bật từng khóa; sinh viên Moodle chưa có trong EWARS bỏ qua + đếm riêng; 1 lần đồng bộ = 3 lô + Xác nhận nạp cả 3. Kết quả mong đợi viết TRƯỚC: `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`. Tài khoản hệ thống chuyển sang 10c (Chạy tay: người bấm là người thực hiện).
+
+- [x] ATT-02 theo cửa sổ 14 ngày + test; chạy lại nghiệm thu v3 (không đổi).
+- [x] `ImportSource.MOODLE` (migration), `MoodleCourseLink` + `MoodleSyncRun` (tài khoản hệ thống chuyển sang 10c).
+- [x] `data-import/moodle/`: client REST (POST, timeout, retry), 3 mapper thuần (điểm danh quy đổi phút → tiết, trắc nghiệm, thực hành), sinh CSV → lô `STAGED` → xem trước → xác nhận.
+- [x] Queue `moodle-sync`; trang **Kết nối Moodle** (trạng thái, liên kết khóa học, chế độ, Đồng bộ ngay, lỗi gần nhất); nhãn nguồn Moodle ở lịch sử nạp + bảng độ mới; Audit Log.
+- [x] Test mapper (fixture JSON) + tích hợp đồng bộ với máy chủ Moodle giả.
+
+**Kết quả 10b (2026-11-08):** nghiệm thu `moodle-sync-acceptance` (máy chủ Moodle giả từ fixture) khớp `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`: 3 lô nguồn MOODLE 480 · 121 · 120 dòng, 0 lỗi; 12 dấu hiệu, 9 cảnh báo; đồng bộ lại → "Không có thay đổi"; lô Moodle không hoàn tác. Kiểm tay với Moodle 5.3 Docker: bật 2 khóa → Đồng bộ ngay → 721 dòng → Xác nhận nạp cả 3 → chạy đánh giá mốc 07/11 → 9/20 sinh viên, 12 dấu hiệu; Hủy hoạt động; trang điện thoại không tràn ngang. Phát hiện + sửa trong phase: ATT-02 không báo khi ngày chốt dày (đổi sang cửa sổ 14 ngày — người dùng chốt); gia hạn riêng cần lưu (`han_rieng` → `LmsAssignmentSubmission.extendedDueAt`, LMS-03/04); Moodle chỉ trả Course ID number khi có `moodle/course:update`; gọi song song → Moodle "Unable to acquire a lock" (gọi tuần tự + thử lại).
 
 ### Phase 10c — Chế độ Tự động (thời gian thực)
 - [ ] Plugin `integrations/moodle/local_ewars` (observer + adhoc task + HMAC) theo bảng sự kiện mục 4b.

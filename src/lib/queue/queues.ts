@@ -7,6 +7,8 @@ export const QUEUE_NAMES = {
   /** 1 job / EvaluationRun: RiskScore + 12 luật (2 đường kích hoạt dùng chung — docs/rules/08). */
   evaluationRun: 'evaluation-run',
   sendNotifications: 'send-notifications',
+  /** Đồng bộ Moodle (Phase 10 — docs/tich-hop-moodle.md): 1 job / MoodleSyncRun. */
+  moodleSync: 'moodle-sync',
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];

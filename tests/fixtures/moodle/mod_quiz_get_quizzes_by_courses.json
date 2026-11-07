@@ -1,14 +1,14 @@
 [
   {
     "params": {
-      "courseids": [10]
+      "courseids": [14]
     },
     "response": {
       "quizzes": [
         {
-          "id": 16,
-          "coursemodule": 44,
-          "course": 10,
+          "id": 28,
+          "coursemodule": 76,
+          "course": 14,
           "name": "Trắc nghiệm chương 1",
           "intro": "Test quiz 1",
           "introformat": 1,
@@ -58,9 +58,9 @@
           "duedate": 1789491540
         },
         {
-          "id": 17,
-          "coursemodule": 45,
-          "course": 10,
+          "id": 29,
+          "coursemodule": 77,
+          "course": 14,
           "name": "Trắc nghiệm chương 2",
           "intro": "Test quiz 2",
           "introformat": 1,
@@ -110,9 +110,9 @@
           "duedate": 1791910740
         },
         {
-          "id": 18,
-          "coursemodule": 46,
-          "course": 10,
+          "id": 30,
+          "coursemodule": 78,
+          "course": 14,
           "name": "Trắc nghiệm chương 3",
           "intro": "Test quiz 3",
           "introformat": 1,
@@ -143,14 +143,14 @@
   },
   {
     "params": {
-      "courseids": [11]
+      "courseids": [15]
     },
     "response": {
       "quizzes": [
         {
-          "id": 19,
-          "coursemodule": 52,
-          "course": 11,
+          "id": 31,
+          "coursemodule": 84,
+          "course": 15,
           "name": "Trắc nghiệm chương 1",
           "intro": "Test quiz 4",
           "introformat": 1,
@@ -200,9 +200,9 @@
           "duedate": 1789491540
         },
         {
-          "id": 20,
-          "coursemodule": 53,
-          "course": 11,
+          "id": 32,
+          "coursemodule": 85,
+          "course": 15,
           "name": "Trắc nghiệm chương 2",
           "intro": "Test quiz 5",
           "introformat": 1,
@@ -252,9 +252,9 @@
           "duedate": 1791910740
         },
         {
-          "id": 21,
-          "coursemodule": 54,
-          "course": 11,
+          "id": 33,
+          "coursemodule": 86,
+          "course": 15,
           "name": "Trắc nghiệm chương 3",
           "intro": "Test quiz 6",
           "introformat": 1,

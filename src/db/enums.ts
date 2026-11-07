@@ -167,7 +167,15 @@ export enum EvaluationRunStatus {
 /** Tên `ImportSource` (không phải `DataSource`) để tránh trùng class của TypeORM. */
 export enum ImportSource {
   FILE = 'FILE',
+  /** Đồng bộ chỉ đọc từ Moodle (Phase 10 — docs/tich-hop-moodle.md): file CSV do hệ thống sinh. */
+  MOODLE = 'MOODLE',
 }
+
+// ── Đồng bộ Moodle (Phase 10, docs/rules/12) — lưu varchar, kiểm bằng union ─────────
+export const MOODLE_SYNC_TRIGGERS = ['MANUAL'] as const;
+export type MoodleSyncTrigger = (typeof MOODLE_SYNC_TRIGGERS)[number];
+export const MOODLE_SYNC_STATUSES = ['QUEUED', 'RUNNING', 'STAGED', 'NO_CHANGE', 'FAILED'] as const;
+export type MoodleSyncStatus = (typeof MOODLE_SYNC_STATUSES)[number];
 
 export enum ImportBatchStatus {
   UPLOADING = 'UPLOADING',

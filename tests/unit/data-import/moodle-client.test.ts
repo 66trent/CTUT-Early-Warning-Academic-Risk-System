@@ -67,6 +67,7 @@ describe('Moodle client — gọi web service', () => {
 
   it('HTTP lỗi và dữ liệu không phải JSON', async () => {
     const http = createMoodleClient({
+      retryDelayMs: 0,
       baseUrl: 'http://m',
       token: 't',
       fetchImpl: fakeFetch('', 503).impl,
@@ -81,9 +82,50 @@ describe('Moodle client — gọi web service', () => {
     await expect(html.call('x')).rejects.toMatchObject({ code: 'INVALID_JSON' });
   });
 
+  it('lỗi tạm thời (Moodle tranh khóa cache, 503) → thử lại; lỗi nghiệp vụ (token sai) → không thử lại', async () => {
+    const replies = [
+      new Response(
+        '{"exception":"moodle_exception","errorcode":"cannotlock","message":"Unable to acquire a lock for caching."}',
+      ),
+      new Response('', { status: 503 }),
+      new Response('{"ok":1}'),
+    ];
+    let count = 0;
+    const flaky = (() => Promise.resolve(replies[count++] ?? new Response('{}'))) as typeof fetch;
+    const client = createMoodleClient({
+      baseUrl: 'http://m',
+      token: 't',
+      fetchImpl: flaky,
+      retryDelayMs: 0,
+    });
+    await expect(client.call('x')).resolves.toEqual({ ok: 1 });
+    expect(count).toBe(3);
+
+    let calls = 0;
+    const invalid = (() => {
+      calls += 1;
+      return Promise.resolve(
+        new Response('{"exception":"x","errorcode":"invalidtoken","message":"Invalid token"}'),
+      );
+    }) as typeof fetch;
+    const strict = createMoodleClient({
+      baseUrl: 'http://m',
+      token: 't',
+      fetchImpl: invalid,
+      retryDelayMs: 0,
+    });
+    await expect(strict.call('x')).rejects.toMatchObject({ code: 'invalidtoken' });
+    expect(calls).toBe(1);
+  });
+
   it('không kết nối được → NETWORK', async () => {
     const impl = (() => Promise.reject(new TypeError('fetch failed'))) as typeof fetch;
-    const client = createMoodleClient({ baseUrl: 'http://m', token: 't', fetchImpl: impl });
+    const client = createMoodleClient({
+      baseUrl: 'http://m',
+      token: 't',
+      fetchImpl: impl,
+      retryDelayMs: 0,
+    });
     await expect(client.call('x')).rejects.toMatchObject({ code: 'NETWORK' });
   });
 });

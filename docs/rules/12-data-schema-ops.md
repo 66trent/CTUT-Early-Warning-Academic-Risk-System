@@ -10,7 +10,7 @@ Xem `00-project-context.md` trước. File này đặc tả các bảng vận h�
 | dataType | String(40) | NOT NULL | | Kiểu TS `ImportDataType` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `STUDENT`/`ATTENDANCE_SUMMARY`/`LMS_QUIZ`/`LMS_ASSIGNMENT`/`COURSE_RESULT` |
 | courseId | String(20) | NULL | FK → Course | Học phần Admin chọn trên form (tùy chọn, mặc định "tự nhận diện từ file") — có thì dòng thuộc học phần khác → `COURSE_MISMATCH` |
 | termId | String(10) | NULL | FK → Term | Bắt buộc với mọi loại trừ `STUDENT`. Chọn trên form nhập, mặc định học kỳ `isCurrent` |
-| source | ImportSource (enum) | NOT NULL | | `FILE` (MVP chỉ nhập file CSV/XLSX). Tên enum `ImportSource` để tránh trùng class `DataSource` của TypeORM |
+| source | ImportSource (enum) | NOT NULL | | `FILE` (người dùng tải lên) / `MOODLE` (file CSV do bộ đồng bộ Moodle sinh — Phase 10b, xem "Đồng bộ Moodle" cuối file). Tên enum `ImportSource` để tránh trùng class `DataSource` của TypeORM |
 | fileName | String(255) | NOT NULL | | Tên file đầu tiên của lô (chỉ hiển thị; lô nhiều file hiện thêm "+ N file") |
 | sourceChecksum | String(64) | NOT NULL | | SHA-256 nội dung file (lô 1 file) / SHA-256 của danh sách checksum các file đã sắp xếp (lô nhiều file) — chống nạp trùng (xem RÀNG BUỘC) |
 | performedBy | String(20) | NOT NULL | FK → User | |
@@ -128,3 +128,41 @@ Học kỳ chọn trên form nhập (mặc định học kỳ hiện tại); c�
 9. Chống nhập trùng file bằng `sourceChecksum`.
 10. Hủy batch `STAGED` chưa được dùng để tính RiskScore.
 11. Dữ liệu lỗi hoặc chưa đối soát MUST NOT vào Rule Engine (chỉ đọc dữ liệu từ batch `LOADED`/`RECONCILED`).
+
+## Đồng bộ Moodle (Phase 10b, chốt 2026-11-07/08 — `docs/tich-hop-moodle.md` mục 9, 9b)
+
+Bộ đồng bộ CHỈ ĐỌC Moodle (web service REST, token `MOODLE_WS_TOKEN`) → mapper thuần sinh file CSV ĐÚNG cột mẫu (1 file / khóa / loại) → đi qua ĐÚNG đường nạp nhiều file ở trên (kiểm tra dòng, tạo `Course`/`Enrollment`, thẻ học phần, lịch sử). Kết quả học phần KHÔNG đồng bộ (vẫn nạp file).
+
+### MoodleCourseLink — `moodle_course_links`
+
+| Field | Kiểu | Null? | Ghi chú |
+|---|---|---|---|
+| id | uuid | NOT NULL | PK |
+| moodleCourseId | Int | NOT NULL | `course.id` Moodle; UNIQUE (`moodleCourseId`, `termId`) |
+| termId | String(10) | NOT NULL | FK → Term (xóa học kỳ → xóa liên kết) |
+| sectionCode | String(30) | NOT NULL | = Course ID number (12 chữ số) của khóa Moodle |
+| courseId | String(20) | NOT NULL | Mã học phần — mặc định bỏ 2 số cuối, Admin sửa được |
+| courseName | String(150) | NOT NULL | Mặc định từ tên khóa Moodle (bỏ phần "(nhóm …) — …") |
+| moodleShortname / moodleFullname | String(255) | NOT NULL | Hiển thị |
+| enabled | Boolean | NOT NULL | Mặc định `false` — Admin bật từng khóa |
+| totalPeriodsOverride | Int | NULL | Ghi đè tổng số tiết (NULL = tổng thời lượng các buổi ÷ `MOODLE_PERIOD_MINUTES`) |
+| lastSyncAt / lastError | DateTime / text | NULL | Lần đọc gần nhất; lỗi đọc khóa này (không chứa token) |
+| unknownStudents | Json | NOT NULL | Sinh viên Moodle chưa có trong EWARS ở lần gần nhất `[{ moodleUserId, idnumber, email }]` ≤ 500 |
+| updatedBy | String(20) | NOT NULL | Người sửa gần nhất (Audit Log `MOODLE_LINK_UPDATED`) |
+
+### MoodleSyncRun — `moodle_sync_runs`
+
+1 lần đồng bộ của 1 học kỳ: `trigger` (`MANUAL`; 10c thêm), `requestedBy`, `status` `QUEUED` → `RUNNING` → `STAGED` (đã tạo lô) / `NO_CHANGE` / `FAILED`, `batchIds` (`{ ATTENDANCE_SUMMARY?, LMS_QUIZ?, LMS_ASSIGNMENT? }`), `stats` (theo khóa: số dòng sinh, số SV chưa có, ghi chú, lỗi; số file không đổi theo loại), `errorMessage`, `createdAt`, `finishedAt`. Queue `moodle-sync`, `jobId` = id, chạy 1 job/lần.
+
+### Quy tắc
+
+- Chỉ khóa `enabled` của học kỳ (chưa chốt). Chặn đồng bộ mới khi đang có lần `QUEUED`/`RUNNING` hoặc lần trước còn lô chưa xác nhận/hủy.
+- Khớp sinh viên: `user.idnumber` = MSSV (không phân biệt hoa thường); trống/không khớp → email đã lưu của sinh viên. KHÔNG suy MSSV từ email. Chỉ người có vai `student` trong khóa.
+- **Ngoại lệ của `00` (từ chối + ghi `ImportErrorRow`)**: sinh viên Moodle chưa có trong EWARS bị BỎ QUA và đếm riêng (`MoodleCourseLink.unknownStudents`, `stats`) — 1 khóa Moodle có thể có sinh viên khoa khác chưa nhập; ghi dòng lỗi sẽ lặp lại mỗi lần đồng bộ và đẩy tỷ lệ lỗi > 10%.
+- File sinh ra: tên `moodle-<mã lớp học phần>-<diem-danh|trac-nghiem|thuc-hanh>.csv`, UTF-8 có BOM. File trùng checksum với lô còn hiệu lực cùng loại, học kỳ → BỎ QUA (không đổi); cả 3 loại không đổi → `NO_CHANGE`, không tạo lô.
+- Chạy tay: lô `STAGED` → "Xác nhận nạp cả 3" (`MOODLE_SYNC_CONFIRMED`, mỗi lô vẫn ghi `IMPORT_CONFIRMED`) hoặc "Hủy" (`MOODLE_SYNC_DISCARDED`). Đánh giá sau nạp như nạp file (DEMO_MODE: Admin bấm chạy).
+- **Lô nguồn `MOODLE` không hoàn tác** — Moodle là nguồn gốc: sửa trên Moodle rồi đồng bộ lại.
+- Lỗi 1 khóa (mạng, quyền, Moodle) không chặn khóa khác; client thử lại lỗi tạm thời (mạng, quá giờ, HTTP 5xx, Moodle "Unable to acquire a lock") 2 lần; gọi Moodle TUẦN TỰ (gọi song song làm Moodle tranh khóa cache — gặp khi kiểm tay Phase 10b).
+- Quy đổi điểm danh: 1 ngày chốt cho MỖI NGÀY có buổi đã điểm danh (cộng dồn đến hết ngày); số tiết buổi = thời lượng ÷ `MOODLE_PERIOD_MINUTES` (mặc định 50, làm tròn, ≥ 1); ký hiệu `MOODLE_EXCUSED_ACRONYMS` (mặc định `E`) có phép, `MOODLE_UNEXCUSED_ACRONYMS` (mặc định `A`) không phép, còn lại có mặt; sinh viên không có trạng thái ở buổi đã điểm danh → không tính vắng; buổi theo nhóm tính cho cả lớp (giới hạn).
+- File thực hành có cột tùy chọn **`han_rieng`** (hạn nộp riêng / gia hạn — Moodle *Grant extension*), nhận như `han_nop` (chỉ ngày → 23:59). Nạp file tay cũng dùng được.
+

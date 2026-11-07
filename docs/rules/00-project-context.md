@@ -6,7 +6,7 @@ Nguồn sự thật duy nhất về nghiệp vụ và mô hình dữ liệu củ
 
 CTUT-EWARS (Early Warning Academic Risk System): hệ thống phát hiện dấu hiệu rủi ro học tập của sinh viên dựa trên luật nghiệp vụ có thể cấu hình, tổng hợp từ các nguồn: điểm danh tổng hợp (theo tiết), LMS (bài trắc nghiệm + trạng thái nộp bài thực hành), kết quả học phần đã khóa điểm. 12 luật (Phase 8a, chốt 2026-10-18 theo ảnh hệ thống trường + Quy chế 336/QĐ-ĐHKTCN). Bộ luật: `08-business-rules-catalog.md`.
 
-Nguồn điểm danh + LMS từ Phase 10 (chốt hướng 2026-11-07, chưa làm): ngoài nạp file, đồng bộ CHỈ ĐỌC từ Moodle (Web service REST + plugin `local_ewars` đẩy sự kiện; chế độ Tự động / Chạy tay) — thiết kế ở `docs/tich-hop-moodle.md`. Kết quả học phần vẫn chỉ nạp file.
+Nguồn điểm danh + LMS từ Phase 10 (chốt hướng 2026-11-07; 10a–10b xong — Chạy tay, 10c Tự động chưa làm): ngoài nạp file, đồng bộ CHỈ ĐỌC từ Moodle (Web service REST + plugin `local_ewars` đẩy sự kiện; chế độ Tự động / Chạy tay) — thiết kế ở `docs/tich-hop-moodle.md`. Kết quả học phần vẫn chỉ nạp file.
 
 Tên hiển thị của hệ thống (giao diện, email, tiêu đề trang) đọc từ biến môi trường `NEXT_PUBLIC_APP_NAME` — MUST NOT ghi cứng ở nhiều nơi.
 
@@ -39,7 +39,7 @@ Cách có tài khoản: `STUDENT` chỉ đăng nhập Google OAuth bằng email 
 3. Trong học kỳ (hằng tuần): nhập điểm danh tổng hợp + bài trắc nghiệm + trạng thái nộp bài thực hành → chạy đánh giá → `Alert` → CVHT xử lý → sinh viên xem. Học phần nào khóa điểm thì nhập kết quả học phần đó ngay (`ACA-01` báo không đạt).
 4. Cuối kỳ: đủ kết quả các học phần → đánh giá (`ACA-02/03/04`) → chốt học kỳ (lần chạy cuối `TERM_CLOSING` rồi `closedAt`). Kết quả không đạt là căn cứ nhận diện học lại ở học kỳ sau (`COMB-02`).
 
-Mỗi bước MUST từ chối dữ liệu tham chiếu tới thứ chưa tồn tại ở bước trước (VD: `mssv` chưa có trong danh sách sinh viên), ghi vào `ImportErrorRow`. Ngoại lệ duy nhất được tự tạo: `Course` và `Enrollment` (xem `09`).
+Mỗi bước MUST từ chối dữ liệu tham chiếu tới thứ chưa tồn tại ở bước trước (VD: `mssv` chưa có trong danh sách sinh viên), ghi vào `ImportErrorRow`. Ngoại lệ duy nhất được tự tạo: `Course` và `Enrollment` (xem `09`). Ngoại lệ ghi lỗi (Phase 10b, người dùng chốt 2026-11-08): đồng bộ Moodle BỎ QUA + đếm riêng sinh viên Moodle chưa có trong EWARS, không ghi `ImportErrorRow` (xem `12`).
 
 ## Mô hình dữ liệu cốt lõi (entity glossary)
 

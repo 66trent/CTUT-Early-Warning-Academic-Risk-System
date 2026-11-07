@@ -45,6 +45,9 @@ const EWARS_CAPABILITIES = [
     'webservice/rest:use',
     'moodle/course:view',
     'moodle/course:viewhiddencourses',
+    // Moodle chỉ trả Course ID number (= mã lớp học phần) trong core_course_get_courses_by_field cho
+    // người có quyền này (phát hiện ở Phase 10b). Token vẫn chỉ gọi được các hàm loại read ở trên.
+    'moodle/course:update',
     'moodle/course:viewparticipants',
     'moodle/course:enrolreview',
     'moodle/user:viewdetails',

@@ -119,6 +119,36 @@ describe('ATT-02: vắng tăng nhanh (theo % tổng số tiết)', () => {
     expect(triggersOf('ATT-02', [enrollment()])).toEqual([]);
   });
 
+  it('ngày chốt dày (Moodle chốt mỗi buổi): so với ngày chốt CŨ NHẤT trong 14 ngày, không phải liền trước', () => {
+    // Môn 60 tiết, mỗi tuần 1 buổi 4 tiết: liền trước chỉ tăng 4 (< 6), nhưng trong 14 ngày tăng 8.
+    const weekly = enrollment({
+      attendance: [
+        snapshot('2026-10-15', { totalPeriods: 60, unexcusedAbsence: 0 }),
+        snapshot('2026-10-22', { totalPeriods: 60, unexcusedAbsence: 0 }),
+        snapshot('2026-10-29', { totalPeriods: 60, unexcusedAbsence: 4 }),
+        snapshot('2026-11-05', { totalPeriods: 60, unexcusedAbsence: 8 }),
+      ],
+    });
+    const [t] = triggersOf(
+      'ATT-02',
+      [weekly],
+      context({}, undefined, new Date('2026-11-06T16:59:00Z')),
+    );
+    expect(t?.severity).toBe(Severity.HIGH);
+    expect(t?.inputSnapshot).toMatchObject({ increase: 8, days: 14, previousDate: '2026-10-22' });
+    // Vắng rải rác (mỗi 14 ngày 1 buổi) → trong cửa sổ chỉ tăng 4 → không.
+    const sparse = enrollment({
+      attendance: [
+        snapshot('2026-10-22', { totalPeriods: 60, unexcusedAbsence: 8 }),
+        snapshot('2026-10-29', { totalPeriods: 60, unexcusedAbsence: 8 }),
+        snapshot('2026-11-05', { totalPeriods: 60, unexcusedAbsence: 12 }),
+      ],
+    });
+    expect(
+      triggersOf('ATT-02', [sparse], context({}, undefined, new Date('2026-11-06T16:59:00Z'))),
+    ).toEqual([]);
+  });
+
   it('số vắng giảm (dữ liệu bị sửa) → không kích hoạt, ghi cảnh báo chất lượng dữ liệu', () => {
     const evaluation = evaluateStudent(student([twoSnapshots(9, 3)]), context());
     expect(evaluation.triggers.filter((t) => t.ruleCode === 'ATT-02')).toEqual([]);

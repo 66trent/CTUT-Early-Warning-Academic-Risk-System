@@ -1,15 +1,15 @@
 [
   {
     "params": {
-      "assignmentids": [13, 14, 15]
+      "assignmentids": [25, 26, 27]
     },
     "response": {
       "assignments": [
         {
-          "assignmentid": 14,
+          "assignmentid": 26,
           "userflags": [
             {
-              "id": 3,
+              "id": 5,
               "userid": 19,
               "locked": 0,
               "mailed": 2,
@@ -22,13 +22,13 @@
       "warnings": [
         {
           "item": "assignment",
-          "itemid": 13,
+          "itemid": 25,
           "warningcode": "3",
           "message": "No user flags found"
         },
         {
           "item": "assignment",
-          "itemid": 15,
+          "itemid": 27,
           "warningcode": "3",
           "message": "No user flags found"
         }
@@ -37,26 +37,26 @@
   },
   {
     "params": {
-      "assignmentids": [16, 17, 18]
+      "assignmentids": [30, 28, 29]
     },
     "response": {
       "assignments": [],
       "warnings": [
         {
           "item": "assignment",
-          "itemid": 16,
+          "itemid": 30,
           "warningcode": "3",
           "message": "No user flags found"
         },
         {
           "item": "assignment",
-          "itemid": 17,
+          "itemid": 28,
           "warningcode": "3",
           "message": "No user flags found"
         },
         {
           "item": "assignment",
-          "itemid": 18,
+          "itemid": 29,
           "warningcode": "3",
           "message": "No user flags found"
         }

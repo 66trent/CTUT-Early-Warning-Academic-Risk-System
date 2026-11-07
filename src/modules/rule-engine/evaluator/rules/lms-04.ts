@@ -10,11 +10,12 @@ const conditionSchema = z.object({
 });
 export type Lms04Condition = z.infer<typeof conditionSchema>;
 
-/** Bài thực hành đã nộp (tại asOf) sau hạn nộp. */
+/** Bài thực hành đã nộp (tại asOf) sau hạn nộp (hạn riêng nếu được gia hạn). */
 export function lateAssignments(facts: EnrollmentFacts): number {
   let late = 0;
   for (const [activityId, submittedAt] of facts.assignment.submittedAt) {
-    const dueAt = facts.assignment.dueAt.get(activityId);
+    const dueAt =
+      facts.assignment.extendedDueAt.get(activityId) ?? facts.assignment.dueAt.get(activityId);
     if (dueAt && submittedAt > dueAt) late += 1;
   }
   return late;

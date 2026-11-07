@@ -99,7 +99,7 @@ EWARS lấy **tổng số tiết** = tổng thời lượng mọi buổi đã t�
 
 - Web service + token: `npm run moodle:setup` in dòng "Moodle 5.3 …, tài khoản ewars_sync, 11 hàm được cấp".
 - Ghi lại JSON mẫu cho test: `npm run moodle:setup -- --reset --cutoff=2026-11-06` rồi `npm run moodle:fixtures` → `tests/fixtures/moodle/` (đủ 20 sinh viên + `_meta.json`; kiểm luôn quyền đọc dữ liệu mọi sinh viên). Xong thì `npm run moodle:setup -- --reset` để về ngày chốt hôm qua.
-- Đồng bộ sang EWARS (trang "Kết nối Moodle", Đồng bộ ngay / Tự động) — Phase 10b, 10c.
+- **Đồng bộ sang EWARS (Phase 10b — Chạy tay)**: đăng nhập Admin EWARS → menu **Kết nối Moodle** → chọn học kỳ **Học kỳ 1, 2026–2027** → bảng "Khóa học trên Moodle": **Bật đồng bộ** 2 khóa → **Đồng bộ ngay** (vài giây, trang tự cập nhật) → kiểm 3 lô (Điểm danh / Bài trắc nghiệm / Bài thực hành, bấm tên để xem từng dòng) → **Xác nhận nạp cả 3** → **Chạy đánh giá** (chọn học kỳ 2026–2027, mốc = ngày chốt) → kết quả như mục 3. Sửa dữ liệu trên Moodle rồi bấm Đồng bộ ngay lại: chỉ file thay đổi được nạp. Chế độ Tự động (thời gian thực): Phase 10c.
 
 ## 6. Giới hạn của Moodle demo
 

@@ -72,6 +72,11 @@ const envSchema = z
      */
     MOODLE_BASE_URL: optionalString.pipe(z.url().optional()),
     MOODLE_WS_TOKEN: optionalString,
+    /** Quy đổi điểm danh Moodle (buổi có thời lượng) → tiết: 1 tiết = 50 phút (người dùng xác nhận 2026-11-07). */
+    MOODLE_PERIOD_MINUTES: z.coerce.number().int().min(1).max(240).default(50),
+    /** Ký hiệu trạng thái điểm danh (mod_attendance) tính là vắng có phép / không phép, phân cách dấu phẩy. */
+    MOODLE_EXCUSED_ACRONYMS: z.string().trim().min(1).default('E'),
+    MOODLE_UNEXCUSED_ACRONYMS: z.string().trim().min(1).default('A'),
   })
   .superRefine((env, ctx) => {
     if (!isStaffEmail(env.ADMIN_SEED_EMAIL, env.STAFF_EMAIL_DOMAIN)) {
