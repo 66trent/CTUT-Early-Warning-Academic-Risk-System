@@ -9,13 +9,13 @@ import { confirmAction, pickOption, quickLogin } from './helpers';
  */
 const HEADER =
   'mssv,ho_dem,ten,ma_lop_hoc_phan,ma_hoc_phan,ten_hoc_phan,ngay_chot,tong_so_tiet,vang_co_phep,vang_khong_phep';
-/** Ngày chốt mới (sau 09/10 của bộ demo) → dòng thêm mới, hoàn tác được. */
+/** Ngày chốt mới (ngày chốt riêng của test, chưa có trong bộ demo) → dòng thêm mới, hoàn tác được. */
 const row = (mssv: string, hoDem: string, ten: string) =>
   `${mssv},${hoDem},${ten},010100240802,,Logic học,2025-10-16,30,0,0`;
-const GOOD_A = row('KTPM2411901', 'Nguyễn Minh', 'An');
-const GOOD_B = row('KTPM2411905', 'Hoàng Văn', 'Em');
+const GOOD_A = row('KTPM2411901', 'Vũ Quốc', 'Hưng');
+const GOOD_B = row('KTPM2411905', 'Ngô Minh', 'Tiến');
 const BAD = row('KTPM2411999', 'Không', 'Có');
-const FIXED = row('KTPM2411902', 'Trần Thị', 'Bích');
+const FIXED = row('KTPM2411902', 'Hồ Mỹ', 'Lan');
 
 const csv = (...rows: string[]) => Buffer.from(`﻿${[HEADER, ...rows].join('\r\n')}\r\n`);
 

@@ -9,12 +9,35 @@ const EVENT = 'ewars:quick-guide';
 /** Dự phòng khi trình duyệt chặn localStorage. */
 const memory = new Map<string, string>();
 
+/** Khóa đang ở lần xem đầu tiên trong phiên tải trang này: vẫn mở dù đã ghi nhớ "đóng" cho lần sau. */
+const firstViews = new Set<string>();
+
 function read(key: string): string | null {
   try {
     return window.localStorage.getItem(key) ?? memory.get(key) ?? null;
   } catch {
     return memory.get(key) ?? null;
   }
+}
+
+function store(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Trình duyệt chặn lưu trữ — thẻ vẫn mở/đóng theo bộ nhớ trong phiên.
+  }
+  memory.set(key, value);
+}
+
+/** Mở ở lần xem đầu, từ lần sau mặc định thu gọn; người dùng bấm mở/đóng thì nhớ theo ý họ. */
+function isOpen(key: string): boolean {
+  const value = read(key);
+  if (value === null) {
+    firstViews.add(key);
+    store(key, 'closed');
+    return true;
+  }
+  return value === 'open' || firstViews.has(key);
 }
 
 function subscribe(onChange: () => void) {
@@ -28,21 +51,18 @@ function subscribe(onChange: () => void) {
 
 /**
  * Thẻ "Lần đầu dùng?" thu gọn được. Trạng thái đóng/mở nhớ trên trình duyệt (tiện ích riêng của
- * người xem — lỗi lưu trữ thì vẫn hiện bình thường). Mặc định mở cho lần đầu.
+ * người xem — lỗi lưu trữ thì vẫn hiện bình thường). Server vẽ thu gọn để trang không nhảy với
+ * người đã xem; lần xem đầu tự mở.
  */
 export function QuickGuide({ guide, storageKey }: { guide: Guide; storageKey: string }) {
   const open = useSyncExternalStore(
     subscribe,
-    () => read(storageKey) !== 'closed',
-    () => true,
+    () => isOpen(storageKey),
+    () => false,
   );
   const toggle = (next: boolean) => {
-    try {
-      window.localStorage.setItem(storageKey, next ? 'open' : 'closed');
-    } catch {
-      // Trình duyệt chặn lưu trữ — thẻ vẫn mở/đóng theo sự kiện bên dưới trong phiên.
-    }
-    memory.set(storageKey, next ? 'open' : 'closed');
+    firstViews.delete(storageKey);
+    store(storageKey, next ? 'open' : 'closed');
     window.dispatchEvent(new Event(EVENT));
   };
   return (

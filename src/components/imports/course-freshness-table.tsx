@@ -91,7 +91,7 @@ export function CourseFreshnessTable({ courses }: { courses: CourseFreshnessDto[
       <div className="flex flex-wrap gap-1">
         <Button
           size="sm"
-          variant={onlyAttention ? 'default' : 'outline'}
+          variant={onlyAttention ? 'secondary' : 'ghost'}
           aria-pressed={onlyAttention}
           onClick={() => setOnlyAttention(true)}
         >
@@ -99,7 +99,7 @@ export function CourseFreshnessTable({ courses }: { courses: CourseFreshnessDto[
         </Button>
         <Button
           size="sm"
-          variant={onlyAttention ? 'outline' : 'default'}
+          variant={onlyAttention ? 'ghost' : 'secondary'}
           aria-pressed={!onlyAttention}
           onClick={() => setOnlyAttention(false)}
         >

@@ -44,7 +44,7 @@ export default async function AuditLogsPage({
   const result = await listAuditLogs(filter, list);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Nhật ký hệ thống"
         description="Ghi lại thao tác quan trọng: đăng nhập thất bại, duyệt tài khoản, nhập dữ liệu, cấu hình luật, xử lý cảnh báo, xem hồ sơ sinh viên. Không sửa hay xóa được."

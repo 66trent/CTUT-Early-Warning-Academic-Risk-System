@@ -3,7 +3,7 @@ import { Clock } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { SignOutButton } from '@/components/auth/sign-out-button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { UserAccountStatus } from '@/db/enums';
 import { getAuthState } from '@/lib/auth-server';
 
@@ -46,7 +46,7 @@ export default async function PendingApprovalPage() {
       <Card className="shadow-sm">
         <CardHeader>
           <Clock aria-hidden className="size-10 text-primary" />
-          <CardTitle className="text-2xl">{text.title}</CardTitle>
+          <h1>{text.title}</h1>
           <CardDescription>
             Xin chào {state.user.fullName}. {text.description}
           </CardDescription>

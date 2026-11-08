@@ -1,7 +1,9 @@
-import { Brackets } from 'typeorm';
+import { Brackets, In, Not } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
+import { Alert } from '@/db/entities/alert.entity';
 import { Student } from '@/db/entities/student.entity';
-import { type OfficialAcademicStatus } from '@/db/enums';
+import { Term } from '@/db/entities/term.entity';
+import { AlertStatus, type OfficialAcademicStatus, type Severity } from '@/db/enums';
 import {
   applyOrder,
   firstPage,
@@ -26,10 +28,28 @@ export interface StudentSearchItemDto {
   fullName: string;
   classId: string;
   officialAcademicStatus: OfficialAcademicStatus;
+  /** Mức cảnh báo ở học kỳ hiện tại; null khi không có cảnh báo hoặc chưa đặt học kỳ hiện tại. */
+  currentSeverity: Severity | null;
 }
 
 /** Ký tự đặc biệt của LIKE → thoát, để tìm đúng chuỗi người dùng gõ. */
 export const escapeLike = (value: string) => value.replace(/[\\%_]/g, (c) => `\\${c}`);
+
+/** Mức cảnh báo ở học kỳ hiện tại của các sinh viên trong 1 trang danh sách. */
+async function currentSeverities(studentIds: string[]): Promise<Map<string, Severity>> {
+  const ds = await getDataSource();
+  const term = await ds.getRepository(Term).findOneBy({ isCurrent: true });
+  if (!term || studentIds.length === 0) return new Map();
+  const alerts = await ds.getRepository(Alert).find({
+    where: {
+      termId: term.termId,
+      studentId: In(studentIds),
+      status: Not(AlertStatus.INVALIDATED),
+    },
+    select: { studentId: true, severity: true },
+  });
+  return new Map(alerts.map((a) => [a.studentId, a.severity]));
+}
 
 /**
  * Admin tìm sinh viên theo mã / họ tên (chứa chuỗi, không phân biệt hoa thường), lọc theo ngành của
@@ -67,12 +87,14 @@ export async function searchStudents(
     );
   }
   const [students, total] = await qb.getManyAndCount();
+  const severityOf = await currentSeverities(students.map((s) => s.studentId));
   return {
     items: students.map((s) => ({
       studentId: s.studentId,
       fullName: s.fullName,
       classId: s.classId,
       officialAcademicStatus: s.officialAcademicStatus,
+      currentSeverity: severityOf.get(s.studentId) ?? null,
     })),
     total,
     page: list.page,

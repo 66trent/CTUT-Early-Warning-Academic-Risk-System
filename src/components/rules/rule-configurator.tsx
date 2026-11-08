@@ -229,6 +229,7 @@ function DraftPanel({ rule }: { rule: RuleDetailDto }) {
 function NewDraftForm({ rule }: { rule: RuleDetailDto }) {
   const [value, setValue] = useState<ConditionValue>(rule.active?.condition ?? {});
   const [pending, setPending] = useState(false);
+  const changed = useMemo(() => changedPaths(rule.active?.condition, value).length, [rule, value]);
   const save = async () => {
     setPending(true);
     const res = await createRuleVersionAction({ ruleCode: rule.ruleCode, condition: value });
@@ -241,7 +242,8 @@ function NewDraftForm({ rule }: { rule: RuleDetailDto }) {
       <CardHeader>
         <CardTitle>Bước 1 · Sửa ngưỡng và lưu bản nháp</CardTitle>
         <CardDescription>
-          Sửa ngưỡng luôn tạo phiên bản mới, phiên bản đang áp dụng không bị ghi đè.
+          Form đã điền sẵn giá trị đang áp dụng. Sửa ngưỡng luôn tạo phiên bản mới, phiên bản đang
+          áp dụng không bị ghi đè.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -251,10 +253,17 @@ function NewDraftForm({ rule }: { rule: RuleDetailDto }) {
           value={value}
           onChange={setValue}
         />
-        <Button className="self-start" onClick={() => void save()} disabled={pending}>
-          {pending ? <Loader2 className="animate-spin" /> : <Save aria-hidden />}
-          Lưu bản nháp
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button onClick={() => void save()} disabled={pending}>
+            {pending ? <Loader2 className="animate-spin" /> : <Save aria-hidden />}
+            Lưu bản nháp
+          </Button>
+          {changed > 0 && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 tabular-nums dark:bg-amber-950 dark:text-amber-300">
+              Đã đổi {changed} giá trị so với bản đang áp dụng
+            </span>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

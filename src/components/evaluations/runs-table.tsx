@@ -4,6 +4,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { Activity } from 'lucide-react';
 import Link from 'next/link';
 import { DataTable } from '@/components/data-table/data-table';
+import { SeverityCounts } from '@/components/domain/severity-counts';
 import { EmptyState } from '@/components/empty-state';
 import { formatVnDateTime } from '@/lib/dates';
 import type { SortDir } from '@/lib/list-params';
@@ -33,14 +34,25 @@ const columns: ColumnDef<EvaluationRunListItemDto>[] = [
   {
     accessorKey: 'trigger',
     header: 'Cách chạy',
-    cell: ({ row }) =>
-      `${RUN_TRIGGER_LABELS[row.original.trigger]}${row.original.triggeredBy ? ` (${row.original.triggeredBy})` : ''}`,
+    cell: ({ row }) => {
+      const by = row.original.triggeredBy;
+      // Tài khoản ADMIN mặc định trùng với nhãn "Admin chạy" nên không lặp lại.
+      return `${RUN_TRIGGER_LABELS[row.original.trigger]}${by && by !== 'ADMIN' ? ` (${by})` : ''}`;
+    },
   },
   {
     accessorKey: 'asOf',
     header: 'Tính đến',
     meta: { sortKey: 'asOf' },
-    cell: ({ row }) => formatVnDateTime(row.original.asOf),
+    cell: ({ row }) => {
+      const sameMoment =
+        Math.abs(Date.parse(row.original.asOf) - Date.parse(row.original.createdAt)) < 60_000;
+      return sameMoment ? (
+        <span className="text-muted-foreground">Lúc chạy</span>
+      ) : (
+        formatVnDateTime(row.original.asOf)
+      );
+    },
   },
   {
     accessorKey: 'status',
@@ -60,7 +72,7 @@ const columns: ColumnDef<EvaluationRunListItemDto>[] = [
   {
     accessorKey: 'triggerCount',
     header: 'Dấu hiệu phát hiện',
-    cell: ({ row }) => <span className="tabular-nums">{row.original.triggerCount}</span>,
+    cell: ({ row }) => <SeverityCounts items={row.original.bySeverity} />,
   },
 ];
 

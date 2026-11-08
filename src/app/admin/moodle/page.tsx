@@ -90,13 +90,21 @@ export default async function MoodlePage({
       : 'Hệ thống chưa được khai báo địa chỉ Moodle và khóa truy cập chỉ đọc. Người quản trị máy chủ cần khai báo rồi khởi động lại hệ thống.';
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Kết nối Moodle"
         description="Đồng bộ chỉ đọc điểm danh, bài trắc nghiệm, bài thực hành từ Moodle. Kết quả học phần vẫn nhập file."
       />
 
-      <Card className="shadow-sm">
+      <Card
+        className={cn(
+          'shadow-sm',
+          !connection.ok &&
+            (connection.configured
+              ? 'border-destructive/30 bg-destructive/5'
+              : 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40'),
+        )}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {connection.ok ? (
@@ -146,10 +154,8 @@ export default async function MoodlePage({
             <CardHeader>
               <CardTitle>Đồng bộ · {term.termName}</CardTitle>
               <CardDescription>
-                Thủ công: mỗi lần đồng bộ tạo tối đa 3 đợt nhập (điểm danh / trắc nghiệm / thực
-                hành, mỗi khóa 1 file), dữ liệu chỉ được ghi sau khi bạn bấm Xác nhận. Tự động: có
-                thay đổi trên Moodle là tự nhập và tự chạy đánh giá. Sinh viên Moodle chưa có trong
-                EWARS được bỏ qua và đếm riêng.
+                Thủ công: dữ liệu chỉ được ghi sau khi bạn bấm Xác nhận. Tự động: Moodle có thay đổi
+                là hệ thống tự nhập và tự chạy đánh giá.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -167,8 +173,8 @@ export default async function MoodlePage({
             <CardHeader>
               <CardTitle>Khóa học trên Moodle</CardTitle>
               <CardDescription>
-                Chỉ khóa có Course ID number là mã lớp học phần 12 chữ số mới bật được. Điểm danh
-                quy đổi thời lượng buổi học ra tiết (1 tiết = 50 phút).
+                Chỉ khóa có mã lớp học phần 12 chữ số (ô Course ID number trên Moodle) mới bật được.
+                Điểm danh quy đổi thời lượng buổi học ra tiết (1 tiết = 50 phút).
               </CardDescription>
             </CardHeader>
             <CardContent>

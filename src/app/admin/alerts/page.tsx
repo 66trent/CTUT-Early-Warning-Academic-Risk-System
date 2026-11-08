@@ -72,7 +72,7 @@ export default async function AdminAlertsPage({
     return `/admin/alerts?${query.toString()}`;
   };
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         helpHref={HELP_LINKS.alerts}
         title="Cảnh báo sớm"

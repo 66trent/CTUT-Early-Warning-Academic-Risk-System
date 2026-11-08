@@ -58,7 +58,7 @@
 | 11 | Kiến trúc | Next.js · PostgreSQL · Worker + Redis · MinIO · Docker · Moodle 5.3 | 0:50 |
 | 12 | Bảo mật và pháp lý | Token chỉ đọc · chữ ký HMAC · phân quyền theo lớp · nhật ký · Luật 91/2025 | 0:50 |
 | 13 | Kiểm thử | 472 test · nghiệm thu Moodle khớp 100% · đo 34 giây | 0:40 |
-| 14 | Dữ liệu demo | Moodle: lớp KTPM2411, 2 khóa, HK1 2026–2027 · Bộ nhập file: 5 lớp × 20 SV | 0:30 |
+| 14 | Dữ liệu demo | Moodle: lớp KTPM2411, 2 khóa, HK1 2026–2027 · Bộ nhập file: 6 lớp, 110 SV | 0:30 |
 | 15 | (Demo trực tiếp) | — | 14:00 |
 | 16 | Giới hạn · Hướng phát triển · Kết luận | 4 + 3 gạch | 1:20 |
 
@@ -213,7 +213,7 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 docker compose --profile dev --profile moodle up -d --build
 ```
 
-3. Dữ liệu sạch cho buổi bảo vệ (bộ nhập file v3 nhập sẵn, chưa chạy đánh giá):
+3. Dữ liệu sạch cho buổi bảo vệ (bộ nhập file v4 nhập sẵn, chưa chạy đánh giá):
 
 ```bash
 npm run demo:reset -- --yes
@@ -357,11 +357,11 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 *"Kết quả học phần là điểm chính thức, không có trong Moodle, nên em dùng bộ dữ liệu nhập file của học kỳ trước — năm lớp, một trăm sinh viên — đã nhập sẵn để tiết kiệm thời gian."*
 
-[**Nhập dữ liệu** → chỉ Lịch sử: 7 đợt nhập file (kết quả HK3, điểm danh, trắc nghiệm, thực hành, kết quả cuối kỳ).]
+[**Nhập dữ liệu** → chỉ Lịch sử: 9 đợt nhập file (kết quả HK2, HK3, điểm danh, trắc nghiệm, thực hành, kết quả cuối kỳ).]
 
 [**Học kỳ** → **Học kỳ 1, 2025–2026** → **Chốt học kỳ** → điền mốc **2025-12-31** → **Chạy đánh giá cuối và chốt**.]
 
-*"Cuối học kỳ, quản trị viên chốt. Trước khi chốt, hệ thống liệt kê **hai sinh viên còn thiếu kết quả** để biết trước. Lần chạy cuối mới xét các luật học kỳ."*
+*"Cuối học kỳ, quản trị viên chốt. Trước khi chốt, hệ thống liệt kê **ba sinh viên còn thiếu kết quả** để biết trước. Lần chạy cuối mới xét các luật học kỳ."*
 
 [Chờ chạy xong. **Cảnh báo sớm** → học kỳ 1, 2025–2026 → mở **HTTT2411908**.]
 
@@ -526,6 +526,6 @@ Học kỳ Moodle = **Học kỳ 1, 2026–2027** (lớp KTPM2411). Bộ nhập 
 ## Phần 6 — Tờ ghi nhớ 1 trang (in ra, để trên bàn)
 
 - **Câu một dòng:** Moodle → chuông báo (ký HMAC) → EWARS tự đọc lại (chỉ đọc) → tự nhập → 12 luật → chuông cố vấn · chỉ tham khảo.
-- **Số cần nhớ:** Moodle: 2 khóa × 15 buổi × 4 tiết = **60 tiết** · đồng bộ ~480 · **121** · **120** dòng · **12 dấu hiệu, 9 cảnh báo** · 903 = 16/60 (**26,7%**, Rất cao) · 906: 8 → 12/60 = **20%** (Cao, mở lại) · đo **34 giây** · hạn nộp + **5 phút** · dò **10 phút** · tự nhập khi lỗi ≤ **10%** · **472** test · 11 hàm chỉ đọc · 1 tiết = **50 phút** · A = **3,8**.
+- **Số cần nhớ:** Moodle: 2 khóa × 15 buổi × 4 tiết = **60 tiết** · đồng bộ ~480 · **121** · **120** dòng · **12 dấu hiệu, 9 cảnh báo** · 903 = 16/60 (**26,7%**, Rất cao) · 906: 8 → 12/60 = **20%** (Cao, mở lại) · đo **34 giây** · hạn nộp + **5 phút** · dò **10 phút** · tự nhập khi lỗi ≤ **10%** · **484** test · 11 hàm chỉ đọc · 1 tiết = **50 phút** · A = **3,8**.
 - **Thứ tự demo:** Moodle (khóa MMT, điểm danh) → Kết nối Moodle: bật 2 khóa → Đồng bộ ngay → 3 đợt nhập → Xác nhận → Chạy đánh giá (12/9) → chuông Admin → GV001: 903 xác nhận + can thiệp; 906 giải quyết → SV 903 → Bật Tự động → ★ Moodle điểm danh 906 vắng → chuông "1 mở lại" → 906 Cao 20% + MailHog → lưới an toàn → chốt HK 2025–2026 (mốc 2025-12-31) → HTTT 908, KTPM 918 → Nhật ký.
 - **Ba điều phải nói bằng được:** (1) EWARS chỉ đọc Moodle, không tự quyết học vụ; (2) gần thời gian thực ~1 phút + lưới an toàn cho việc không có sự kiện; (3) đã giải quyết mà xấu hơn thì tự mở lại và báo ngay.

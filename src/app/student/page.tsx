@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { Lightbulb, Mail } from 'lucide-react';
 import { StudentCourseCards } from '@/components/alerts/student-course-cards';
+import { StatCard } from '@/components/dashboard/dashboard-parts';
 import { QuickGuide } from '@/components/quick-guide';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserRole } from '@/db/enums';
@@ -29,10 +29,19 @@ export default async function StudentHomePage() {
     term ? getStudentOverview(user.userId, term.termId) : null,
     getAttendanceThreshold(),
   ]);
-  const attention = overview?.level === 'NEEDS_ATTENTION';
+  const courses = overview?.profile.courses ?? [];
+  const work = courses.reduce(
+    (sum, c) => ({
+      done: sum.done + c.quizzes.submitted + c.assignments.submitted,
+      total: sum.total + c.quizzes.total + c.assignments.total,
+    }),
+    { done: 0, total: 0 },
+  );
+  const graded = courses.filter((c) => c.result).length;
+  const focus = overview?.focus ?? [];
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div>
         <h1>Tình hình học tập của bạn</h1>
         <p className="mt-1 text-muted-foreground">
@@ -41,30 +50,22 @@ export default async function StudentHomePage() {
         </p>
       </div>
 
-      <QuickGuide guide={STUDENT_GUIDE} storageKey="ewars:guide:student" />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label="Học phần trong học kỳ" value={courses.length} tone="hero" />
+        <StatCard label="Bài đã hoàn thành" value={work.done} suffix={`/ ${work.total}`} />
+        <StatCard label="Học phần đã có kết quả" value={graded} suffix={`/ ${courses.length}`} />
+      </div>
 
-      <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex flex-wrap items-center gap-2">
-            Tổng quan
-            {attention && (
-              <Badge variant="outline" className="gap-1">
-                <Lightbulb aria-hidden />
-                Điều nên chú ý
-              </Badge>
-            )}
-          </CardTitle>
-          <CardDescription>
-            {attention
-              ? 'Cố vấn học tập của bạn đã ghi nhận vài điểm nên cải thiện. Các gợi ý bên dưới có thể giúp bạn.'
-              : overview?.resolved
-                ? 'Cố vấn học tập đã cùng bạn trao đổi các điểm cần chú ý. Hãy tiếp tục theo kế hoạch đã thống nhất nhé!'
-                : 'Theo dõi số liệu từng học phần bên dưới để chủ động trong học tập.'}
-          </CardDescription>
-        </CardHeader>
-        {overview && overview.focus.length > 0 && (
+      {focus.length > 0 && (
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Việc nên làm</CardTitle>
+            <CardDescription>
+              Cố vấn học tập của bạn đã ghi nhận vài điểm nên cải thiện.
+            </CardDescription>
+          </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            {overview.focus.map((f, i) => (
+            {focus.map((f, i) => (
               <div key={i} className="rounded-md border p-3 text-sm">
                 <p className="font-medium">
                   {SOURCE_LABELS[f.source]} · {f.course}
@@ -78,8 +79,16 @@ export default async function StudentHomePage() {
             ))}
             <ReferenceOnlyNotice />
           </CardContent>
-        )}
-      </Card>
+        </Card>
+      )}
+      {focus.length === 0 && overview?.resolved && (
+        <p className="rounded-xl border bg-card px-4 py-3 text-sm shadow-sm">
+          Cố vấn học tập đã cùng bạn trao đổi các điểm cần chú ý. Tiếp tục theo kế hoạch đã thống
+          nhất nhé.
+        </p>
+      )}
+
+      <QuickGuide guide={STUDENT_GUIDE} storageKey="ewars:guide:student" />
 
       <Card className="shadow-sm">
         <CardHeader>
@@ -89,7 +98,7 @@ export default async function StudentHomePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <StudentCourseCards courses={overview?.profile.courses ?? []} threshold={threshold} />
+          <StudentCourseCards courses={courses} threshold={threshold} />
         </CardContent>
       </Card>
 

@@ -288,7 +288,7 @@ function buildColumns(termId: string, canEdit: boolean): ColumnDef<MoodleCourseR
     },
     {
       accessorKey: 'idnumber',
-      header: 'Course ID number',
+      header: 'Mã lớp học phần',
       cell: ({ row }) =>
         row.original.linkable ? (
           <span className="font-mono">{row.original.idnumber}</span>

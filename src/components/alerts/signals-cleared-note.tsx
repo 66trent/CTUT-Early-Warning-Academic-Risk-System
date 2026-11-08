@@ -10,7 +10,7 @@ export function SignalsClearedNote({ at, compact = false }: { at?: string; compa
     return (
       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
         <CircleCheck aria-hidden className="size-3.5" />
-        Lần đánh giá gần nhất không còn dấu hiệu
+        Đã hết dấu hiệu
       </span>
     );
   }

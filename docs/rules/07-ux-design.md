@@ -16,7 +16,7 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 ## CVHT — người dùng chính, tần suất cao
 
 - MUST: màn hình chính của CVHT mặc định mở ra danh sách `Alert` cần hành động (`OPEN`/`ACKNOWLEDGED`) — MUST NOT mở màn hình thống kê tổng quan làm mặc định.
-- MUST: luồng "Xác nhận → Ghi can thiệp" tối đa 2 lần click từ danh sách — dùng Sheet/Dialog hiển thị chi tiết + form can thiệp trên cùng màn hình, MUST NOT chuyển sang trang riêng.
+- MUST: luồng "Xác nhận → Ghi can thiệp" tối đa 2 lần click từ danh sách — dùng Sheet/Dialog hiển thị chi tiết + form can thiệp trên cùng màn hình, MUST NOT chuyển sang trang riêng. Phase 11: bấm cả dòng để mở (tên sinh viên là nút cho bàn phím); hành động chính + "Ghi can thiệp" ghim ở đáy Sheet, "Bỏ qua" và "Không còn hiệu lực" nằm trong menu "Khác"; tab "Cần xử lý" bỏ cột Trạng thái, chỉ gắn nhãn "Mở lại"; bộ lọc mức / nguồn / trạng thái thu vào nút "Bộ lọc", đang lọc thì hiện chip.
 - MUST: khi 1 `Alert` có nhiều `RuleTrigger`, hiển thị tóm tắt trước (ví dụ "3 nguyên nhân: vắng học, giảm tương tác LMS, điểm giữa kỳ thấp"), cho mở rộng xem chi tiết — MUST NOT bắt đọc hết log ngay từ đầu.
 - SHOULD: có chế độ "Đánh dấu đã xem tất cả" cho `Alert` mức `LOW` để giảm cảm giác quá tải.
 
@@ -29,6 +29,10 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 - MUST: có nút/link liên hệ CVHT trực tiếp ngay trên trang cảnh báo cá nhân.
 
 ## Admin — cấu hình an toàn
+
+- MUST (Phase 11): trang Nhập dữ liệu chia 3 tab theo URL `?tab=new|needs|history` (link cũ có bộ lọc mở tab Lịch sử); đợt nhập chờ xác nhận luôn nhắc ở đầu trang. Trạng thái đợt nhập có màu theo việc cần làm: chờ xác nhận hổ phách, bị từ chối đỏ.
+- MUST (Phase 11): lịch sử Chạy đánh giá theo học kỳ (mặc định hiện tại, cho đổi), khối "Lần chạy gần nhất" ở trên, cột Dấu hiệu là cụm số theo mức (`RC 3`, `C 6`).
+- MUST (Phase 11): Nhật ký hệ thống hiện tên đối tượng và nhãn tiếng Việt; JSON, mã lỗi gấp vào "Thông tin kỹ thuật". Trang Bắt đầu gấp giai đoạn đã xong. Danh sách luật gom theo nhóm; trang sửa luật chỉ giữ 1 bảng ngưỡng (bảng chỉ đọc chỉ hiện khi có bản nháp để so sánh).
 
 - MUST: màn hình cấu hình luật có chế độ xem trước tác động trước khi kích hoạt (ước tính số sinh viên bị ảnh hưởng nếu áp dụng ngưỡng mới).
 - MUST: thao tác nguy hiểm (kích hoạt luật mới, hủy batch, đổi trọng số lớn) có bước xác nhận thứ hai (AlertDialog) — MUST NOT thực hiện ngay sau 1 lần click.
@@ -82,3 +86,4 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 - Admin và Cố vấn học tập đều có chuông ở thanh trên. CVHT: thông báo cảnh báo (như cũ) + "đánh giá đã cập nhật"; Admin: "đánh giá đã cập nhật". Danh sách gộp, mới nhất trước (20 dòng), dòng chưa đọc tô nền; dòng cập nhật có biểu tượng làm mới, tiêu đề theo nguồn + số đếm; bấm → trang lần đánh giá (Admin) / Cảnh báo (CVHT). "Đánh dấu tất cả đã đọc".
 - Chuông tự tải lại mỗi 15 giây + khi quay lại tab. Có thông báo mới khi đang mở trang → toast kèm nút "Tải lại" (làm mới dữ liệu trang, không tải lại cả trang).
+- MUST (Phase 11 đợt 4, chốt 2026-11-08): khổ điện thoại, thẻ cảnh báo gồm mức + tên 1 hàng, lý do 1 dòng, cả thẻ bấm được (`meta.mobile` của `DataTable`: `lead`, `plain`). Sinh viên phụ trách: mức cao lên đầu, tìm theo mã hoặc họ tên, gõ không dấu được. Danh sách Sinh viên của Admin có cột mức cảnh báo học kỳ hiện tại. Ô trống dùng `EmptyState` (1 câu vì sao trống, kèm việc nên làm khi có).

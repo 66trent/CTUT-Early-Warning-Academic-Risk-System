@@ -3,7 +3,7 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { DataTable } from '@/components/data-table/data-table';
-import { SeverityBadge } from '@/components/domain/severity-badge';
+import { SEVERITY_ROW_CLASS, SeverityBadge } from '@/components/domain/severity-badge';
 import { Badge } from '@/components/ui/badge';
 import type { Severity } from '@/db/enums';
 import { formatVnDate } from '@/lib/dates';
@@ -24,6 +24,7 @@ const columns: ColumnDef<RuleRowView>[] = [
   {
     accessorKey: 'ruleCode',
     header: 'Luật',
+    enableSorting: false,
     meta: { mobile: 'title' },
     cell: ({ row }) => (
       <span className="flex min-w-0 flex-col whitespace-normal md:min-w-72">
@@ -39,10 +40,10 @@ const columns: ColumnDef<RuleRowView>[] = [
       </span>
     ),
   },
-  { accessorKey: 'groupLabel', header: 'Nhóm' },
   {
     accessorKey: 'activeVersion',
     header: 'Phiên bản đang áp dụng',
+    enableSorting: false,
     meta: { label: 'Đang áp dụng' },
     cell: ({ row }) =>
       row.original.activeVersion ? (
@@ -59,6 +60,7 @@ const columns: ColumnDef<RuleRowView>[] = [
   {
     accessorKey: 'activeSeverity',
     header: 'Mức cao nhất',
+    enableSorting: false,
     cell: ({ row }) =>
       row.original.activeSeverity ? <SeverityBadge severity={row.original.activeSeverity} /> : '—',
   },
@@ -79,6 +81,8 @@ export function RulesTable({ rules }: { rules: RuleRowView[] }) {
       columns={columns}
       data={rules}
       getRowId={(r) => r.ruleCode}
+      groupLabel={(r) => r.groupLabel}
+      rowClassName={(r) => (r.activeSeverity ? SEVERITY_ROW_CLASS[r.activeSeverity] : undefined)}
       emptyMessage="Chưa có luật nào, báo người cài đặt hệ thống nhập bộ luật mặc định."
     />
   );

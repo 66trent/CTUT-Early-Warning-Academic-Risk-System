@@ -39,7 +39,7 @@ Mỗi vai 1 cửa sổ trình duyệt (cửa sổ ẩn danh cho sinh viên) đ�
 
 ## 3. Dữ liệu dựng sẵn (cách A)
 
-Học kỳ `HK1_2026` (17/08–27/12/2026, giá trị demo), danh mục Moodle "HK1 2026–2027", lớp KTPM2411 (20 sinh viên bộ v3). Mọi mốc đặt **tương đối với ngày chốt** để kết quả mong đợi không đổi dù dựng ngày nào. Mỗi khóa học: 15 buổi × 200 phút (4 tiết) = 60 tiết, đã điểm danh 12 buổi đến 06/11; 3 bài trắc nghiệm (10 câu Đúng/Sai, hạn 15/09, 13/10, 24/11); 3 bài thực hành (hạn 22/09, 20/10, 30/11).
+Học kỳ `HK1_2026` (17/08–27/12/2026, giá trị demo), danh mục Moodle "HK1 2026–2027", lớp KTPM2411 (20 sinh viên bộ v4). Mọi mốc đặt **tương đối với ngày chốt** để kết quả mong đợi không đổi dù dựng ngày nào. Mỗi khóa học: 15 buổi × 200 phút (4 tiết) = 60 tiết, đã điểm danh 12 buổi đến 06/11; 3 bài trắc nghiệm (10 câu Đúng/Sai, hạn 15/09, 13/10, 24/11); 3 bài thực hành (hạn 22/09, 20/10, 30/11).
 
 | Khóa học (Course ID number) | Sinh viên tình huống | Dự kiến EWARS báo (khi có Phase 10b) |
 |---|---|---|

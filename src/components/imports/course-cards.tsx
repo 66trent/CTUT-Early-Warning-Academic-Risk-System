@@ -42,8 +42,10 @@ function CourseCard({ card, staged }: { card: ImportCourseCard; staged: boolean 
         </Row>
         {card.snapshotDates && (
           <Row label="Điểm danh">
-            {card.totalPeriods ? `${card.totalPeriods} tiết · ` : ''}ngày chốt{' '}
-            {card.snapshotDates.map(dmy).join(', ')}
+            {card.totalPeriods ? `${card.totalPeriods} tiết · ` : ''}
+            {card.snapshotDates.length > 3
+              ? `${card.snapshotDates.length} ngày chốt, mới nhất ${dmy(card.snapshotDates.at(-1) ?? '')}`
+              : `ngày chốt ${card.snapshotDates.map(dmy).join(', ')}`}
             {card.previousSnapshotDate && (
               <span className="block text-xs text-muted-foreground">
                 Lần nhập trước: chốt {dmy(card.previousSnapshotDate)}

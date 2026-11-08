@@ -56,8 +56,18 @@ function TermActions({ term, canChooseAsOf }: { term: TermDto; canChooseAsOf: bo
 
 function buildColumns(canChooseAsOf: boolean): ColumnDef<TermDto>[] {
   return [
-    { accessorKey: 'termId', header: 'Mã' },
-    { accessorKey: 'termName', header: 'Học kỳ' },
+    {
+      accessorKey: 'termName',
+      header: 'Học kỳ',
+      cell: ({ row }) => <span className="font-medium">{row.original.termName}</span>,
+    },
+    {
+      accessorKey: 'termId',
+      header: 'Mã',
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground tabular-nums">{row.original.termId}</span>
+      ),
+    },
     {
       accessorKey: 'startDate',
       header: 'Thời gian',

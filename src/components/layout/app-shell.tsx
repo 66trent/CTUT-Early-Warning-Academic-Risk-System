@@ -5,19 +5,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { CalendarDays, Menu } from 'lucide-react';
-import { SignOutButton } from '@/components/auth/sign-out-button';
 import { NotificationBell } from '@/components/alerts/notification-bell';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserRole } from '@/db/enums';
 import { APP_NAME, UNIVERSITY_NAME } from '@/lib/app-config';
-import { ROLE_LABELS } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import { NAV_GROUPS, isNavItemActive } from './nav-config';
 import { QuickSearch } from './quick-search';
+import { UserMenu } from './user-menu';
 
 export interface AppShellUser {
   fullName: string;
@@ -46,10 +43,15 @@ function Brand({ rail = false }: { rail?: boolean }) {
         rail && 'md:max-lg:justify-center md:max-lg:px-2',
       )}
     >
-      <Image src="/logo.png" alt="" width={40} height={40} className="size-10 shrink-0" priority />
+      {/* Logo xanh đậm cần nền trắng để không chìm vào sidebar navy. */}
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white">
+        <Image src="/logo.png" alt="" width={40} height={40} className="size-10" priority />
+      </span>
       <div className={cn('min-w-0', rail && 'md:max-lg:hidden')}>
-        <p className="truncate text-base leading-tight font-bold text-accent-strong">{APP_NAME}</p>
-        <p className="truncate text-xs leading-tight text-muted-foreground">{UNIVERSITY_NAME}</p>
+        <p className="truncate text-base leading-tight font-bold text-sidebar-accent-foreground">
+          {APP_NAME}
+        </p>
+        <p className="mt-0.5 text-xs leading-snug text-sidebar-muted">{UNIVERSITY_NAME}</p>
       </div>
     </div>
   );
@@ -73,7 +75,7 @@ function SidebarNav({
           {group.title && (
             <p
               className={cn(
-                'px-3 pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase',
+                'px-3 pb-1 text-xs font-semibold tracking-wide text-sidebar-muted uppercase',
                 rail && 'md:max-lg:sr-only',
               )}
             >
@@ -89,8 +91,10 @@ function SidebarNav({
                 onClick={onNavigate}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150',
-                  active ? 'bg-primary-soft text-primary' : 'text-foreground hover:bg-secondary',
+                  'flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none',
+                  active
+                    ? 'bg-sidebar-primary font-semibold text-sidebar-primary-foreground'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                   rail && 'md:max-lg:justify-center md:max-lg:px-0',
                 )}
               >
@@ -122,12 +126,6 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
       <aside className="fixed inset-y-0 left-0 hidden w-16 flex-col border-r border-sidebar-border bg-sidebar md:flex lg:w-64">
         <Brand rail />
         <SidebarNav role={user.role} rail />
-        <Link
-          href="/legal/privacy-policy"
-          className="mt-auto hidden border-t border-sidebar-border px-6 py-4 text-xs text-muted-foreground hover:underline lg:block"
-        >
-          Chính sách bảo vệ dữ liệu cá nhân
-        </Link>
       </aside>
 
       <div className="flex min-h-screen flex-col md:pl-16 lg:pl-64">
@@ -143,17 +141,17 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 bg-sidebar p-0">
+            <SheetContent side="left" className="w-72 bg-sidebar p-0 text-sidebar-foreground">
               <SheetTitle className="sr-only">Menu chính</SheetTitle>
               <Brand />
               <SidebarNav role={user.role} onNavigate={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
 
-          <Badge variant="outline" className="hidden gap-1.5 sm:inline-flex">
-            <CalendarDays aria-hidden />
+          <span className="hidden h-9 items-center gap-2 rounded-md bg-primary-soft px-3 text-sm font-medium text-accent-strong sm:inline-flex">
+            <CalendarDays aria-hidden className="size-4 text-primary" />
             {currentTermName ?? 'Chưa đặt học kỳ hiện tại'}
-          </Badge>
+          </span>
 
           <div className="ml-auto flex items-center gap-2">
             {user.role !== UserRole.STUDENT && <QuickSearch role={user.role} />}
@@ -164,16 +162,14 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
                 }
               />
             )}
-            <ThemeToggle />
-            <div className="hidden text-right leading-tight sm:block">
-              <p className="text-sm font-semibold">{user.fullName}</p>
-              <p className="text-xs text-muted-foreground">{ROLE_LABELS[user.role]}</p>
-            </div>
-            <SignOutButton compact />
+            <UserMenu fullName={user.fullName} role={user.role} />
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        {/* Một khung chung: mép trái nội dung không nhảy khi đổi trang (docs/rules/03). */}
+        <main className="flex-1 p-4 sm:p-6">
+          <div className="mx-auto w-full max-w-6xl">{children}</div>
+        </main>
       </div>
     </div>
   );

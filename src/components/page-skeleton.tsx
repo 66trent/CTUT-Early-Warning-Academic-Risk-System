@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function PageSkeleton({ cards = 4, rows = 6 }: { cards?: number; rows?: number }) {
   return (
     <div
-      className="mx-auto flex max-w-6xl flex-col gap-6"
+      className="flex flex-col gap-6"
       role="status"
       aria-live="polite"
       aria-label="Đang tải trang"

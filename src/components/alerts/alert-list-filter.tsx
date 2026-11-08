@@ -1,6 +1,6 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,10 @@ export function AlertListFilter({ classes }: { classes: string[] }) {
   const pathname = usePathname();
   const params = useSearchParams();
   const [q, setQ] = useState(params.get('q') ?? '');
+  const [expanded, setExpanded] = useState(false);
+  const activeCount = ['classId', 'severity', 'source', 'status'].filter((k) =>
+    params.get(k),
+  ).length;
 
   const update = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(params.toString());
@@ -89,29 +93,43 @@ export function AlertListFilter({ classes }: { classes: string[] }) {
           Tìm
         </Button>
       </form>
-      {classes.length > 1 &&
-        select(
-          'classId',
-          'Lọc theo lớp',
-          'Mọi lớp',
-          classes.map((c) => ({ value: c, label: c })),
-          'sm:w-36',
-        )}
-      {select(
-        'severity',
-        'Lọc theo mức',
-        'Mọi mức',
-        [...SEVERITY_ORDER].reverse().map((s) => ({ value: s, label: SEVERITY_LABELS[s] })),
-        'sm:w-36',
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <SlidersHorizontal aria-hidden />
+        Bộ lọc{activeCount > 0 ? ` (${activeCount})` : ''}
+      </Button>
+      {expanded && (
+        <>
+          {classes.length > 1 &&
+            select(
+              'classId',
+              'Lọc theo lớp',
+              'Mọi lớp',
+              classes.map((c) => ({ value: c, label: c })),
+              'sm:w-36',
+            )}
+          {select(
+            'severity',
+            'Lọc theo mức',
+            'Mọi mức',
+            [...SEVERITY_ORDER].reverse().map((s) => ({ value: s, label: SEVERITY_LABELS[s] })),
+            'sm:w-36',
+          )}
+          {select(
+            'source',
+            'Lọc theo nguồn dấu hiệu',
+            'Mọi nguồn',
+            SOURCES.map((s) => ({ value: s, label: SOURCE_LABELS[s] })),
+            'sm:w-56',
+          )}
+          {select('status', 'Lọc theo trạng thái', 'Mọi trạng thái', STATUS_OPTIONS)}
+        </>
       )}
-      {select(
-        'source',
-        'Lọc theo nguồn dấu hiệu',
-        'Mọi nguồn',
-        SOURCES.map((s) => ({ value: s, label: SOURCE_LABELS[s] })),
-        'sm:w-56',
-      )}
-      {select('status', 'Lọc theo trạng thái', 'Mọi trạng thái', STATUS_OPTIONS)}
     </div>
   );
 }

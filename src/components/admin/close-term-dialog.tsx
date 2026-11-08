@@ -70,7 +70,11 @@ export function CloseTermDialog({
   return (
     <AlertDialog open={open} onOpenChange={(next) => void onOpenChange(next)}>
       <AlertDialogTrigger asChild>
-        <Button size="sm" variant="ghost">
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+        >
           Chốt học kỳ
         </Button>
       </AlertDialogTrigger>

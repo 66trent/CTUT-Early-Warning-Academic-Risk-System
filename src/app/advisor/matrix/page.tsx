@@ -3,7 +3,7 @@ import { Grid3x3, Users } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TermFilter } from '@/components/alerts/term-filter';
-import { SEVERITY_FILL } from '@/components/dashboard/dashboard-parts';
+import { SEVERITY_CLASS, SEVERITY_SHORT } from '@/components/domain/severity-badge';
 import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,14 +17,6 @@ import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms
 import { getClassMatrix, TERM_COLUMN } from '@/modules/alerts/services/class-matrix.service';
 
 export const metadata: Metadata = { title: 'Ma trận lớp' };
-
-/** Chữ viết tắt trong ô — luôn kèm chữ, không chỉ màu (docs/rules/03); chú thích ở đầu bảng. */
-const SHORT: Record<Severity, string> = {
-  LOW: 'T',
-  MEDIUM: 'TB',
-  HIGH: 'C',
-  CRITICAL: 'RC',
-};
 
 function Cell({
   severity,
@@ -40,31 +32,39 @@ function Cell({
   if (!severity) {
     return (
       <span
-        className="block py-1.5 text-center text-xs text-muted-foreground"
+        className="block text-center text-xs text-muted-foreground"
         aria-label={enrolled ? `${label}: không có dấu hiệu` : `${label}: không học`}
       >
-        {enrolled ? '·' : ''}
+        {enrolled ? '' : '–'}
       </span>
     );
   }
+  // Ô cùng kích thước để đọc như bản đồ nhiệt, không phụ thuộc độ dài tên học phần.
   const body = (
     <span
-      className="block rounded-md py-1.5 text-center text-xs font-semibold"
-      style={{ background: `color-mix(in srgb, ${SEVERITY_FILL[severity]} 30%, transparent)` }}
+      title={SEVERITY_LABELS[severity]}
+      className={cn(
+        'inline-flex h-7 w-10 items-center justify-center rounded text-xs font-semibold',
+        SEVERITY_CLASS[severity],
+      )}
     >
-      {SHORT[severity]}
+      {SEVERITY_SHORT[severity]}
     </span>
   );
-  return href ? (
-    <Link
-      href={href}
-      aria-label={`${label}: ${SEVERITY_LABELS[severity]}, mở cảnh báo`}
-      className="block rounded-md hover:ring-2 hover:ring-primary"
-    >
-      {body}
-    </Link>
-  ) : (
-    body
+  return (
+    <span className="flex justify-center">
+      {href ? (
+        <Link
+          href={href}
+          aria-label={`${label}: ${SEVERITY_LABELS[severity]}, mở cảnh báo`}
+          className="inline-flex rounded hover:ring-2 hover:ring-primary"
+        >
+          {body}
+        </Link>
+      ) : (
+        body
+      )}
+    </span>
   );
 }
 
@@ -85,7 +85,7 @@ export default async function MatrixPage({
 
   if (!term || classes.length === 0) {
     return (
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         <PageHeader title="Ma trận lớp" />
         <EmptyState
           icon={Users}
@@ -99,14 +99,15 @@ export default async function MatrixPage({
   const classId = classes.find((c) => c.classId === requested)?.classId ?? classes[0]?.classId;
   const matrix = classId ? await getClassMatrix(user.userId, classId, term.termId) : null;
   if (!matrix) notFound();
+  // "Cả học kỳ" lên đầu: cột quan trọng nhất luôn trong màn hình, kể cả trên điện thoại.
   const columns = [
-    ...matrix.courses.map((c) => ({ key: c.courseId, title: c.courseName, sub: c.courseId })),
     { key: TERM_COLUMN, title: 'Cả học kỳ', sub: 'Học lực, kết hợp' },
+    ...matrix.courses.map((c) => ({ key: c.courseId, title: c.courseName, sub: c.courseId })),
   ];
   const withSignals = matrix.rows.filter((r) => r.worst).length;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Ma trận lớp"
         description="Mỗi hàng 1 sinh viên, mỗi cột 1 học phần. Ô có màu = sinh viên đang có dấu hiệu ở học phần đó; bấm ô để mở cảnh báo."
@@ -140,32 +141,27 @@ export default async function MatrixPage({
             <ul className="flex flex-wrap gap-3 text-xs" aria-label="Chú thích">
               {[...SEVERITY_ORDER].reverse().map((s) => (
                 <li key={s} className="inline-flex items-center gap-1.5">
-                  <span
-                    className="rounded px-1.5 py-0.5 font-semibold"
-                    style={{
-                      background: `color-mix(in srgb, ${SEVERITY_FILL[s]} 30%, transparent)`,
-                    }}
-                  >
-                    {SHORT[s]}
+                  <span className={cn('rounded px-1.5 py-0.5 font-semibold', SEVERITY_CLASS[s])}>
+                    {SEVERITY_SHORT[s]}
                   </span>
                   {SEVERITY_LABELS[s]}
                 </li>
               ))}
-              <li className="text-muted-foreground">· = có học, không có dấu hiệu</li>
+              <li className="text-muted-foreground">Ô trống: không có dấu hiệu · –: không học</li>
             </ul>
           </div>
           {matrix.rows.length === 0 ? (
             <EmptyState icon={Grid3x3} title="Lớp chưa có sinh viên" />
           ) : (
             <div className="overflow-x-auto rounded-md border">
-              <table className="w-full border-collapse text-sm">
+              <table className="w-full min-w-[34rem] table-fixed border-collapse text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
-                    <th className="sticky left-0 z-10 bg-muted p-2 text-left font-medium">
+                    <th className="sticky left-0 z-10 w-40 bg-muted p-2 text-left font-medium sm:w-56">
                       Sinh viên
                     </th>
                     {columns.map((c) => (
-                      <th key={c.key} className="min-w-24 p-2 text-center font-medium">
+                      <th key={c.key} className="p-2 text-center font-medium">
                         <span className="block leading-tight">{c.title}</span>
                         <span className="block text-xs font-normal text-muted-foreground tabular-nums">
                           {c.sub}
@@ -183,7 +179,7 @@ export default async function MatrixPage({
                       >
                         <Link
                           href={`/advisor/students/${r.studentId}?term=${term.termId}`}
-                          className="font-medium text-primary hover:underline"
+                          className="font-medium hover:text-primary hover:underline"
                         >
                           {r.fullName}
                         </Link>

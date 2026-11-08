@@ -3,6 +3,7 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { DataTable } from '@/components/data-table/data-table';
+import { SeverityBadge } from '@/components/domain/severity-badge';
 import { OFFICIAL_STATUS_LABELS } from '@/lib/labels';
 import type { SortDir } from '@/lib/list-params';
 import type { StudentSearchItemDto } from '@/modules/admin/services/student-search.service';
@@ -31,6 +32,17 @@ const columns: ColumnDef<StudentSearchItemDto>[] = [
     header: 'Lớp',
     meta: { sortKey: 'classId' },
     cell: ({ row }) => <span className="tabular-nums">{row.original.classId}</span>,
+  },
+  {
+    accessorKey: 'currentSeverity',
+    header: 'Cảnh báo học kỳ hiện tại',
+    meta: { label: 'Cảnh báo' },
+    cell: ({ row }) =>
+      row.original.currentSeverity ? (
+        <SeverityBadge severity={row.original.currentSeverity} />
+      ) : (
+        <span className="text-muted-foreground">Không có</span>
+      ),
   },
   {
     accessorKey: 'officialAcademicStatus',

@@ -1,4 +1,6 @@
 import type { AuditAction } from './audit';
+import { formatVnDateTime } from './dates';
+import { ACCOUNT_STATUS_LABELS, ALERT_STATUS_LABELS, ROLE_LABELS } from './labels';
 
 /** Nhãn tiếng Việt cho hành động trong Audit Log — đủ mọi giá trị (kiểm bằng kiểu). Dùng được ở client. */
 export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
@@ -44,3 +46,80 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   MOODLE_SYNC_DISCARDED: 'Hủy lần đồng bộ Moodle',
   MOODLE_SYNC_AUTO: 'Đồng bộ Moodle tự động',
 };
+
+/** Tên đối tượng bằng tiếng Việt thay cho tên bảng (docs/rules/07). */
+export const AUDIT_TARGET_LABELS: Record<string, string> = {
+  AdministrativeClass: 'Lớp sinh hoạt',
+  Alert: 'Cảnh báo',
+  AuthAccount: 'Tài khoản đăng nhập',
+  Enrollment: 'Đăng ký học phần',
+  EvaluationRun: 'Lần chạy đánh giá',
+  ImportBatch: 'Đợt nhập',
+  MoodleCourseLink: 'Khóa học Moodle',
+  MoodleSyncRun: 'Lần đồng bộ Moodle',
+  RuleVersion: 'Phiên bản luật',
+  Student: 'Sinh viên',
+  Term: 'Học kỳ',
+  User: 'Tài khoản',
+};
+
+const DETAIL_LABELS: Record<string, string> = {
+  advisorId: 'Cố vấn học tập',
+  alerts: 'Số cảnh báo',
+  asOf: 'Tính đến',
+  courseId: 'Học phần',
+  courses: 'Số khóa học',
+  departmentId: 'Khoa',
+  endDate: 'Đến ngày',
+  format: 'Định dạng',
+  from: 'Từ',
+  majorId: 'Ngành',
+  mode: 'Chế độ',
+  previousTermId: 'Học kỳ trước',
+  reason: 'Lý do',
+  rows: 'Số dòng',
+  ruleCode: 'Luật',
+  sectionCode: 'Lớp học phần',
+  startDate: 'Từ ngày',
+  studentId: 'Sinh viên',
+  students: 'Số sinh viên',
+  termId: 'Học kỳ',
+  to: 'Sang',
+  toAdvisorId: 'Cố vấn mới',
+  version: 'Phiên bản',
+};
+
+const VALUE_LABELS: Record<string, string> = {
+  ...ACCOUNT_STATUS_LABELS,
+  ...ROLE_LABELS,
+  ...ALERT_STATUS_LABELS,
+  AUTO: 'Tự động',
+  MANUAL: 'Thủ công',
+  false: 'Không',
+  true: 'Có',
+};
+
+const ISO_DATETIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+const TECHNICAL_VALUE = /^[{[]|^[A-Z][A-Z_]+$/;
+
+export interface AuditDetailView {
+  rows: { label: string; value: string }[];
+  /** Mã lỗi, JSON… — chỉ mở khi cần tra cứu. */
+  technical: { key: string; value: string }[];
+}
+
+/** Tách chi tiết nhật ký thành phần đọc được và phần kỹ thuật (docs/rules/07). */
+export function presentAuditDetail(detail: { key: string; value: string }[]): AuditDetailView {
+  const view: AuditDetailView = { rows: [], technical: [] };
+  for (const { key, value } of detail) {
+    if (value === 'null') continue;
+    const label = DETAIL_LABELS[key];
+    const translated = VALUE_LABELS[value];
+    if (label && translated) view.rows.push({ label, value: translated });
+    else if (label && ISO_DATETIME.test(value))
+      view.rows.push({ label, value: formatVnDateTime(value) });
+    else if (label && !TECHNICAL_VALUE.test(value)) view.rows.push({ label, value });
+    else view.technical.push({ key, value });
+  }
+  return view;
+}

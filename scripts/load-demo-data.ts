@@ -1,8 +1,8 @@
 /**
- * npm run demo:load — nạp bộ demo v3 của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md,
+ * npm run demo:load — nhập bộ demo v4 của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md,
  * qua ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
  * Mỗi thư mục = 1 lô nhiều file (1 file / lớp học phần như trường xuất — Phase 8f).
- * Mặc định nạp 02–07 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
+ * Mặc định nhập 02–09 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
  * nạp cả 01 trước (dùng trong `demo:reset`). `--only=02,03` chỉ nạp các bước đó (VD sau `demo:reset --no-data`).
  */
 import 'dotenv/config';
@@ -21,12 +21,14 @@ import {
 const DIR = 'docs/demo-data';
 const STUDENTS_FILE = ['01_sinh_vien.csv', 'STUDENT', null] as const;
 const FILES = [
-  ['02_HK3_2024_ket_qua', 'COURSE_RESULT', 'HK3_2024'],
-  ['03_HK1_2025_diem_danh', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
-  ['04_HK1_2025_trac_nghiem', 'LMS_QUIZ', 'HK1_2025'],
-  ['05_HK1_2025_thuc_hanh', 'LMS_ASSIGNMENT', 'HK1_2025'],
-  ['06_HK1_2025_ket_qua_logic_hoc', 'COURSE_RESULT', 'HK1_2025'],
-  ['07_HK1_2025_ket_qua_cuoi_ky', 'COURSE_RESULT', 'HK1_2025'],
+  ['02_HK2_2024_ket_qua', 'COURSE_RESULT', 'HK2_2024'],
+  ['03_HK3_2024_ket_qua', 'COURSE_RESULT', 'HK3_2024'],
+  ['04_HK1_2025_diem_danh_dot_1', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
+  ['05_HK1_2025_diem_danh_dot_2', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
+  ['06_HK1_2025_trac_nghiem', 'LMS_QUIZ', 'HK1_2025'],
+  ['07_HK1_2025_thuc_hanh', 'LMS_ASSIGNMENT', 'HK1_2025'],
+  ['08_HK1_2025_ket_qua_logic_hoc', 'COURSE_RESULT', 'HK1_2025'],
+  ['09_HK1_2025_ket_qua_cuoi_ky', 'COURSE_RESULT', 'HK1_2025'],
 ] as const;
 
 /** File của 1 bước: thư mục → mọi file `.csv` (theo tên); file → chính nó. */

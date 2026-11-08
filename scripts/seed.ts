@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   if (process.argv.includes('--demo')) {
     const demo = await seedDemo(await getDataSource(), getAuth(), env);
     console.log(
-      `seed:demo — 5 Cố vấn học tập (${demo.advisorsCreated} mới), 5 lớp khóa 2024 Khoa CNTT, học kỳ HK3_2024 + HK1_2025 (hiện tại).`,
+      `seed:demo — 6 Cố vấn học tập (${demo.advisorsCreated} mới), 6 lớp Khoa CNTT, học kỳ HK2_2024, HK3_2024, HK1_2025 (hiện tại).`,
     );
   }
 }

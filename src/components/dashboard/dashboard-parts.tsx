@@ -62,7 +62,10 @@ export function DashboardCard({
   );
 }
 
-/** Thẻ số lớn. `delta` so với lần đánh giá trước: tăng là xấu (đỏ) khi `upIsBad`. */
+/**
+ * Thẻ số lớn. `delta` so với lần đánh giá trước: tăng là xấu (đỏ) khi `upIsBad`.
+ * `tone="hero"` nền navy cho số quan trọng nhất của trang, mỗi trang tối đa 1 thẻ.
+ */
 export function StatCard({
   label,
   value,
@@ -81,33 +84,60 @@ export function StatCard({
   delta?: number | null;
   upIsBad?: boolean;
   href?: string;
-  tone?: 'default' | 'warning' | 'danger';
+  tone?: 'default' | 'warning' | 'high' | 'danger' | 'hero';
   children?: ReactNode;
 }) {
+  const hero = tone === 'hero';
   const body = (
     <>
-      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className={cn('text-sm', hero ? 'text-sidebar-foreground' : 'text-muted-foreground')}>
+        {label}
+      </p>
       <p
         className={cn(
-          'mt-1 text-3xl font-semibold tabular-nums',
-          tone === 'danger' && 'text-red-600 dark:text-red-400',
-          tone === 'warning' && 'text-amber-600 dark:text-amber-400',
+          'mt-1 font-bold tabular-nums',
+          hero || tone === 'danger' || tone === 'high' ? 'text-4xl' : 'text-3xl font-semibold',
+          hero && 'text-sidebar-accent-foreground',
+          tone === 'danger' && 'text-red-700 dark:text-red-400',
+          tone === 'high' && 'text-orange-700 dark:text-orange-400',
+          tone === 'warning' && 'text-amber-700 dark:text-amber-400',
           tone === 'default' && 'text-accent-strong',
         )}
       >
         {value}
         {suffix && (
-          <span className="ml-1 text-base font-normal text-muted-foreground">{suffix}</span>
+          <span
+            className={cn(
+              'ml-1 text-base font-normal',
+              hero ? 'text-sidebar-muted' : 'text-muted-foreground',
+            )}
+          >
+            {suffix}
+          </span>
         )}
       </p>
       {delta !== undefined && delta !== null && <Delta value={delta} upIsBad={upIsBad} />}
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      {hint && (
+        <p className={cn('mt-1 text-xs', hero ? 'text-sidebar-muted' : 'text-muted-foreground')}>
+          {hint}
+        </p>
+      )}
       {children}
     </>
   );
-  const cls = 'block rounded-xl border bg-card p-4 shadow-sm';
+  const cls = cn(
+    'block rounded-xl border p-4 shadow-sm',
+    hero ? 'border-sidebar bg-sidebar' : 'bg-card',
+  );
   return href ? (
-    <Link href={href} className={cn(cls, 'transition-colors hover:bg-secondary')}>
+    <Link
+      href={href}
+      className={cn(
+        cls,
+        'transition-colors',
+        hero ? 'hover:bg-sidebar-accent' : 'hover:bg-secondary',
+      )}
+    >
       {body}
     </Link>
   ) : (
@@ -273,9 +303,20 @@ export interface AttentionItem {
   tone: 'danger' | 'warning' | 'info';
 }
 
-/** Dải "Cần chú ý" — chỉ hiện mục có số > 0; không có mục nào thì báo yên tâm. */
-export function AttentionStrip({ items }: { items: AttentionItem[] }) {
+/**
+ * Dải "Cần chú ý" — chỉ hiện mục có số > 0; không có mục nào thì báo yên tâm. Mục nghiêm trọng đầu
+ * tiên thành băng rôn đỏ kèm nút đi thẳng tới việc đó, các mục còn lại xếp dưới.
+ */
+export function AttentionStrip({
+  items,
+  leadAction = 'Xem ngay',
+}: {
+  items: AttentionItem[];
+  leadAction?: string;
+}) {
   const shown = items.filter((i) => i.count > 0);
+  const lead = shown.find((i) => i.tone === 'danger');
+  const rest = shown.filter((i) => i !== lead);
   if (shown.length === 0) {
     return (
       <p className="flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm text-muted-foreground shadow-sm">
@@ -285,34 +326,54 @@ export function AttentionStrip({ items }: { items: AttentionItem[] }) {
     );
   }
   return (
-    <section
-      aria-label="Cần chú ý"
-      className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40"
-    >
-      <p className="mb-2 text-sm font-semibold text-amber-900 dark:text-amber-200">Cần chú ý</p>
-      <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {shown.map(({ key, icon: Icon, text, count, href, tone }) => (
-          <li key={key}>
-            <Link
-              href={href}
-              className="flex items-start gap-2 rounded-md bg-background/70 px-3 py-2 text-sm hover:bg-background"
-            >
-              <Icon
-                aria-hidden
-                className={cn(
-                  'mt-0.5 size-4 shrink-0',
-                  tone === 'danger' && 'text-red-600 dark:text-red-400',
-                  tone === 'warning' && 'text-amber-600 dark:text-amber-400',
-                  tone === 'info' && 'text-primary',
-                )}
-              />
-              <span>
-                <span className="font-semibold tabular-nums">{count}</span> {text}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <section aria-label="Cần chú ý" className="flex flex-col gap-3">
+      {lead && (
+        <Link
+          href={lead.href}
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-red-700 px-5 py-4 text-white transition-colors hover:bg-red-800"
+        >
+          <span className="flex items-center gap-3 text-base font-semibold">
+            <lead.icon aria-hidden className="size-5 shrink-0" />
+            <span>
+              <span className="tabular-nums">{lead.count}</span> {lead.text}
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-red-700">
+            {leadAction}
+            <ArrowRight aria-hidden className="size-4" />
+          </span>
+        </Link>
+      )}
+      {rest.length > 0 && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
+          <p className="mb-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
+            {lead ? 'Cũng cần chú ý' : 'Cần chú ý'}
+          </p>
+          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {rest.map(({ key, icon: Icon, text, count, href, tone }) => (
+              <li key={key}>
+                <Link
+                  href={href}
+                  className="flex items-start gap-2 rounded-md bg-background/70 px-3 py-2 text-sm hover:bg-background"
+                >
+                  <Icon
+                    aria-hidden
+                    className={cn(
+                      'mt-0.5 size-4 shrink-0',
+                      tone === 'danger' && 'text-red-600 dark:text-red-400',
+                      tone === 'warning' && 'text-amber-600 dark:text-amber-400',
+                      tone === 'info' && 'text-primary',
+                    )}
+                  />
+                  <span>
+                    <span className="font-semibold tabular-nums">{count}</span> {text}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }

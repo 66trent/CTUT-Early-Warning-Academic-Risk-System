@@ -1,14 +1,15 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Form,
   FormControl,
@@ -56,8 +57,7 @@ function StudentTab({ googleEnabled }: { googleEnabled: boolean }) {
   if (!googleEnabled) {
     return (
       <p className="text-sm text-muted-foreground">
-        Đăng nhập bằng Google chưa được cấu hình. Quản trị viên cần khai báo mã ứng dụng Google
-        (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) rồi khởi động lại hệ thống.
+        Đăng nhập bằng Google chưa được bật. Vui lòng liên hệ phòng Đào tạo hoặc Quản trị viên.
       </p>
     );
   }
@@ -207,11 +207,15 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
         </Link>
       </p>
       {demoMode && (
-        <div className="border-t pt-4">
-          <p className="mb-2 text-xs font-medium text-muted-foreground uppercase">
+        <Collapsible className="border-t pt-2">
+          <CollapsibleTrigger className="group flex min-h-11 w-full items-center justify-between gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
             Tài khoản trình diễn
-          </p>
-          <div className="flex flex-col gap-2">
+            <ChevronDown
+              aria-hidden
+              className="size-4 transition-transform group-data-[state=open]:rotate-180"
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-2 pt-1">
             <DemoButton
               account="ADMIN"
               label="Quản trị viên"
@@ -248,8 +252,8 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
             <p className="text-xs text-muted-foreground">
               Sinh viên đăng nhập được khi đã có hồ sơ (sau khi nhập danh sách sinh viên).
             </p>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   );
@@ -259,7 +263,7 @@ export function LoginPanel({ errorCode, googleEnabled, demoMode, demoEmail }: Lo
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Đăng nhập</CardTitle>
+        <h1>Đăng nhập</h1>
         <CardDescription>Bạn là sinh viên hay cán bộ?</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

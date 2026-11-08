@@ -34,7 +34,7 @@
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
   --muted: #f8fafc;
-  --muted-foreground: #64748b;
+  --muted-foreground: #475569;
   --accent: #eff6ff;
   --accent-foreground: #1d4ed8;
   --destructive: #dc2626;
@@ -44,16 +44,18 @@
   --ring: #2563eb;
 
   /* Vùng làm việc phía sau card */
-  --workspace: #f8fafc;
+  --workspace: #f1f5fb;
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
+  /* Sidebar navy lấy từ logo trường: chữ trắng 13,9:1, chữ phụ 7,2:1. */
+  --sidebar: #0f2a5c;
+  --sidebar-foreground: #dbe5f5;
+  --sidebar-muted: #a8bbdd;
   --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eff6ff;
-  --sidebar-accent-foreground: #2563eb;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #2563eb;
+  --sidebar-accent: #1b3a78;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #24437f;
+  --sidebar-ring: #93c5fd;
 }
 
 /*
@@ -93,18 +95,23 @@
 
   --workspace: #0f172a;
 
-  --sidebar: #1e293b;
-  --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #020617;
-  --sidebar-accent: #172554;
-  --sidebar-accent-foreground: #93c5fd;
-  --sidebar-border: #334155;
-  --sidebar-ring: #3b82f6;
+  --sidebar: #0b1a38;
+  --sidebar-foreground: #dbe5f5;
+  --sidebar-muted: #94a8cc;
+  --sidebar-primary: #93c5fd;
+  --sidebar-primary-foreground: #0b1a38;
+  --sidebar-accent: #16294f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1e3358;
+  --sidebar-ring: #93c5fd;
 }
 
 @theme inline {
   --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
+
+  /* Chữ phụ (mã số, ngày, nhãn huy hiệu) 13px thay 12px mặc định (docs/rules/03). */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -135,6 +142,7 @@
   --color-workspace: var(--workspace);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -145,19 +153,45 @@
 
 /*
  * Màu Severity — định nghĩa 1 lần, dùng qua component <SeverityBadge>.
- * LOW slate · MEDIUM amber · HIGH orange · CRITICAL red (docs/rules/03-ui-design.md).
+ * Hai mức cao nền đặc để nổi bật, hai mức thấp nền nhạt (docs/rules/03-ui-design.md).
  */
 @utility severity-low {
-  @apply border-transparent bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-100;
+  @apply border-transparent bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-100;
 }
 @utility severity-medium {
-  @apply border-transparent bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300;
+  @apply border-transparent bg-amber-100 font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-300;
 }
 @utility severity-high {
-  @apply border-transparent bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300;
+  @apply border-transparent bg-orange-700 font-semibold text-white;
 }
 @utility severity-critical {
-  @apply border-transparent bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300;
+  @apply border-transparent bg-red-700 font-semibold text-white dark:bg-red-600;
+}
+
+/* Vạch màu đầu dòng theo mức — cho dòng bảng (ô đầu) và thẻ trên điện thoại. */
+@utility row-severity-low {
+  & > td:first-child,
+  &:is(li) {
+    box-shadow: inset 4px 0 0 var(--chart-severity-low);
+  }
+}
+@utility row-severity-medium {
+  & > td:first-child,
+  &:is(li) {
+    box-shadow: inset 4px 0 0 var(--chart-severity-medium);
+  }
+}
+@utility row-severity-high {
+  & > td:first-child,
+  &:is(li) {
+    box-shadow: inset 4px 0 0 var(--chart-severity-high);
+  }
+}
+@utility row-severity-critical {
+  & > td:first-child,
+  &:is(li) {
+    box-shadow: inset 4px 0 0 var(--chart-severity-critical);
+  }
 }
 
 /*
@@ -193,6 +227,11 @@
     @apply bg-background font-sans text-sm text-foreground antialiased;
   }
   h1 {
-    @apply text-2xl font-semibold text-accent-strong;
+    @apply text-[1.625rem] leading-tight font-semibold text-accent-strong;
   }
+}
+
+/* Chế độ tối: chữ màu chính trên nền thẻ phải đạt 4,5:1 (docs/rules/03), nút vẫn dùng --primary. */
+.dark .text-primary {
+  color: #93c5fd;
 }

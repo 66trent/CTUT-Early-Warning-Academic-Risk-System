@@ -21,12 +21,12 @@ import {
   DashboardCard,
   MeterBar,
   SegmentedProgress,
-  SEVERITY_FILL,
   SeverityBars,
   SimpleBars,
   StatCard,
 } from '@/components/dashboard/dashboard-parts';
 import { RunTrendChart } from '@/components/dashboard/run-trend-chart';
+import { SEVERITY_CLASS } from '@/components/domain/severity-badge';
 import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -88,7 +88,7 @@ export default async function AdminHomePage({
 
   if (!term) {
     return (
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         <PageHeader title="Tổng quan" />
         <EmptyState
           icon={CalendarRange}
@@ -160,7 +160,7 @@ export default async function AdminHomePage({
   ];
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Tổng quan"
         description={
@@ -207,12 +207,13 @@ export default async function AdminHomePage({
         </div>
       )}
 
-      <AttentionStrip items={attention} />
+      <AttentionStrip items={attention} leadAction="Xem danh sách" />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Cảnh báo đang mở"
           value={active}
+          tone="hero"
           hint={`${s.waiting} chờ xác nhận · ${s.following} đang theo dõi`}
           href={alertsHref({})}
         />
@@ -253,9 +254,11 @@ export default async function AdminHomePage({
           href={alertsHref({})}
         >
           {totalAlerts === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              Chưa có cảnh báo nào trong học kỳ này.
-            </p>
+            <EmptyState
+              title="Chưa có cảnh báo nào trong học kỳ này"
+              description="Cảnh báo xuất hiện sau khi chạy đánh giá trên dữ liệu đã nhập."
+              action={{ href: '/admin/evaluations', label: 'Chạy đánh giá' }}
+            />
           ) : (
             <div className="flex flex-col gap-6">
               <SegmentedProgress
@@ -263,19 +266,19 @@ export default async function AdminHomePage({
                   {
                     label: 'Chờ xác nhận',
                     count: s.waiting,
-                    className: 'bg-red-500',
+                    className: 'bg-violet-500',
                     href: alertsHref({ status: 'waiting' }),
                   },
                   {
                     label: 'Đang theo dõi',
                     count: s.following,
-                    className: 'bg-amber-500',
+                    className: 'bg-indigo-500',
                     href: alertsHref({ status: 'following' }),
                   },
                   {
                     label: 'Đã xong',
                     count: s.done,
-                    className: 'bg-emerald-500',
+                    className: 'bg-slate-400',
                     href: alertsHref({ status: 'done' }),
                   },
                 ]}
@@ -298,9 +301,10 @@ export default async function AdminHomePage({
           hrefLabel="Lịch sử chạy"
         >
           {o.trend.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              Chưa có lần đánh giá cả học kỳ nào hoàn tất.
-            </p>
+            <EmptyState
+              title="Chưa có lần đánh giá nào hoàn tất"
+              description="Biểu đồ xuất hiện sau lần đánh giá cả học kỳ đầu tiên."
+            />
           ) : (
             <RunTrendChart
               data={o.trend.map((p) => ({ label: shortDate(p.asOf), ...p.bySeverity }))}
@@ -327,7 +331,7 @@ export default async function AdminHomePage({
           description="Số sinh viên có dấu hiệu ở học phần"
         >
           {o.topCourses.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">Chưa có.</p>
+            <EmptyState title="Chưa có học phần nào có cảnh báo" />
           ) : (
             <SimpleBars
               unit="SV"
@@ -354,7 +358,7 @@ export default async function AdminHomePage({
           }
         >
           {o.classSeverity.rows.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">Chưa có.</p>
+            <EmptyState title="Chưa có lớp nào có cảnh báo" />
           ) : (
             <table className="w-full text-center text-sm">
               <thead>
@@ -377,15 +381,10 @@ export default async function AdminHomePage({
                           href={alertsHref({ classId: r.classId, severity: sv })}
                           className={cn(
                             'block rounded-md py-1 tabular-nums hover:ring-2 hover:ring-primary',
-                            r.bySeverity[sv] === 0 && 'pointer-events-none text-muted-foreground',
+                            r.bySeverity[sv] === 0
+                              ? 'pointer-events-none text-muted-foreground'
+                              : SEVERITY_CLASS[sv],
                           )}
-                          style={
-                            r.bySeverity[sv] > 0
-                              ? {
-                                  background: `color-mix(in srgb, ${SEVERITY_FILL[sv]} 25%, transparent)`,
-                                }
-                              : undefined
-                          }
                           aria-label={`${r.classId}, ${SEVERITY_LABELS[sv]}: ${r.bySeverity[sv]} cảnh báo`}
                         >
                           {r.bySeverity[sv]}
@@ -403,52 +402,42 @@ export default async function AdminHomePage({
       <DashboardCard
         title="Độ mới dữ liệu"
         description={`${o.freshness.totalCourses} học phần trong học kỳ. "Chậm" = ngày dữ liệu cũ hơn ${STALE_DAYS} ngày so với ngày mới nhất của học kỳ.`}
-        href="/admin/imports#do-moi-du-lieu"
+        href="/admin/imports?tab=needs"
         hrefLabel="Xem từng học phần"
         className="scroll-mt-20"
       >
         <div id="do-moi-du-lieu" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {o.freshness.sources.map((f) => {
-            const problems = f.stale.length + (f.source === 'ATTENDANCE' ? f.missing.length : 0);
-            return (
-              <div key={f.source} className="flex flex-col gap-1 rounded-lg border p-3 text-sm">
-                <p className="font-medium">{FRESHNESS_LABELS[f.source]}</p>
-                <p className="text-muted-foreground">
-                  {f.latest ? `Mới nhất ${formatVnDate(f.latest)}` : 'Chưa có dữ liệu'}
-                </p>
-                <p className="tabular-nums">
-                  {f.coursesWithData}/{o.freshness.totalCourses} học phần có dữ liệu
-                </p>
-                {f.source === 'COURSE_RESULT' ? (
-                  <span className="text-xs text-muted-foreground">Nhập khi học phần khóa điểm</span>
-                ) : problems === 0 && f.missing.length === 0 && f.coursesWithData > 0 ? (
-                  <span className="w-fit rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                    Đủ và đều
-                  </span>
-                ) : (
-                  <ul className="flex flex-col gap-0.5 text-xs text-amber-700 dark:text-amber-400">
-                    {f.stale.slice(0, 3).map((c) => (
-                      <li key={c.courseId}>
-                        Chậm: {c.courseName} ({shortDate(c.latest)})
-                      </li>
-                    ))}
-                    {f.missing.slice(0, 3).map((c) => (
-                      <li
-                        key={c.courseId}
-                        className={f.source === 'ATTENDANCE' ? '' : 'text-muted-foreground'}
-                      >
-                        Chưa có: {c.courseName}
-                        {f.source !== 'ATTENDANCE' && ' (có thể không dùng LMS)'}
-                      </li>
-                    ))}
-                    {f.stale.length + f.missing.length > 6 && (
-                      <li>… và {f.stale.length + f.missing.length - 6} học phần khác</li>
-                    )}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
+          {o.freshness.sources.map((f) => (
+            <div key={f.source} className="flex flex-col gap-2 rounded-lg border p-3 text-sm">
+              <p className="font-medium">{FRESHNESS_LABELS[f.source]}</p>
+              <p className="text-muted-foreground">
+                {f.latest ? `Mới nhất ${formatVnDate(f.latest)}` : 'Chưa có dữ liệu'} ·{' '}
+                <span className="tabular-nums">
+                  {f.coursesWithData}/{o.freshness.totalCourses} học phần
+                </span>
+              </p>
+              {f.source === 'COURSE_RESULT' ? (
+                <span className="text-xs text-muted-foreground">Nhập khi học phần khóa điểm</span>
+              ) : f.stale.length === 0 && f.missing.length === 0 && f.coursesWithData > 0 ? (
+                <span className="w-fit rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  Đủ và đều
+                </span>
+              ) : (
+                <span className="flex flex-wrap gap-1.5">
+                  {f.stale.length > 0 && (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 tabular-nums dark:bg-amber-950 dark:text-amber-300">
+                      {f.stale.length} chậm
+                    </span>
+                  )}
+                  {f.missing.length > 0 && (
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">
+                      {f.missing.length} chưa có
+                    </span>
+                  )}
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       </DashboardCard>
     </div>

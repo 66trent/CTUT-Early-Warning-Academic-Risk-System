@@ -36,7 +36,7 @@ export default async function RuleDetailPage({
   if (!rule) notFound();
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div>
         <PageBreadcrumbs
           items={[{ label: 'Cấu hình luật', href: '/admin/rules' }, { label: rule.ruleCode }]}
@@ -60,7 +60,8 @@ export default async function RuleDetailPage({
               : 'Chưa có phiên bản đang áp dụng.'}
           </CardDescription>
         </CardHeader>
-        {rule.active && (
+        {/* Chưa có bản nháp: form bên dưới đã điền sẵn giá trị đang áp dụng, không lặp bảng. */}
+        {rule.active && rule.draft && (
           <CardContent>
             <ConditionEditor
               ruleCode={rule.ruleCode}

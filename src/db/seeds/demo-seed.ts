@@ -2,11 +2,17 @@ import { type DataSource } from 'typeorm';
 import { type Auth } from '@/lib/auth';
 import { vnEndOfDay, vnStartOfDay } from '@/lib/dates';
 import { staffDomainForSamples } from '@/lib/email-domains';
-import { DEMO_ADVISOR_IDS, DEMO_CLASS_ACCOUNTS } from '@/lib/demo-accounts';
+import {
+  DEMO_ADVISOR_IDS,
+  DEMO_ADVISOR_NAMES,
+  DEMO_CLASS_ACCOUNTS,
+  DEMO_PENDING_ADVISOR,
+} from '@/lib/demo-accounts';
 import { type Env } from '@/lib/env';
 import { AdministrativeClass } from '../entities/administrative-class.entity';
 import { Term } from '../entities/term.entity';
-import { UserRole } from '../enums';
+import { User } from '../entities/user.entity';
+import { UserAccountStatus, UserRole } from '../enums';
 import { ensureStaffAccount } from './base-seed';
 
 /**
@@ -15,28 +21,34 @@ import { ensureStaffAccount } from './base-seed';
  */
 export const DEMO_ADVISORS = DEMO_ADVISOR_IDS.map((userId) => ({
   userId,
-  fullName: `Cố vấn học tập ${userId}`,
+  fullName: DEMO_ADVISOR_NAMES[userId],
 }));
 
 /**
- * Toàn Khoa CNTT khóa 2024 (Phase 9a, chốt 2026-10-22): 5 lớp — mã theo mẫu `KTPM2411`, tên
- * "<Ngành> K2024", mỗi lớp 1 Cố vấn học tập.
+ * Khoa CNTT (bản v4): 6 lớp mã theo mẫu `KTPM2411`, tên "<Ngành> K<khóa>", mỗi lớp 1 Cố vấn học tập.
  */
 export const DEMO_CLASSES = DEMO_CLASS_ACCOUNTS.map((c) => ({
   classId: c.classId,
-  className: `${c.majorName} K2024`,
+  className: `${c.majorName} K${c.cohortYear}`,
   departmentId: 'K.CNTT',
   majorId: c.majorId,
-  cohortYear: '2024',
+  cohortYear: c.cohortYear,
   advisorId: c.advisorId,
 }));
 
 /**
  * Học kỳ ĐÃ QUA để mọi mốc demo (10/10, 20/11, 31/12) ở quá khứ — chế độ demo không cho chọn mốc
- * tương lai. `HK3_2024` = học kỳ liền trước (HK3 chương trình khung, chỉ nạp kết quả — cho
+ * tương lai. `HK2_2024` chỉ có 1 dòng (học lại lần 3). `HK3_2024` = học kỳ liền trước (chỉ kết quả, cho
  * `ACA-04`, học lại; ngày là giá trị demo). `HK1_2025` = HK4 chương trình khung, học kỳ hiện tại.
  */
 export const DEMO_TERMS = [
+  {
+    termId: 'HK2_2024',
+    termName: 'Học kỳ 2, 2024–2025',
+    academicYear: '2024-2025',
+    startDate: '2025-01-06',
+    endDate: '2025-04-27',
+  },
   {
     termId: 'HK3_2024',
     termName: 'Học kỳ 3, 2024–2025',
@@ -82,6 +94,16 @@ export async function seedDemo(
     });
     if (created) advisorsCreated += 1;
   }
+
+  await dataSource.getRepository(User).upsert(
+    {
+      ...DEMO_PENDING_ADVISOR,
+      email: `${DEMO_PENDING_ADVISOR.userId.toLowerCase()}${domain}`,
+      role: UserRole.ADVISOR,
+      accountStatus: UserAccountStatus.PENDING_APPROVAL,
+    },
+    ['userId'],
+  );
 
   await dataSource.transaction(async (em) => {
     await em.getRepository(AdministrativeClass).upsert(DEMO_CLASSES, ['classId']);

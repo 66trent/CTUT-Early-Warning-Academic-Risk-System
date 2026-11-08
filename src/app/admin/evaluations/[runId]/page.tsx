@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, SearchX } from 'lucide-react';
+import { EmptyState } from '@/components/empty-state';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { z } from 'zod';
+import { StatCard } from '@/components/dashboard/dashboard-parts';
 import { DataPagination } from '@/components/data-table/data-pagination';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { SeverityBadge } from '@/components/domain/severity-badge';
+import { RunProgress } from '@/components/evaluations/run-progress';
 import { RunStatusBadge } from '@/components/evaluations/run-status-badge';
 import { RunStudentsFilter } from '@/components/evaluations/run-students-filter';
 import { RunStudentsTable } from '@/components/evaluations/run-students-table';
@@ -28,15 +31,6 @@ import { runStudentFilterSchema } from '@/modules/rule-engine/validators/evaluat
 
 export const metadata: Metadata = { title: 'Kết quả chạy đánh giá' };
 
-function Stat({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="rounded-md border bg-background p-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-xl font-semibold text-accent-strong tabular-nums">{value}</p>
-    </div>
-  );
-}
-
 export default async function EvaluationRunPage({
   params,
   searchParams,
@@ -58,11 +52,9 @@ export default async function EvaluationRunPage({
       : [null, { classes: [], rules: [] }];
   const busy =
     run.status === EvaluationRunStatus.QUEUED || run.status === EvaluationRunStatus.RUNNING;
-  const progress =
-    run.totalStudents > 0 ? Math.round((run.processedStudents / run.totalStudents) * 100) : 0;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <AutoRefresh active={busy} />
       <div>
         <PageBreadcrumbs
@@ -85,38 +77,44 @@ export default async function EvaluationRunPage({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <Stat label="Sinh viên đã xét" value={`${run.processedStudents}/${run.totalStudents}`} />
-        <Stat label="Sinh viên có dấu hiệu" value={run.studentsWithSignals} />
-        <Stat
-          label="Cảnh báo mới / cập nhật"
-          value={`${run.alertsCreated} / ${run.alertsUpdated}`}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+        <StatCard
+          label="Sinh viên có dấu hiệu"
+          value={run.studentsWithSignals}
+          suffix={`/ ${run.processedStudents}`}
+          tone="hero"
         />
-        <Stat label="Thiếu dữ liệu để tính điểm" value={run.insufficientCount} />
-        <Stat label="Cảnh báo chất lượng dữ liệu" value={run.warnings.length} />
+        <StatCard
+          label="Cảnh báo mới"
+          value={run.alertsCreated}
+          tone={run.alertsCreated > 0 ? 'high' : 'default'}
+          hint={`${run.alertsUpdated} cảnh báo cập nhật`}
+        />
+        <StatCard
+          label="Sinh viên đã xét"
+          value={run.processedStudents}
+          suffix={`/ ${run.totalStudents}`}
+        />
+        <StatCard
+          label="Thiếu dữ liệu để tính điểm"
+          value={run.insufficientCount}
+          tone={run.insufficientCount > 0 ? 'warning' : 'default'}
+        />
+        <StatCard
+          label="Cảnh báo chất lượng dữ liệu"
+          value={run.warnings.length}
+          tone={run.warnings.length > 0 ? 'warning' : 'default'}
+        />
       </div>
 
       {busy && (
         <Card className="shadow-sm">
-          <CardContent className="flex flex-col gap-2">
-            <p className="text-muted-foreground">
-              {run.status === EvaluationRunStatus.QUEUED
-                ? 'Đang chờ đến lượt chạy, trang tự cập nhật.'
-                : `Đang chạy đánh giá: ${run.processedStudents}/${run.totalStudents} sinh viên, trang tự cập nhật.`}
-            </p>
-            <div
-              role="progressbar"
-              aria-label="Tiến độ chạy đánh giá"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={progress}
-              className="h-2 overflow-hidden rounded-full bg-muted"
-            >
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+          <CardContent>
+            <RunProgress
+              status={run.status}
+              processed={run.processedStudents}
+              total={run.totalStudents}
+            />
           </CardContent>
         </Card>
       )}
@@ -149,9 +147,8 @@ export default async function EvaluationRunPage({
           <CardContent className="flex flex-col gap-4">
             <ReferenceOnlyNotice />
             <p className="text-sm text-muted-foreground">
-              Điểm ưu tiên từ 0 (ổn định) đến 1 (rủi ro cao), có trọng số trên các nguồn đủ dữ liệu
-              — chỉ dùng để sắp xếp ưu tiên, không tạo cảnh báo. Bấm &ldquo;N dấu hiệu&rdquo; để xem
-              từng luật.
+              Điểm ưu tiên từ 0 đến 1, chỉ dùng để sắp xếp thứ tự xem, không tạo cảnh báo. Bấm
+              &ldquo;N dấu hiệu&rdquo; để xem từng luật.
             </p>
             <Suspense>
               <RunStudentsFilter classes={options.classes} rules={options.rules} />
@@ -160,9 +157,19 @@ export default async function EvaluationRunPage({
               rows={result.items}
               sort={{ sort: list.sort, dir: list.dir }}
               emptyMessage={
-                filter.all
-                  ? 'Không có sinh viên nào khớp bộ lọc.'
-                  : 'Không có sinh viên nào có dấu hiệu khớp bộ lọc, chọn "Tất cả sinh viên" để xem điểm ưu tiên của mọi sinh viên.'
+                <EmptyState
+                  icon={SearchX}
+                  title={
+                    filter.all
+                      ? 'Không có sinh viên nào khớp bộ lọc'
+                      : 'Không có sinh viên nào có dấu hiệu khớp bộ lọc'
+                  }
+                  description={
+                    filter.all
+                      ? 'Thử bỏ bớt điều kiện lọc.'
+                      : 'Chọn "Tất cả sinh viên" để xem điểm ưu tiên của mọi sinh viên.'
+                  }
+                />
               }
             />
             <DataPagination

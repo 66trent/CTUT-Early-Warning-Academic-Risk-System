@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 /** Trang "không tìm thấy" — dùng cho not-found.tsx gốc và từng khu vực vai trò. */
 export function NotFoundView({ homeHref = '/' }: { homeHref?: string }) {
   return (
-    <div className="mx-auto flex max-w-lg flex-col items-center gap-3 py-16 text-center">
+    <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-3 py-16 text-center">
       <span className="flex size-12 items-center justify-center rounded-full bg-muted">
         <FileQuestion aria-hidden className="size-6 text-muted-foreground" />
       </span>

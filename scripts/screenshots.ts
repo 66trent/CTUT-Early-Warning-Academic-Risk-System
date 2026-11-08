@@ -1,6 +1,6 @@
 /**
  * npm run screenshots — chụp màn hình cho báo cáo + kiểm tra responsive (Phase 7, cập nhật 9c).
- * Cần app ở http://localhost:3000 (DEMO_MODE=true) và bộ demo v3 đã chạy 2 mốc (học kỳ còn mở):
+ * Cần app ở http://localhost:3000 (DEMO_MODE=true) và bộ demo v4 đã chạy 2 mốc (học kỳ còn mở):
  *   npm run demo:reset -- --yes --evaluate=2 && npm run screenshots
  * Bộ ảnh sau chốt học kỳ (luật học lực ACA-02/03/04 — chỉ có sau chốt, bẫy #31):
  *   npm run demo:reset -- --yes --evaluate && npm run screenshots -- --closed
@@ -43,7 +43,7 @@ const openAlert = (studentId: string) => async (page: Page) => {
   await page.waitForTimeout(800);
 };
 
-/** Sinh viên demo có nhiều dấu hiệu nhất (bộ demo v3 — KET_QUA_MONG_DOI.md). */
+/** Sinh viên demo có nhiều dấu hiệu nhất (bộ demo v4, KET_QUA_MONG_DOI.md). */
 const DEMO_STUDENT = 'KTPM2411903';
 const ADMIN = 'Quản trị viên';
 const GV001 = 'Cố vấn học tập GV001';
@@ -118,6 +118,7 @@ const CLOSED_SHOTS: Shot[] = [
 async function login(page: Page, account: string): Promise<void> {
   await page.goto(`${BASE}/login`);
   await page.getByRole('tab', { name: 'Cán bộ' }).click();
+  await page.getByRole('button', { name: 'Tài khoản trình diễn' }).click();
   await page.getByRole('button', { name: account, exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith('/login'));
 }

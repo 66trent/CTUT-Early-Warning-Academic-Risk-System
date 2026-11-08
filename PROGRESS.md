@@ -239,3 +239,46 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra: typecheck, lint, format, 473 test xanh; kiểm trên app 16 trang, không còn từ cũ, không lỗi console. Chưa chạy Playwright e2e và build.
 - Còn: bảng Lịch sử nhập (21px) và bảng Lớp (42px) vẫn cuộn nhẹ, xử lý ở đợt 3. Cảnh báo đã có trong DB giữ lý do cũ có mã luật đến lần đánh giá sau.
 - Tự kiểm tra: Admin → Tài khoản, Cấu hình luật → ATT-01; CVHT → Tổng quan, mở 1 cảnh báo.
+
+## Phase 11 đợt 1 — Màu, khung, cỡ chữ (2026-11-08)
+
+- Token: sidebar navy `#0F2A5C`, nền làm việc `#F1F5FB`, chữ phụ `#475569`, tiêu đề trang 26px, `text-xs` = 13px. Mức Rất cao + Cao nền đặc chữ trắng, Trung bình + Thấp nền nhạt (`globals.css`, ghi `03`).
+- Khung: sidebar navy + logo trên đĩa trắng + tên trường đủ 2 dòng; menu tài khoản `layout/user-menu.tsx` (avatar, đổi giao diện, chính sách dữ liệu, đăng xuất), bỏ `theme-toggle.tsx`; cụm học kỳ nổi hơn; nhóm menu "Bắt đầu" đổi thành "Tổng hợp".
+- Độ rộng đặt 1 lần ở `AppShell`: 12 trang Admin đo mép trái đều 280px (trước đó 280–464px).
+- Kiểm tra: typecheck, lint, 473 test xanh; xem trên app desktop, tablet, điện thoại, chế độ tối; điện thoại không tràn ngang; đăng xuất qua menu chạy được. Chưa chạy Playwright e2e và build.
+- Còn: đợt 2 (Tổng quan, danh sách + chi tiết cảnh báo, Ma trận, trang Sinh viên, đăng nhập).
+- Tự kiểm tra: đăng nhập Admin, xem sidebar + cột Mức ở Cảnh báo sớm; bấm tên góc phải mở menu tài khoản.
+
+## Phase 11 đợt 2 — Sáu màn hình trọng tâm (2026-11-08)
+
+- Tổng quan Admin + Cố vấn: băng rôn đỏ kèm nút đi thẳng tới việc cần làm, 1 thẻ số nền navy, thanh tiến độ đúng màu trạng thái, bảng theo lớp dùng màu mức, Độ mới dữ liệu gọn 4 ô. Khối hướng dẫn tự thu gọn từ lần xem thứ hai.
+- Cảnh báo: vạch màu đầu dòng, gom theo mức, bấm cả dòng để mở, bỏ cột Trạng thái ở tab Cần xử lý, bộ lọc thu vào 1 nút. `DataTable` thêm `rowClassName`, `onRowClick`, `groupLabel`.
+- Chi tiết: đầu Sheet ghi "N dấu hiệu: nguồn", nút Xác nhận + Ghi can thiệp ghim đáy, thao tác phụ vào menu Khác.
+- Ma trận: ô cùng kích thước, màu đặc, "Cả học kỳ" lên đầu, bỏ dấu chấm thừa. Trang Sinh viên: 3 thẻ số, khối "Việc nên làm" chỉ hiện khi có, tông hổ phách thay đỏ, thẻ 3 cột.
+- Đăng nhập: nửa trái navy, thêm `h1`, Tài khoản trình diễn thu gọn (đã đổi `tests/e2e/helpers.ts`, `scripts/screenshots.ts`). Ghi `03`, `07`.
+- Kiểm tra: typecheck, lint, 473 test xanh; xem trên app desktop + điện thoại, không tràn ngang. Chưa chạy Playwright e2e và build.
+- Còn: đợt 3 (Nhập dữ liệu, Chạy đánh giá, Moodle, Nhật ký, Bắt đầu, Cấu hình luật), đợt 4.
+- Tự kiểm tra: GV001 → Tổng quan → Xử lý ngay → bấm 1 dòng; Ma trận lớp; sinh viên → Tình hình học tập.
+
+## Phase 11 đợt 3 — Trang quản trị (2026-11-08)
+
+- Nhập dữ liệu: 3 tab theo URL (Nhập mới, Cần nhập, Lịch sử), dải nhắc đợt nhập chờ xác nhận, trạng thái có màu, số dòng lỗi đỏ, gom 10 nút mẫu vào 1 menu, hết cắt cột.
+- Chạy đánh giá: khối lần chạy gần nhất, cụm số theo mức ở lịch sử, lọc theo học kỳ (mặc định hiện tại), cột Tính đến ghi "Lúc chạy" khi trùng thời điểm. Trang kết quả dùng thẻ số mới.
+- Nhật ký: tên đối tượng và nhãn tiếng Việt, JSON + mã lỗi gấp vào "Thông tin kỹ thuật" (`presentAuditDetail`, test mới). Bắt đầu: gấp giai đoạn đã xong (3.250 → 2.467px). Luật: gom theo nhóm, trang sửa còn 1 bảng + báo số giá trị đã đổi.
+- Moodle: khung trạng thái có màu, câu dẫn ngắn, cột "Mã lớp học phần". Học kỳ: nút Chốt kiểu cảnh báo. Lớp: gộp Khoa + Ngành, hết cắt cột. Chi tiết đợt nhập: tiêu đề kèm học phần, "đồng bộ tự động", rút gọn ngày chốt.
+- Kiểm tra: typecheck, lint, format, 475 test xanh; xem 14 trang desktop + 5 trang điện thoại, không tràn ngang, không lỗi console. Chưa chạy Playwright e2e và build.
+- Còn: đợt 4 (điện thoại, chế độ tối, trang trống, dữ liệu trình diễn, ảnh, báo cáo Word; cột mức ở danh sách Sinh viên).
+- Tự kiểm tra: Admin → Nhập dữ liệu (3 tab), Chạy đánh giá, Nhật ký hệ thống, Bắt đầu, Cấu hình luật.
+
+## Phase 11 đợt 4 — Hoàn thiện, bộ demo v4 (2026-11-08)
+
+- Bộ demo v4 làm lại từ đầu (người dùng chốt): 6 lớp, 110 sinh viên mỗi người một tên, cố vấn có tên người, lớp năm nhất `KTPM2511`, thêm `GV006`, `GV007` (chờ duyệt), `HK2_2024`, điểm danh 4 ngày chốt, 9 đợt nhập, 7 file minh họa lỗi. Bộ v3 lưu ở `_luu-tru-v3/`.
+- `KET_QUA_MONG_DOI.md` viết tay trước, có ma trận bao phủ từng nhánh luật. Engine khớp ngay: 52 → 44 → 42 dấu hiệu, 32 → 40 → 50 cảnh báo, thông báo 32/30 · 11/11 · 11/11.
+- Test `demo-v4-acceptance` thêm: đủ trạng thái cảnh báo KHMT (Đang xử lý, Bỏ qua, Mở lại, Không còn hiệu lực + cảnh báo mới), học lại lần 3, học kỳ đầu khóa, 7 file lỗi.
+- Giao diện: thẻ cảnh báo điện thoại gọn (167 → 116px), trang Sinh viên phụ trách thành thẻ + tìm kiếm + mức cao lên đầu, cột Cảnh báo ở danh sách Sinh viên, màu chữ chế độ tối đạt 4,5:1, thay các câu trống bằng `EmptyState`, trang 404 canh giữa. Ghi `03`, `07`.
+- Sửa `demo-script.md`, `kich-ban-thuyet-trinh.md`, README, e2e, script ảnh theo v4.
+- Ảnh chụp lại 66 tấm, không tràn ngang. Báo cáo Word bản hội đồng: đổi thuật ngữ, số liệu v4, 13 ảnh mới, thêm câu giải thích "Điểm ưu tiên", vẫn 83 trang (bản cũ `backups/Bao-cao-do-an-CTUT-EWARS.truoc-dot4-20261108.docx`).
+- Kiểm tra: typecheck, lint, format, migration:check, 484 test, build, e2e 2/2 xanh; kiểm trên app desktop + điện thoại + chế độ tối, 0 chữ dưới 4,5:1.
+- DB dev đã `demo:reset -- --yes` (có tự sao lưu): chưa chạy đánh giá. Moodle demo chưa dựng lại.
+- Còn: báo cáo kỹ thuật Word vẫn 10 luật (ngoài đợt này); chạy `npm run moodle:setup -- --reset` trước khi thử Moodle.
+- Tự kiểm tra: Admin → Sinh viên (cột Cảnh báo); chạy đánh giá mốc 2025-10-10 → 32 cảnh báo; GV006 → sinh viên năm nhất sau chốt; mở điện thoại xem Cảnh báo cần xử lý.

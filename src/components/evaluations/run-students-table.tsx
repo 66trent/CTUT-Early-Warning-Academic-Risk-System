@@ -114,7 +114,7 @@ export function RunStudentsTable({
 }: {
   rows: RunStudentRowDto[];
   sort: { sort: string | null; dir: SortDir };
-  emptyMessage: string;
+  emptyMessage: React.ReactNode;
 }) {
   return (
     <DataTable

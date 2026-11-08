@@ -15,7 +15,7 @@ export default async function StudentAdvisorPage() {
   const overview = term ? await getStudentOverview(user.userId, term.termId) : null;
   const advisor = overview?.advisor ?? null;
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="flex max-w-3xl flex-col gap-6">
       <h1>Liên hệ Cố vấn học tập</h1>
       <Card className="shadow-sm">
         <CardHeader>

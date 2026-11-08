@@ -29,6 +29,7 @@ import { ImportBatchStatus, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
 import { parseListParams, type RawSearchParams } from '@/lib/list-params';
+import { isSystemAccount } from '@/lib/system-accounts';
 import { formatFileSize } from '@/lib/utils';
 import { errorReasonLabel } from '@/modules/data-import/labels';
 import {
@@ -73,21 +74,25 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
   const fileLabel = multi ? `${batch.files.length} file` : batch.fileName;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <AutoRefresh active={batch.busy} />
       <div>
         <PageBreadcrumbs
           items={[{ label: 'Nhập dữ liệu', href: '/admin/imports' }, { label: fileLabel }]}
         />
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1>{batch.dataTypeLabel}</h1>
+          <h1>
+            {batch.dataTypeLabel}
+            {batch.courses.length === 1 ? ` · ${batch.courses[0]?.courseName}` : ''}
+          </h1>
           <BatchStatusBadge status={batch.status} />
         </div>
         <p className="mt-1 text-muted-foreground">
           {fileLabel}
           {batch.termName ? ` · ${batch.termName}` : ''}
           {batch.selectedCourseId ? ` · chỉ học phần ${batch.selectedCourseId}` : ''} · tải lên{' '}
-          {formatVnDateTime(batch.createdAt)} bởi {batch.performedBy}
+          {formatVnDateTime(batch.createdAt)}
+          {isSystemAccount(batch.performedBy) ? ' · đồng bộ tự động' : ` bởi ${batch.performedBy}`}
         </p>
       </div>
 

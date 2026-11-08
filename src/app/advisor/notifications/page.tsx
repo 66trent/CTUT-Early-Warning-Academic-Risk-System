@@ -32,7 +32,7 @@ export default async function NotificationsPage({
     `/advisor/notifications${withParams(params, { filter, page: null })}`;
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="flex max-w-3xl flex-col gap-6">
       <PageHeader
         title="Thông báo"
         description="Hệ thống báo khi lớp bạn có cảnh báo mới, cảnh báo mở lại hoặc tăng mức. Bấm để mở cảnh báo."

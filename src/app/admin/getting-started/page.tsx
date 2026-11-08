@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import {
   ArrowRight,
   CheckCircle2,
+  ChevronDown,
   Circle,
   Download,
   Lightbulb,
@@ -201,7 +202,7 @@ export default async function GettingStartedPage() {
   );
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Bắt đầu"
         description="Hướng dẫn vận hành hệ thống theo thứ tự. Mỗi bước cần dữ liệu của bước trước; trang tự đánh dấu khi đã có dữ liệu."
@@ -276,27 +277,58 @@ export default async function GettingStartedPage() {
         <div className="flex min-w-0 flex-col gap-8">
           {PHASES.map((phase, i) => {
             const items = steps.filter((s) => s.phase === phase);
-            return (
-              <section key={phase} id={phaseAnchor(phase)} className="scroll-mt-20">
-                <div className="mb-3 flex items-start gap-3">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <h2 className="text-lg font-semibold">{SETUP_PHASE_LABELS[phase]}</h2>
-                    <p className="text-sm text-muted-foreground">{PHASE_INTROS[phase]}</p>
-                  </div>
+            const finished = items.every((s) => s.done);
+            const list = (
+              <ol className="flex flex-col gap-3">
+                {items.map((step) => (
+                  <StepCard
+                    key={step.key}
+                    step={step}
+                    index={steps.indexOf(step) + 1}
+                    templates={templates}
+                  />
+                ))}
+              </ol>
+            );
+            const heading = (
+              <>
+                <span
+                  className={cn(
+                    'flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold',
+                    finished ? 'bg-secondary text-primary' : 'bg-primary text-primary-foreground',
+                  )}
+                >
+                  {finished ? <CheckCircle2 aria-hidden className="size-5" /> : i + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-lg font-semibold">{SETUP_PHASE_LABELS[phase]}</h2>
+                  <p className="text-sm text-muted-foreground">{PHASE_INTROS[phase]}</p>
                 </div>
-                <ol className="flex flex-col gap-3">
-                  {items.map((step) => (
-                    <StepCard
-                      key={step.key}
-                      step={step}
-                      index={steps.indexOf(step) + 1}
-                      templates={templates}
-                    />
-                  ))}
-                </ol>
+              </>
+            );
+            // Giai đoạn đã xong gấp thành 1 dòng; trình duyệt tự mở khi đi tới neo bên trong.
+            return finished ? (
+              <details
+                key={phase}
+                id={phaseAnchor(phase)}
+                className="group/phase scroll-mt-20 rounded-lg border bg-card p-4 shadow-sm"
+              >
+                <summary className="flex cursor-pointer list-none items-center gap-3 [&::-webkit-details-marker]:hidden">
+                  {heading}
+                  <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
+                    Đã xong {items.length}/{items.length}
+                  </span>
+                  <ChevronDown
+                    aria-hidden
+                    className="size-4 shrink-0 text-muted-foreground transition-transform group-open/phase:rotate-180"
+                  />
+                </summary>
+                <div className="mt-4">{list}</div>
+              </details>
+            ) : (
+              <section key={phase} id={phaseAnchor(phase)} className="scroll-mt-20">
+                <div className="mb-3 flex items-start gap-3">{heading}</div>
+                {list}
               </section>
             );
           })}

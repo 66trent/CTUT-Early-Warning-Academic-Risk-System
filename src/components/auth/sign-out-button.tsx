@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/auth-client';
 
-export function SignOutButton({ compact = false }: { compact?: boolean }) {
+/** Đăng xuất rồi về trang đăng nhập — dùng chung cho nút và menu tài khoản. */
+export function useSignOut() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -16,6 +17,12 @@ export function SignOutButton({ compact = false }: { compact?: boolean }) {
     router.replace('/login');
     router.refresh();
   };
+
+  return { signOut, pending };
+}
+
+export function SignOutButton({ compact = false }: { compact?: boolean }) {
+  const { signOut, pending } = useSignOut();
 
   return (
     <Button

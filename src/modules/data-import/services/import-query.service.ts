@@ -4,7 +4,7 @@ import { ImportBatchFile } from '@/db/entities/import-batch-file.entity';
 import { ImportBatch, type ImportCourseCard } from '@/db/entities/import-batch.entity';
 import { ImportErrorRow } from '@/db/entities/import-error-row.entity';
 import { Term } from '@/db/entities/term.entity';
-import { type ImportBatchStatus, IMPORT_DATA_TYPES, ImportSource } from '@/db/enums';
+import { ImportBatchStatus, IMPORT_DATA_TYPES, ImportSource } from '@/db/enums';
 import {
   applyOrder,
   firstPage,
@@ -209,6 +209,25 @@ export async function listImportBatches(
     page: list.page,
     size: list.size,
   };
+}
+
+/** Đợt nhập đang chờ xác nhận, mới nhất trước — dải nhắc ở đầu trang Nhập dữ liệu. */
+export async function listPendingBatches(
+  limit = 5,
+): Promise<{ items: ImportBatchListItemDto[]; total: number }> {
+  const [batches, total] = await (
+    await getDataSource()
+  )
+    .getRepository(ImportBatch)
+    .createQueryBuilder('b')
+    .leftJoinAndSelect('b.term', 'term')
+    .where('b.status = :status', { status: ImportBatchStatus.STAGED })
+    .andWhere("b.summary->>'confirmedAt' IS NULL")
+    .orderBy('b.createdAt', 'DESC')
+    .take(limit)
+    .getManyAndCount();
+  const files = await countFiles(batches.map((b) => b.id));
+  return { items: batches.map((b) => toListItem(b, files.get(b.id) ?? 1)), total };
 }
 
 /** Lựa chọn bộ lọc lịch sử nạp: học phần + khoa có trong hệ thống. */

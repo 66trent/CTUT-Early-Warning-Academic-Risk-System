@@ -16,7 +16,7 @@ test('Cố vấn học tập xác nhận cảnh báo và ghi can thiệp', async
   await expect(row).toBeVisible();
   await row.getByRole('button', { name: 'Xem' }).click();
   const sheet = page.getByRole('dialog');
-  await expect(sheet.getByText('Lê Văn Cường').first()).toBeVisible();
+  await expect(sheet.getByText('Bùi Anh Phát').first()).toBeVisible();
 
   const acknowledge = sheet.getByRole('button', { name: 'Xác nhận đã xem' });
   if (await acknowledge.isVisible()) {

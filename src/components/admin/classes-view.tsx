@@ -1,7 +1,7 @@
 'use client';
 
 import { type ColumnDef } from '@tanstack/react-table';
-import { Building2, Pencil, Plus } from 'lucide-react';
+import { Building2, Pencil, Plus, SearchX } from 'lucide-react';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/empty-state';
@@ -69,16 +69,15 @@ export function ClassesTable({
       cell: ({ row }) => <span className="tabular-nums">{row.original.cohortYear}</span>,
     },
     {
-      accessorKey: 'departmentName',
-      header: 'Khoa',
-      meta: { sortKey: 'departmentId' },
-    },
-    {
       accessorKey: 'majorName',
       header: 'Ngành',
       meta: { sortKey: 'majorId' },
-      cell: ({ row }) =>
-        row.original.majorName ?? <span className="text-muted-foreground">Chưa chọn</span>,
+      cell: ({ row }) => (
+        <span className="flex flex-col">
+          {row.original.majorName ?? <span className="text-muted-foreground">Chưa chọn</span>}
+          <span className="text-xs text-muted-foreground">{row.original.departmentName}</span>
+        </span>
+      ),
     },
     {
       accessorKey: 'advisorName',
@@ -147,7 +146,11 @@ export function ClassesTable({
       serverSort={sort}
       emptyMessage={
         filtered ? (
-          'Không có lớp nào khớp bộ lọc.'
+          <EmptyState
+            icon={SearchX}
+            title="Không có lớp nào khớp bộ lọc"
+            description="Thử bỏ bớt điều kiện lọc."
+          />
         ) : (
           <EmptyState
             icon={Building2}

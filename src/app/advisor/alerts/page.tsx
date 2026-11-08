@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inbox } from 'lucide-react';
+import { Inbox, SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ActiveAlertFilters } from '@/components/alerts/active-alert-filters';
@@ -61,10 +61,10 @@ export default async function AdvisorAlertsPage({
   const filtered = Object.values(extra).some((v) => v !== undefined);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Cảnh báo cần xử lý"
-        description="Mức cao trên cùng. Bấm Xem để mở chi tiết, xác nhận và ghi can thiệp."
+        description="Mức cao trên cùng. Bấm vào dòng để mở chi tiết, xác nhận và ghi can thiệp."
         action={term ? <ExportAlertsButton basePath="/api/alerts/export" params={params} /> : null}
       />
       <ReferenceOnlyNotice />
@@ -90,9 +90,14 @@ export default async function AdvisorAlertsPage({
             items={result.items}
             profileBase="/advisor/students"
             serverSort={{ sort: list.sort, dir: list.dir }}
+            hideStatus={!all}
             emptyMessage={
               filtered ? (
-                'Không có cảnh báo nào khớp bộ lọc.'
+                <EmptyState
+                  icon={SearchX}
+                  title="Không có cảnh báo nào khớp bộ lọc"
+                  description="Thử bỏ bớt điều kiện lọc."
+                />
               ) : (
                 <EmptyState
                   icon={Inbox}

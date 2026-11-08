@@ -5,6 +5,7 @@ export async function quickLogin(page: Page, label: string): Promise<void> {
   await page.context().clearCookies();
   await page.goto('/login');
   await page.getByRole('tab', { name: 'Cán bộ' }).click();
+  await page.getByRole('button', { name: 'Tài khoản trình diễn' }).click();
   await page.getByRole('button', { name: label, exact: true }).click();
   await expect(page).not.toHaveURL(/\/login/);
 }

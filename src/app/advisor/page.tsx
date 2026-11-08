@@ -31,7 +31,7 @@ import { SeverityBadge } from '@/components/domain/severity-badge';
 import { EmptyState } from '@/components/empty-state';
 import { PageHeader } from '@/components/page-header';
 import { QuickGuide } from '@/components/quick-guide';
-import { UserRole } from '@/db/enums';
+import { Severity, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDate, formatVnDateTime } from '@/lib/dates';
 import { ALERT_STATUS_LABELS } from '@/lib/labels';
@@ -84,7 +84,7 @@ export default async function AdvisorHomePage({
 
   if (!term) {
     return (
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         <PageHeader title="Tổng quan" />
         <EmptyState
           icon={CalendarClock}
@@ -112,6 +112,10 @@ export default async function AdvisorHomePage({
   const total = summary.waiting + summary.following + summary.done;
   const latest = trend.at(-1) ?? null;
   const previous = trend.at(-2) ?? null;
+  const change =
+    latest && previous ? latest.studentsWithSignals - previous.studentsWithSignals : null;
+  const activeCount = (severity: Severity) =>
+    summary.activeBySeverity.find((x) => x.severity === severity)?.count ?? 0;
 
   const header = (
     <PageHeader
@@ -128,7 +132,7 @@ export default async function AdvisorHomePage({
 
   if (classes.length === 0) {
     return (
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         {header}
         <EmptyState
           icon={Users}
@@ -167,42 +171,42 @@ export default async function AdvisorHomePage({
   ];
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       {header}
       <QuickGuide guide={ADVISOR_GUIDE} storageKey="ewars:guide:advisor" />
       <ReferenceOnlyNotice />
-      <AttentionStrip items={attention} />
+      <AttentionStrip items={attention} leadAction="Xử lý ngay" />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Cần xử lý"
           value={summary.waiting}
-          tone={summary.waiting > 0 ? 'danger' : 'default'}
-          hint="Mới hoặc mở lại, chờ xác nhận"
+          tone="hero"
+          hint={`${summary.studentsWithAlerts}/${summary.totalStudents} sinh viên có cảnh báo`}
           href={alertsHref({ status: 'waiting' })}
+        />
+        <StatCard
+          label="Mức Rất cao"
+          value={activeCount(Severity.CRITICAL)}
+          tone={activeCount(Severity.CRITICAL) > 0 ? 'danger' : 'default'}
+          hint="Cảnh báo đang mở"
+          href={alertsHref({ severity: Severity.CRITICAL })}
+        />
+        <StatCard
+          label="Mức Cao"
+          value={activeCount(Severity.HIGH)}
+          tone={activeCount(Severity.HIGH) > 0 ? 'high' : 'default'}
+          hint="Cảnh báo đang mở"
+          href={alertsHref({ severity: Severity.HIGH })}
         />
         <StatCard
           label="Đang theo dõi"
           value={summary.following}
-          hint="Đã xác nhận hoặc đang can thiệp"
+          hint={`${summary.done} đã xong (${pct(summary.done, total)}% trong học kỳ)`}
           href={alertsHref({ status: 'following' })}
-        />
-        <StatCard
-          label="Đã xong"
-          value={summary.done}
-          hint={`${pct(summary.done, total)}% cảnh báo trong học kỳ`}
-          href={alertsHref({ status: 'done' })}
         >
           <MeterBar value={total === 0 ? 0 : summary.done / total} label="Tỷ lệ đã xong" />
         </StatCard>
-        <StatCard
-          label="Sinh viên có cảnh báo"
-          value={summary.studentsWithAlerts}
-          suffix={`/ ${summary.totalStudents}`}
-          delta={
-            latest && previous ? latest.studentsWithSignals - previous.studentsWithSignals : null
-          }
-        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -257,9 +261,10 @@ export default async function AdvisorHomePage({
           hrefLabel="Tất cả"
         >
           {students.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              Chưa có sinh viên nào cần chú ý trong học kỳ này.
-            </p>
+            <EmptyState
+              title="Chưa có sinh viên nào cần chú ý trong học kỳ này"
+              description="Cảnh báo xuất hiện sau mỗi lần hệ thống đánh giá dữ liệu của lớp bạn."
+            />
           ) : (
             <ul className="divide-y">
               {students.map((s) => (
@@ -289,12 +294,17 @@ export default async function AdvisorHomePage({
         </DashboardCard>
         <DashboardCard
           title="Diễn biến qua các lần đánh giá"
-          description="Số sinh viên lớp bạn có dấu hiệu theo mức cao nhất"
+          description={`Số sinh viên lớp bạn có dấu hiệu theo mức cao nhất${
+            change === null || change === 0
+              ? ''
+              : ` (${change > 0 ? '+' : ''}${change} so với lần trước)`
+          }`}
         >
           {trend.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              Chưa có lần đánh giá cả học kỳ nào hoàn tất.
-            </p>
+            <EmptyState
+              title="Chưa có lần đánh giá nào hoàn tất"
+              description="Biểu đồ xuất hiện sau lần đánh giá cả học kỳ đầu tiên."
+            />
           ) : (
             <RunTrendChart
               data={trend.map((p) => ({
@@ -314,9 +324,7 @@ export default async function AdvisorHomePage({
         >
           <div id="hen-theo-doi">
             {followUps.length === 0 ? (
-              <p className="py-6 text-center text-sm text-muted-foreground">
-                Không có lịch hẹn theo dõi nào đến hạn.
-              </p>
+              <EmptyState title="Không có lịch hẹn theo dõi nào đến hạn" />
             ) : (
               <ul className="divide-y">
                 {followUps.map((f) => (

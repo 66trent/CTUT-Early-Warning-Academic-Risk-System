@@ -16,14 +16,14 @@ const columns: ColumnDef<ImportBatchListItemDto>[] = [
     accessorKey: 'createdAt',
     header: 'Thời điểm',
     meta: { sortKey: 'createdAt' },
-    cell: ({ row }) => formatVnDateTime(row.original.createdAt),
+    cell: ({ row }) => (
+      <span className="flex flex-col">
+        <span className="tabular-nums">{formatVnDateTime(row.original.createdAt)}</span>
+        <span className="text-xs text-muted-foreground">{row.original.termName ?? '—'}</span>
+      </span>
+    ),
   },
   { accessorKey: 'dataTypeLabel', header: 'Loại dữ liệu', meta: { sortKey: 'dataType' } },
-  {
-    accessorKey: 'termName',
-    header: 'Học kỳ',
-    cell: ({ row }) => row.original.termName ?? '—',
-  },
   {
     accessorKey: 'courseLabel',
     header: 'Học phần',
@@ -34,22 +34,23 @@ const columns: ColumnDef<ImportBatchListItemDto>[] = [
     header: 'File',
     meta: { sortKey: 'fileName', mobile: 'title' },
     cell: ({ row }) => (
-      <span className="inline-flex flex-wrap items-baseline gap-x-1">
+      <span className="flex min-w-0 flex-col gap-0.5">
         <Link
           href={`/admin/imports/${row.original.id}`}
-          className="break-all text-primary hover:underline"
+          title={row.original.fileName}
+          className="block max-w-full truncate text-primary hover:underline md:max-w-56"
         >
           {row.original.fileName}
         </Link>
-        {row.original.fileCount > 1 && (
-          <span className="text-xs text-muted-foreground">
-            + {row.original.fileCount - 1} file khác
+        {(row.original.fileCount > 1 || row.original.fromMoodle) && (
+          <span className="flex items-center gap-2">
+            {row.original.fileCount > 1 && (
+              <span className="text-xs text-muted-foreground">
+                + {row.original.fileCount - 1} file khác
+              </span>
+            )}
+            {row.original.fromMoodle && <Badge variant="outline">Moodle</Badge>}
           </span>
-        )}
-        {row.original.fromMoodle && (
-          <Badge variant="outline" className="text-xs">
-            Moodle
-          </Badge>
         )}
       </span>
     ),
@@ -65,7 +66,10 @@ const columns: ColumnDef<ImportBatchListItemDto>[] = [
     header: 'Hợp lệ / Lỗi',
     cell: ({ row }) => (
       <span className="tabular-nums">
-        {row.original.successRows} / {row.original.errorRows}
+        {row.original.successRows} /{' '}
+        <span className={row.original.errorRows > 0 ? 'font-semibold text-destructive' : undefined}>
+          {row.original.errorRows}
+        </span>
       </span>
     ),
   },

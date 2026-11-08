@@ -38,7 +38,7 @@ export const STUDENT_GUIDE: QuickGuide = {
     },
     {
       title: 'Điều nên chú ý',
-      text: 'Khi Cố vấn học tập đã trao đổi với bạn về một điểm cần cải thiện, khối "Tổng quan" sẽ hiện gợi ý cụ thể.',
+      text: 'Khi Cố vấn học tập đã trao đổi với bạn về một điểm cần cải thiện, khối "Việc nên làm" sẽ hiện gợi ý cụ thể.',
     },
     {
       title: 'Cần hỗ trợ',

@@ -40,6 +40,8 @@ export interface EvaluationRunListItemDto {
   totalStudents: number;
   processedStudents: number;
   triggerCount: number;
+  /** Số dấu hiệu theo mức — CRITICAL trước. */
+  bySeverity: { severity: Severity; count: number }[];
   insufficientCount: number;
   alertsCreated: number;
   alertsUpdated: number;
@@ -54,8 +56,6 @@ export interface EvaluationRunDetailDto extends EvaluationRunListItemDto {
   warnings: { code: string; studentId: string | null; courseId: string | null; message: string }[];
   /** Số cảnh báo chất lượng dữ liệu theo loại — nhiều nhất trước. */
   warningSummary: { code: string; count: number }[];
-  /** Số dấu hiệu theo mức — CRITICAL trước. */
-  bySeverity: { severity: Severity; count: number }[];
   /** Số sinh viên có ít nhất 1 dấu hiệu. */
   studentsWithSignals: number;
 }
@@ -105,23 +105,38 @@ export interface EvaluationFormOptionsDto {
   canChooseAsOf: boolean;
 }
 
-/** Số trigger theo lần chạy — COUNT … GROUP BY tường minh (docs/rules/01). */
-async function countTriggers(runIds: string[]): Promise<Map<string, number>> {
-  if (runIds.length === 0) return new Map();
+/** Dạng đầy đủ 4 mức, CRITICAL trước. */
+function severityList(counts: Map<Severity, number>): { severity: Severity; count: number }[] {
+  return [...SEVERITY_ORDER]
+    .reverse()
+    .map((severity) => ({ severity, count: counts.get(severity) ?? 0 }));
+}
+
+/** Số trigger theo lần chạy + mức — COUNT … GROUP BY tường minh (docs/rules/01). */
+async function countTriggers(runIds: string[]): Promise<Map<string, Map<Severity, number>>> {
+  const result = new Map<string, Map<Severity, number>>();
+  if (runIds.length === 0) return result;
   const rows = await (
     await getDataSource()
   )
     .getRepository(RuleTrigger)
     .createQueryBuilder('t')
     .select('t.evaluationRunId', 'runId')
+    .addSelect('t.severity', 'severity')
     .addSelect('COUNT(*)', 'count')
     .where('t.evaluationRunId IN (:...runIds)', { runIds })
     .groupBy('t.evaluationRunId')
-    .getRawMany<{ runId: string; count: string }>();
-  return new Map(rows.map((r) => [r.runId, Number(r.count)]));
+    .addGroupBy('t.severity')
+    .getRawMany<{ runId: string; severity: Severity; count: string }>();
+  for (const r of rows) {
+    const counts = result.get(r.runId) ?? new Map<Severity, number>();
+    counts.set(r.severity, Number(r.count));
+    result.set(r.runId, counts);
+  }
+  return result;
 }
 
-function toListItem(run: EvaluationRun, triggerCount: number): EvaluationRunListItemDto {
+function toListItem(run: EvaluationRun, counts: Map<Severity, number>): EvaluationRunListItemDto {
   return {
     id: run.id,
     termId: run.termId,
@@ -132,7 +147,8 @@ function toListItem(run: EvaluationRun, triggerCount: number): EvaluationRunList
     status: run.status,
     totalStudents: run.totalStudents,
     processedStudents: run.processedStudents,
-    triggerCount,
+    triggerCount: [...counts.values()].reduce((x, y) => x + y, 0),
+    bySeverity: severityList(counts),
     insufficientCount: run.insufficientCount,
     alertsCreated: run.alertsCreated,
     alertsUpdated: run.alertsUpdated,
@@ -197,8 +213,10 @@ export async function getEvaluationFormOptions(): Promise<EvaluationFormOptionsD
 
 export async function listEvaluationRuns(
   list: ListParams<RunSortKey> = firstPage(RUN_DEFAULT_SORT),
+  termId?: string,
 ): Promise<Paged<EvaluationRunListItemDto>> {
   const [runs, total] = await (await getDataSource()).getRepository(EvaluationRun).findAndCount({
+    where: termId ? { termId } : {},
     relations: { term: true },
     order: findOrder(
       resolveSort(list, RUN_DEFAULT_SORT).sort,
@@ -210,11 +228,23 @@ export async function listEvaluationRuns(
   });
   const counts = await countTriggers(runs.map((r) => r.id));
   return {
-    items: runs.map((r) => toListItem(r, counts.get(r.id) ?? 0)),
+    items: runs.map((r) => toListItem(r, counts.get(r.id) ?? new Map<Severity, number>())),
     total,
     page: list.page,
     size: list.size,
   };
+}
+
+/** Lần chạy mới nhất của học kỳ — khối tóm tắt ở trang Chạy đánh giá. */
+export async function getLatestEvaluationRun(
+  termId: string,
+): Promise<EvaluationRunDetailDto | null> {
+  const latest = await (await getDataSource()).getRepository(EvaluationRun).findOne({
+    select: { id: true },
+    where: { termId },
+    order: { createdAt: 'DESC' },
+  });
+  return latest ? getEvaluationRunDetail(latest.id) : null;
 }
 
 const rank = (s: Severity) => SEVERITY_ORDER.indexOf(s);
@@ -244,13 +274,12 @@ export async function getEvaluationRunDetail(
       .getRawOne<{ count: string }>(),
   ]);
   const counts = new Map(severityRows.map((r) => [r.severity, Number(r.count)]));
-  const triggerCount = [...counts.values()].reduce((x, y) => x + y, 0);
   const warningCounts = new Map<string, number>();
   for (const w of run.dataWarnings ?? [])
     warningCounts.set(w.code, (warningCounts.get(w.code) ?? 0) + 1);
 
   return {
-    ...toListItem(run, triggerCount),
+    ...toListItem(run, counts),
     errorMessage: run.errorMessage,
     importBatchId: run.importBatchId,
     finishedAt: run.finishedAt?.toISOString() ?? null,
@@ -263,9 +292,6 @@ export async function getEvaluationRunDetail(
     warningSummary: [...warningCounts.entries()]
       .map(([code, count]) => ({ code, count }))
       .sort((a, b) => b.count - a.count || a.code.localeCompare(b.code)),
-    bySeverity: [...SEVERITY_ORDER]
-      .reverse()
-      .map((severity) => ({ severity, count: counts.get(severity) ?? 0 })),
     studentsWithSignals: Number(studentRow?.count ?? 0),
   };
 }

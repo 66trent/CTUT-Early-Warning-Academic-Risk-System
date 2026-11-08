@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Lock } from 'lucide-react';
+import { ChevronDown, Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,12 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
@@ -67,6 +73,8 @@ function Evidence({ triggerId }: { triggerId: string }) {
   );
 }
 
+const INTERVENTION_FORM_ID = 'ghi-can-thiep';
+
 function StatusActions({ detail, onDone }: { detail: AlertDetailDto; onDone: () => void }) {
   const [pending, setPending] = useState<AlertStatus | null>(null);
   const [reasonFor, setReasonFor] = useState<AlertStatus | null>(null);
@@ -86,22 +94,44 @@ function StatusActions({ detail, onDone }: { detail: AlertDetailDto; onDone: () 
     onDone();
   };
 
-  if (detail.allowedTransitions.length === 0) return null;
+  const [primary, ...others] = detail.allowedTransitions;
+  if (!primary) return null;
+  const choose = (to: AlertStatus) => (NEEDS_REASON.includes(to) ? setReasonFor(to) : void run(to));
+  // Ghim ở đáy Sheet: hành động chính luôn trong tầm mắt dù nội dung dài (docs/rules/07).
   return (
-    <div className="flex flex-col gap-3">
+    <div className="sticky bottom-0 z-10 -mx-4 -mb-6 flex flex-col gap-3 border-t bg-background px-4 py-3">
       <div className="flex flex-wrap gap-2">
-        {detail.allowedTransitions.map((to, i) => (
-          <Button
-            key={to}
-            size="sm"
-            variant={i === 0 ? 'default' : 'outline'}
-            disabled={pending !== null}
-            onClick={() => (NEEDS_REASON.includes(to) ? setReasonFor(to) : void run(to))}
-          >
-            {pending === to && <Loader2 className="animate-spin" />}
-            {TRANSITION_LABELS[to]}
-          </Button>
-        ))}
+        <Button disabled={pending !== null} onClick={() => choose(primary)}>
+          {pending === primary && <Loader2 className="animate-spin" />}
+          {TRANSITION_LABELS[primary]}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            document
+              .getElementById(INTERVENTION_FORM_ID)
+              ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        >
+          Ghi can thiệp
+        </Button>
+        {others.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" disabled={pending !== null}>
+                Khác
+                <ChevronDown aria-hidden />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {others.map((to) => (
+                <DropdownMenuItem key={to} onSelect={() => choose(to)}>
+                  {TRANSITION_LABELS[to]}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
       {reasonFor && (
         <div className="flex flex-col gap-2 rounded-md border p-3">
@@ -167,6 +197,7 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
   const canProcess = detail ? detail.allowedTransitions.length > 0 : false;
   // Mã luật chỉ cho Admin; Cố vấn học tập đọc tên luật (người dùng chốt 2026-11-08).
   const showRuleCode = profileBase.startsWith('/admin');
+  const signalTotal = detail?.groups.reduce((sum, g) => sum + g.signals.length, 0) ?? 0;
 
   return (
     <Sheet open={alertId !== null} onOpenChange={(open) => !open && onClose()}>
@@ -194,12 +225,16 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
             {detail.signalsClearedAt && <SignalsClearedNote at={detail.signalsClearedAt} />}
 
             <section className="flex flex-col gap-2">
-              <h3 className="font-semibold">{detail.summary}</h3>
+              <h3 className="font-semibold">
+                {signalTotal > 0
+                  ? `${signalTotal} dấu hiệu: ${detail.groups.map((g) => g.label).join(' · ')}`
+                  : detail.summary}
+              </h3>
               <Accordion type="multiple" className="rounded-md border px-3">
                 {detail.groups.flatMap((g) =>
                   g.signals.map((s) => (
                     <AccordionItem key={s.triggerId} value={s.triggerId}>
-                      <AccordionTrigger className="text-left">
+                      <AccordionTrigger className="text-left hover:no-underline">
                         <span className="flex flex-col gap-1">
                           <span className="flex flex-wrap items-center gap-2 text-sm">
                             <SeverityBadge severity={s.severity} />
@@ -225,8 +260,11 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
               )}
             </section>
 
-            <StatusActions detail={detail} onDone={refresh} />
-            {canProcess && <InterventionForm alertId={detail.alertId} onSaved={refresh} />}
+            {canProcess && (
+              <div id={INTERVENTION_FORM_ID} className="scroll-mt-4">
+                <InterventionForm alertId={detail.alertId} onSaved={refresh} />
+              </div>
+            )}
 
             <section className="flex flex-col gap-2">
               <h3 className="font-semibold">Can thiệp đã ghi ({detail.interventions.length})</h3>
@@ -274,6 +312,8 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
                 Xem hồ sơ học tập theo học phần
               </Link>
             </Button>
+
+            <StatusActions detail={detail} onDone={refresh} />
           </div>
         )}
       </SheetContent>

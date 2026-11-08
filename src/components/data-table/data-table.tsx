@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { type ReactNode, useState } from 'react';
+import { Fragment, type ReactNode, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -30,8 +30,11 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     /** Nhãn ở dạng thẻ trên điện thoại khi `header` không phải chuỗi. */
     label?: string;
-    /** Dạng thẻ: `title` = tiêu đề thẻ, `footer` = cuối thẻ (nút thao tác), `hide` = ẩn. */
-    mobile?: 'title' | 'footer' | 'hide';
+    /**
+     * Dạng thẻ: `title` = tiêu đề thẻ, `lead` = cùng hàng tiêu đề (bên trái), `plain` = cả dòng, không
+     * có nhãn, `footer` = cuối thẻ (nút thao tác), `hide` = ẩn.
+     */
+    mobile?: 'title' | 'lead' | 'plain' | 'footer' | 'hide';
     /** Khóa sắp xếp phía server — có thì tiêu đề cột bấm được khi bảng dùng `serverSort`. */
     sortKey?: string;
   }
@@ -48,6 +51,12 @@ interface DataTableProps<TData> {
    * trang hiện tại (danh sách ngắn).
    */
   serverSort?: { sort: string | null; dir: SortDir };
+  /** Class thêm cho từng dòng (bảng) và thẻ (điện thoại). */
+  rowClassName?: (row: TData) => string | undefined;
+  /** Bấm cả dòng / thẻ. Vẫn cần 1 phần tử bấm được trong dòng cho người dùng bàn phím. */
+  onRowClick?: (row: TData) => void;
+  /** Nhãn nhóm: dòng đổi nhãn so với dòng trước thì chèn 1 hàng tiêu đề nhóm; `null` = không gom. */
+  groupLabel?: (row: TData) => string | null;
 }
 
 function headerLabel<TData>(header: Header<TData, unknown>): ReactNode {
@@ -76,6 +85,9 @@ export function DataTable<TData>({
   emptyMessage,
   getRowId,
   serverSort,
+  rowClassName,
+  onRowClick,
+  groupLabel,
 }: DataTableProps<TData>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -133,6 +145,15 @@ export function DataTable<TData>({
   };
 
   const rows = table.getRowModel().rows;
+  /** Nhãn nhóm của dòng thứ `i` nếu dòng này mở đầu 1 nhóm mới. */
+  const groupStart = (i: number): string | null => {
+    const row = rows[i];
+    if (!groupLabel || !row) return null;
+    const label = groupLabel(row.original);
+    const before = rows[i - 1];
+    return label !== null && (!before || groupLabel(before.original) !== label) ? label : null;
+  };
+  const clickable = onRowClick ? 'cursor-pointer hover:bg-primary-soft' : undefined;
   const empty = (
     <div className="flex min-h-24 items-center justify-center p-4 text-center text-muted-foreground">
       {emptyMessage}
@@ -162,15 +183,33 @@ export function DataTable<TData>({
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => (
-                <TableRow key={row.id} className="even:bg-muted">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              rows.map((row, i) => {
+                const group = groupStart(i);
+                return (
+                  <Fragment key={row.id}>
+                    {group && (
+                      <TableRow className="bg-secondary hover:bg-secondary">
+                        <TableCell
+                          colSpan={columns.length}
+                          className="py-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+                        >
+                          {group}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow
+                      className={cn('even:bg-muted', clickable, rowClassName?.(row.original))}
+                      onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </Fragment>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -178,7 +217,8 @@ export function DataTable<TData>({
 
       <ul className="flex flex-col gap-2 md:hidden" aria-label="Danh sách">
         {rows.length === 0 && <li className="rounded-md border">{empty}</li>}
-        {rows.map((row) => {
+        {rows.map((row, rowIndex) => {
+          const group = groupStart(rowIndex);
           const cells = row.getVisibleCells();
           const marked = cells.some((c) => c.column.columnDef.meta?.mobile === 'title');
           const kind = (c: Cell<TData, unknown>, i: number) =>
@@ -187,32 +227,61 @@ export function DataTable<TData>({
           const render = (c: Cell<TData, unknown>) =>
             flexRender(c.column.columnDef.cell, c.getContext());
           return (
-            <li key={row.id} className="flex flex-col gap-2 rounded-md border bg-card p-3 text-sm">
-              {cells.map((c, i) =>
-                kind(c, i) === 'title' ? (
-                  <div key={c.id} className="font-medium">
-                    {render(c)}
-                  </div>
-                ) : null,
+            <Fragment key={row.id}>
+              {group && (
+                <li className="pt-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                  {group}
+                </li>
               )}
-              <dl className="grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-3 gap-y-1">
+              <li
+                className={cn(
+                  'flex flex-col gap-2 rounded-md border bg-card p-3 text-sm',
+                  clickable,
+                  rowClassName?.(row.original),
+                )}
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+              >
+                <div className="flex items-start gap-2">
+                  {cells.map((c, i) =>
+                    kind(c, i) === 'lead' ? (
+                      <div key={c.id} className="shrink-0">
+                        {render(c)}
+                      </div>
+                    ) : null,
+                  )}
+                  {cells.map((c, i) =>
+                    kind(c, i) === 'title' ? (
+                      <div key={c.id} className="min-w-0 font-medium">
+                        {render(c)}
+                      </div>
+                    ) : null,
+                  )}
+                </div>
                 {cells.map((c, i) =>
-                  kind(c, i) === 'field' ? (
-                    <div key={c.id} className="contents">
-                      <dt className="text-muted-foreground">{cellLabel(c)}</dt>
-                      <dd className="min-w-0 break-words">{render(c)}</dd>
+                  kind(c, i) === 'plain' ? <div key={c.id}>{render(c)}</div> : null,
+                )}
+                <dl className="grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-3 gap-y-1 empty:hidden">
+                  {cells.map((c, i) =>
+                    kind(c, i) === 'field' ? (
+                      <div key={c.id} className="contents">
+                        <dt className="text-muted-foreground">{cellLabel(c)}</dt>
+                        <dd className="min-w-0 break-words">{render(c)}</dd>
+                      </div>
+                    ) : null,
+                  )}
+                </dl>
+                {cells.map((c, i) =>
+                  kind(c, i) === 'footer' ? (
+                    <div
+                      key={c.id}
+                      className={cn('flex flex-wrap justify-end gap-2 border-t pt-2')}
+                    >
+                      {render(c)}
                     </div>
                   ) : null,
                 )}
-              </dl>
-              {cells.map((c, i) =>
-                kind(c, i) === 'footer' ? (
-                  <div key={c.id} className={cn('flex flex-wrap justify-end gap-2 border-t pt-2')}>
-                    {render(c)}
-                  </div>
-                ) : null,
-              )}
-            </li>
+              </li>
+            </Fragment>
           );
         })}
       </ul>

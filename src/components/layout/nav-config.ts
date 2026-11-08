@@ -35,7 +35,7 @@ export interface NavGroup {
 export const NAV_GROUPS: Record<UserRole, NavGroup[]> = {
   [UserRole.ADMIN]: [
     {
-      title: 'Bắt đầu',
+      title: 'Tổng hợp',
       items: [
         { title: 'Bắt đầu', href: '/admin/getting-started', icon: ClipboardCheck },
         { title: 'Tổng quan', href: '/admin', icon: LayoutDashboard },

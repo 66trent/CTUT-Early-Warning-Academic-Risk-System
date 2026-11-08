@@ -1,12 +1,12 @@
 /**
  * npm run demo:reset -- --yes — đưa DB về trạng thái demo chuẩn trước giờ bảo vệ:
  *   sao lưu (npm run backup) → XÓA toàn bộ dữ liệu (schema public + auth) → db:init →
- *   migration:run → seed → seed:demo → nạp bộ demo v3 (7 lô, nhiều file) qua quy trình nhập thật (worker xử lý).
+ *   migration:run → seed → seed:demo → nhập bộ demo v4 (9 đợt, nhiều file) qua quy trình nhập thật (worker xử lý).
  * Chỉ khi DEMO_MODE=true; bắt buộc `--yes`. Cần container postgres, redis, minio, worker đang chạy.
  * `--evaluate`: chạy luôn 3 mốc chính thức của KET_QUA_MONG_DOI.md (HK1_2025: 10/10, 20/11 và chốt
  * học kỳ 31/12) — dùng để tập dượt / chụp ảnh; khi trình bày thật nên bấm chạy trước hội đồng.
  * `--evaluate=2`: chỉ 2 mốc đầu (học kỳ chưa chốt — để trình diễn chốt học kỳ trên giao diện).
- * `--no-data`: dừng sau seed:demo (khoa, lớp, CVHT, học kỳ) — KHÔNG nạp 7 lô, để người trình bày
+ * `--no-data`: dừng sau seed:demo (khoa, lớp, CVHT, học kỳ) — KHÔNG nhập 9 đợt, để người trình bày
  *   tự nhập trên giao diện theo docs/demo-script.md (Phần "Tự nhập dữ liệu").
  * Sau khi chạy: đăng nhập lại (mọi phiên cũ bị xóa).
  */
@@ -90,16 +90,16 @@ async function main(): Promise<void> {
   step('Chạy migration', 'migration:run');
   step('Dữ liệu nền (khoa, Admin, 12 luật)', 'seed');
   step(
-    'Dữ liệu nền demo (GV001–GV005, 5 lớp khóa 2024 Khoa CNTT, học kỳ HK3_2024 + HK1_2025)',
+    'Dữ liệu nền demo (GV001–GV006, 6 lớp Khoa CNTT, học kỳ HK2_2024 + HK3_2024 + HK1_2025)',
     'seed:demo',
   );
   if (process.argv.includes('--no-data')) {
     process.stdout.write(
-      '\n✔ Xong (chưa có sinh viên, chưa nạp dữ liệu). Đăng nhập Admin → Nhập dữ liệu, nạp lần lượt docs/demo-data/01 → 07.\n',
+      '\n✔ Xong (chưa có sinh viên, chưa nạp dữ liệu). Đăng nhập Admin → Nhập dữ liệu, nhập lần lượt docs/demo-data/01 → 09.\n',
     );
     return;
   }
-  step('Nạp bộ demo v3 qua worker (7 lô nhiều file)', 'demo:load', ['--with-students']);
+  step('Nhập bộ demo v4 qua worker (9 đợt nhiều file)', 'demo:load', ['--with-students']);
   const evaluate = process.argv.find((a) => a.startsWith('--evaluate'));
   if (evaluate) {
     const count = evaluate === '--evaluate=2' ? 2 : OFFICIAL_RUNS.length;
