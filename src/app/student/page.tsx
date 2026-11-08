@@ -85,7 +85,7 @@ export default async function StudentHomePage() {
         <CardHeader>
           <CardTitle>Các học phần trong học kỳ</CardTitle>
           <CardDescription>
-            Số liệu lấy theo lần nạp dữ liệu gần nhất của nhà trường.
+            Số liệu lấy theo lần nhập dữ liệu gần nhất của nhà trường.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -99,7 +99,7 @@ export default async function StudentHomePage() {
           <CardDescription>
             {overview?.advisor
               ? `Cố vấn học tập của bạn: ${overview.advisor.fullName}.`
-              : 'Lớp của bạn chưa có Cố vấn học tập phụ trách — hãy liên hệ phòng Đào tạo.'}
+              : 'Lớp của bạn chưa có Cố vấn học tập phụ trách, hãy liên hệ phòng Đào tạo.'}
           </CardDescription>
         </CardHeader>
         {overview?.advisor && (

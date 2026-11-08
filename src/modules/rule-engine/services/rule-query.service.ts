@@ -53,7 +53,10 @@ function conditionSchemaOf(ruleCode: string): ConditionSchema | null {
     ruleCode === RISK_SCORE_RULE_CODE
       ? riskScoreConfigSchema
       : getRuleDefinition(ruleCode)?.conditionSchema;
-  return schema ? (z.toJSONSchema(schema, { io: 'input' }) as ConditionSchema) : null;
+  // toJSONSchema trả object có prototype lạ → sao chép thành dữ liệu thuần trước khi đưa xuống Client.
+  return schema
+    ? (JSON.parse(JSON.stringify(z.toJSONSchema(schema, { io: 'input' }))) as ConditionSchema)
+    : null;
 }
 
 function toVersionDto(v: RuleVersion): RuleVersionDto {

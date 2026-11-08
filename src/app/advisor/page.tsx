@@ -25,6 +25,7 @@ import {
 } from '@/components/dashboard/dashboard-parts';
 import { RunTrendChart } from '@/components/dashboard/run-trend-chart';
 import { AlertStatusBadge } from '@/components/domain/alert-status-badge';
+import { DataCompletenessBadge } from '@/components/domain/data-completeness-badge';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
 import { SeverityBadge } from '@/components/domain/severity-badge';
 import { EmptyState } from '@/components/empty-state';
@@ -118,7 +119,7 @@ export default async function AdvisorHomePage({
       description={
         <>
           {term.termName}
-          {lastRun ? ` · lần đánh giá gần nhất: mốc dữ liệu ${formatVnDate(lastRun.asOf)}` : ''}
+          {lastRun ? ` · lần đánh giá gần nhất: tính đến ${formatVnDate(lastRun.asOf)}` : ''}
         </>
       }
       action={<TermFilter terms={terms} value={term.termId} />}
@@ -239,6 +240,7 @@ export default async function AdvisorHomePage({
                   <MeterBar
                     value={c.students === 0 ? 0 : c.studentsWithAlerts / c.students}
                     label={`Tỷ lệ sinh viên có cảnh báo lớp ${c.classId}`}
+                    tone="attention"
                   />
                 </Link>
               </li>
@@ -250,7 +252,7 @@ export default async function AdvisorHomePage({
       <div className="grid gap-6 lg:grid-cols-2">
         <DashboardCard
           title="Sinh viên cần chú ý nhất"
-          description="Mức cảnh báo cao nhất, rồi điểm rủi ro (0–1)"
+          description="Mức cảnh báo cao nhất, rồi điểm ưu tiên (0–1)"
           href={alertsHref({})}
           hrefLabel="Tất cả"
         >
@@ -268,8 +270,11 @@ export default async function AdvisorHomePage({
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{s.studentName}</span>
-                      <span className="text-xs text-muted-foreground tabular-nums">
-                        {s.studentId} · {s.classId} · điểm rủi ro {fmtRisk(s.riskScore)}
+                      <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground tabular-nums">
+                        {s.studentId} · {s.classId} · điểm ưu tiên {fmtRisk(s.riskScore)}
+                        {s.dataCompletenessLevel && (
+                          <DataCompletenessBadge level={s.dataCompletenessLevel} />
+                        )}
                       </span>
                     </span>
                     <span className="flex shrink-0 flex-col items-end gap-1">

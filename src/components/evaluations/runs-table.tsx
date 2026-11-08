@@ -38,7 +38,7 @@ const columns: ColumnDef<EvaluationRunListItemDto>[] = [
   },
   {
     accessorKey: 'asOf',
-    header: 'Mốc dữ liệu',
+    header: 'Tính đến',
     meta: { sortKey: 'asOf' },
     cell: ({ row }) => formatVnDateTime(row.original.asOf),
   },
@@ -81,7 +81,7 @@ export function RunsTable({
         <EmptyState
           icon={Activity}
           title="Chưa có lần chạy đánh giá nào"
-          description="Nạp dữ liệu học tập của học kỳ rồi bấm Chạy đánh giá ở khung phía trên."
+          description="Nhập dữ liệu học tập của học kỳ rồi bấm Chạy đánh giá ở khung phía trên."
         />
       }
     />

@@ -98,19 +98,19 @@ function baseError(
   if (!known.has(row.studentId)) {
     return {
       reason: 'STUDENT_NOT_FOUND',
-      detail: `Sinh viên ${row.studentId} chưa có trong danh sách — nhập danh sách sinh viên trước.`,
+      detail: `Sinh viên ${row.studentId} chưa có trong danh sách, nhập danh sách sinh viên trước.`,
     };
   }
   if (row.termCode && row.termCode !== term.termId) {
     return {
       reason: 'TERM_MISMATCH',
-      detail: `Cột học kỳ ghi ${row.termCode} nhưng lô nhập chọn ${term.termId}.`,
+      detail: `Cột học kỳ ghi ${row.termCode} nhưng đợt nhập chọn ${term.termId}.`,
     };
   }
   if (batch.courseId && row.courseId !== batch.courseId) {
     return {
       reason: 'COURSE_MISMATCH',
-      detail: `Dòng thuộc học phần ${row.courseId} nhưng lô nhập chọn học phần ${batch.courseId}.`,
+      detail: `Dòng thuộc học phần ${row.courseId} nhưng đợt nhập chọn học phần ${batch.courseId}.`,
     };
   }
   return null;
@@ -147,7 +147,7 @@ export async function checkAcademicReferences<T extends AcademicRowBase>(
     if (row.givenName && nameKey(row.givenName) !== nameKey(fullName)) {
       warn(i, {
         code: 'NAME_MISMATCH',
-        message: `Họ tên trong file "${row.givenName}" khác hệ thống "${fullName}" — có thể sai MSSV.`,
+        message: `Họ tên trong file "${row.givenName}" khác hệ thống "${fullName}", có thể sai MSSV.`,
       });
     }
   });

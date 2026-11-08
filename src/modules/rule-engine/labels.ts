@@ -9,7 +9,7 @@ export const RUN_STATUS_LABELS: Record<EvaluationRunStatus, string> = {
 };
 
 export const RUN_TRIGGER_LABELS: Record<EvaluationTrigger, string> = {
-  [EvaluationTrigger.AUTO_AFTER_IMPORT]: 'Tự động sau khi nạp',
+  [EvaluationTrigger.AUTO_AFTER_IMPORT]: 'Tự động sau khi nhập',
   [EvaluationTrigger.MANUAL]: 'Admin chạy',
   [EvaluationTrigger.SCHEDULED]: 'Tự động theo lịch',
   [EvaluationTrigger.TERM_CLOSING]: 'Chốt học kỳ (lần cuối)',
@@ -21,7 +21,7 @@ export const RULE_GROUP_LABELS: Record<RuleGroup, string> = {
   [RuleGroup.ACADEMIC]: 'Học lực',
   [RuleGroup.COMBINED]: 'Kết hợp',
   [RuleGroup.EXCEPTION]: 'Ngoại lệ',
-  [RuleGroup.RISK_SCORE]: 'Điểm rủi ro',
+  [RuleGroup.RISK_SCORE]: 'Điểm ưu tiên',
 };
 
 export const RULE_STATUS_LABELS: Record<RuleStatus, string> = {
@@ -34,7 +34,7 @@ export const RULE_STATUS_LABELS: Record<RuleStatus, string> = {
 /** Mô tả ngắn từng luật (docs/rules/08) — giúp người cấu hình hiểu ngưỡng đang sửa. */
 export const RULE_DESCRIPTIONS: Record<string, string> = {
   'ATT-01':
-    'Tỷ lệ tiết vắng (có phép + không phép) trên tổng số tiết của học phần. Quy chế: vắng vượt quá 20% bị cấm thi — hệ thống chỉ cảnh báo, không ghi điểm.',
+    'Tỷ lệ tiết vắng (có phép + không phép) trên tổng số tiết của học phần. Quy chế: vắng vượt quá 20% bị cấm thi, hệ thống chỉ cảnh báo, không ghi điểm.',
   'ATT-02':
     'Số tiết vắng không phép tăng nhanh giữa 2 lần chốt điểm danh gần nhau (theo % tổng số tiết).',
   'LMS-01': 'Số bài trắc nghiệm đã quá hạn mà sinh viên chưa làm.',
@@ -42,7 +42,7 @@ export const RULE_DESCRIPTIONS: Record<string, string> = {
   'LMS-03': 'Số bài thực hành đã quá hạn mà sinh viên chưa nộp (chỉ dựa trạng thái nộp).',
   'LMS-04': 'Số bài thực hành nộp trễ. Mức thấp chỉ hiện trong ứng dụng, không gửi email.',
   'ACA-01':
-    'Học phần không đạt (điểm F, kể cả không được dự thi, vắng thi) — báo ngay khi học phần khóa điểm.',
+    'Học phần không đạt (điểm F, kể cả không được dự thi, vắng thi), báo ngay khi học phần khóa điểm.',
   'ACA-02':
     'Tỷ lệ tín chỉ không đạt trong học kỳ. Quy chế 336 Điều 11a: vượt 50% là ngưỡng cảnh báo học tập.',
   'ACA-03':
@@ -52,7 +52,7 @@ export const RULE_DESCRIPTIONS: Record<string, string> = {
   'COMB-01': 'Nhiều nguồn (điểm danh, trắc nghiệm, thực hành) cùng có dấu hiệu trên 1 học phần.',
   'COMB-02': 'Đang học lại học phần đã rớt mà vẫn có dấu hiệu điểm danh hoặc LMS.',
   'RISK-SCORE':
-    'Trọng số điểm rủi ro tổng hợp và tham số dữ liệu dùng chung (độ mới điểm danh, bài trắc nghiệm đến hạn, quy đổi điểm chữ).',
+    'Trọng số điểm ưu tiên tổng hợp và tham số dữ liệu dùng chung (độ mới điểm danh, bài trắc nghiệm đến hạn, quy đổi điểm chữ).',
 };
 
 /** Nhãn trường trong `condition`. Khóa dạng `MÃ_LUẬT:trường` ghi đè nhãn chung khi nghĩa khác. */
@@ -88,7 +88,7 @@ export const CONDITION_FIELD_LABELS: Record<string, string> = {
   minSeverity: 'Tính dấu hiệu từ mức',
   minAttempt: 'Từ lần học thứ',
   bump: 'Nâng thêm (bậc)',
-  weights: 'Trọng số điểm rủi ro',
+  weights: 'Trọng số điểm ưu tiên',
   attendance: 'Điểm danh',
   lms: 'LMS',
   academic: 'Học lực',

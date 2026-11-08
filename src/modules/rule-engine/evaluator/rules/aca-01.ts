@@ -31,7 +31,7 @@ export const aca01: CourseRule<Aca01Condition> = {
     const r = facts.result;
     if (!r || r.passed) return { hit: null };
     const cause =
-      r.eligibleForExam === false ? ' — không được dự thi' : r.absentFromExam ? ' — vắng thi' : '';
+      r.eligibleForExam === false ? ' · không được dự thi' : r.absentFromExam ? ' · vắng thi' : '';
     return {
       hit: {
         severity: c.severity,

@@ -58,7 +58,7 @@ function Cell({
   return href ? (
     <Link
       href={href}
-      aria-label={`${label}: ${SEVERITY_LABELS[severity]} — mở cảnh báo`}
+      aria-label={`${label}: ${SEVERITY_LABELS[severity]}, mở cảnh báo`}
       className="block rounded-md hover:ring-2 hover:ring-primary"
     >
       {body}

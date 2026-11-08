@@ -37,14 +37,14 @@ export default async function EvaluationsPage({ searchParams }: EvaluationsPageP
       <PageHeader
         helpHref={HELP_LINKS.evaluations}
         title="Chạy đánh giá"
-        description="Áp dụng 12 luật cảnh báo và tính điểm rủi ro trên dữ liệu đã nạp. Hệ thống tự chạy sau mỗi lần nạp dữ liệu học tập và mỗi đêm (chế độ demo: chỉ chạy khi Admin bấm)."
+        description="Áp dụng 12 luật cảnh báo và tính điểm ưu tiên trên dữ liệu đã nhập."
       />
 
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Chạy đánh giá ngay</CardTitle>
           <CardDescription>
-            Chỉ dùng dữ liệu phát sinh đến mốc dữ liệu và phiên bản luật đang áp dụng. Kết quả là
+            Chỉ dùng dữ liệu phát sinh đến ngày đã chọn và phiên bản luật đang áp dụng. Kết quả là
             dấu hiệu tham khảo, không phải quyết định học vụ.
           </CardDescription>
         </CardHeader>

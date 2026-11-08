@@ -79,7 +79,7 @@ function statusWarning(row: Omit<LmsAssignmentRow, keyof AcademicRowBase>): RowW
   if (late === (row.status === SubmissionStatus.LATE)) return null;
   return {
     code: 'SUBMISSION_STATUS_MISMATCH',
-    message: `Bài "${row.activityName}" ghi "${late ? 'Đã nộp' : 'Nộp trễ'}" nhưng thời điểm nộp ${late ? 'sau' : 'trước'} hạn — hệ thống tính theo thời điểm nộp.`,
+    message: `Bài "${row.activityName}" ghi "${late ? 'Đã nộp' : 'Nộp trễ'}" nhưng thời điểm nộp ${late ? 'sau' : 'trước'} hạn, hệ thống tính theo thời điểm nộp.`,
   };
 }
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { RuleGroup, Severity } from '@/db/enums';
-import { severityRank, severitySchema } from '../helpers';
+import { describeSignals, severityRank, severitySchema } from '../helpers';
 import { SEVERITY_LABELS } from '@/lib/labels';
 import { type CourseRule, type SignalSource } from '../types';
 
@@ -47,9 +47,7 @@ export const comb01: CourseRule<Comb01Condition> = {
     return {
       hit: {
         severity: c.severity,
-        reason: `${groups.length} nguồn dữ liệu cùng có dấu hiệu từ mức ${SEVERITY_LABELS[c.minSeverity]} trở lên: ${strong
-          .map((h) => `${h.ruleCode} (${SEVERITY_LABELS[h.severity]})`)
-          .join(', ')}.`,
+        reason: `${groups.length} nguồn dữ liệu cùng có dấu hiệu từ mức ${SEVERITY_LABELS[c.minSeverity]} trở lên: ${describeSignals(strong)}.`,
         inputSnapshot: {
           groups: groups.join(','),
           rules: strong.map((h) => `${h.ruleCode}:${h.severity}`).join(','),

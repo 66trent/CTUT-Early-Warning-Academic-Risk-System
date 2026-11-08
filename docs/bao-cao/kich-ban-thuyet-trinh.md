@@ -2,8 +2,8 @@
 
 > Tài liệu này để **đọc thành tiếng và tập nói**. Đoạn in nghiêng là lời nói nguyên văn; chữ trong ngoặc vuông `[ ]` là việc làm (chuyển slide, bấm, chờ), không đọc ra.
 > Tổng thời lượng: **thuyết trình ~13 phút + demo ~14 phút + hỏi đáp**. Trọng tâm: **dữ liệu từ Moodle về EWARS gần thời gian thực → tự đánh giá → chuông báo cố vấn**.
-> Số liệu Moodle khớp `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`; số liệu nạp file khớp `docs/demo-data/KET_QUA_MONG_DOI.md` (đều có test tự động). Đừng tự đổi số.
-> Bản cũ (nạp file là trọng tâm) xem lịch sử Git của file này hoặc `docs/demo-script.md` mục "Kịch bản nạp file".
+> Số liệu Moodle khớp `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`; số liệu nhập file khớp `docs/demo-data/KET_QUA_MONG_DOI.md` (đều có test tự động). Đừng tự đổi số.
+> Bản cũ (nhập file là trọng tâm) xem lịch sử Git của file này hoặc `docs/demo-script.md` mục "Kịch bản nhập file".
 
 ---
 
@@ -30,7 +30,7 @@
 | Moodle | "hệ thống học trực tuyến trường đang dùng — nơi giảng viên điểm danh, ra bài, sinh viên làm bài" |
 | Web service chỉ đọc | "cửa đọc dữ liệu Moodle cấp cho EWARS — chỉ đọc được, không ghi gì vào Moodle" |
 | Plugin `local_ewars` / sự kiện | "một mẩu nhỏ cài trên Moodle, có thay đổi là **bấm chuông** báo EWARS — chuông chỉ có mã số, không có điểm hay tên" |
-| Chế độ Chạy tay / Tự động | "Chạy tay: xem trước rồi mới nạp. Tự động: có thay đổi là tự nạp, tự đánh giá" |
+| Chế độ Thủ công / Tự động | "Thủ công: xem trước rồi mới nhập. Tự động: có thay đổi là tự nhập, tự đánh giá" |
 | Gần thời gian thực | "khoảng nửa phút đến hai phút, không phải tức thì từng giây" |
 | Rule engine | "bộ máy chạy luật" — đọc dữ liệu, so với ngưỡng, ra dấu hiệu |
 | Dấu hiệu / Cảnh báo | "một lần một luật đúng với một sinh viên" / "hồ sơ cố vấn thấy — gom mọi dấu hiệu của 1 sinh viên trong 1 học kỳ" |
@@ -50,15 +50,15 @@
 | 3 | Mục tiêu và ranh giới | 4 việc làm · 1 việc KHÔNG làm | 0:50 |
 | 4 | Người dùng | Sinh viên · Cố vấn học tập · Quản trị | 0:40 |
 | 5 | Dữ liệu đầu vào | Moodle: điểm danh · trắc nghiệm · thực hành — File: kết quả học phần, danh sách SV | 0:50 |
-| 6 | Kết nối Moodle | Sơ đồ: Moodle → chuông báo (plugin) → EWARS đọc lại (chỉ đọc) → nạp → đánh giá → chuông cố vấn | 1:30 |
+| 6 | Kết nối Moodle | Sơ đồ: Moodle → chuông báo (plugin) → EWARS đọc lại (chỉ đọc) → nhập → đánh giá → chuông cố vấn | 1:30 |
 | 7 | "Thời gian thực" nghĩa là gì | Bảng độ trễ + lưới an toàn | 1:00 |
 | 8 | 12 luật | 4 nhóm: Điểm danh · LMS · Học lực · Kết hợp | 1:20 |
 | 9 | Từ dấu hiệu đến cảnh báo | dữ liệu → luật → dấu hiệu → cảnh báo → cố vấn → sinh viên; tự mở lại | 0:50 |
-| 10 | Điểm rủi ro và thiếu dữ liệu | 0,4 / 0,3 / 0,3 · Đủ / Một phần / Chưa đủ | 0:40 |
+| 10 | Điểm ưu tiên và thiếu dữ liệu | 0,4 / 0,3 / 0,3 · Đủ / Một phần / Chưa đủ | 0:40 |
 | 11 | Kiến trúc | Next.js · PostgreSQL · Worker + Redis · MinIO · Docker · Moodle 5.3 | 0:50 |
 | 12 | Bảo mật và pháp lý | Token chỉ đọc · chữ ký HMAC · phân quyền theo lớp · nhật ký · Luật 91/2025 | 0:50 |
 | 13 | Kiểm thử | 472 test · nghiệm thu Moodle khớp 100% · đo 34 giây | 0:40 |
-| 14 | Dữ liệu demo | Moodle: lớp KTPM2411, 2 khóa, HK1 2026–2027 · Bộ nạp file: 5 lớp × 20 SV | 0:30 |
+| 14 | Dữ liệu demo | Moodle: lớp KTPM2411, 2 khóa, HK1 2026–2027 · Bộ nhập file: 5 lớp × 20 SV | 0:30 |
 | 15 | (Demo trực tiếp) | — | 14:00 |
 | 16 | Giới hạn · Hướng phát triển · Kết luận | 4 + 3 gạch | 1:20 |
 
@@ -71,7 +71,7 @@ Giảng viên điểm danh / SV nộp bài trên Moodle
 EWARS nhận chuông → gom 30 giây
         │ ② EWARS tự đọc lại dữ liệu qua web service CHỈ ĐỌC       vài giây
         ▼
-Sinh file đúng mẫu → kiểm tra → tự nạp (lỗi ≤ 10%)
+Sinh file đúng mẫu → kiểm tra → tự nhập (lỗi ≤ 10%)
         │ ③ chạy 12 luật                                           vài giây
         ▼
 Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn, email Cố vấn
@@ -120,7 +120,7 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 
 *"Ba nguồn học tập hằng tuần — **điểm danh**, **bài trắc nghiệm**, **bài thực hành** — lấy **trực tiếp từ Moodle**. Điểm danh dùng plugin Attendance phổ biến nhất của Moodle; Moodle ghi theo buổi có thời lượng, em quy đổi ra tiết: một tiết năm mươi phút."*
 
-*"Còn **kết quả học phần** — điểm chính thức đã khóa — không nằm trong Moodle, nên vẫn nạp bằng file CSV hoặc Excel, qua hai bước: xem trước rồi mới xác nhận. Đường nạp file vẫn dùng song song khi trường chưa dùng Moodle cho một môn nào đó."*
+*"Còn **kết quả học phần** — điểm chính thức đã khóa — không nằm trong Moodle, nên vẫn nhập bằng file CSV hoặc Excel, qua hai bước: xem trước rồi mới xác nhận. Đường nhập file vẫn dùng song song khi trường chưa dùng Moodle cho một môn nào đó."*
 
 ### Slide 6 — Kết nối Moodle (1:30)
 
@@ -130,9 +130,9 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 
 [Chỉ ②.] *"Kênh thứ hai: nhận chuông xong, EWARS **tự đọc lại dữ liệu** qua cửa web service **chỉ đọc** mà Moodle cấp. Nghĩa là EWARS không tin nội dung chuông — kể cả chuông giả cũng không ghi được dữ liệu sai."*
 
-[Chỉ ③.] *"Dữ liệu đọc về được chuyển thành đúng mẫu file mà trường đang dùng, đi qua đúng bước kiểm tra như nạp file, rồi **tự chạy 12 luật**. Có cảnh báo mới, tăng mức hay mở lại thì **chuông của cố vấn kêu**, kèm email."*
+[Chỉ ③.] *"Dữ liệu đọc về được chuyển thành đúng mẫu file mà trường đang dùng, đi qua đúng bước kiểm tra như nhập file, rồi **tự chạy 12 luật**. Có cảnh báo mới, tăng mức hay mở lại thì **chuông của cố vấn kêu**, kèm email."*
 
-*"Có hai chế độ cho mỗi khóa học: **Chạy tay** — lần đầu kết nối, quản trị viên xem trước rồi mới nạp; và **Tự động** — dùng hằng ngày. Ở chế độ Tự động, lô nào lỗi quá 10% thì hệ thống **không tự nạp** mà dừng chờ quản trị viên xem."*
+*"Có hai chế độ cho mỗi khóa học: **Thủ công** — lần đầu kết nối, quản trị viên xem trước rồi mới nhập; và **Tự động** — dùng hằng ngày. Ở chế độ Tự động, đợt nhập nào lỗi quá 10% thì hệ thống **không tự nhập** mà dừng chờ quản trị viên xem."*
 
 ### Slide 7 — "Thời gian thực" nghĩa là gì (1:00)
 
@@ -166,13 +166,13 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 
 *"Sinh viên chỉ thấy cảnh báo **sau khi cố vấn xác nhận** — để nhận thông tin kèm sự hỗ trợ."*
 
-### Slide 10 — Điểm rủi ro và thiếu dữ liệu (0:40)
+### Slide 10 — Điểm ưu tiên và thiếu dữ liệu (0:40)
 
-*"Mỗi sinh viên có điểm rủi ro 0 đến 1: điểm danh 0,4, LMS 0,3, học lực 0,3 — chỉ để **sắp xếp**, không tạo cảnh báo. Không có dữ liệu thì hệ thống ghi **Chưa đủ dữ liệu**, **không** coi là rủi ro thấp."*
+*"Mỗi sinh viên có điểm ưu tiên 0 đến 1: điểm danh 0,4, LMS 0,3, học lực 0,3 — chỉ để **sắp xếp**, không tạo cảnh báo. Không có dữ liệu thì hệ thống ghi **Chưa đủ dữ liệu**, **không** coi là rủi ro thấp."*
 
 ### Slide 11 — Kiến trúc (0:50)
 
-*"Next.js cho cả giao diện và máy chủ, PostgreSQL lưu dữ liệu. Việc nặng — đọc Moodle, nạp dữ liệu, chạy luật — nằm trong **hàng đợi** và một tiến trình chạy ngầm riêng, nên giao diện không bị treo. File gốc lưu ở MinIO."*
+*"Next.js cho cả giao diện và máy chủ, PostgreSQL lưu dữ liệu. Việc nặng — đọc Moodle, nhập dữ liệu, chạy luật — nằm trong **hàng đợi** và một tiến trình chạy ngầm riêng, nên giao diện không bị treo. File gốc lưu ở MinIO."*
 
 *"Để demo, em tự dựng **Moodle 5.3** — bản ổn định mới nhất — cùng plugin điểm danh, chạy trong Docker cạnh hệ thống, giả lập Moodle của trường. Toàn bộ dựng lại được bằng vài lệnh."*
 
@@ -184,7 +184,7 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 
 ### Slide 13 — Kiểm thử (0:40)
 
-*"Hệ thống có **472 test tự động** chạy trên cơ sở dữ liệu thật. Với Moodle, em ghi lại phản hồi thật của Moodle 5.3 làm dữ liệu mẫu, rồi dựng **máy chủ Moodle giả** để test không phụ thuộc mạng: đồng bộ phải ra đúng 480, 121, 120 dòng và đúng **12 dấu hiệu, 9 cảnh báo** tính tay trước. Có test cho cả các tình huống xấu: nhận trùng sự kiện, lô nhiều lỗi, dữ liệu cũ đè dữ liệu mới, máy chủ dừng giữa chừng."*
+*"Hệ thống có **472 test tự động** chạy trên cơ sở dữ liệu thật. Với Moodle, em ghi lại phản hồi thật của Moodle 5.3 làm dữ liệu mẫu, rồi dựng **máy chủ Moodle giả** để test không phụ thuộc mạng: đồng bộ phải ra đúng 480, 121, 120 dòng và đúng **12 dấu hiệu, 9 cảnh báo** tính tay trước. Có test cho cả các tình huống xấu: nhận trùng sự kiện, đợt nhập nhiều lỗi, dữ liệu cũ đè dữ liệu mới, máy chủ dừng giữa chừng."*
 
 *"Đo thực tế trên Moodle Docker: giảng viên điểm danh vắng đến lúc cảnh báo đổi mức là **34 giây**; hết hạn nộp đến lúc đánh giá lại là **đúng 5 phút**."*
 
@@ -192,7 +192,7 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 
 *"Phần Moodle: lớp Kỹ thuật phần mềm 2411, hai khóa học Mạng máy tính và Hệ điều hành, học kỳ 1 năm 2026–2027 theo ngày thật. Mỗi khóa 15 buổi, 3 bài trắc nghiệm, 3 bài thực hành; em cài sẵn khoảng mười tình huống: vắng vượt ngưỡng, vắng tăng nhanh, bỏ bài, điểm thấp, nộp trễ, được gia hạn."*
 
-*"Phần học lực: bộ dữ liệu năm lớp, một trăm sinh viên của học kỳ trước, nạp bằng file. Họ tên, mã số đều là giả."*
+*"Phần học lực: bộ dữ liệu năm lớp, một trăm sinh viên của học kỳ trước, nhập bằng file. Họ tên, mã số đều là giả."*
 
 *"Sau đây em xin demo."*
 
@@ -213,7 +213,7 @@ Cảnh báo mới / tăng mức / mở lại → 🔔 chuông Admin + Cố vấn
 docker compose --profile dev --profile moodle up -d --build
 ```
 
-3. Dữ liệu sạch cho buổi bảo vệ (bộ nạp file v3 nạp sẵn, chưa chạy đánh giá):
+3. Dữ liệu sạch cho buổi bảo vệ (bộ nhập file v3 nhập sẵn, chưa chạy đánh giá):
 
 ```bash
 npm run demo:reset -- --yes
@@ -256,7 +256,7 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 *"Giảng viên điểm danh theo ký hiệu: P có mặt, L đi trễ, E vắng có phép, A vắng không phép. Toàn bộ dữ liệu này đang **nằm trong Moodle** — EWARS chưa có gì."*
 
-### M2 — Kết nối Moodle, đồng bộ Chạy tay (1:30 → 4:00)
+### M2 — Kết nối Moodle, đồng bộ Thủ công (1:30 → 4:00)
 
 [Chrome — Admin EWARS → **Kết nối Moodle**.]
 
@@ -268,21 +268,21 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 [Bấm **Bật đồng bộ** ở 2 khóa (xác nhận). Bấm **Đồng bộ ngay**. Chờ ~10 giây.]
 
-*"Lần kết nối đầu tiên em dùng chế độ **Chạy tay**: hệ thống đọc Moodle, chuyển thành ba lô — điểm danh, trắc nghiệm, thực hành — nhưng **chưa ghi** gì cả."*
+*"Lần kết nối đầu tiên em dùng chế độ **Thủ công**: hệ thống đọc Moodle, chuyển thành ba đợt nhập — điểm danh, trắc nghiệm, thực hành — nhưng **chưa ghi** gì cả."*
 
-[Kết quả: 3 lô.] *"Khoảng 480 dòng điểm danh"* (số này tăng theo số buổi đã học), *"121 dòng trắc nghiệm, 120 dòng thực hành, **0 lỗi**."*
+[Kết quả: 3 đợt nhập.] *"Khoảng 480 dòng điểm danh"* (số này tăng theo số buổi đã học), *"121 dòng trắc nghiệm, 120 dòng thực hành, **0 lỗi**."*
 
-[Bấm tên lô **Điểm danh** → màn xem trước, chỉ cột tổng số tiết = 60.]
+[Bấm tên đợt nhập **Điểm danh** → màn xem trước, chỉ cột tổng số tiết = 60.]
 
 *"Mỗi ngày có buổi điểm danh thành một ngày chốt; tổng số tiết 60 — tức 15 buổi nhân 200 phút chia 50 phút một tiết. Đây là chỗ duy nhất phải quy đổi."*
 
-[Quay lại Kết nối Moodle → **Xác nhận nạp cả 3** → xác nhận.]
+[Quay lại Kết nối Moodle → **Xác nhận nhập cả 3** → xác nhận.]
 
 ### M3 — Chạy đánh giá, chuông Admin (4:00 → 5:00)
 
 [**Chạy đánh giá** → Học kỳ 1, 2026–2027 → để trống mốc (= bây giờ) → Chạy.]
 
-*"Ở chế độ Chạy tay, em bấm chạy đánh giá."* [Kết quả.] *"**12 dấu hiệu, 9 cảnh báo** trong 20 sinh viên — đúng bảng em tính tay trước."*
+*"Ở chế độ Thủ công, em bấm chạy đánh giá."* [Kết quả.] *"**12 dấu hiệu, 9 cảnh báo** trong 20 sinh viên — đúng bảng em tính tay trước."*
 
 [Chỉ chuông góc trên — có số đỏ. Mở chuông.]
 
@@ -308,7 +308,7 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 [Chrome — Admin → Kết nối Moodle → **Bật Tự động** ở 2 khóa (xác nhận).]
 
-*"Bây giờ em chuyển hai khóa sang **Tự động**. Hệ thống chỉ cho bật khi khóa đã được xác nhận nạp ít nhất một lần. Khung này cho biết: số khóa Tự động, chuông Moodle gần nhất, lần dò thay đổi gần nhất."*
+*"Bây giờ em chuyển hai khóa sang **Tự động**. Hệ thống chỉ cho bật khi khóa đã được xác nhận nhập ít nhất một lần. Khung này cho biết: số khóa Tự động, chuông Moodle gần nhất, lần dò thay đổi gần nhất."*
 
 ### M6 ★ Thời gian thực: giảng viên điểm danh → chuông cố vấn (8:00 → 10:30)
 
@@ -325,7 +325,7 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 - *"Tác vụ nền của Moodle chạy mỗi phút, sẽ gửi chuông có ký HMAC sang EWARS."*
 - *"EWARS gom các chuông trong 30 giây, rồi tự đọc lại điểm danh của khóa này qua cửa chỉ đọc."*
 - *"Chỉ file điểm danh Mạng máy tính thay đổi — các file khác giống lần trước nên bỏ qua."*
-- *"Lô mới 0 lỗi nên hệ thống tự xác nhận dưới tên 'Đồng bộ Moodle (hệ thống)', nạp, rồi chạy 12 luật."*
+- *"Đợt nhập mới 0 lỗi nên hệ thống tự xác nhận dưới tên 'Đồng bộ Moodle (hệ thống)', nhập, rồi chạy 12 luật."*
 
 [Chuông Edge có số mới / toast "Moodle: Điểm danh — Mạng máy tính vừa cập nhật" hiện ra → bấm **Tải lại** trên toast.]
 
@@ -343,21 +343,21 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 [Chrome — Admin → Kết nối Moodle, chỉ danh sách "Các lần đồng bộ".]
 
-*"Mỗi lần đồng bộ ghi rõ nguồn: Admin bấm, sự kiện Moodle, dò thay đổi định kỳ, đồng bộ đêm, hay hết hạn nộp. Lô nào lỗi quá 10% sẽ hiện **'Cần Admin xem'** và không tự nạp."*
+*"Mỗi lần đồng bộ ghi rõ nguồn: Admin bấm, sự kiện Moodle, dò thay đổi định kỳ, đồng bộ đêm, hay hết hạn nộp. Đợt nhập nào lỗi quá 10% sẽ hiện **'Cần Admin xem'** và không tự nhập."*
 
 *"Hai trường hợp Moodle **không phát sự kiện**: hết hạn nộp mà sinh viên không nộp — EWARS đã hẹn giờ chạy lại đúng hạn cộng 5 phút; và điểm danh bằng app điện thoại — lịch dò 10 phút sẽ bắt được."*
 
 *"Nếu sinh viên rời khóa trên Moodle, EWARS **không tự xóa** dữ liệu mà liệt kê ở đây để quản trị viên đánh dấu rút học phần — xóa dữ liệu tự động là việc em cố ý không làm."*
 
-[**Nhập dữ liệu** → Lịch sử nạp, chỉ nhãn **Moodle** + người thực hiện "Đồng bộ Moodle (hệ thống)".]
+[**Nhập dữ liệu** → Lịch sử nhập, chỉ nhãn **Moodle** + người thực hiện "Đồng bộ Moodle (hệ thống)".]
 
-*"Lô từ Moodle hiện ở lịch sử nạp như lô file, có nhãn Moodle, lưu file gốc để đối chiếu. Lô Moodle **không hoàn tác** — Moodle là nguồn gốc, sai thì sửa trên Moodle, lần đồng bộ sau tự sửa theo."*
+*"Đợt nhập từ Moodle hiện ở lịch sử nhập như đợt nhập file, có nhãn Moodle, lưu file gốc để đối chiếu. Đợt nhập Moodle **không hoàn tác** — Moodle là nguồn gốc, sai thì sửa trên Moodle, lần đồng bộ sau tự sửa theo."*
 
-### M8 — Học lực: kết quả học phần vẫn nạp file + chốt học kỳ (11:30 → 13:30)
+### M8 — Học lực: kết quả học phần vẫn nhập file + chốt học kỳ (11:30 → 13:30)
 
-*"Kết quả học phần là điểm chính thức, không có trong Moodle, nên em dùng bộ dữ liệu nạp file của học kỳ trước — năm lớp, một trăm sinh viên — đã nạp sẵn để tiết kiệm thời gian."*
+*"Kết quả học phần là điểm chính thức, không có trong Moodle, nên em dùng bộ dữ liệu nhập file của học kỳ trước — năm lớp, một trăm sinh viên — đã nhập sẵn để tiết kiệm thời gian."*
 
-[**Nhập dữ liệu** → chỉ Lịch sử: 7 lô nạp file (kết quả HK3, điểm danh, trắc nghiệm, thực hành, kết quả cuối kỳ).]
+[**Nhập dữ liệu** → chỉ Lịch sử: 7 đợt nhập file (kết quả HK3, điểm danh, trắc nghiệm, thực hành, kết quả cuối kỳ).]
 
 [**Học kỳ** → **Học kỳ 1, 2025–2026** → **Chốt học kỳ** → điền mốc **2025-12-31** → **Chạy đánh giá cuối và chốt**.]
 
@@ -375,14 +375,14 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 [**Nhật ký hệ thống** → lọc hành động "Đồng bộ Moodle tự động".]
 
-*"Mọi lần đồng bộ, đổi chế độ, xác nhận nạp, xem hồ sơ sinh viên đều ghi nhật ký, không sửa không xóa được — kể cả việc do hệ thống tự làm."*
+*"Mọi lần đồng bộ, đổi chế độ, xác nhận nhập, xem hồ sơ sinh viên đều ghi nhật ký, không sửa không xóa được — kể cả việc do hệ thống tự làm."*
 
 *"Phần demo của em đến đây là hết. Em xin quay lại slide cuối."*
 
 ### Nếu đang trễ giờ — bỏ theo thứ tự này
 
-1. M2: bỏ mở màn xem trước lô điểm danh (chỉ nói "tổng số tiết quy đổi ra 60").
-2. M7: chỉ nói 1 câu: *"Hết hạn nộp và điểm danh bằng app có lịch chạy riêng, lô nhiều lỗi dừng chờ quản trị viên."*
+1. M2: bỏ mở màn xem trước đợt nhập điểm danh (chỉ nói "tổng số tiết quy đổi ra 60").
+2. M7: chỉ nói 1 câu: *"Hết hạn nộp và điểm danh bằng app có lịch chạy riêng, đợt nhập nhiều lỗi dừng chờ quản trị viên."*
 3. M8: bỏ KTPM2411918, chỉ giữ HTTT2411908.
 4. M5: bỏ phần sinh viên xem.
 5. **Không bỏ** M6 (thời gian thực + tự mở lại) — đây là phần khác biệt nhất.
@@ -433,16 +433,16 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 *"Dạ, chuông phải có chữ ký bằng khóa bí mật; sai chữ ký hoặc lệch giờ quá 5 phút bị từ chối. Mà kể cả chuông thật, EWARS cũng không tin nội dung — chỉ coi là tín hiệu để tự đọc lại Moodle. Chuông giả nhiều nhất làm EWARS đọc Moodle thêm một lần."*
 
 **H: Moodle hoặc EWARS tắt giữa chừng thì sao?**
-*"Dạ, plugin dùng tác vụ nền nên Moodle tự gửi lại khi EWARS sống lại. Phía EWARS có ba lưới: dò thay đổi mỗi 10 phút, đồng bộ đầy đủ mỗi đêm, và tự gỡ các lô bị kẹt. Em đã thử tắt máy chủ giữa chừng — phần bị lỡ được gom lại tự động, có test cho từng trường hợp."*
+*"Dạ, plugin dùng tác vụ nền nên Moodle tự gửi lại khi EWARS sống lại. Phía EWARS có ba lưới: dò thay đổi mỗi 10 phút, đồng bộ đầy đủ mỗi đêm, và tự gỡ các đợt nhập bị kẹt. Em đã thử tắt máy chủ giữa chừng — phần bị lỡ được gom lại tự động, có test cho từng trường hợp."*
 
 **H: Dữ liệu Moodle sai thì sao, có hoàn tác không?**
-*"Dạ, lô Moodle không hoàn tác vì Moodle là nguồn gốc: giảng viên sửa trên Moodle, lần đồng bộ sau tự sửa theo. Kể cả sửa đi sửa lại về như cũ, hệ thống vẫn nạp đúng — em đã gặp và sửa lỗi này."*
+*"Dạ, đợt nhập Moodle không hoàn tác vì Moodle là nguồn gốc: giảng viên sửa trên Moodle, lần đồng bộ sau tự sửa theo. Kể cả sửa đi sửa lại về như cũ, hệ thống vẫn nhập đúng — em đã gặp và sửa lỗi này."*
 
 **H: Một khóa Moodle có nhiều lớp học phần, hay sinh viên khoa khác thì sao?**
 *"Dạ, bản này mỗi khóa Moodle là một lớp học phần — đây là giới hạn em ghi rõ. Sinh viên Moodle chưa có trong EWARS thì bỏ qua và đếm riêng, không tính là lỗi."*
 
 **H: Vì sao kết quả học phần không lấy từ Moodle?**
-*"Dạ, sổ điểm Moodle là điểm thành phần giảng viên nhập, không phải điểm chính thức đã khóa ở phòng Đào tạo. Luật học lực theo quy chế phải dùng điểm chính thức, nên vẫn nạp file."*
+*"Dạ, sổ điểm Moodle là điểm thành phần giảng viên nhập, không phải điểm chính thức đã khóa ở phòng Đào tạo. Luật học lực theo quy chế phải dùng điểm chính thức, nên vẫn nhập file."*
 
 ### 4.2 Câu hỏi về ý tưởng, nghiệp vụ
 
@@ -453,7 +453,7 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 *"Dạ, trường chưa có dữ liệu lịch sử có nhãn để huấn luyện; cảnh báo phải giải thích được — 'vắng 21,7%' chứ không phải 'mô hình nói 0,8'; và luật bám quy chế, nhà trường kiểm soát được. Khi có dữ liệu nhiều học kỳ, học máy là hướng phát triển hợp lý."*
 
 **H: Ngưỡng 10%, 15% lấy ở đâu? Trọng số 0,4/0,3/0,3?**
-*"Dạ, 20% là quy chế; 10% và 15% em đề xuất — khoảng một nửa và ba phần tư ngưỡng cấm thi — chưa hiệu chỉnh bằng dữ liệu thật, quản trị viên đổi được và có chạy thử. Trọng số: điểm danh nặng nhất vì có hậu quả cứng theo quy chế; điểm rủi ro chỉ để sắp xếp, không tạo cảnh báo."*
+*"Dạ, 20% là quy chế; 10% và 15% em đề xuất — khoảng một nửa và ba phần tư ngưỡng cấm thi — chưa hiệu chỉnh bằng dữ liệu thật, quản trị viên đổi được và có chạy thử. Trọng số: điểm danh nặng nhất vì có hậu quả cứng theo quy chế; điểm ưu tiên chỉ để sắp xếp, không tạo cảnh báo."*
 
 **H: Hệ thống báo sai thì sao?**
 *"Dạ, cố vấn có trạng thái 'Bỏ qua (báo sai)' kèm lý do; mọi cảnh báo là tham khảo, không đổi học vụ."*
@@ -466,7 +466,7 @@ Video quay sẵn trọn phần demo trong USB/desktop — máy trục trặc th�
 
 ### 4.3 Câu hỏi cần mở màn hình
 
-Học kỳ Moodle = **Học kỳ 1, 2026–2027** (lớp KTPM2411). Bộ nạp file = **Học kỳ 1, 2025–2026**.
+Học kỳ Moodle = **Học kỳ 1, 2026–2027** (lớp KTPM2411). Bộ nhập file = **Học kỳ 1, 2025–2026**.
 
 | Hội đồng hỏi | Mở đâu | Mã luật |
 |---|---|---|
@@ -480,7 +480,7 @@ Học kỳ Moodle = **Học kỳ 1, 2026–2027** (lớp KTPM2411). Bộ nạp f
 | Rớt môn, tín chỉ, ĐTB, sa sút? | Sau M8: KTPM2411913/914, 915, 918; HTTT2411906–908 | ACA-01…04 |
 | Sinh viên chuyển đến / thiếu dữ liệu? | Học kỳ 2025–2026: GV005 → KHDL2411919 "Chưa đủ" | — |
 | Phân quyền? | GV002 dán `/advisor/students/KTPM2411903` → bị chặn | — |
-| Nạp file có lỗi? | `docs/demo-data/minh-hoa-loi/` (làm trên học kỳ chưa chốt) | — |
+| Nhập file có lỗi? | `docs/demo-data/minh-hoa-loi/` (làm trên học kỳ chưa chốt) | — |
 | Hết hạn nộp tự đánh giá? | Kịch bản phụ ở `docs/demo-script.md` (cần chờ 5–8 phút) | LMS-01, LMS-03 |
 | Hiệu năng, sao lưu, bảo mật? | `docs/bao-cao/02-hieu-nang.md`, `03-sao-luu-khoi-phuc.md`, `01-ra-soat-bao-mat.md` | — |
 
@@ -513,9 +513,9 @@ Học kỳ Moodle = **Học kỳ 1, 2026–2027** (lớp KTPM2411). Bộ nạp f
 
 | Sự cố | Nói gì | Làm gì |
 |---|---|---|
-| M6: quá 2 phút chưa có chuông | *"Tác vụ nền của Moodle chạy mỗi phút, đôi khi lệch một nhịp; trong lúc chờ em cho thầy cô xem trang Kết nối…"* | Admin → Kết nối Moodle → **Đồng bộ ngay** (khóa Tự động nạp luôn) → chuông sau ~15 giây |
+| M6: quá 2 phút chưa có chuông | *"Tác vụ nền của Moodle chạy mỗi phút, đôi khi lệch một nhịp; trong lúc chờ em cho thầy cô xem trang Kết nối…"* | Admin → Kết nối Moodle → **Đồng bộ ngay** (khóa Tự động nhập luôn) → chuông sau ~15 giây |
 | M6: không đăng nhập / không thao tác được Moodle | *"Em dùng lệnh mô phỏng đi đúng đường của Moodle."* | Terminal: `docker compose exec -u www-data moodle php /var/www/html/ewars-cli/ewars_simulate.php --course=010100089201 --absent=KTPM2411906` (Git Bash: thêm `MSYS_NO_PATHCONV=1` ở đầu) |
-| Chuông Moodle báo lỗi / trang Kết nối "Không kết nối được" | *"Kết nối Moodle đang gián đoạn — đây là lý do có chế độ Chạy tay và lịch dò dự phòng."* | `docker compose --profile moodle up -d moodle` rồi tải lại; vẫn lỗi → mở video |
+| Chuông Moodle báo lỗi / trang Kết nối "Không kết nối được" | *"Kết nối Moodle đang gián đoạn — đây là lý do có chế độ Thủ công và lịch dò dự phòng."* | `docker compose --profile moodle up -d moodle` rồi tải lại; vẫn lỗi → mở video |
 | Trang tải lâu | *"Hệ thống đang xử lý, trong lúc chờ em xin giải thích…"* | Chờ tối đa 15 giây |
 | Lỗi / trắng trang | *"Dạ, máy demo đang gặp sự cố, em xin phép chuyển sang video quay sẵn từ đúng dữ liệu này."* | Mở video, nói theo Phần 3 |
 | Bấm nhầm, kích hoạt luật | *"Em vừa kích hoạt nhầm; số liệu phía sau sẽ khác một chút."* | Đi tiếp |
@@ -525,7 +525,7 @@ Học kỳ Moodle = **Học kỳ 1, 2026–2027** (lớp KTPM2411). Bộ nạp f
 
 ## Phần 6 — Tờ ghi nhớ 1 trang (in ra, để trên bàn)
 
-- **Câu một dòng:** Moodle → chuông báo (ký HMAC) → EWARS tự đọc lại (chỉ đọc) → tự nạp → 12 luật → chuông cố vấn · chỉ tham khảo.
-- **Số cần nhớ:** Moodle: 2 khóa × 15 buổi × 4 tiết = **60 tiết** · đồng bộ ~480 · **121** · **120** dòng · **12 dấu hiệu, 9 cảnh báo** · 903 = 16/60 (**26,7%**, Rất cao) · 906: 8 → 12/60 = **20%** (Cao, mở lại) · đo **34 giây** · hạn nộp + **5 phút** · dò **10 phút** · tự nạp khi lỗi ≤ **10%** · **472** test · 11 hàm chỉ đọc · 1 tiết = **50 phút** · A = **3,8**.
-- **Thứ tự demo:** Moodle (khóa MMT, điểm danh) → Kết nối Moodle: bật 2 khóa → Đồng bộ ngay → 3 lô → Xác nhận → Chạy đánh giá (12/9) → chuông Admin → GV001: 903 xác nhận + can thiệp; 906 giải quyết → SV 903 → Bật Tự động → ★ Moodle điểm danh 906 vắng → chuông "1 mở lại" → 906 Cao 20% + MailHog → lưới an toàn → chốt HK 2025–2026 (mốc 2025-12-31) → HTTT 908, KTPM 918 → Nhật ký.
+- **Câu một dòng:** Moodle → chuông báo (ký HMAC) → EWARS tự đọc lại (chỉ đọc) → tự nhập → 12 luật → chuông cố vấn · chỉ tham khảo.
+- **Số cần nhớ:** Moodle: 2 khóa × 15 buổi × 4 tiết = **60 tiết** · đồng bộ ~480 · **121** · **120** dòng · **12 dấu hiệu, 9 cảnh báo** · 903 = 16/60 (**26,7%**, Rất cao) · 906: 8 → 12/60 = **20%** (Cao, mở lại) · đo **34 giây** · hạn nộp + **5 phút** · dò **10 phút** · tự nhập khi lỗi ≤ **10%** · **472** test · 11 hàm chỉ đọc · 1 tiết = **50 phút** · A = **3,8**.
+- **Thứ tự demo:** Moodle (khóa MMT, điểm danh) → Kết nối Moodle: bật 2 khóa → Đồng bộ ngay → 3 đợt nhập → Xác nhận → Chạy đánh giá (12/9) → chuông Admin → GV001: 903 xác nhận + can thiệp; 906 giải quyết → SV 903 → Bật Tự động → ★ Moodle điểm danh 906 vắng → chuông "1 mở lại" → 906 Cao 20% + MailHog → lưới an toàn → chốt HK 2025–2026 (mốc 2025-12-31) → HTTT 908, KTPM 918 → Nhật ký.
 - **Ba điều phải nói bằng được:** (1) EWARS chỉ đọc Moodle, không tự quyết học vụ; (2) gần thời gian thực ~1 phút + lưới an toàn cho việc không có sự kiện; (3) đã giải quyết mà xấu hơn thì tự mở lại và báo ngay.

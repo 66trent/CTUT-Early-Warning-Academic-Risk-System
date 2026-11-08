@@ -120,7 +120,7 @@ export default async function AdminAlertsPage({
                 <EmptyState
                   icon={ShieldCheck}
                   title="Chưa có cảnh báo nào trong học kỳ này"
-                  description="Cảnh báo xuất hiện sau khi nạp dữ liệu học tập và chạy đánh giá."
+                  description="Cảnh báo xuất hiện sau khi nhập dữ liệu học tập và chạy đánh giá."
                   action={{ href: '/admin/evaluations', label: 'Chạy đánh giá' }}
                 />
               )

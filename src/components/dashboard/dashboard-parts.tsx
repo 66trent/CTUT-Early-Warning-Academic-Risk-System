@@ -137,8 +137,16 @@ function Delta({ value, upIsBad }: { value: number; upIsBad: boolean }) {
   );
 }
 
-/** Thanh tỷ lệ 0–1. */
-export function MeterBar({ value, label }: { value: number; label: string }) {
+/** Thanh tỷ lệ 0–1. `tone`: `good` khi càng cao càng tốt, `attention` khi càng cao càng cần chú ý. */
+export function MeterBar({
+  value,
+  label,
+  tone = 'good',
+}: {
+  value: number;
+  label: string;
+  tone?: 'good' | 'attention';
+}) {
   const pct = Math.round(Math.min(1, Math.max(0, value)) * 100);
   return (
     <div
@@ -150,7 +158,10 @@ export function MeterBar({ value, label }: { value: number; label: string }) {
       className="mt-2 h-2 overflow-hidden rounded-full bg-muted"
     >
       <div
-        className="h-full rounded-full bg-emerald-600 dark:bg-emerald-500"
+        className={cn(
+          'h-full rounded-full',
+          tone === 'good' ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-orange-500',
+        )}
         style={{ width: `${pct}%` }}
       />
     </div>

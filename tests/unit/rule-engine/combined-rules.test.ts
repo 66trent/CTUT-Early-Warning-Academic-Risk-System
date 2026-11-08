@@ -32,6 +32,12 @@ describe('COMB-01: nhiều nguồn cùng xấu (điểm danh · trắc nghiệm 
     expect(triggersOf('COMB-01', [attendanceAndAssignment()])[0]?.severity).toBe(Severity.CRITICAL);
   });
 
+  it('lý do ghi tên nguồn + mức, không lộ mã luật', () => {
+    const [t] = triggersOf('COMB-01', [attendanceAndAssignment()]);
+    expect(t?.reason).toContain('điểm danh (Trung bình), bài thực hành (Trung bình)');
+    expect(t?.reason).not.toMatch(/ATT-|LMS-/);
+  });
+
   it('trắc nghiệm (LMS-01) + thực hành (LMS-03) là 2 nguồn khác nhau → CRITICAL', () => {
     const e = enrollment({
       quizAttempts: [attempt('Q01', '2025-09-14'), attempt('Q02', '2025-09-21')],
@@ -82,6 +88,8 @@ describe('COMB-02: học lại vẫn sa sút', () => {
     const [t] = triggersOf('COMB-02', [retaking()]);
     expect(t?.severity).toBe(Severity.HIGH);
     expect(t?.reason).toContain('đã rớt ở Học kỳ 3, 2024–2025');
+    expect(t?.reason).toContain('bài trắc nghiệm (Trung bình)');
+    expect(t?.reason).not.toMatch(/ATT-|LMS-/);
     expect(t?.inputSnapshot).toMatchObject({ attemptNumber: 2, failedTerms: 'HK3_2024' });
   });
 

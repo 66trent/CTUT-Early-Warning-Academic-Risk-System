@@ -68,8 +68,8 @@ export const aca03: StudentRule<Aca03Condition> = {
         reason:
           `ĐTB học kỳ (hệ 4) ${formatNumber(value)} trên ${academics.credits} tín chỉ` +
           (regulation !== null
-            ? ` — dưới ${formatNumber(regulation, 1)}, chạm ngưỡng cảnh báo học tập theo quy chế${ctx.isFirstTerm ? ' (học kỳ đầu khóa)' : ''} (tham khảo).`
-            : ` — dưới ${formatNumber(c.warnBelow, 1)}.`) +
+            ? ` · dưới ${formatNumber(regulation, 1)}, chạm ngưỡng cảnh báo học tập theo quy chế${ctx.isFirstTerm ? ' (học kỳ đầu khóa)' : ''} (tham khảo).`
+            : ` · dưới ${formatNumber(c.warnBelow, 1)}.`) +
           missing,
         inputSnapshot: {
           gpa4: value,

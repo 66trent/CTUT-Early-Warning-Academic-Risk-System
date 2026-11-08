@@ -79,7 +79,7 @@ export function RulesTable({ rules }: { rules: RuleRowView[] }) {
       columns={columns}
       data={rules}
       getRowId={(r) => r.ruleCode}
-      emptyMessage="Chưa có luật nào — báo người cài đặt hệ thống nạp bộ luật mặc định."
+      emptyMessage="Chưa có luật nào, báo người cài đặt hệ thống nhập bộ luật mặc định."
     />
   );
 }

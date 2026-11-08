@@ -94,7 +94,7 @@ async function buildEmail(n: Notification): Promise<{ to: string; subject: strin
     text:
       `Kính gửi ${recipient.fullName},\n\n` +
       `Hệ thống ghi nhận sinh viên ${student.fullName} (${student.studentId}, lớp ${student.classId}) ` +
-      `có dấu hiệu cần hỗ trợ trong ${term.termName} — mức ${SEVERITY_LABELS[alert.severity]}.\n\n` +
+      `có dấu hiệu cần hỗ trợ trong ${term.termName} · mức ${SEVERITY_LABELS[alert.severity]}.\n\n` +
       `Dấu hiệu chính:\n${triggers.map((t) => `- ${t.reason}`).join('\n')}\n\n` +
       `Xem chi tiết và ghi nhận can thiệp: ${link}\n\n` +
       'Cảnh báo sớm — mang tính tham khảo, không phải quyết định học vụ chính thức.',

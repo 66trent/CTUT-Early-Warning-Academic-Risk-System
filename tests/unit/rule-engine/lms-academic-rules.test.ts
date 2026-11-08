@@ -252,7 +252,7 @@ describe('ACA-02: tín chỉ không đạt trong học kỳ (Điều 11a)', () =
     const most = [completed('A', 'D', 2), completed('B', 'F'), completed('C', 'F')];
     const [t] = triggersOf('ACA-02', most);
     expect(t?.severity).toBe(Severity.CRITICAL);
-    expect(t?.reason).toContain('chạm ngưỡng cảnh báo học tập theo quy chế');
+    expect(t?.reason).toContain('Chạm ngưỡng cảnh báo học tập theo quy chế');
   });
 
   it('sát ngưỡng: rớt đúng 50% → HIGH (luật là > 50%); không rớt → không kích hoạt', () => {

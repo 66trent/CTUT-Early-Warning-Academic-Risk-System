@@ -109,7 +109,8 @@ export function summarize(
     (a, b) => rank(b.severity) - rank(a.severity) || a.ruleCode.localeCompare(b.ruleCode),
   );
   const rest = triggers.length - 1;
-  return rest > 0 ? `${top?.reason ?? ''} · và ${rest} dấu hiệu khác` : (top?.reason ?? '');
+  const reason = top?.reason ?? '';
+  return rest > 0 ? `${reason.replace(/\.$/, '')} · và ${rest} dấu hiệu khác` : reason;
 }
 
 const OVERDUE_MS = OVERDUE_DAYS * 24 * 60 * 60 * 1000;

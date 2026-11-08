@@ -116,7 +116,7 @@ async function insertRun(em: EntityManager, input: RequestEvaluationInput): Prom
   } else if (busy.length > 0) {
     throw new AppError(
       'RUN_IN_PROGRESS',
-      'Đang có lần chạy đánh giá cho phạm vi này — chờ xong rồi chạy lại.',
+      'Đang có lần chạy đánh giá cho phạm vi này, chờ xong rồi chạy lại.',
     );
   }
   const run = em.create(EvaluationRun, {

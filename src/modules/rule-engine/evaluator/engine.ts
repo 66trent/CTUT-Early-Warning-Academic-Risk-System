@@ -153,7 +153,7 @@ export function evaluateStudent(input: StudentInput, ctx: EvaluationContext): St
       warnings.push({
         code: 'ATTENDANCE_INVALID',
         courseId: f.input.courseId,
-        message: 'Số liệu điểm danh mâu thuẫn (tiết vắng vượt tổng số tiết) — bỏ qua.',
+        message: 'Số liệu điểm danh mâu thuẫn (tiết vắng vượt tổng số tiết), bỏ qua.',
       });
     }
   }

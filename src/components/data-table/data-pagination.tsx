@@ -48,7 +48,7 @@ export function DataPagination({
         {total === 0
           ? `0 ${unit}`
           : page > last
-            ? `Trang ${page} không có dữ liệu — có ${total} ${unit} trong ${last} trang. `
+            ? `Trang ${page} không có dữ liệu, có ${total} ${unit} trong ${last} trang. `
             : `Hiển thị ${from}–${to} / ${total} ${unit}`}
         {total > 0 && page > last && (
           <Link href={href(last)} className="text-primary hover:underline">

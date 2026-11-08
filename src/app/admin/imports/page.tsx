@@ -55,17 +55,17 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
       <PageHeader
         helpHref={HELP_LINKS.imports}
         title="Nhập dữ liệu"
-        description="Nạp danh sách sinh viên và dữ liệu học tập từ file CSV hoặc Excel."
+        description="Nhập danh sách sinh viên và dữ liệu học tập từ file CSV hoặc Excel."
       />
 
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>
-            {parentDetail ? `Nạp lại file đã sửa — ${parentDetail.fileName}` : 'Nạp file mới'}
+            {parentDetail ? `Nhập lại file đã sửa · ${parentDetail.fileName}` : 'Nhập file mới'}
           </CardTitle>
           <CardDescription>
-            Chỉ nhận dữ liệu của sinh viên đã có trong danh sách. Hệ thống tự phát hiện file đã nạp
-            trước đó. Sau khi kiểm tra, bạn xem trước kết quả rồi mới xác nhận nạp; dòng lỗi được
+            Chỉ nhận dữ liệu của sinh viên đã có trong danh sách. Hệ thống tự phát hiện file đã nhập
+            trước đó. Sau khi kiểm tra, bạn xem trước kết quả rồi mới xác nhận nhập; dòng lỗi được
             tách riêng để tải về sửa.
           </CardDescription>
         </CardHeader>
@@ -105,7 +105,7 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
             </div>
             <p className="text-xs text-muted-foreground">
               Nên dùng file Excel (.xlsx). Nếu sửa file CSV bằng Excel, khi lưu chọn “CSV UTF-8
-              (Comma delimited)” và ghi ngày dạng 2026-10-05 — lưu kiểu khác sẽ mất dấu tiếng Việt
+              (Comma delimited)” và ghi ngày dạng 2026-10-05, lưu kiểu khác sẽ mất dấu tiếng Việt
               hoặc đổi ngày sang kiểu Mỹ.
             </p>
           </div>
@@ -115,11 +115,11 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
       {currentTerm && freshness && (
         <Card id="do-moi-du-lieu" className="scroll-mt-20 shadow-sm">
           <CardHeader>
-            <CardTitle>Học phần nào cần nạp dữ liệu — {currentTerm.termName}</CardTitle>
+            <CardTitle>Học phần nào cần nhập dữ liệu · {currentTerm.termName}</CardTitle>
             <CardDescription>
               Ngày dữ liệu mới nhất của từng học phần. “Chậm” = cũ hơn {STALE_DAYS} ngày so với ngày
               dữ liệu mới nhất của cả học kỳ. Học phần không dùng LMS sẽ luôn “chưa có” bài trắc
-              nghiệm / thực hành — không cần nạp.
+              nghiệm / thực hành, không cần nhập.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -130,7 +130,7 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
 
       <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Lịch sử nạp dữ liệu</CardTitle>
+          <CardTitle>Lịch sử nhập dữ liệu</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <BatchesFilter
@@ -145,7 +145,7 @@ export default async function ImportsPage({ searchParams }: ImportsPageProps) {
             total={history.total}
             page={history.page}
             size={history.size}
-            unit="lần nạp"
+            unit="lần nhập"
           />
         </CardContent>
       </Card>

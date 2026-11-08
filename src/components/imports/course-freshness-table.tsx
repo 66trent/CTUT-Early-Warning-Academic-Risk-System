@@ -95,7 +95,7 @@ export function CourseFreshnessTable({ courses }: { courses: CourseFreshnessDto[
           aria-pressed={onlyAttention}
           onClick={() => setOnlyAttention(true)}
         >
-          Cần nạp ({attention.length})
+          Cần nhập ({attention.length})
         </Button>
         <Button
           size="sm"
@@ -113,7 +113,7 @@ export function CourseFreshnessTable({ courses }: { courses: CourseFreshnessDto[
         emptyMessage={
           onlyAttention
             ? 'Mọi học phần đều đã có dữ liệu điểm danh và LMS đều đặn.'
-            : 'Học kỳ chưa có học phần nào — học phần tự tạo khi nạp dữ liệu học tập đầu tiên.'
+            : 'Học kỳ chưa có học phần nào, học phần tự tạo khi nhập dữ liệu học tập đầu tiên.'
         }
       />
     </div>

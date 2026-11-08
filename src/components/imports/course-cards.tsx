@@ -46,7 +46,7 @@ function CourseCard({ card, staged }: { card: ImportCourseCard; staged: boolean 
             {card.snapshotDates.map(dmy).join(', ')}
             {card.previousSnapshotDate && (
               <span className="block text-xs text-muted-foreground">
-                Lần nạp trước: chốt {dmy(card.previousSnapshotDate)}
+                Lần nhập trước: chốt {dmy(card.previousSnapshotDate)}
               </span>
             )}
           </Row>

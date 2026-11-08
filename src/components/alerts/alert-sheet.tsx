@@ -165,6 +165,8 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
     router.refresh();
   };
   const canProcess = detail ? detail.allowedTransitions.length > 0 : false;
+  // Mã luật chỉ cho Admin; Cố vấn học tập đọc tên luật (người dùng chốt 2026-11-08).
+  const showRuleCode = profileBase.startsWith('/admin');
 
   return (
     <Sheet open={alertId !== null} onOpenChange={(open) => !open && onClose()}>
@@ -206,7 +208,8 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
                           </span>
                           <span className="text-sm font-normal">{s.reason}</span>
                           <span className="text-xs font-normal text-muted-foreground">
-                            {s.ruleCode} · {s.ruleName} · số liệu ngày {formatVnDate(s.dataDate)}
+                            {showRuleCode && `${s.ruleCode} · `}
+                            {s.ruleName} · số liệu ngày {formatVnDate(s.dataDate)}
                           </span>
                         </span>
                       </AccordionTrigger>
@@ -238,8 +241,8 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
                   </p>
                   {i.content === null ? (
                     <p className="mt-1 flex items-center gap-1 text-muted-foreground">
-                      <Lock aria-hidden className="size-3.5" /> Nội dung bảo mật — chỉ Cố vấn học
-                      tập phụ trách xem được.
+                      <Lock aria-hidden className="size-3.5" /> Nội dung bảo mật, chỉ Cố vấn học tập
+                      phụ trách xem được.
                     </p>
                   ) : (
                     <p className="mt-1 whitespace-pre-wrap">{i.content}</p>
@@ -261,7 +264,7 @@ export function AlertSheet({ alertId, profileBase, onClose }: AlertSheetProps) {
                   {formatVnDateTime(h.changedAt)} ·{' '}
                   {h.fromStatus ? `${ALERT_STATUS_LABELS[h.fromStatus]} → ` : ''}
                   {ALERT_STATUS_LABELS[h.toStatus]} · {h.changedBy ?? 'Hệ thống'}
-                  {h.reason ? ` — ${h.reason}` : ''}
+                  {h.reason ? ` · ${h.reason}` : ''}
                 </p>
               ))}
             </section>

@@ -36,7 +36,7 @@ import {
   listErrorRows,
 } from '@/modules/data-import/services/import-query.service';
 
-export const metadata: Metadata = { title: 'Chi tiết lô nhập' };
+export const metadata: Metadata = { title: 'Chi tiết đợt nhập' };
 
 interface BatchPageProps {
   params: Promise<{ batchId: string }>;
@@ -114,8 +114,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
             {batch.status === ImportBatchStatus.UPLOADING ? (
               <>
                 <p>
-                  Đang tải lên — đã nhận {batch.files.length} file. Nếu đã đóng trang giữa chừng,
-                  hãy hủy lần nạp này rồi nạp lại.
+                  Đang tải lên, đã nhận {batch.files.length} file. Nếu đã đóng trang giữa chừng, hãy
+                  hủy lần nhập này rồi nhập lại.
                 </p>
                 <div>
                   <UploadingActions batchId={batch.id} />
@@ -123,7 +123,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
               </>
             ) : (
               <p>
-                Hệ thống đang {batch.confirmed ? 'nạp dữ liệu' : 'kiểm tra file'} — trang tự cập
+                Hệ thống đang {batch.confirmed ? 'nhập dữ liệu' : 'kiểm tra file'} — trang tự cập
                 nhật.
               </p>
             )}
@@ -134,9 +134,9 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
       {multi && (
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Các file trong lần nạp ({batch.files.length})</CardTitle>
+            <CardTitle>Các file trong lần nhập ({batch.files.length})</CardTitle>
             <CardDescription>
-              Cả {batch.files.length} file được kiểm tra, xác nhận và nạp cùng lúc như 1 lô.
+              Cả {batch.files.length} file được kiểm tra, xác nhận và nhập cùng lúc như 1 đợt nhập.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -157,7 +157,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
       {batch.status === ImportBatchStatus.REJECTED && batch.errorMessage && (
         <Card className="border-destructive/30 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-destructive">Không nạp được file</CardTitle>
+            <CardTitle className="text-destructive">Không nhập được file</CardTitle>
             <CardDescription>{batch.errorMessage}</CardDescription>
           </CardHeader>
         </Card>
@@ -168,8 +168,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
           <CardHeader>
             <CardTitle>Xem trước và xác nhận</CardTitle>
             <CardDescription>
-              Dữ liệu CHƯA được ghi. Kiểm tra vài dòng đầu bên dưới rồi xác nhận nạp. Lô chờ quá 7
-              ngày sẽ tự hủy.
+              Dữ liệu chưa được ghi. Kiểm tra vài dòng đầu bên dưới rồi xác nhận nhập. Đợt nhập chờ
+              quá 7 ngày sẽ tự hủy.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -180,8 +180,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
               >
                 <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
                 <p>
-                  Hơn 10% số dòng bị lỗi. Nạp thiếu nhiều dòng có thể làm kết quả đánh giá thiếu
-                  chính xác — nên sửa file lỗi trước khi nạp.
+                  Hơn 10% số dòng bị lỗi. Nhập thiếu nhiều dòng có thể làm kết quả đánh giá thiếu
+                  chính xác, nên sửa file lỗi trước khi nhập.
                 </p>
               </div>
             )}
@@ -228,12 +228,12 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
       {loaded && (
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Đã nạp dữ liệu</CardTitle>
+            <CardTitle>Đã nhập dữ liệu</CardTitle>
             <CardDescription>
               Thêm mới {batch.inserted ?? 0} · cập nhật {batch.updated ?? 0} · không đổi{' '}
               {batch.unchanged ?? 0}
-              {batch.completedAt ? ` · xong lúc ${formatVnDateTime(batch.completedAt)}` : ''}. Nạp
-              nhầm file thì có thể hoàn tác khi lô chỉ thêm mới dữ liệu.
+              {batch.completedAt ? ` · xong lúc ${formatVnDateTime(batch.completedAt)}` : ''}. Nhập
+              nhầm file thì có thể hoàn tác khi đợt nhập chỉ thêm mới dữ liệu.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -252,7 +252,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
           <CardHeader>
             <CardTitle>Cảnh báo ({batch.warnings.length})</CardTitle>
             <CardDescription>
-              Các dòng này vẫn được nạp, nhưng nên kiểm tra lại với nơi xuất dữ liệu.
+              Các dòng này vẫn được nhập, nhưng nên kiểm tra lại với nơi xuất dữ liệu.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -281,7 +281,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
           <CardHeader>
             <CardTitle>Dòng lỗi ({batch.errorRows})</CardTitle>
             <CardDescription>
-              Tải file lỗi về, sửa theo cột “lý do” rồi nạp lại — chỉ những dòng đã sửa được thêm.
+              Tải file lỗi về, sửa theo cột “lý do” rồi nhập lại, chỉ những dòng đã sửa được thêm.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -295,7 +295,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
               <Button asChild size="sm" variant="outline">
                 <Link href={`/admin/imports?parent=${batch.id}`}>
                   <RotateCw aria-hidden />
-                  Nạp lại file đã sửa
+                  Nhập lại file đã sửa
                 </Link>
               </Button>
             </div>

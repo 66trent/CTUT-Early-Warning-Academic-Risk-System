@@ -125,7 +125,7 @@ function AccountActions({
           description={
             account.emailVerified
               ? 'Cố vấn học tập sẽ đăng nhập và sử dụng được hệ thống.'
-              : 'Email chưa được xác minh — sau khi duyệt, người dùng vẫn phải xác minh email mới đăng nhập được.'
+              : 'Email chưa được xác minh, sau khi duyệt, người dùng vẫn phải xác minh email mới đăng nhập được.'
           }
           confirmLabel="Duyệt"
           successMessage="Đã duyệt tài khoản"
@@ -149,7 +149,7 @@ function AccountActions({
   if (account.accountStatus === UserAccountStatus.ACTIVE) {
     const nextRole = account.role === UserRole.ADVISOR ? UserRole.ADMIN : UserRole.ADVISOR;
     return (
-      <div className="flex flex-wrap justify-end gap-2">
+      <div className="flex flex-nowrap justify-end gap-2">
         <ConfirmActionButton
           trigger={`Đổi thành ${ROLE_LABELS[nextRole]}`}
           title={`Đổi vai trò của ${name}?`}
@@ -238,16 +238,14 @@ export function AccountsTable({
       accessorKey: 'fullName',
       header: 'Họ tên',
       meta: { sortKey: 'fullName', mobile: 'title' },
-    },
-    {
-      accessorKey: 'email',
-      header: 'Email',
+      // Email nằm chung cột họ tên để bảng đủ chỗ cho cột thao tác ở khổ desktop.
       cell: ({ row }) => (
         <span className="inline-flex flex-col">
-          {row.original.email}
-          {row.original.emailVerified === false && (
-            <span className="text-xs text-muted-foreground">Chưa xác minh email</span>
-          )}
+          <span className="font-medium">{row.original.fullName}</span>
+          <span className="text-xs text-muted-foreground">
+            {row.original.email}
+            {row.original.emailVerified === false && ' · chưa xác minh email'}
+          </span>
         </span>
       ),
     },

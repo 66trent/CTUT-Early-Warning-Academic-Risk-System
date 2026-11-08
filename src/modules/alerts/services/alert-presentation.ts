@@ -80,8 +80,25 @@ const EVIDENCE_LABELS: Record<string, string> = {
   maxScore: 'Thang điểm',
 };
 
+/** Tên nguồn của luật kết hợp (`groups` lưu mã `ATTENDANCE,QUIZ`). */
+const GROUP_NAMES: Record<string, string> = {
+  ATTENDANCE: 'Điểm danh',
+  QUIZ: 'Bài trắc nghiệm',
+  ASSIGNMENT: 'Bài thực hành',
+  ACADEMIC: 'Kết quả học tập',
+};
+
+/** Danh sách mã luật kèm mức — câu lý do đã nêu nguồn và mức bằng lời nên không lặp ở bằng chứng. */
+const HIDDEN_EVIDENCE_KEYS = new Set(['rules', 'signals']);
+
 function formatValue(key: string, value: string | number | boolean | null): string {
   if (value === null) return '—';
+  if (key === 'groups' && typeof value === 'string') {
+    return value
+      .split(',')
+      .map((g) => GROUP_NAMES[g] ?? g)
+      .join(', ');
+  }
   if (key === 'rate' && typeof value === 'number')
     return `${(Math.round(value * 1000) / 10).toLocaleString('vi-VN')}%`;
   if (typeof value === 'boolean') return value ? 'Có' : 'Không';
@@ -98,9 +115,9 @@ export function evidenceRows(
     const i = order.indexOf(key.replace(/\d+$/, ''));
     return i === -1 ? order.length : i;
   };
-  const entries = Object.entries(snapshot).sort(
-    ([a], [b]) => rank(a) - rank(b) || a.localeCompare(b),
-  );
+  const entries = Object.entries(snapshot)
+    .filter(([key]) => !HIDDEN_EVIDENCE_KEYS.has(key))
+    .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b));
   return entries.map(([key, value]) => {
     const quiz = /^(quiz|score|maxScore)(\d+)$/.exec(key);
     const label = quiz

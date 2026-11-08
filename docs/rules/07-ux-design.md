@@ -71,6 +71,8 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 ## Nhất quán thuật ngữ
 
+- MUST (người dùng chốt 2026-11-08): chữ hiển thị dùng **Nhập** (không "Nạp"), **đợt nhập** (không "lô"), **Thủ công** (không "Chạy tay"), **Tính đến ngày / tính đến** (không "Mốc dữ liệu"), **Điểm ưu tiên** (không "Điểm rủi ro" — tên kỹ thuật `RiskScore` trong code và tài liệu giữ nguyên). Chữ "demo" không hiện trên giao diện, dùng "trình diễn".
+- MUST (người dùng chốt 2026-11-08): Cố vấn học tập không thấy mã luật (`ATT-01`…): câu lý do viết bằng tên nguồn + mức, chi tiết cảnh báo ghi tên luật; Admin vẫn thấy mã. Không dùng tên hàm, tên biến môi trường, câu lệnh trong lời nhắn giao diện.
 - MUST: dùng đúng 1 tên gọi xuyên suốt app/email/tài liệu cho mỗi vai trò/khái niệm (tên hệ thống trên giao diện, email và báo cáo MUST giống nhau; "Cố vấn học tập" — không đổi thành "CVHT"/"Giảng viên chủ nhiệm"/"Advisor" tùy màn hình; "Cảnh báo sớm" — không đổi tên khác ở nơi khác).
 - MUST: bộ lọc Khoa (suy ra qua lớp sinh hoạt) ở Tổng quan Admin, danh sách cảnh báo Admin và ô chọn học phần khi chạy đánh giá — người dùng chốt 2026-10-15.
 - MUST (Phase 9a, chốt 2026-10-22): bộ lọc **Ngành** (ngành của lớp sinh hoạt, gom mọi khóa) cạnh bộ lọc Khoa ở Tổng quan Admin, Cảnh báo sớm (Admin, kể cả xuất file), Sinh viên, Khoa và lớp (bảng có cột Ngành); danh sách ngành theo khoa đang chọn, đổi khoa thì bỏ lọc ngành; khoa chưa có danh mục ngành thì ẩn ô lọc. Form tạo / sửa lớp chọn ngành của khoa đã chọn.

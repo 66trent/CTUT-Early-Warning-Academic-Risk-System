@@ -310,7 +310,7 @@ describe('Đồng bộ Moodle — chế độ Tự động (Phase 10c)', () => {
       .getRepository(UpdateNotification)
       .findBy({ evaluationRunId: autoRun ?? '' });
     const advisorBell = bell.find((n) => n.recipientId === ADVISOR);
-    expect(advisorBell?.title).toBe('Moodle: Điểm danh — Mạng máy tính vừa cập nhật');
+    expect(advisorBell?.title).toBe('Moodle: Điểm danh · Mạng máy tính vừa cập nhật');
     expect(advisorBell?.body).toBe(`Lớp ${CLS}: không có thay đổi cảnh báo`);
     expect(bell.find((n) => n.recipientId === IMPORT_ACTOR)?.link).toBe(
       `/admin/evaluations/${autoRun}`,

@@ -48,8 +48,8 @@ function runLabel(run: MoodleSyncRunDto): string {
   }
   if (run.canConfirm) return 'Chờ xác nhận';
   if (run.batches.every((b) => b.status === ImportBatchStatus.DISCARDED)) return 'Đã hủy';
-  if (run.busy) return 'Đang nạp';
-  return run.mode === 'AUTO' ? 'Đã tự nạp' : 'Đã nạp';
+  if (run.busy) return 'Đang nhập';
+  return run.mode === 'AUTO' ? 'Đã tự nhập' : 'Đã nhập';
 }
 
 function SyncNowButton({ termId, disabled }: { termId: string; disabled: boolean }) {
@@ -58,7 +58,7 @@ function SyncNowButton({ termId, disabled }: { termId: string; disabled: boolean
     setPending(true);
     const result = await requestMoodleSyncAction({ termId });
     setPending(false);
-    if (result.ok) toast.success('Đã bắt đầu đồng bộ — trang tự cập nhật khi xong.');
+    if (result.ok) toast.success('Đã bắt đầu đồng bộ, trang tự cập nhật khi xong.');
     else toast.error(result.message);
   }
   return (
@@ -70,7 +70,9 @@ function SyncNowButton({ termId, disabled }: { termId: string; disabled: boolean
 }
 
 function LatestRun({ run }: { run: MoodleSyncRunDto }) {
-  const total = run.batches.reduce((sum, b) => sum + b.successRows, 0);
+  // Chỉ nguồn đang chờ xác nhận mới được nhập; nguồn bị từ chối không tính vào nút.
+  const confirmable = run.batches.filter((b) => b.status === ImportBatchStatus.STAGED);
+  const total = confirmable.reduce((sum, b) => sum + b.successRows, 0);
   const unchanged = Object.values(run.unchangedFiles).reduce((sum, n) => sum + (n ?? 0), 0);
   return (
     <div className="flex flex-col gap-4 rounded-lg border p-4">
@@ -82,13 +84,13 @@ function LatestRun({ run }: { run: MoodleSyncRunDto }) {
           {runLabel(run)}
         </Badge>
         <span className="text-sm text-muted-foreground">
-          {run.mode === 'AUTO' ? 'Tự động' : 'Chạy tay'} · {TRIGGER_LABELS[run.trigger]}
+          {run.mode === 'AUTO' ? 'Tự động' : 'Thủ công'} · {TRIGGER_LABELS[run.trigger]}
         </span>
       </div>
       {run.needsReview && (
         <p className="text-sm text-amber-700 dark:text-amber-400">
-          Lô có hơn 10% dòng lỗi nên hệ thống không tự nạp. Xem dòng lỗi ở từng lô rồi Xác nhận (nạp
-          dòng hợp lệ) hoặc Hủy.
+          Đợt nhập có hơn 10% dòng lỗi nên hệ thống không tự nhập. Xem dòng lỗi ở từng đợt nhập rồi
+          Xác nhận (nhập dòng hợp lệ) hoặc Hủy.
         </p>
       )}
       {run.errorMessage && (
@@ -115,7 +117,7 @@ function LatestRun({ run }: { run: MoodleSyncRunDto }) {
       )}
       {unchanged > 0 && (
         <p className="text-sm text-muted-foreground">
-          {unchanged} file không đổi so với lần nạp trước — bỏ qua.
+          {unchanged} file không đổi so với lần nhập trước, bỏ qua.
         </p>
       )}
       {run.courses.some((c) => c.error || c.notes.length > 0 || c.unknownStudents > 0) && (
@@ -141,12 +143,12 @@ function LatestRun({ run }: { run: MoodleSyncRunDto }) {
         <div className="flex flex-wrap gap-2">
           {run.canConfirm && (
             <ConfirmActionButton
-              trigger={`Xác nhận nạp cả ${run.batches.length} (${total} dòng)`}
+              trigger={`Xác nhận nhập ${confirmable.length} nguồn (${total} dòng)`}
               triggerVariant="default"
-              title={`Nạp ${total} dòng từ Moodle?`}
-              description="Hệ thống kiểm tra lại toàn bộ rồi ghi dữ liệu. Dòng lỗi (nếu có) không được nạp — xem chi tiết ở từng lô."
-              confirmLabel="Nạp dữ liệu"
-              successMessage="Đã xác nhận, hệ thống đang nạp dữ liệu."
+              title={`Nhập ${total} dòng từ Moodle?`}
+              description="Hệ thống kiểm tra lại toàn bộ rồi ghi dữ liệu. Dòng lỗi (nếu có) không được nhập, xem chi tiết ở từng đợt nhập."
+              confirmLabel="Nhập dữ liệu"
+              successMessage="Đã xác nhận, hệ thống đang nhập dữ liệu."
               onConfirm={() => confirmMoodleSyncAction({ runId: run.id })}
             />
           )}

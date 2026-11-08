@@ -1,5 +1,10 @@
 import { getDataSource } from '@/db/data-source';
-import { type AlertStatus, type InterventionType, type Severity } from '@/db/enums';
+import {
+  type AlertStatus,
+  type DataCompletenessLevel,
+  type InterventionType,
+  type Severity,
+} from '@/db/enums';
 
 /**
  * Số liệu riêng trang tổng quan Cố vấn học tập — phạm vi luôn là lớp có `advisorId` = người gọi
@@ -47,6 +52,8 @@ export interface AttentionStudentDto {
   severity: Severity;
   status: AlertStatus;
   riskScore: number | null;
+  /** Luôn đi cùng `riskScore` khi hiển thị (docs/rules/03). */
+  dataCompletenessLevel: DataCompletenessLevel | null;
 }
 
 /** Sinh viên cần chú ý nhất: cảnh báo chưa đóng, mức cao nhất trước rồi RiskScore. */
@@ -65,10 +72,11 @@ export async function getAttentionStudents(
       severity: Severity;
       status: AlertStatus;
       risk: number | null;
+      level: DataCompletenessLevel | null;
     }[]
   >(
     `SELECT a.alert_id, a.student_id, s.full_name, s.class_id, a.severity, a.status,
-       l.risk_score_value AS risk
+       l.risk_score_value AS risk, l.data_completeness_level AS level
      FROM alerts a
      JOIN students s ON s.student_id = a.student_id
      JOIN administrative_classes c ON c.class_id = s.class_id
@@ -87,6 +95,7 @@ export async function getAttentionStudents(
     severity: r.severity,
     status: r.status,
     riskScore: r.risk,
+    dataCompletenessLevel: r.level,
   }));
 }
 

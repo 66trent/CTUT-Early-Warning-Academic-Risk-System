@@ -126,7 +126,7 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
         </div>
         {options.canChooseAsOf && (
           <div className="grid gap-2">
-            <Label htmlFor="run-as-of">Mốc dữ liệu (chế độ demo, để trống = bây giờ)</Label>
+            <Label htmlFor="run-as-of">Tính đến ngày (để trống là hôm nay)</Label>
             <Input
               id="run-as-of"
               type="date"
@@ -143,7 +143,7 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
         </Button>
         {busy && (
           <span className="text-sm text-muted-foreground">
-            Đang có lần chạy chưa xong — chờ xong rồi chạy lại.
+            Đang có lần chạy chưa xong, chờ xong rồi chạy lại.
           </span>
         )}
       </div>

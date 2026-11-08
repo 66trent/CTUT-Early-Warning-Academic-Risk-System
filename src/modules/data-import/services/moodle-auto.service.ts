@@ -320,7 +320,10 @@ async function reloadLostBatch(batchId: string, enqueue: ImportEnqueuer): Promis
   const confirmedAt = batch ? readSummary(batch.summary).confirmedAt : undefined;
   if (batch?.status !== ImportBatchStatus.STAGED || !confirmedAt) return;
   if (Date.now() - new Date(confirmedAt).getTime() < 2 * 60_000) return;
-  logger.warn({ batchId }, 'đồng bộ Moodle: lô đã xác nhận chưa được nạp — đưa lại vào hàng đợi');
+  logger.warn(
+    { batchId },
+    'đồng bộ Moodle: đợt nhập đã xác nhận chưa được nhập, đưa lại vào hàng đợi',
+  );
   await enqueue('load', batchId);
 }
 
@@ -361,13 +364,13 @@ export async function setMoodleSyncMode(
     if (await hasPendingRun(link.termId, link.id)) {
       throw new AppError(
         'SYNC_PENDING',
-        'Khóa còn dữ liệu chờ xác nhận — hãy Xác nhận nạp hoặc Hủy trước khi bật Tự động.',
+        'Khóa còn dữ liệu chờ xác nhận, hãy Xác nhận nhập hoặc Hủy trước khi bật Tự động.',
       );
     }
     if (!(await hasLoadedMoodleData(link))) {
       throw new AppError(
         'AUTO_NEEDS_FIRST_SYNC',
-        'Hãy Đồng bộ ngay, xem trước và Xác nhận nạp ít nhất 1 lần trước khi bật Tự động.',
+        'Hãy Đồng bộ ngay, xem trước và Xác nhận nhập ít nhất 1 lần trước khi bật Tự động.',
       );
     }
   }

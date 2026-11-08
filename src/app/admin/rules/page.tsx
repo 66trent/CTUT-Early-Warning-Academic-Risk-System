@@ -19,7 +19,7 @@ export default async function RulesPage() {
       <PageHeader
         helpHref={HELP_LINKS.rules}
         title="Cấu hình luật"
-        description="12 luật cảnh báo và cấu hình điểm rủi ro. Sửa ngưỡng tạo phiên bản mới, phải chạy thử rồi mới kích hoạt."
+        description="12 luật cảnh báo và cấu hình điểm ưu tiên. Sửa ngưỡng tạo phiên bản mới, phải chạy thử rồi mới kích hoạt."
       />
       <Card className="shadow-sm">
         <CardContent>

@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { RuleGroup, Severity } from '@/db/enums';
-import { bumpSeverity, maxSeverity, severityRank, severitySchema } from '../helpers';
-import { SEVERITY_LABELS } from '@/lib/labels';
+import {
+  bumpSeverity,
+  describeSignals,
+  maxSeverity,
+  severityRank,
+  severitySchema,
+} from '../helpers';
 import { type CourseRule } from '../types';
 
 const conditionSchema = z.object({
@@ -49,9 +54,7 @@ export const comb02: CourseRule<Comb02Condition> = {
     return {
       hit: {
         severity: bumpSeverity(highest, c.bump),
-        reason: `Đang học lại lần ${facts.attemptNumber} (đã rớt ở ${failedIn}) và vẫn có dấu hiệu sa sút: ${signals
-          .map((h) => `${h.ruleCode} (${SEVERITY_LABELS[h.severity]})`)
-          .join(', ')}.`,
+        reason: `Đang học lại lần ${facts.attemptNumber} (đã rớt ở ${failedIn}) và vẫn có dấu hiệu sa sút: ${describeSignals(signals)}.`,
         inputSnapshot: {
           attemptNumber: facts.attemptNumber,
           failedTerms: facts.failedTerms.map((t) => t.termId).join(','),

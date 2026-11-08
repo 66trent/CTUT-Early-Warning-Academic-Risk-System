@@ -24,7 +24,7 @@ export function TermFilter({ terms, value }: { terms: TermOptionDto[]; value: st
         router.push(`?${next.toString()}`);
       }}
     >
-      <SelectTrigger aria-label="Học kỳ" className="w-64">
+      <SelectTrigger aria-label="Học kỳ" className="w-72 max-w-full">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

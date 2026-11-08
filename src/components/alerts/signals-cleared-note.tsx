@@ -19,8 +19,8 @@ export function SignalsClearedNote({ at, compact = false }: { at?: string; compa
       <CircleCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-primary" />
       <span>
         Lần đánh giá cả học kỳ gần nhất{at ? ` (${formatVnDateTime(at)})` : ''} không còn dấu hiệu
-        nào. Cảnh báo vẫn mở — Cố vấn học tập cân nhắc chuyển &quot;Đã giải quyết&quot; nếu sinh
-        viên đã ổn định. Dấu hiệu bên dưới là của lần có dấu hiệu gần nhất.
+        nào. Cảnh báo vẫn mở, Cố vấn học tập cân nhắc chuyển &quot;Đã giải quyết&quot; nếu sinh viên
+        đã ổn định. Dấu hiệu bên dưới là của lần có dấu hiệu gần nhất.
       </span>
     </p>
   );

@@ -96,7 +96,7 @@ async function assertTermOpen(
 ) {
   if (!def.requiresTerm) return;
   const term = batch.termId ? await em.findOneBy(Term, { termId: batch.termId }) : null;
-  if (!term) throw new FileRejectedError('Chưa chọn học kỳ cho lô nhập.');
+  if (!term) throw new FileRejectedError('Chưa chọn học kỳ cho đợt nhập.');
   if (term.closedAt)
     throw new FileRejectedError(`${term.termName} đã chốt, không nhận thêm dữ liệu.`);
 }
@@ -163,7 +163,7 @@ async function runPass(
   const dataSource = await getDataSource();
   await assertTermOpen(dataSource.manager, batch, def);
   const files = await batchFiles(batch.id);
-  if (files.length === 0) throw new FileRejectedError('Lô nhập không có file nào.');
+  if (files.length === 0) throw new FileRejectedError('Đợt nhập không có file nào.');
   const fileNameOf = new Map(files.map((f) => [f.fileOrder, f.fileName]));
   const multi = files.length > 1;
 
@@ -379,7 +379,7 @@ export async function validateImportBatch(batchId: string): Promise<void> {
         batchId,
         pass.totalRows === 0
           ? 'File không có dòng dữ liệu nào.'
-          : 'Không có dòng hợp lệ nào — tải file lỗi để sửa.',
+          : 'Không có dòng hợp lệ nào, tải file lỗi để sửa.',
       );
       return;
     }
@@ -503,11 +503,11 @@ export async function loadImportBatch(
 
 /** Job lỗi hết số lần thử → đánh dấu lô bị từ chối thay vì treo mãi (docs/rules/01). */
 export async function failImportBatch(batchId: string, reason: string): Promise<void> {
-  logger.error({ batchId, reason }, 'lô nhập lỗi hệ thống');
+  logger.error({ batchId, reason }, 'đợt nhập lỗi hệ thống');
   const repo = (await getDataSource()).getRepository(ImportBatch);
   const batch = await repo.findOneBy({ id: batchId });
   if (!batch) return;
   if (batch.status === ImportBatchStatus.VALIDATING || batch.status === ImportBatchStatus.STAGED) {
-    await rejectBatch(batchId, 'Lỗi hệ thống khi xử lý file. Vui lòng thử nạp lại.');
+    await rejectBatch(batchId, 'Lỗi hệ thống khi xử lý file. Vui lòng thử nhập lại.');
   }
 }

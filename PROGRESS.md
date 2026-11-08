@@ -229,3 +229,13 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Kiểm tra: typecheck, lint, format, migration:check, 472 test, build — xanh. Kiểm tay: GV001 giải quyết 906 → Moodle điểm danh vắng → chuông "Lớp KTPM2411: 1 mở lại" + email; toast chuông hiện sau 38 giây.
 - DB dev: học kỳ `HK1_2026` đã bị diễn tập nhiều lần; trước buổi bảo vệ làm đúng mục Chuẩn bị của `docs/demo-script.md` (demo:reset + moodle:setup --reset + đặt học kỳ hiện tại).
 - Tự kiểm tra: đăng nhập Admin hoặc GV001 → chuông góc trên; thao tác trên Moodle (hoặc lệnh `ewars_simulate.php`) → ~1 phút có toast "… vừa cập nhật" + nút Tải lại.
+
+## Phase 11 đợt 0 — Sửa lỗi giao diện và từ ngữ (2026-11-08)
+
+- Rà soát 30 màn hình, báo cáo: https://claude.ai/artifact/BZPB8MSLscXmY1uVLQS1nG. Người dùng chốt: sidebar navy, nền đặc cho mức Rất cao + Cao, đổi thuật ngữ, ẩn mã luật với CVHT, "Điểm ưu tiên" (ghi `07`).
+- Lỗi đã sửa: trang sửa luật báo "Only plain objects"; bảng Tài khoản cắt cột thao tác (email gộp cột họ tên, ẩn `SYSTEM_MOODLE`); ô học kỳ cắt chữ; nút Moodle "cả 3" (đếm đúng nguồn chờ xác nhận); thanh "SV có cảnh báo" màu xanh lá; "· và N dấu hiệu" thừa dấu chấm; điểm ưu tiên CVHT thiếu badge độ đầy dữ liệu; lưới hướng dẫn 3 ô.
+- Từ ngữ: Nạp → Nhập, lô → đợt nhập, Chạy tay → Thủ công, Mốc dữ liệu → Tính đến, bỏ chữ demo, bỏ gạch dài (trừ dòng bắt buộc của `03`), lời nhắn Moodle không còn tên hàm / biến môi trường. Lý do COMB-01/02 ghi tên nguồn + mức (`describeSignals`).
+- Kịch bản `docs/demo-script.md`, `docs/bao-cao/kich-ban-thuyet-trinh.md` đã đổi thuật ngữ; báo cáo Word chưa (đợt 4).
+- Kiểm tra: typecheck, lint, format, 473 test xanh; kiểm trên app 16 trang, không còn từ cũ, không lỗi console. Chưa chạy Playwright e2e và build.
+- Còn: bảng Lịch sử nhập (21px) và bảng Lớp (42px) vẫn cuộn nhẹ, xử lý ở đợt 3. Cảnh báo đã có trong DB giữ lý do cũ có mã luật đến lần đánh giá sau.
+- Tự kiểm tra: Admin → Tài khoản, Cấu hình luật → ATT-01; CVHT → Tổng quan, mở 1 cảnh báo.

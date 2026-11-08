@@ -90,7 +90,7 @@ export default async function AuditLogsPage({
               <Input
                 id="audit-target"
                 name="target"
-                placeholder="MSSV, mã lô…"
+                placeholder="MSSV, mã đợt nhập…"
                 defaultValue={filter.target}
               />
             </div>

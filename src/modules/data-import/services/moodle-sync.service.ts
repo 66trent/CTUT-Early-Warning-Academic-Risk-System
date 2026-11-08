@@ -256,12 +256,12 @@ export async function requestMoodleSync(
   const created: string[] = [];
   if (count('MANUAL') > 0) {
     if (await runs.existsBy({ termId, mode: 'MANUAL', status: In([...OPEN_RUN_STATUSES]) })) {
-      throw new AppError('SYNC_RUNNING', 'Đang có lần đồng bộ chạy cho học kỳ này — chờ xong.');
+      throw new AppError('SYNC_RUNNING', 'Đang có lần đồng bộ chạy cho học kỳ này, chờ xong.');
     }
     if (await hasPendingRun(termId)) {
       throw new AppError(
         'SYNC_PENDING',
-        'Lần đồng bộ trước còn dữ liệu chờ xác nhận — hãy "Xác nhận nạp cả 3" hoặc "Hủy" trước.',
+        'Lần đồng bộ trước còn dữ liệu chờ xác nhận , hãy Xác nhận nhập hoặc Hủy trước.',
       );
     }
     const input = { termId, mode: 'MANUAL', trigger: 'MANUAL', requestedBy: actorId } as const;
@@ -520,7 +520,7 @@ export async function failInterruptedMoodleRuns(now = new Date()): Promise<numbe
     { status: In([...OPEN_RUN_STATUSES]), createdAt: LessThan(cutoff) },
     {
       status: 'FAILED',
-      errorMessage: 'Bị gián đoạn (worker dừng giữa chừng) — lần dò thay đổi sau sẽ kéo lại.',
+      errorMessage: 'Bị gián đoạn, lần dò thay đổi sau sẽ kéo lại.',
       finishedAt: now,
     },
   );
@@ -581,19 +581,17 @@ export async function confirmMoodleSync(
       (b) => b.status === ImportBatchStatus.UPLOADING || b.status === ImportBatchStatus.VALIDATING,
     )
   ) {
-    throw new AppError(
-      'SYNC_VALIDATING',
-      'Dữ liệu đang được kiểm tra — chờ vài giây rồi xác nhận.',
-    );
+    throw new AppError('SYNC_VALIDATING', 'Dữ liệu đang được kiểm tra, chờ vài giây rồi xác nhận.');
   }
   const pending = batches.filter(
     (b) => b.status === ImportBatchStatus.STAGED && !readSummary(b.summary).confirmedAt,
   );
-  if (pending.length === 0) throw new AppError('INVALID_STATUS', 'Không còn lô nào chờ xác nhận.');
+  if (pending.length === 0)
+    throw new AppError('INVALID_STATUS', 'Không còn đợt nhập nào chờ xác nhận.');
   if (await isSyncRunStale(run)) {
     throw new AppError(
       'SYNC_STALE',
-      'Đã có lần đồng bộ mới hơn được nạp cho khóa học này — dữ liệu đang chờ đã cũ. Hãy Hủy rồi Đồng bộ lại.',
+      'Đã có lần đồng bộ mới hơn được nhập cho khóa học này, dữ liệu đang chờ đã cũ. Hãy Hủy rồi Đồng bộ lại.',
     );
   }
   for (const batch of pending) await confirmImportBatch(batch.id, actorId, enqueue);
@@ -616,7 +614,7 @@ export async function discardMoodleSync(
   const pending = batches.filter(
     (b) => b.status === ImportBatchStatus.STAGED && !readSummary(b.summary).confirmedAt,
   );
-  if (pending.length === 0) throw new AppError('INVALID_STATUS', 'Không còn lô nào để hủy.');
+  if (pending.length === 0) throw new AppError('INVALID_STATUS', 'Không còn đợt nhập nào để hủy.');
   for (const batch of pending) await discardImportBatch(batch.id, actorId);
   await writeAuditLog({
     actorId,

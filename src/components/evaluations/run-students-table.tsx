@@ -89,7 +89,7 @@ const columns: ColumnDef<RunStudentRowDto>[] = [
   },
   {
     accessorKey: 'riskScore',
-    header: 'Điểm rủi ro',
+    header: 'Điểm ưu tiên',
     meta: { sortKey: 'riskScore' },
     cell: ({ row }) => <RiskScoreBar value={row.original.riskScore} />,
   },

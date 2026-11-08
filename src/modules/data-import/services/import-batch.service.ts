@@ -61,7 +61,7 @@ const sha256 = (data: Buffer | string) => createHash('sha256').update(data).dige
 const tooManyFiles = () =>
   new AppError(
     'TOO_MANY_FILES',
-    `Mỗi lần nạp tối đa ${IMPORT_LIMITS.maxFilesPerBatch} file. Hãy chia thành nhiều lần.`,
+    `Mỗi lần nhập tối đa ${IMPORT_LIMITS.maxFilesPerBatch} file. Hãy chia thành nhiều lần.`,
   );
 
 /** Kiểm tra loại, học kỳ (chưa chốt), học phần chọn trên form. */
@@ -150,7 +150,7 @@ async function assertFileNotLoaded(
   if (duplicate) {
     throw new AppError(
       'DUPLICATE_FILE',
-      `File ${fileName} đã được nạp trước đó. Nếu cần nạp lại, hãy hủy hoặc hoàn tác lô cũ.`,
+      `File ${fileName} đã được nhập trước đó. Nếu cần nhập lại, hãy hủy hoặc hoàn tác đợt nhập cũ.`,
     );
   }
 }
@@ -221,9 +221,9 @@ async function lockUploading(
     where: { id: batchId },
     lock: { mode: 'pessimistic_write' },
   });
-  if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy lô nhập.');
+  if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy đợt nhập.');
   if (batch.status !== ImportBatchStatus.UPLOADING || batch.performedBy !== actorId) {
-    throw new AppError('INVALID_STATUS', 'Lô không còn nhận thêm file.');
+    throw new AppError('INVALID_STATUS', 'Đợt nhập không còn nhận thêm file.');
   }
   return batch;
 }
@@ -250,7 +250,7 @@ export async function addImportFile(
     if (files.some((f) => f.sourceChecksum === checksum)) {
       throw new AppError(
         'DUPLICATE_FILE',
-        `File ${name} trùng nội dung với 1 file khác trong lần nạp này.`,
+        `File ${name} trùng nội dung với 1 file khác trong lần nhập này.`,
       );
     }
     if (batch.source !== ImportSource.MOODLE) await assertFileNotLoaded(em, checksum, batch, name);
@@ -331,7 +331,7 @@ export async function createImportBatch(
 ): Promise<{ batchId: string }> {
   const files = 'files' in input ? input.files : [{ fileName: input.fileName, data: input.data }];
   const [first, ...rest] = files;
-  if (!first) throw new AppError('INVALID_INPUT', 'Chọn file cần nạp.');
+  if (!first) throw new AppError('INVALID_INPUT', 'Chọn file cần nhập.');
   if (files.length > IMPORT_LIMITS.maxFilesPerBatch) throw tooManyFiles();
   const { batchId } = await beginImportUpload(input, first, actorId);
   try {
@@ -346,7 +346,7 @@ export async function createImportBatch(
 
 async function findBatch(batchId: string): Promise<ImportBatch> {
   const batch = await (await getDataSource()).getRepository(ImportBatch).findOneBy({ id: batchId });
-  if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy lô nhập.');
+  if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy đợt nhập.');
   return batch;
 }
 
@@ -362,10 +362,10 @@ export async function confirmImportBatch(
       where: { id: batchId },
       lock: { mode: 'pessimistic_write' },
     });
-    if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy lô nhập.');
+    if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy đợt nhập.');
     const summary = readSummary(batch.summary);
     if (batch.status !== ImportBatchStatus.STAGED || summary.confirmedAt) {
-      throw new AppError('INVALID_STATUS', 'Lô không còn ở trạng thái chờ xác nhận.');
+      throw new AppError('INVALID_STATUS', 'Đợt nhập không còn ở trạng thái chờ xác nhận.');
     }
     await em.update(
       ImportBatch,
@@ -406,9 +406,9 @@ export async function discardImportBatch(
       where: { id: batchId },
       lock: { mode: 'pessimistic_write' },
     });
-    if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy lô nhập.');
+    if (!batch) throw new AppError('BATCH_NOT_FOUND', 'Không tìm thấy đợt nhập.');
     if (!isDiscardable(batch)) {
-      throw new AppError('INVALID_STATUS', 'Chỉ hủy được lô đang chờ xác nhận.');
+      throw new AppError('INVALID_STATUS', 'Chỉ hủy được đợt nhập đang chờ xác nhận.');
     }
     await em.update(
       ImportBatch,
@@ -458,26 +458,25 @@ export type RollbackEligibility = { allowed: true } | { allowed: false; reason: 
  */
 export async function getRollbackEligibility(batch: ImportBatch): Promise<RollbackEligibility> {
   if (batch.status !== ImportBatchStatus.LOADED && batch.status !== ImportBatchStatus.RECONCILED) {
-    return { allowed: false, reason: 'Chỉ hoàn tác được lô đã nạp.' };
+    return { allowed: false, reason: 'Chỉ hoàn tác được đợt nhập đã nhập.' };
   }
   if (batch.source === ImportSource.MOODLE) {
     return {
       allowed: false,
-      reason:
-        'Lô đồng bộ từ Moodle không hoàn tác — Moodle là nguồn gốc: sửa trên Moodle rồi đồng bộ lại.',
+      reason: 'Dữ liệu đồng bộ từ Moodle không hoàn tác được. Hãy sửa trên Moodle rồi đồng bộ lại.',
     };
   }
   const summary = readSummary(batch.summary);
   if (summary.retried || summary.createdKeys === undefined) {
     return {
       allowed: false,
-      reason: 'Lô đã phải nạp lại sau sự cố nên không xác định chắc dữ liệu đã tạo.',
+      reason: 'Đợt nhập đã phải nhập lại sau sự cố nên không xác định chắc dữ liệu đã tạo.',
     };
   }
   if ((summary.updated ?? 0) > 0) {
     return {
       allowed: false,
-      reason: `Lô đã cập nhật ${summary.updated} dòng có sẵn — hoàn tác sẽ không trả lại giá trị cũ. Hãy nạp file đúng để sửa.`,
+      reason: `Đợt nhập đã cập nhật ${summary.updated} dòng có sẵn, hoàn tác sẽ không trả lại giá trị cũ. Hãy nhập file đúng để sửa.`,
     };
   }
   const laterBatch = await (await getDataSource()).getRepository(ImportBatch).exists({
@@ -492,7 +491,7 @@ export async function getRollbackEligibility(batch: ImportBatch): Promise<Rollba
   if (laterBatch) {
     return {
       allowed: false,
-      reason: 'Đã có lô cùng loại nạp sau lô này — dữ liệu có thể đã bị ghi đè.',
+      reason: 'Đã có đợt nhập cùng loại sau đợt này nên dữ liệu có thể đã bị ghi đè.',
     };
   }
   return { allowed: true };
@@ -522,7 +521,10 @@ export async function rollbackImportBatch(
       !locked ||
       (locked.status !== ImportBatchStatus.LOADED && locked.status !== ImportBatchStatus.RECONCILED)
     ) {
-      throw new AppError('INVALID_STATUS', 'Trạng thái lô đã thay đổi, vui lòng tải lại trang.');
+      throw new AppError(
+        'INVALID_STATUS',
+        'Trạng thái đợt nhập đã thay đổi, vui lòng tải lại trang.',
+      );
     }
     const blocked = await def.rollback(createdKeys, em, locked);
     if (blocked) throw new AppError('ROLLBACK_NOT_ALLOWED', blocked);

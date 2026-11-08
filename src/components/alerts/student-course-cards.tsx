@@ -58,7 +58,7 @@ function AttendanceBar({
       <p className="text-xs text-muted-foreground">
         {limit !== null
           ? over
-            ? `Đã vượt ${limit}% — hãy trao đổi ngay với giảng viên và Cố vấn học tập.`
+            ? `Đã vượt ${limit}%, hãy trao đổi ngay với giảng viên và Cố vấn học tập.`
             : `Vạch giữa là ${limit}%: vắng quá mức này sẽ không được dự thi.`
           : ''}{' '}
         Số liệu chốt ngày {formatVnDate(attendance.snapshotDate)}.
@@ -154,7 +154,7 @@ export function StudentCourseCards({
                   )}
                 >
                   {c.result.letterGrade}
-                  {c.result.passed ? '' : ' — chưa đạt, cần học lại'}
+                  {c.result.passed ? '' : ' · chưa đạt, cần học lại'}
                 </span>
               </p>
             ) : (

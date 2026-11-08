@@ -17,7 +17,7 @@ import { ACCOUNT_STATUS_LABELS } from '@/lib/labels';
 
 const ALL = 'ALL';
 const ROLE_OPTIONS = [
-  { value: 'STAFF', label: 'Cán bộ (Cố vấn học tập và Quản trị viên)' },
+  { value: 'STAFF', label: 'Tất cả cán bộ' },
   { value: UserRole.ADVISOR, label: 'Cố vấn học tập' },
   { value: UserRole.ADMIN, label: 'Quản trị viên' },
   { value: UserRole.STUDENT, label: 'Sinh viên' },

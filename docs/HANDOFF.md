@@ -27,7 +27,8 @@
 | 9c Kịch bản trình diễn theo lớp (+ cập nhật báo cáo Word) | Xong | `phase-9c` (từ `phase-9b`) | #19 → `phase-9b` | — |
 | 10a Moodle 5.3 Docker + dữ liệu demo (+ commit chế độ tự nhập demo, vá audit) | Xong | `phase-10a` (từ `phase-9c`) | #20 → `phase-9c` | xanh |
 | 10b Đồng bộ Moodle — Chạy tay (+ ATT-02 cửa sổ 14 ngày, gia hạn `han_rieng`) | Xong | `phase-10b` (từ `phase-10a`) | #21 → `phase-10a` | — |
-| 10c Đồng bộ Moodle — Tự động (plugin `local_ewars`, sự kiện, dò 10 phút, đêm, hạn nộp) | Xong | `phase-10c` (đang checkout, từ `phase-10b`) | → `phase-10b` | — |
+| 10c Đồng bộ Moodle — Tự động (plugin `local_ewars`, sự kiện, dò 10 phút, đêm, hạn nộp) | Xong | `phase-10c` (từ `phase-10b`) | → `phase-10b` | — |
+| 11 Làm mới giao diện (đợt 0 xong, chưa commit; đợt 1–4 chưa làm — `implement.md`) | Đang làm | `phase-11-giao-dien` (đang checkout, từ `phase-10c`) | — | — |
 
 - Repo: https://github.com/66trent/CTUT-Early-Warning-Academic-Risk-System — **đã merge #1–#8 vào `main` (merge commit, 2026-10-15)**. Từ Phase 7 PR đi thẳng vào `main`.
 - Quy trình mỗi phase (người dùng đã đồng ý, làm liên tục từ Phase 0): code → `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` → kiểm tra tay trên trình duyệt → tick `docs/implement.md` → ghi `PROGRESS.md` (≤15 dòng) → commit (kèm `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) → push → `gh pr create` (body kết thúc bằng `🤖 Generated with [Claude Code](https://claude.com/claude-code)`) → `bind_pr` → báo kết quả theo DoD + hướng dẫn tự kiểm tra.
@@ -81,6 +82,7 @@
 - Chuông + kịch bản (chốt 2026-11-08, ghi `06`, `07`, `11`): chuông cho Admin + CVHT lớp liên quan (lớp có cảnh báo thay đổi hoặc có SV học phần vừa nạp); 1 thông báo / lần đánh giá xong, mọi nguồn; tự tải lại 15 giây + toast "Tải lại"; kịch bản bảo vệ lấy Moodle làm trọng tâm (học lực vẫn dùng bộ nạp file v3, chốt Học kỳ 1 2025–2026 ở M8).
 - Phase 10 Moodle (chốt hướng 2026-11-07; 10a–10c xong, 10d chưa — `docs/tich-hop-moodle.md` mục 9, kế hoạch `implement.md`): giảng viên yêu cầu lấy điểm danh + trắc nghiệm + thực hành từ Moodle; tự dựng Moodle 5.3 LTS Docker + plugin `mod_attendance` (moodle.org không có dữ liệu trường); kéo Web service REST (token chỉ đọc) + plugin tự viết `local_ewars` đẩy sự kiện; 2 chế độ Tự động (sự kiện → nạp → đánh giá ngay, job hẹn giờ lúc hết hạn nộp) và Chạy tay (xem trước → xác nhận); điểm danh quy đổi phút → tiết (**1 tiết = 50 phút** người dùng xác nhận; E/A/P/L mặc định, cấu hình được); học kỳ demo Moodle theo ngày thật `HK1_2026` 17/08–27/12/2026, không đụng bộ v3; dữ liệu Moodle demo = script HOẶC người dùng tự làm tay (`docs/huong-dan-moodle.md`); mã học phần / lớp học phần tự thiết kế, KHÔNG xác minh với trường (giảng viên: do Phòng Đào tạo) — Course ID number = mã lớp học phần, mã học phần = bỏ 2 số cuối.
 - Giao diện (chốt 2026-10-19, ghi `03`): họ tên sắp theo tên rồi họ; RiskScore hiển thị 0–1 (dấu phẩy) + thanh; danh mục khoa = chip lọc + mục thu gọn; giữ shadcn, chỉ thêm thành phần; kế hoạch giao diện chia 8b–8f.
+- Làm mới giao diện (chốt 2026-11-08, Phase 11, ghi `07`): sidebar navy đậm và nền đặc cho mức Rất cao + Cao (cập nhật `03` ở đợt 1); chữ hiển thị dùng Nhập / đợt nhập / Thủ công / Tính đến ngày / Điểm ưu tiên (code và tài liệu kỹ thuật giữ `RiskScore`, lô); Cố vấn học tập không thấy mã luật. Đổi chữ hiển thị hàng loạt bằng AST (chỉ string + JSX text), test e2e đọc theo chữ trên nút nên phải đổi cùng.
 
 ## 4. Câu hỏi còn mở (hỏi người dùng đúng lúc)
 

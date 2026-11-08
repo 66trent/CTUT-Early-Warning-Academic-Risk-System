@@ -50,8 +50,8 @@ export default function PrivacyPolicyPage() {
             quá trình, điểm thi, điểm tổng kết).
           </p>
           <p>
-            <strong>Dữ liệu nhạy cảm:</strong> hệ thống KHÔNG lưu lý do vắng (chỉ lưu số buổi). Ghi
-            chú can thiệp của Cố vấn học tập có thể chứa thông tin sức khỏe — khi đó được đánh dấu
+            <strong>Dữ liệu nhạy cảm:</strong> hệ thống không lưu lý do vắng (chỉ lưu số buổi). Ghi
+            chú can thiệp của Cố vấn học tập có thể chứa thông tin sức khỏe, khi đó được đánh dấu
             “nhạy cảm”, chỉ Cố vấn học tập phụ trách trực tiếp xem được; quản trị viên và các trang
             tổng hợp không hiển thị nội dung này.
           </p>
@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
             thay đổi tình trạng học vụ của sinh viên.
           </p>
           <p>
-            Dữ liệu KHÔNG được dùng cho mục đích khác: không chia sẻ cho bên thứ ba ngoài phạm vi
+            Dữ liệu không được dùng cho mục đích khác: không chia sẻ cho bên thứ ba ngoài phạm vi
             đào tạo, không dùng cho quảng cáo hay thương mại.
           </p>
         </Section>
@@ -76,8 +76,8 @@ export default function PrivacyPolicyPage() {
         <Section n={5} title="Thời gian lưu trữ">
           <p>
             Dữ liệu học tập và file dữ liệu gốc được lưu theo quy định lưu trữ hồ sơ đào tạo của nhà
-            trường: {env.PRIVACY_RETENTION ?? TO_CONFIRM}. File gốc các lô nhập được giữ tối thiểu 1
-            học kỳ và chỉ quản trị viên tải được.
+            trường: {env.PRIVACY_RETENTION ?? TO_CONFIRM}. File gốc các đợt nhập được giữ tối thiểu
+            1 học kỳ và chỉ quản trị viên tải được.
           </p>
         </Section>
 
@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
               sinh viên thuộc lớp mình phụ trách; quản trị viên chỉ giám sát.
             </li>
             <li>
-              Nhật ký kiểm toán chỉ ghi thêm, không sửa hay xóa được — ghi lại các thao tác quan
+              Nhật ký kiểm toán chỉ ghi thêm, không sửa hay xóa được, ghi lại các thao tác quan
               trọng, kể cả việc xem hồ sơ sinh viên.
             </li>
             <li>Mật khẩu được băm, phiên đăng nhập có thời hạn, giới hạn số lần đăng nhập sai.</li>

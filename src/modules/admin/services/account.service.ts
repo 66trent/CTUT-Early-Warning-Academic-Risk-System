@@ -6,6 +6,7 @@ import { User } from '@/db/entities/user.entity';
 import { UserAccountStatus, UserRole } from '@/db/enums';
 import { type AuditAction, writeAuditLog } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
+import { MOODLE_SYSTEM_USER_ID } from '@/lib/system-accounts';
 import {
   applyOrder,
   firstPage,
@@ -139,6 +140,8 @@ function applyAccountFilter(
 ): void {
   if (filter.role === 'STAFF') qb.where('u.role IN (:...roles)', { roles: STAFF_ROLES });
   else qb.where('u.role = :role', { role: filter.role });
+  // Tài khoản hệ thống không phải người dùng thật, không có thao tác nào để quản lý.
+  qb.andWhere('u.userId <> :systemUser', { systemUser: MOODLE_SYSTEM_USER_ID });
   if (filter.q) {
     qb.andWhere('(u.userId ILIKE :q OR u.fullName ILIKE :q OR u.email ILIKE :q)', {
       q: `%${escapeLike(filter.q)}%`,

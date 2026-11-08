@@ -14,8 +14,8 @@ const MESSAGES: Record<string, string> = {
     'Email chưa được xác minh. Vui lòng mở liên kết xác minh trong hộp thư của bạn.',
   INVALID_EMAIL_OR_PASSWORD: 'Email hoặc mật khẩu chưa đúng.',
   RATE_LIMITED: 'Bạn đã thử quá nhiều lần. Vui lòng đợi 1 phút rồi thử lại.',
-  DEMO_DISABLED: 'Chế độ demo đang tắt.',
-  DEMO_ACCOUNT_MISSING: 'Tài khoản demo chưa được tạo. Quản trị viên cần chạy dữ liệu demo.',
+  DEMO_DISABLED: 'Đăng nhập nhanh đang tắt.',
+  DEMO_ACCOUNT_MISSING: 'Tài khoản trình diễn chưa được tạo.',
 };
 
 const FALLBACK = 'Đăng nhập không thành công. Vui lòng thử lại.';

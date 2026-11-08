@@ -125,7 +125,7 @@ export function CourseSnapshotTable({
                       className={c.result.passed ? 'font-medium' : 'font-medium text-destructive'}
                     >
                       {c.result.letterGrade}
-                      {c.result.passed ? '' : ' — không đạt'}
+                      {c.result.passed ? '' : ' · không đạt'}
                     </span>
                     <span className="block text-xs text-muted-foreground">
                       {resultLabel(c.result)}

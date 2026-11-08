@@ -65,7 +65,9 @@ export function QuickGuide({ guide, storageKey }: { guide: Guide; storageKey: st
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <ol className="grid gap-3 px-4 pb-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol
+          className={`grid gap-3 px-4 pb-4 sm:grid-cols-2 ${guide.steps.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}
+        >
           {guide.steps.map((s, i) => (
             <li key={s.title} className="rounded-lg bg-background/80 p-3 text-sm">
               <p className="font-medium">

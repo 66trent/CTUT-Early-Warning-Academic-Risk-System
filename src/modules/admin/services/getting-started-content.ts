@@ -20,7 +20,7 @@ export interface StepGuide {
 export const PHASE_INTROS: Record<SetupPhase, string> = {
   FOUNDATION: 'Làm 1 lần khi bắt đầu dùng hệ thống, và lặp lại khi có khóa sinh viên mới.',
   TERM: 'Đầu mỗi học kỳ (1 năm học có 3 học kỳ chính).',
-  DURING_TERM: 'Lặp lại mỗi tuần trong học kỳ — càng đều đặn, cảnh báo càng sớm.',
+  DURING_TERM: 'Lặp lại mỗi tuần trong học kỳ, càng đều đặn, cảnh báo càng sớm.',
   END_OF_TERM: 'Khi các học phần khóa điểm, trước khi sang học kỳ mới.',
 };
 
@@ -35,7 +35,7 @@ export const STEP_GUIDES: Record<string, StepGuide> = {
       'Mở Tài khoản, lọc "Chờ duyệt", kiểm tra mã cán bộ rồi bấm Duyệt.',
     ],
     why: 'Chỉ tài khoản đã duyệt mới được gán làm Cố vấn học tập của lớp và nhận cảnh báo.',
-    tip: 'Không duyệt tài khoản lạ — Cố vấn học tập xem được thông tin học tập của sinh viên.',
+    tip: 'Không duyệt tài khoản lạ, Cố vấn học tập xem được thông tin học tập của sinh viên.',
   },
   classes: {
     what: [
@@ -47,7 +47,7 @@ export const STEP_GUIDES: Record<string, StepGuide> = {
   students: {
     what: [
       'Tải file mẫu, điền danh sách sinh viên (mã lớp phải trùng lớp đã tạo).',
-      'Nạp file → xem trước → sửa dòng lỗi nếu có → xác nhận nạp.',
+      'Nhập file → xem trước → sửa dòng lỗi nếu có → xác nhận nhập.',
     ],
     why: 'Mọi dữ liệu học tập sau này chỉ nhận sinh viên đã có trong danh sách; sinh viên cũng chỉ đăng nhập được khi đã có hồ sơ.',
     templates: ['STUDENT'],
@@ -55,7 +55,7 @@ export const STEP_GUIDES: Record<string, StepGuide> = {
   },
   term: {
     what: ['Tạo học kỳ (mã, tên, ngày bắt đầu, kết thúc).', 'Đặt làm học kỳ hiện tại.'],
-    why: 'Dữ liệu nạp và cảnh báo đều gắn với 1 học kỳ. Không cần nhập lớp học phần hay đăng ký học phần — hệ thống tự tạo từ dữ liệu nạp.',
+    why: 'Dữ liệu nhập và cảnh báo đều gắn với 1 học kỳ. Không cần nhập lớp học phần hay đăng ký học phần, hệ thống tự tạo từ dữ liệu nhập.',
   },
   rules: {
     what: [
@@ -67,38 +67,39 @@ export const STEP_GUIDES: Record<string, StepGuide> = {
   attendance: {
     what: [
       'Xuất số liệu điểm danh theo tiết của từng lớp học phần (tổng tiết, tiết vắng có phép, không phép).',
-      'Nạp file, chọn học kỳ; kiểm tra thẻ nhận diện học phần ở màn xem trước rồi xác nhận.',
+      'Nhập file, chọn học kỳ; kiểm tra thẻ nhận diện học phần ở màn xem trước rồi xác nhận.',
     ],
-    why: 'Vắng học là dấu hiệu sớm nhất — phát hiện từ giữa học kỳ, trước khi có điểm.',
+    why: 'Vắng học là dấu hiệu sớm nhất, phát hiện từ giữa học kỳ, trước khi có điểm.',
     templates: ['ATTENDANCE_SUMMARY'],
-    tip: 'Mỗi lần nạp là 1 ngày chốt; hệ thống giữ mọi ngày chốt để so sánh xu hướng.',
+    tip: 'Mỗi lần nhập là 1 ngày chốt; hệ thống giữ mọi ngày chốt để so sánh xu hướng.',
   },
   lms: {
     what: [
       'Xuất kết quả bài trắc nghiệm và trạng thái nộp bài thực hành từ LMS, kèm hạn nộp từng bài.',
-      'Nạp 2 loại file riêng, mỗi loại 1 lần.',
+      'Nhập 2 loại file riêng, mỗi loại 1 lần.',
     ],
     why: 'Bỏ bài, điểm thấp, nộp trễ là dấu hiệu học tập sa sút trước kỳ thi.',
     templates: ['LMS_QUIZ', 'LMS_ASSIGNMENT'],
   },
   evaluation: {
     what: [
-      'Hệ thống tự chạy sau mỗi lần nạp dữ liệu học tập và mỗi đêm.',
+      'Hệ thống tự chạy sau mỗi lần nhập dữ liệu học tập và mỗi đêm.',
       'Muốn xem ngay: mở Chạy đánh giá, chọn học kỳ (hoặc 1 học phần) rồi bấm chạy.',
     ],
-    why: 'Lần chạy áp dụng các luật lên dữ liệu đã nạp, tạo cảnh báo và gửi thông báo cho Cố vấn học tập.',
-    tip: 'Chế độ demo không tự chạy — Admin bấm chạy và chọn mốc dữ liệu.',
+    why: 'Lần chạy áp dụng các luật lên dữ liệu đã nhập, tạo cảnh báo và gửi thông báo cho Cố vấn học tập.',
   },
   'advisor-handling': {
     what: [
       'Theo dõi cảnh báo mới và cảnh báo của lớp chưa có Cố vấn học tập.',
-      'Cố vấn học tập xác nhận, ghi can thiệp và đóng cảnh báo — Admin chỉ xem.',
+      'Cố vấn học tập xác nhận, ghi can thiệp và đóng cảnh báo, Admin chỉ xem.',
     ],
     why: 'Cảnh báo chỉ có ích khi có người liên hệ sinh viên. Sinh viên chỉ thấy cảnh báo sau khi Cố vấn học tập xác nhận.',
   },
   'final-results': {
-    what: ['Học phần nào khóa điểm thì xuất bảng điểm và nạp ngay, không cần đợi đủ mọi học phần.'],
-    why: 'Dùng cho các luật học lực: không đạt học phần, tín chỉ không đạt, điểm trung bình — và nhận diện học lại ở học kỳ sau.',
+    what: [
+      'Học phần nào khóa điểm thì xuất bảng điểm và nhập ngay, không cần đợi đủ mọi học phần.',
+    ],
+    why: 'Dùng cho các luật học lực: không đạt học phần, tín chỉ không đạt, điểm trung bình, và nhận diện học lại ở học kỳ sau.',
     templates: ['COURSE_RESULT'],
   },
   'close-term': {
@@ -106,7 +107,7 @@ export const STEP_GUIDES: Record<string, StepGuide> = {
       'Mở Học kỳ → Chốt học kỳ; xem danh sách sinh viên còn thiếu kết quả.',
       'Xác nhận: hệ thống chạy đánh giá lần cuối rồi chốt.',
     ],
-    why: 'Sau khi chốt, học kỳ không nhận thêm dữ liệu — kết quả đánh giá cuối kỳ được giữ nguyên làm căn cứ.',
+    why: 'Sau khi chốt, học kỳ không nhận thêm dữ liệu, kết quả đánh giá cuối kỳ được giữ nguyên làm căn cứ.',
     tip: 'Đặt học kỳ mới làm học kỳ hiện tại sau khi chốt.',
   },
 };
@@ -130,12 +131,12 @@ export const GETTING_STARTED_FAQ: FaqItem[] = [
   {
     question: '"Chưa đủ dữ liệu" nghĩa là gì?',
     answer:
-      'Sinh viên chưa có dữ liệu ở nguồn nào (điểm danh, bài LMS, kết quả) để tính điểm rủi ro. Không có nghĩa là rủi ro thấp — cần nạp bổ sung dữ liệu.',
+      'Sinh viên chưa có dữ liệu ở nguồn nào (điểm danh, bài LMS, kết quả) để tính điểm ưu tiên. Đây chưa phải kết luận rủi ro thấp, cần nhập bổ sung dữ liệu.',
   },
   {
-    question: 'Nạp nhầm file thì làm sao?',
+    question: 'Nhập nhầm file thì làm sao?',
     answer:
-      'Ở màn xem trước bấm Hủy, dữ liệu chưa được ghi. Nếu đã xác nhận nạp, mở lô nhập đó và bấm Hoàn tác — chỉ được khi lô chỉ thêm dữ liệu mới (không sửa dòng có sẵn) và chưa có lô cùng loại nạp sau. Nếu không hoàn tác được, nạp lại file đúng để ghi đè.',
+      'Ở màn xem trước bấm Hủy, dữ liệu chưa được ghi. Nếu đã xác nhận nhập, mở đợt nhập đó và bấm Hoàn tác. Chỉ hoàn tác được khi đợt nhập chỉ thêm dữ liệu mới (không sửa dòng có sẵn) và chưa có đợt nhập cùng loại sau đó. Nếu không hoàn tác được, nhập lại file đúng để ghi đè.',
   },
   {
     question: 'Muốn đổi ngưỡng cảnh báo thì làm thế nào?',
@@ -145,7 +146,7 @@ export const GETTING_STARTED_FAQ: FaqItem[] = [
   {
     question: 'Tạo lớp học phần, đăng ký học phần ở đâu?',
     answer:
-      'Không cần tạo. Học phần và danh sách sinh viên học phần được hệ thống tự tạo từ file điểm danh, LMS và kết quả khi nạp.',
+      'Không cần tạo. Học phần và danh sách sinh viên học phần được hệ thống tự tạo từ file điểm danh, LMS và kết quả khi nhập.',
   },
   {
     question: 'Sinh viên đăng nhập bằng gì?',

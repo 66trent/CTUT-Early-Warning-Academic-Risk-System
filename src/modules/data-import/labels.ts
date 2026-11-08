@@ -20,7 +20,7 @@ export const BATCH_STATUS_LABELS: Record<ImportBatchStatus, string> = {
   [ImportBatchStatus.VALIDATING]: 'Đang kiểm tra',
   [ImportBatchStatus.STAGED]: 'Chờ xác nhận',
   [ImportBatchStatus.LOADED]: 'Đang cập nhật',
-  [ImportBatchStatus.RECONCILED]: 'Đã nạp',
+  [ImportBatchStatus.RECONCILED]: 'Đã nhập',
   [ImportBatchStatus.REJECTED]: 'Bị từ chối',
   [ImportBatchStatus.DISCARDED]: 'Đã hủy',
   [ImportBatchStatus.ROLLED_BACK]: 'Đã hoàn tác',

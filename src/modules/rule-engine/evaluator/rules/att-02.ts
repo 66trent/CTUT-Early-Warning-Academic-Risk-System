@@ -51,7 +51,7 @@ export const att02: CourseRule<Att02Condition> = {
           {
             code: 'ATTENDANCE_DECREASED',
             courseId: facts.input.courseId,
-            message: `Số tiết vắng không phép giảm từ ${s1.unexcusedAbsence} (${formatVnDate(s1.snapshotDate)}) xuống ${s2.unexcusedAbsence} (${formatVnDate(s2.snapshotDate)}) — dữ liệu nguồn có thể đã bị sửa.`,
+            message: `Số tiết vắng không phép giảm từ ${s1.unexcusedAbsence} (${formatVnDate(s1.snapshotDate)}) xuống ${s2.unexcusedAbsence} (${formatVnDate(s2.snapshotDate)}), dữ liệu nguồn có thể đã bị sửa.`,
           },
         ],
       };

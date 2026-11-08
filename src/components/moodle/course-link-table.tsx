@@ -74,7 +74,7 @@ function EditLinkDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Thông tin học phần — {link.sectionCode}</DialogTitle>
+          <DialogTitle>Thông tin học phần · {link.sectionCode}</DialogTitle>
           <DialogDescription>
             Dùng khi tự tạo học phần trong EWARS. Mã học phần mặc định = mã lớp học phần bỏ 2 số
             cuối.
@@ -175,7 +175,7 @@ function Departures({ link }: { link: Link }) {
         <ListPopover
           icon={FileX}
           label={`${link.removedActivities.length} bài đã xóa trên Moodle`}
-          note="Bài vẫn còn trong EWARS (giới hạn đã biết) — kiểm tra lại nếu sinh viên bị cảnh báo vì bài này."
+          note="Bài vẫn còn trong EWARS (giới hạn đã biết), kiểm tra lại nếu sinh viên bị cảnh báo vì bài này."
           items={link.removedActivities.map((a) => ({
             key: `${a.kind}-${a.name}-${a.detectedAt}`,
             text: `${a.kind === 'QUIZ' ? 'Trắc nghiệm' : 'Thực hành'}: ${a.name}`,
@@ -206,7 +206,7 @@ function SyncState({ link }: { link: Link | null }) {
         <ListPopover
           icon={UserX}
           label={`${link.unknownStudents.length} sinh viên Moodle chưa có trong EWARS`}
-          note="Bỏ qua khi đồng bộ (không tính là lỗi). Nạp danh sách sinh viên của họ rồi đồng bộ lại."
+          note="Bỏ qua khi đồng bộ (không tính là lỗi). Nhập danh sách sinh viên của họ rồi đồng bộ lại."
           items={link.unknownStudents.map((u, i) => ({
             key: `${u.idnumber ?? ''}-${u.email ?? ''}-${i}`,
             text: `${u.idnumber || '(trống ID number)'} · ${u.email ?? '—'}`,
@@ -222,16 +222,16 @@ function ModeButton({ link, name }: { link: Link; name: string }) {
   const auto = link.syncMode === 'AUTO';
   return (
     <ConfirmActionButton
-      trigger={auto ? 'Về Chạy tay' : 'Bật Tự động'}
+      trigger={auto ? 'Về Thủ công' : 'Bật Tự động'}
       triggerVariant="outline"
-      title={auto ? `Chuyển ${name} về Chạy tay?` : `Bật Tự động cho ${name}?`}
+      title={auto ? `Chuyển ${name} về Thủ công?` : `Bật Tự động cho ${name}?`}
       description={
         auto
-          ? 'Dữ liệu Moodle chỉ được nạp khi bạn bấm Đồng bộ ngay rồi Xác nhận.'
-          : 'Có thay đổi trên Moodle (điểm danh, bài nộp, bài mới) là EWARS tự kéo về, tự nạp (lô lỗi > 10% sẽ chờ bạn xem) và tự chạy đánh giá; đến hạn nộp cũng tự đánh giá lại. Cần đã xác nhận nạp ít nhất 1 lần.'
+          ? 'Dữ liệu Moodle chỉ được nhập khi bạn bấm Đồng bộ ngay rồi Xác nhận.'
+          : 'Có thay đổi trên Moodle (điểm danh, bài nộp, bài mới) là EWARS tự kéo về, tự nhập (đợt nhập lỗi > 10% sẽ chờ bạn xem) và tự chạy đánh giá; đến hạn nộp cũng tự đánh giá lại. Cần đã xác nhận nhập ít nhất 1 lần.'
       }
-      confirmLabel={auto ? 'Về Chạy tay' : 'Bật Tự động'}
-      successMessage={auto ? 'Đã chuyển về Chạy tay' : 'Đã bật Tự động — đang kéo dữ liệu lần đầu'}
+      confirmLabel={auto ? 'Về Thủ công' : 'Bật Tự động'}
+      successMessage={auto ? 'Đã chuyển về Thủ công' : 'Đã bật Tự động, đang kéo dữ liệu lần đầu'}
       onConfirm={() =>
         setMoodleSyncModeAction({ linkId: link.id, syncMode: auto ? 'MANUAL' : 'AUTO' })
       }
@@ -259,7 +259,7 @@ function RowActions({
         title={enabled ? `Tắt đồng bộ ${row.fullname}?` : `Bật đồng bộ ${row.fullname}?`}
         description={
           enabled
-            ? 'Lần đồng bộ sau không đọc khóa học này nữa. Dữ liệu đã nạp vẫn giữ nguyên.'
+            ? 'Lần đồng bộ sau không đọc khóa học này nữa. Dữ liệu đã nhập vẫn giữ nguyên.'
             : `Từ lần "Đồng bộ ngay" tới, điểm danh, trắc nghiệm, bài thực hành của khóa học này được đưa vào học kỳ đang chọn (mã lớp học phần ${row.idnumber}).`
         }
         confirmLabel={enabled ? 'Tắt' : 'Bật'}
@@ -294,7 +294,7 @@ function buildColumns(termId: string, canEdit: boolean): ColumnDef<MoodleCourseR
           <span className="font-mono">{row.original.idnumber}</span>
         ) : (
           <Badge variant="outline" className="text-muted-foreground">
-            {row.original.idnumber ? `${row.original.idnumber} — không phải 12 chữ số` : 'Chưa có'}
+            {row.original.idnumber ? `${row.original.idnumber}, không phải 12 chữ số` : 'Chưa có'}
           </Badge>
         ),
     },
@@ -327,7 +327,7 @@ function buildColumns(termId: string, canEdit: boolean): ColumnDef<MoodleCourseR
               Đang bật
             </Badge>
             <span className="text-muted-foreground">
-              {row.original.link.syncMode === 'AUTO' ? 'Tự động' : 'Chạy tay'}
+              {row.original.link.syncMode === 'AUTO' ? 'Tự động' : 'Thủ công'}
             </span>
           </div>
         ) : (

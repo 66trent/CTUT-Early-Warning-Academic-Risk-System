@@ -21,9 +21,9 @@ describe('Chuông "đánh giá đã cập nhật" — nội dung', () => {
       courseNames: ['Mạng máy tính'],
     };
     expect(updateTitle(auto, { ...data, source: 'MOODLE' })).toBe(
-      'Moodle: Điểm danh, Bài trắc nghiệm — Mạng máy tính vừa cập nhật',
+      'Moodle: Điểm danh, Bài trắc nghiệm · Mạng máy tính vừa cập nhật',
     );
-    expect(updateTitle(auto, { ...data, source: 'FILE' })).toMatch(/^Nạp file: /);
+    expect(updateTitle(auto, { ...data, source: 'FILE' })).toMatch(/^Nhập file: /);
     expect(updateTitle(auto, null)).toBe('Đánh giá lại sau khi dữ liệu thay đổi');
     expect(updateTitle({ trigger: EvaluationTrigger.MANUAL, courseId: null }, null)).toBe(
       'Admin chạy đánh giá',

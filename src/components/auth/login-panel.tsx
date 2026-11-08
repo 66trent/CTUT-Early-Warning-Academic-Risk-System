@@ -209,7 +209,7 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
       {demoMode && (
         <div className="border-t pt-4">
           <p className="mb-2 text-xs font-medium text-muted-foreground uppercase">
-            Đăng nhập nhanh (chế độ demo)
+            Tài khoản trình diễn
           </p>
           <div className="flex flex-col gap-2">
             <DemoButton
@@ -218,7 +218,7 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
               pending={demoPending}
               onClick={quickLogin}
             />
-            <ul className="flex flex-col gap-2" aria-label="Lớp demo">
+            <ul className="flex flex-col gap-2" aria-label="Lớp trình diễn">
               {DEMO_ROWS.map((row) => (
                 <li
                   key={row.classId}
@@ -246,7 +246,7 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
               ))}
             </ul>
             <p className="text-xs text-muted-foreground">
-              Sinh viên đăng nhập được khi đã có hồ sơ (sau khi nạp danh sách sinh viên).
+              Sinh viên đăng nhập được khi đã có hồ sơ (sau khi nhập danh sách sinh viên).
             </p>
           </div>
         </div>
@@ -260,7 +260,7 @@ export function LoginPanel({ errorCode, googleEnabled, demoMode, demoEmail }: Lo
     <Card className="shadow-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Đăng nhập</CardTitle>
-        <CardDescription>Chọn đúng đối tượng của bạn.</CardDescription>
+        <CardDescription>Bạn là sinh viên hay cán bộ?</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {errorCode && <ErrorBanner message={signInMessage(errorCode)} />}

@@ -72,7 +72,7 @@ function rateWarning(
   if (given.ok && Math.abs(given.value - computed) <= RATE_TOLERANCE) return null;
   return {
     code: 'ABSENCE_RATE_MISMATCH',
-    message: `Tỷ lệ vắng trong file "${raw}" khác số tính lại ${computed.toFixed(2)}% — hệ thống dùng số tiết.`,
+    message: `Tỷ lệ vắng trong file "${raw}" khác số tính lại ${computed.toFixed(2)}%, hệ thống dùng số tiết.`,
   };
 }
 

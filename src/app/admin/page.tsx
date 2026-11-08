@@ -93,7 +93,7 @@ export default async function AdminHomePage({
         <EmptyState
           icon={CalendarRange}
           title="Chưa có học kỳ nào"
-          description="Tạo học kỳ và đặt làm học kỳ hiện tại để bắt đầu nạp dữ liệu và theo dõi cảnh báo."
+          description="Tạo học kỳ và đặt làm học kỳ hiện tại để bắt đầu nhập dữ liệu và theo dõi cảnh báo."
           action={{ href: '/admin/getting-started', label: 'Mở hướng dẫn bắt đầu' }}
         />
       </div>
@@ -144,7 +144,7 @@ export default async function AdminHomePage({
     {
       key: 'errors',
       icon: FileWarning,
-      text: 'lô nhập gần đây có trên 10% dòng lỗi',
+      text: 'đợt nhập gần đây có trên 10% dòng lỗi',
       count: o.attention.highErrorBatches,
       href: '/admin/imports',
       tone: 'warning',
@@ -152,7 +152,7 @@ export default async function AdminHomePage({
     {
       key: 'no-advisor',
       icon: UserX,
-      text: 'lớp chưa có Cố vấn học tập — cảnh báo không có người xử lý',
+      text: 'lớp chưa có Cố vấn học tập, cảnh báo không có người xử lý',
       count: o.attention.classesWithoutAdvisor,
       href: '/admin/classes?noAdvisor=1',
       tone: 'warning',
@@ -169,7 +169,7 @@ export default async function AdminHomePage({
             {department ? ` · ${department.departmentName}` : ''} ·{' '}
             {o.lastRun ? (
               <>
-                lần đánh giá gần nhất: mốc dữ liệu {formatVnDate(o.lastRun.asOf)} ·{' '}
+                lần đánh giá gần nhất: tính đến {formatVnDate(o.lastRun.asOf)} ·{' '}
                 <Link
                   href={`/admin/evaluations/${o.lastRun.id}`}
                   className="text-primary hover:underline"
@@ -237,7 +237,7 @@ export default async function AdminHomePage({
           label="Chưa đủ dữ liệu"
           value={latest?.insufficient ?? '—'}
           tone={(latest?.insufficient ?? 0) > 0 ? 'warning' : 'default'}
-          hint="Không phải rủi ro thấp — cần bổ sung dữ liệu"
+          hint="Cần thêm dữ liệu để đánh giá"
           href={
             o.lastRun
               ? `/admin/evaluations/${o.lastRun.id}?all=1&sort=riskScore&dir=asc`
@@ -293,7 +293,7 @@ export default async function AdminHomePage({
 
         <DashboardCard
           title="Diễn biến qua các lần đánh giá"
-          description="Số sinh viên có dấu hiệu theo mức cao nhất, mỗi cột là 1 mốc dữ liệu"
+          description="Số sinh viên có dấu hiệu theo mức cao nhất, mỗi cột là 1 lần đánh giá"
           href="/admin/evaluations"
           hrefLabel="Lịch sử chạy"
         >
@@ -420,7 +420,7 @@ export default async function AdminHomePage({
                   {f.coursesWithData}/{o.freshness.totalCourses} học phần có dữ liệu
                 </p>
                 {f.source === 'COURSE_RESULT' ? (
-                  <span className="text-xs text-muted-foreground">Nạp khi học phần khóa điểm</span>
+                  <span className="text-xs text-muted-foreground">Nhập khi học phần khóa điểm</span>
                 ) : problems === 0 && f.missing.length === 0 && f.coursesWithData > 0 ? (
                   <span className="w-fit rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
                     Đủ và đều

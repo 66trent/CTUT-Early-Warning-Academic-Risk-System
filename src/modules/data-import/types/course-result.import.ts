@@ -114,7 +114,7 @@ function gradePointWarning(
   if (given.ok && Math.round(given.value * 10) === GRADE_POINT_TENTHS[letter]) return null;
   return {
     code: 'GRADE_POINT_MISMATCH',
-    message: `Thang điểm 4 "${text}" khác quy đổi của điểm chữ ${letter} (${GRADE_POINT_TENTHS[letter] / 10}) — hệ thống dùng điểm chữ.`,
+    message: `Thang điểm 4 "${text}" khác quy đổi của điểm chữ ${letter} (${GRADE_POINT_TENTHS[letter] / 10}), hệ thống dùng điểm chữ.`,
   };
 }
 

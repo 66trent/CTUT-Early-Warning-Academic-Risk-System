@@ -89,7 +89,7 @@ export function TermsTable({ terms, canChooseAsOf }: { terms: TermDto[]; canChoo
         <EmptyState
           icon={CalendarRange}
           title="Chưa có học kỳ nào"
-          description="Bấm Tạo học kỳ ở góc trên, rồi đặt học kỳ đó làm học kỳ hiện tại để bắt đầu nạp dữ liệu."
+          description="Bấm Tạo học kỳ ở góc trên, rồi đặt học kỳ đó làm học kỳ hiện tại để bắt đầu nhập dữ liệu."
         />
       }
     />

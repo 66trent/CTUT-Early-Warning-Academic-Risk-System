@@ -41,7 +41,7 @@ function mergeFiles(current: File[], added: File[]): { files: File[]; problems: 
     else if (file.size > IMPORT_LIMITS.maxUploadBytes) problems.push(`${file.name}: quá 20MB`);
     else if (files.some((f) => f.name === file.name)) continue;
     else if (files.length >= IMPORT_LIMITS.maxFilesPerBatch) {
-      problems.push(`Mỗi lần nạp tối đa ${IMPORT_LIMITS.maxFilesPerBatch} file`);
+      problems.push(`Mỗi lần nhập tối đa ${IMPORT_LIMITS.maxFilesPerBatch} file`);
       break;
     } else files.push(file);
   }
@@ -73,7 +73,7 @@ export function UploadForm({ options, parent }: UploadFormProps) {
   /** Gửi lần lượt từng file (Server Action ≤ 21MB/lần), file cuối bắt đầu kiểm tra cả lô. */
   const submit = async () => {
     if (files.length === 0) {
-      toast.error('Chọn file cần nạp.');
+      toast.error('Chọn file cần nhập.');
       return;
     }
     setSent(0);
@@ -167,7 +167,7 @@ export function UploadForm({ options, parent }: UploadFormProps) {
             </Select>
             <p className="text-xs text-muted-foreground">
               Chọn khi mọi file chỉ của 1 học phần: dòng thuộc học phần khác sẽ bị báo lỗi. Không
-              cần chọn khoa hay lớp — hệ thống tự đọc lớp sinh hoạt, khoa của từng sinh viên và hiện
+              cần chọn khoa hay lớp, hệ thống tự đọc lớp sinh hoạt, khoa của từng sinh viên và hiện
               ở bước xem trước.
             </p>
           </div>
@@ -175,7 +175,7 @@ export function UploadForm({ options, parent }: UploadFormProps) {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="import-file">
-          File dữ liệu (.csv hoặc .xlsx — chọn được nhiều file cùng loại, tối đa{' '}
+          File dữ liệu (.csv hoặc .xlsx, chọn được nhiều file cùng loại, tối đa{' '}
           {IMPORT_LIMITS.maxFilesPerBatch} file, mỗi file ≤ 20MB)
         </Label>
         <div
@@ -273,7 +273,7 @@ export function UploadForm({ options, parent }: UploadFormProps) {
         <Button type="submit" disabled={pending || files.length === 0 || (needsTerm && !termId)}>
           {pending ? <Loader2 className="animate-spin" /> : <FileUp aria-hidden />}
           {parent
-            ? 'Nạp lại file đã sửa'
+            ? 'Nhập lại file đã sửa'
             : files.length > 1
               ? `Tải ${files.length} file lên và kiểm tra`
               : 'Tải lên và kiểm tra'}

@@ -192,7 +192,7 @@ async function* limitRows(rows: AsyncIterable<RawRow>, maxRows: number): AsyncIt
     count += 1;
     if (count > maxRows) {
       throw new FileRejectedError(
-        `Lô có hơn ${IMPORT_LIMITS.maxDataRows.toLocaleString('vi-VN')} dòng dữ liệu. Hãy tách thành nhiều file hoặc nhiều lần nạp.`,
+        `Đợt nhập có hơn ${IMPORT_LIMITS.maxDataRows.toLocaleString('vi-VN')} dòng dữ liệu. Hãy tách thành nhiều file hoặc nhiều lần nhập.`,
       );
     }
     yield row;

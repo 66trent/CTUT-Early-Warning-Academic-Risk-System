@@ -80,8 +80,8 @@ export default async function EvaluationRunPage({
         </div>
         <p className="mt-1 text-muted-foreground">
           {RUN_TRIGGER_LABELS[run.trigger]}
-          {run.triggeredBy ? ` bởi ${run.triggeredBy}` : ''} · mốc dữ liệu{' '}
-          {formatVnDateTime(run.asOf)} · tạo lúc {formatVnDateTime(run.createdAt)}
+          {run.triggeredBy ? ` bởi ${run.triggeredBy}` : ''} · tính đến {formatVnDateTime(run.asOf)}{' '}
+          · tạo lúc {formatVnDateTime(run.createdAt)}
         </p>
       </div>
 
@@ -101,8 +101,8 @@ export default async function EvaluationRunPage({
           <CardContent className="flex flex-col gap-2">
             <p className="text-muted-foreground">
               {run.status === EvaluationRunStatus.QUEUED
-                ? 'Đang chờ đến lượt chạy — trang tự cập nhật.'
-                : `Đang chạy đánh giá: ${run.processedStudents}/${run.totalStudents} sinh viên — trang tự cập nhật.`}
+                ? 'Đang chờ đến lượt chạy, trang tự cập nhật.'
+                : `Đang chạy đánh giá: ${run.processedStudents}/${run.totalStudents} sinh viên, trang tự cập nhật.`}
             </p>
             <div
               role="progressbar"
@@ -149,8 +149,8 @@ export default async function EvaluationRunPage({
           <CardContent className="flex flex-col gap-4">
             <ReferenceOnlyNotice />
             <p className="text-sm text-muted-foreground">
-              Điểm rủi ro từ 0 (ổn định) đến 1 (rủi ro cao), có trọng số trên các nguồn đủ dữ liệu —
-              chỉ dùng để sắp xếp ưu tiên, không tạo cảnh báo. Bấm &ldquo;N dấu hiệu&rdquo; để xem
+              Điểm ưu tiên từ 0 (ổn định) đến 1 (rủi ro cao), có trọng số trên các nguồn đủ dữ liệu
+              — chỉ dùng để sắp xếp ưu tiên, không tạo cảnh báo. Bấm &ldquo;N dấu hiệu&rdquo; để xem
               từng luật.
             </p>
             <Suspense>
@@ -162,7 +162,7 @@ export default async function EvaluationRunPage({
               emptyMessage={
                 filter.all
                   ? 'Không có sinh viên nào khớp bộ lọc.'
-                  : 'Không có sinh viên nào có dấu hiệu khớp bộ lọc — chọn "Tất cả sinh viên" để xem điểm rủi ro của mọi sinh viên.'
+                  : 'Không có sinh viên nào có dấu hiệu khớp bộ lọc, chọn "Tất cả sinh viên" để xem điểm ưu tiên của mọi sinh viên.'
               }
             />
             <DataPagination
@@ -182,7 +182,7 @@ export default async function EvaluationRunPage({
           <CardHeader>
             <CardTitle>Cảnh báo chất lượng dữ liệu ({run.warnings.length})</CardTitle>
             <CardDescription>
-              Dữ liệu bị bỏ qua khi tính — nên kiểm tra lại với nơi xuất dữ liệu.
+              Dữ liệu bị bỏ qua khi tính, nên kiểm tra lại với nơi xuất dữ liệu.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">

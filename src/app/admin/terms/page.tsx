@@ -27,7 +27,7 @@ export default async function TermsPage() {
       <PageHeader
         helpHref={HELP_LINKS.terms}
         title="Học kỳ"
-        description="Mỗi thời điểm chỉ có 1 học kỳ hiện tại. Chốt học kỳ sau khi đã nhập kết quả học phần — hệ thống chạy đánh giá lần cuối rồi mới chốt."
+        description="Mỗi thời điểm chỉ có 1 học kỳ hiện tại. Chốt học kỳ sau khi đã nhập kết quả học phần. Hệ thống chạy đánh giá lần cuối, sau đó chốt học kỳ."
         action={<CreateTermDialog defaultStartYear={currentAcademicStartYear()} />}
       />
       <Card className="shadow-sm">

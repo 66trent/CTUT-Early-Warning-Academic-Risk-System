@@ -55,7 +55,7 @@ export const aca02: StudentRule<Aca02Condition> = {
             .map((r) => r.courseName)
             .join(', ')}` +
           (exceeded
-            ? ` — chạm ngưỡng cảnh báo học tập theo quy chế (> ${exceeded}%, tham khảo).`
+            ? `. Chạm ngưỡng cảnh báo học tập theo quy chế (> ${exceeded}%, tham khảo).`
             : '.') +
           missing,
         inputSnapshot: {

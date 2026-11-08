@@ -34,26 +34,26 @@ export function StagedActions({
   return (
     <div className="flex flex-wrap gap-2">
       <ConfirmActionButton
-        trigger={`Xác nhận nạp ${successRows} dòng`}
+        trigger={`Xác nhận nhập ${successRows} dòng`}
         triggerVariant="default"
-        title={`Nạp ${successRows} dòng hợp lệ?`}
+        title={`Nhập ${successRows} dòng hợp lệ?`}
         description={
           errorRows > 0
-            ? `${errorRows} dòng lỗi sẽ không được nạp — bạn tải file lỗi để sửa rồi nạp lại sau. Hệ thống kiểm tra lại toàn bộ trước khi ghi.`
+            ? `${errorRows} dòng lỗi sẽ không được nhập, bạn tải file lỗi để sửa rồi nhập lại sau. Hệ thống kiểm tra lại toàn bộ trước khi ghi.`
             : 'Hệ thống kiểm tra lại toàn bộ trước khi ghi dữ liệu.'
         }
-        confirmLabel="Nạp dữ liệu"
-        successMessage="Đã xác nhận, hệ thống đang nạp dữ liệu."
+        confirmLabel="Nhập dữ liệu"
+        successMessage="Đã xác nhận, hệ thống đang nhập dữ liệu."
         onConfirm={() => confirmImportAction({ batchId })}
       />
       <ConfirmActionButton
-        trigger="Hủy lô"
+        trigger="Hủy đợt nhập"
         triggerVariant="ghost"
         destructive
-        title="Hủy lô nhập này?"
-        description="Không có dữ liệu nào được ghi. Bạn có thể nạp lại cùng file sau khi hủy."
-        confirmLabel="Hủy lô"
-        successMessage="Đã hủy lô nhập."
+        title="Hủy đợt nhập này?"
+        description="Không có dữ liệu nào được ghi. Bạn có thể nhập lại cùng file sau khi hủy."
+        confirmLabel="Hủy đợt nhập"
+        successMessage="Đã hủy đợt nhập."
         onConfirm={() => discardImportAction({ batchId })}
       />
     </div>
@@ -64,13 +64,13 @@ export function StagedActions({
 export function UploadingActions({ batchId }: { batchId: string }) {
   return (
     <ConfirmActionButton
-      trigger="Hủy lần nạp này"
+      trigger="Hủy lần nhập này"
       triggerVariant="outline"
       destructive
-      title="Hủy lần nạp đang tải lên?"
-      description="Các file đã tải lên sẽ bị bỏ, không có dữ liệu nào được ghi. Lô tải lên dở quá 1 ngày cũng tự hủy."
+      title="Hủy lần nhập đang tải lên?"
+      description="Các file đã tải lên sẽ bị bỏ, không có dữ liệu nào được ghi. Đợt nhập tải lên dở quá 1 ngày cũng tự hủy."
       confirmLabel="Hủy"
-      successMessage="Đã hủy lần nạp."
+      successMessage="Đã hủy lần nhập."
       onConfirm={() => discardImportAction({ batchId })}
     />
   );
@@ -91,7 +91,7 @@ export function RollbackAction({
         <TooltipTrigger asChild>
           <span tabIndex={0}>
             <Button size="sm" variant="outline" disabled>
-              Hoàn tác lô
+              Hoàn tác đợt nhập
             </Button>
           </span>
         </TooltipTrigger>
@@ -101,12 +101,12 @@ export function RollbackAction({
   }
   return (
     <ConfirmActionButton
-      trigger="Hoàn tác lô"
+      trigger="Hoàn tác đợt nhập"
       destructive
-      title="Hoàn tác lô nhập này?"
-      description="Xóa toàn bộ dữ liệu mà lô này đã thêm mới. Thao tác được ghi nhật ký và không thể làm lại."
+      title="Hoàn tác đợt nhập này?"
+      description="Xóa toàn bộ dữ liệu mà đợt nhập này đã thêm mới. Thao tác được ghi nhật ký và không thể làm lại."
       confirmLabel="Hoàn tác"
-      successMessage="Đã hoàn tác lô nhập."
+      successMessage="Đã hoàn tác đợt nhập."
       onConfirm={() => rollbackImportAction({ batchId })}
     />
   );

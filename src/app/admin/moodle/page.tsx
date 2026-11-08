@@ -36,7 +36,7 @@ function AutoStatus({ status }: { status: MoodleAutoStatusDto }) {
     ? status.lastEventAt
       ? `Sự kiện Moodle gần nhất: ${formatVnDateTime(status.lastEventAt)} · ${status.eventsLast24h} sự kiện trong 24 giờ`
       : 'Chưa nhận sự kiện nào từ Moodle (plugin local_ewars).'
-    : 'Chưa đặt MOODLE_WEBHOOK_SECRET — không nhận sự kiện, chỉ dò thay đổi định kỳ.';
+    : 'Chưa bật nhận sự kiện từ Moodle, hệ thống chỉ dò thay đổi định kỳ.';
   const checked = status.lastCheckedAt
     ? `Dò thay đổi gần nhất: ${formatVnDateTime(status.lastCheckedAt)}`
     : 'Chưa dò thay đổi lần nào.';
@@ -82,18 +82,18 @@ export default async function MoodlePage({
     ? 'Cần kết nối được Moodle.'
     : enabled === 0
       ? 'Bật ít nhất 1 khóa học ở bảng bên dưới.'
-      : `${enabled} khóa học đang bật — khóa Chạy tay chờ bạn xác nhận, khóa Tự động nạp luôn.`;
+      : `${enabled} khóa học đang bật, khóa Thủ công chờ bạn xác nhận, khóa Tự động nhập luôn.`;
   const connectionText = connection.ok
-    ? `${connection.siteName ?? ''} — Moodle ${connection.release ?? ''} · tài khoản ${connection.username ?? ''} · ${connection.functionCount} hàm chỉ đọc được cấp · ${connection.baseUrl ?? ''}`
+    ? `${connection.siteName ?? ''} · Moodle ${connection.release ?? ''} · tài khoản ${connection.username ?? ''} · ${connection.functionCount} hàm chỉ đọc được cấp · ${connection.baseUrl ?? ''}`
     : connection.configured
       ? (connection.error ?? 'Lỗi không xác định.')
-      : 'Đặt MOODLE_BASE_URL và MOODLE_WS_TOKEN (token web service chỉ đọc) trong biến môi trường rồi khởi động lại. Moodle demo: npm run moodle:up rồi npm run moodle:setup (docs/huong-dan-moodle.md).';
+      : 'Hệ thống chưa được khai báo địa chỉ Moodle và khóa truy cập chỉ đọc. Người quản trị máy chủ cần khai báo rồi khởi động lại hệ thống.';
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
         title="Kết nối Moodle"
-        description="Đồng bộ chỉ đọc điểm danh, bài trắc nghiệm, bài thực hành từ Moodle. Kết quả học phần vẫn nạp file."
+        description="Đồng bộ chỉ đọc điểm danh, bài trắc nghiệm, bài thực hành từ Moodle. Kết quả học phần vẫn nhập file."
       />
 
       <Card className="shadow-sm">
@@ -118,7 +118,7 @@ export default async function MoodlePage({
         <Card className="shadow-sm">
           <CardContent className="flex items-center gap-2 text-muted-foreground">
             <PlugZap aria-hidden />
-            Chưa có học kỳ đang mở — tạo học kỳ ở trang Học kỳ trước.
+            Chưa có học kỳ đang mở, tạo học kỳ ở trang Học kỳ trước.
           </CardContent>
         </Card>
       ) : (
@@ -144,12 +144,12 @@ export default async function MoodlePage({
 
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle>Đồng bộ — {term.termName}</CardTitle>
+              <CardTitle>Đồng bộ · {term.termName}</CardTitle>
               <CardDescription>
-                Chạy tay: mỗi lần đồng bộ tạo tối đa 3 lô (điểm danh / trắc nghiệm / thực hành, mỗi
-                khóa 1 file), dữ liệu chỉ được ghi sau khi bạn bấm Xác nhận. Tự động: có thay đổi
-                trên Moodle là tự nạp và tự chạy đánh giá. Sinh viên Moodle chưa có trong EWARS được
-                bỏ qua và đếm riêng.
+                Thủ công: mỗi lần đồng bộ tạo tối đa 3 đợt nhập (điểm danh / trắc nghiệm / thực
+                hành, mỗi khóa 1 file), dữ liệu chỉ được ghi sau khi bạn bấm Xác nhận. Tự động: có
+                thay đổi trên Moodle là tự nhập và tự chạy đánh giá. Sinh viên Moodle chưa có trong
+                EWARS được bỏ qua và đếm riêng.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">

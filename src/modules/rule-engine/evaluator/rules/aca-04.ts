@@ -86,7 +86,7 @@ export const aca04: StudentRule<Aca04Condition> = {
     ) {
       severities.push(c.consecutiveSeverity);
       reasons.push(
-        `2 học kỳ liên tiếp (${previous.termName} và học kỳ này) chạm ngưỡng cảnh báo học tập theo quy chế — quy chế: 3 lần cảnh báo liên tiếp bị buộc thôi học (tham khảo)`,
+        `2 học kỳ liên tiếp (${previous.termName} và học kỳ này) chạm ngưỡng cảnh báo học tập theo quy chế. Quy chế: 3 lần cảnh báo liên tiếp bị buộc thôi học (tham khảo)`,
       );
     }
     const severity = maxSeverity(severities);

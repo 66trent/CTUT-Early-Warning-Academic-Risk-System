@@ -87,8 +87,8 @@ export function BatchesTable({
       emptyMessage={
         <EmptyState
           icon={FileUp}
-          title="Chưa có lần nạp dữ liệu nào"
-          description="Bắt đầu bằng danh sách sinh viên ở khung phía trên, sau đó nạp điểm danh và dữ liệu LMS hằng tuần."
+          title="Chưa có lần nhập dữ liệu nào"
+          description="Bắt đầu bằng danh sách sinh viên ở khung phía trên, sau đó nhập điểm danh và dữ liệu LMS hằng tuần."
         />
       }
     />

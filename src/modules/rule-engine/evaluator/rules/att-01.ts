@@ -75,7 +75,7 @@ export const att01: CourseRule<Att01Condition> = {
         severity,
         reason:
           `Vắng ${absences}/${s.totalPeriods} tiết (${formatPercent(rate)})` +
-          (exceeded ? ` — đã vượt ngưỡng cấm thi ${exceeded}%.` : '.'),
+          (exceeded ? ` · đã vượt ngưỡng cấm thi ${exceeded}%.` : '.'),
         inputSnapshot: {
           snapshotDate: vnDateKey(s.snapshotDate),
           absences,

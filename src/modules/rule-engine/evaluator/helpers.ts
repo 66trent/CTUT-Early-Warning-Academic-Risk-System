@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { Severity, SEVERITY_ORDER } from '@/db/enums';
+import { SEVERITY_LABELS } from '@/lib/labels';
+import type { SignalSource } from './types';
 
 export const severitySchema = z.enum(Severity);
 
@@ -16,6 +18,32 @@ export function maxSeverity(values: readonly Severity[]): Severity | null {
 export function bumpSeverity(s: Severity, steps: number): Severity {
   const index = Math.min(SEVERITY_ORDER.length - 1, severityRank(s) + steps);
   return SEVERITY_ORDER[index] ?? Severity.CRITICAL;
+}
+
+const SIGNAL_NAMES: Record<SignalSource, string> = {
+  ATTENDANCE: 'điểm danh',
+  QUIZ: 'bài trắc nghiệm',
+  ASSIGNMENT: 'bài thực hành',
+  ACADEMIC: 'kết quả học tập',
+};
+
+/**
+ * Câu lý do của luật kết hợp: tên nguồn + mức cao nhất của nguồn đó, nặng trước (VD "điểm danh
+ * (Cao), bài thực hành (Trung bình)"). Không đưa mã luật vào lý do — người đọc là Cố vấn học tập.
+ */
+export function describeSignals(
+  hits: readonly { signal: SignalSource | null; severity: Severity }[],
+): string {
+  const highest = new Map<SignalSource, Severity>();
+  for (const { signal, severity } of hits) {
+    if (!signal) continue;
+    const current = highest.get(signal);
+    if (!current || severityRank(severity) > severityRank(current)) highest.set(signal, severity);
+  }
+  return [...highest]
+    .sort(([, a], [, b]) => severityRank(b) - severityRank(a))
+    .map(([signal, severity]) => `${SIGNAL_NAMES[signal]} (${SEVERITY_LABELS[severity]})`)
+    .join(', ');
 }
 
 export const DAY_MS = 24 * 3600 * 1000;

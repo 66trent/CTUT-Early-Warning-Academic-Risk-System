@@ -62,7 +62,7 @@ export function CloseTermDialog({
       toast.error(result.message);
       return;
     }
-    toast.success(`Đang chạy đánh giá cuối — ${termName} sẽ được chốt khi chạy xong.`);
+    toast.success(`Đang chạy đánh giá cuối, ${termName} sẽ được chốt khi chạy xong.`);
     setOpen(false);
     router.push(`/admin/evaluations/${result.data.runId}`);
   };
@@ -94,7 +94,7 @@ export function CloseTermDialog({
               ) : (
                 <div className="grid gap-1 text-foreground">
                   <p className="font-medium text-amber-700 dark:text-amber-300">
-                    {missing.length} sinh viên còn học phần chưa có kết quả — đánh giá cuối chỉ tính
+                    {missing.length} sinh viên còn học phần chưa có kết quả, đánh giá cuối chỉ tính
                     trên học phần đã có:
                   </p>
                   <ul className="max-h-48 list-disc overflow-y-auto pl-5 text-sm">
@@ -114,7 +114,7 @@ export function CloseTermDialog({
               )}
               {canChooseAsOf && (
                 <div className="grid gap-2 text-foreground">
-                  <Label htmlFor="close-as-of">Mốc dữ liệu (chế độ demo, để trống = bây giờ)</Label>
+                  <Label htmlFor="close-as-of">Tính đến ngày (để trống là hôm nay)</Label>
                   <Input
                     id="close-as-of"
                     type="date"

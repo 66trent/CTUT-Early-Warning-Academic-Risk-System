@@ -380,3 +380,17 @@ Chốt 2026-11-08 (`docs/tich-hop-moodle.md` mục 9c): tự xác nhận khi l�
 - [ ] Kịch bản demo Moodle (giảng viên điểm danh / sinh viên nộp bài → CVHT thấy cảnh báo), sơ đồ tích hợp cho báo cáo, ảnh chụp.
 
 **DoD:** `typecheck`, `lint`, `format:check`, `migration:check`, `test`, `build` xanh; bộ demo v3 + test nghiệm thu không đổi. **Kiểm tra tay:** điểm danh vắng / nộp bài trên Moodle local → ≤ 2 phút CVHT thấy thay đổi; bài quá hạn chưa nộp → cảnh báo ≤ 10 phút sau hạn; chế độ Chạy tay hiện xem trước trước khi nạp.
+
+---
+
+## Phase 11 — Làm mới giao diện (chốt 2026-11-08)
+
+Rà soát 30 màn hình: https://claude.ai/artifact/BZPB8MSLscXmY1uVLQS1nG. Người dùng chốt: sidebar navy đậm, nền đặc cho mức Rất cao + Cao, đổi thuật ngữ (Nhập, đợt nhập, Thủ công, Tính đến ngày), ẩn mã luật với Cố vấn học tập, "Điểm ưu tiên". Làm từng đợt, xong mỗi đợt báo người dùng kiểm tra. Họ tên dữ liệu demo: hỏi ở đợt 4.
+
+- [x] Đợt 0: sửa lỗi và từ ngữ.
+- [ ] Đợt 1: token màu, sidebar navy, header, độ rộng trang, bảng màu mức, cỡ chữ tối thiểu; cập nhật `03`.
+- [ ] Đợt 2: Tổng quan Admin + Cố vấn học tập, danh sách + chi tiết cảnh báo, Ma trận lớp, trang Sinh viên, đăng nhập.
+- [ ] Đợt 3: Nhập dữ liệu chia tab (+ bảng Lịch sử nhập, bảng Lớp còn cuộn nhẹ), Chạy đánh giá, Moodle, Nhật ký, Bắt đầu, Cấu hình luật.
+- [ ] Đợt 4: điện thoại, chế độ tối, trang trống, dữ liệu trình diễn, ảnh chụp, báo cáo Word.
+
+**DoD:** `typecheck`, `lint`, `format:check`, `test`, `build`, e2e xanh; bộ demo v3 không đổi số cảnh báo. **Kiểm tra tay:** từng đợt trên giao diện, khổ desktop + điện thoại.

@@ -43,7 +43,7 @@ export const lms02: CourseRule<Lms02Condition> = {
         warnings.push({
           code: 'QUIZ_MAX_SCORE_MISSING',
           courseId: facts.input.courseId,
-          message: `Một lượt làm bài trắc nghiệm (lần ${a.attemptNumber}) thiếu điểm tối đa — bỏ qua khi xét điểm thấp.`,
+          message: `Một lượt làm bài trắc nghiệm (lần ${a.attemptNumber}) thiếu điểm tối đa, bỏ qua khi xét điểm thấp.`,
         });
         continue;
       }

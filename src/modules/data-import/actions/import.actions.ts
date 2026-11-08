@@ -33,7 +33,7 @@ export async function uploadImportAction(
     const user = await requireActionUser(ADMIN);
     const file = formData.get('file');
     if (!(file instanceof File) || file.size === 0) {
-      return { ok: false, code: 'INVALID_INPUT', message: 'Chọn file cần nạp.' };
+      return { ok: false, code: 'INVALID_INPUT', message: 'Chọn file cần nhập.' };
     }
     if (file.size > IMPORT_LIMITS.maxUploadBytes) {
       return {
@@ -68,7 +68,7 @@ export async function uploadImportAction(
         return {
           ok: false,
           code: 'RATE_LIMITED',
-          message: 'Bạn đã tạo quá nhiều lần nạp trong 1 giờ. Vui lòng thử lại sau.',
+          message: 'Bạn đã tạo quá nhiều lần nhập trong 1 giờ. Vui lòng thử lại sau.',
         };
       }
       batchId = (await beginImportUpload(meta, upload, user.userId)).batchId;

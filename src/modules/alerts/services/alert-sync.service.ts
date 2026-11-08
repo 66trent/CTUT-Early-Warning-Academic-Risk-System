@@ -240,7 +240,7 @@ async function handleNoSignals(em: EntityManager, run: RunInfo, alert: Alert): P
   if (!OPEN_ALERT_STATUSES.includes(alert.status)) return;
   // Hoàn tác lô: dữ liệu đã bị gỡ — không phụ thuộc mốc asOf (docs/rules/12).
   if (run.rollback) {
-    const reason = 'Dữ liệu nguồn đã được hoàn tác — không còn dấu hiệu.';
+    const reason = 'Dữ liệu nguồn đã được hoàn tác, không còn dấu hiệu.';
     await em.update(
       Alert,
       { alertId: alert.alertId },

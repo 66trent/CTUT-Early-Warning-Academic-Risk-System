@@ -69,7 +69,7 @@ export function BatchFilesTable({ files }: { files: BatchFileView[] }) {
       columns={columns}
       data={files}
       getRowId={(f) => f.fileName}
-      emptyMessage="Lô chưa có file nào."
+      emptyMessage="Đợt nhập chưa có file nào."
     />
   );
 }

@@ -3,7 +3,7 @@ import { Severity } from '@/db/enums';
 
 const asOfDate = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày mốc dạng YYYY-MM-DD.')
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày dạng YYYY-MM-DD.')
   .optional()
   .or(z.literal(''));
 

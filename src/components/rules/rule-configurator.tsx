@@ -158,7 +158,7 @@ function DraftPanel({ rule }: { rule: RuleDetailDto }) {
             </div>
             {rule.canChooseAsOf ? (
               <div className="grid gap-2">
-                <Label htmlFor="dry-as-of">Mốc dữ liệu (chế độ demo, để trống = bây giờ)</Label>
+                <Label htmlFor="dry-as-of">Tính đến ngày (để trống là hôm nay)</Label>
                 <Input
                   id="dry-as-of"
                   type="date"
@@ -241,7 +241,7 @@ function NewDraftForm({ rule }: { rule: RuleDetailDto }) {
       <CardHeader>
         <CardTitle>Bước 1 · Sửa ngưỡng và lưu bản nháp</CardTitle>
         <CardDescription>
-          Sửa ngưỡng luôn tạo phiên bản mới — phiên bản đang áp dụng không bị ghi đè.
+          Sửa ngưỡng luôn tạo phiên bản mới, phiên bản đang áp dụng không bị ghi đè.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

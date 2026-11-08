@@ -42,8 +42,8 @@ export function updateTitle(
   data: ImportDescription | null,
 ): string {
   if (run.trigger === EvaluationTrigger.AUTO_AFTER_IMPORT && data) {
-    const what = `${data.dataTypes.join(', ')}${data.courseNames.length ? ` — ${data.courseNames.join(', ')}` : ''}`;
-    return clip(`${data.source === 'MOODLE' ? 'Moodle' : 'Nạp file'}: ${what} vừa cập nhật`, 200);
+    const what = `${data.dataTypes.join(', ')}${data.courseNames.length ? ` · ${data.courseNames.join(', ')}` : ''}`;
+    return clip(`${data.source === 'MOODLE' ? 'Moodle' : 'Nhập file'}: ${what} vừa cập nhật`, 200);
   }
   switch (run.trigger) {
     case EvaluationTrigger.AUTO_AFTER_IMPORT:
@@ -53,7 +53,7 @@ export function updateTitle(
     case EvaluationTrigger.SCHEDULED:
       return 'Đánh giá tự động theo lịch';
     case EvaluationTrigger.TERM_CLOSING:
-      return 'Chốt học kỳ — đánh giá lần cuối';
+      return 'Chốt học kỳ: đánh giá lần cuối';
   }
 }
 

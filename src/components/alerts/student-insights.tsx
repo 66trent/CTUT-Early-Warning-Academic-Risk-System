@@ -71,7 +71,7 @@ function eventView(e: TimelineEventDto): { icon: typeof ShieldAlert; text: strin
     case 'RESULT':
       return {
         icon: e.passed ? BadgeCheck : BookOpenCheck,
-        text: `Công bố điểm ${e.courseName}: ${e.letterGrade}${e.passed ? '' : ' — không đạt'}`,
+        text: `Công bố điểm ${e.courseName}: ${e.letterGrade}${e.passed ? '' : ' · không đạt'}`,
       };
   }
 }
@@ -145,7 +145,7 @@ export function StudentInsightsPanel({ insights }: { insights: StudentInsightsDt
         <CardHeader>
           <CardTitle>Dòng thời gian</CardTitle>
           <CardDescription>
-            Cảnh báo, can thiệp (chỉ ghi loại) và các mốc dữ liệu — mới nhất trước.
+            Cảnh báo, can thiệp (chỉ ghi loại) và các ngày chốt dữ liệu, mới nhất trước.
           </CardDescription>
         </CardHeader>
         <CardContent>

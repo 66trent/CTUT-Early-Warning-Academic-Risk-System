@@ -20,7 +20,7 @@ export const ADVISOR_GUIDE: QuickGuide = {
     },
     {
       title: 'Xác nhận rồi liên hệ sinh viên',
-      text: 'Sinh viên chỉ thấy cảnh báo SAU KHI bạn xác nhận. Gọi điện, gặp trực tiếp hoặc gửi email rồi ghi lại can thiệp.',
+      text: 'Sinh viên chỉ thấy cảnh báo sau khi bạn xác nhận. Gọi điện, gặp trực tiếp hoặc gửi email rồi ghi lại can thiệp.',
     },
     {
       title: 'Theo dõi và đóng',

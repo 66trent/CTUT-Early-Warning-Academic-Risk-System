@@ -32,7 +32,7 @@ export function termAcademics(
       summary.warnings.push({
         code: 'COURSE_CREDITS_MISSING',
         courseId: r.courseId,
-        message: `Học phần ${r.courseName} chưa có số tín chỉ — bỏ qua khi tính ĐTB và tín chỉ không đạt.`,
+        message: `Học phần ${r.courseName} chưa có số tín chỉ, bỏ qua khi tính ĐTB và tín chỉ không đạt.`,
       });
       continue;
     }
@@ -41,7 +41,7 @@ export function termAcademics(
       summary.warnings.push({
         code: 'UNKNOWN_LETTER_GRADE',
         courseId: r.courseId,
-        message: `Điểm chữ "${r.letterGrade}" chưa có trong thang quy đổi — bỏ qua khi tính ĐTB.`,
+        message: `Điểm chữ "${r.letterGrade}" chưa có trong thang quy đổi, bỏ qua khi tính ĐTB.`,
       });
       continue;
     }

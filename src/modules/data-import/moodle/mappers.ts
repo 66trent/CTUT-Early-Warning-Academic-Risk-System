@@ -170,9 +170,7 @@ function mapQuizzes(
   for (const quiz of data.quizzes) {
     const due = quiz.duedate || quiz.timeclose;
     if (!due)
-      notes.push(
-        `Trắc nghiệm "${quiz.name}" không có hạn nộp — luật dùng cách "đa số lớp đã làm".`,
-      );
+      notes.push(`Trắc nghiệm "${quiz.name}" không có hạn nộp, luật dùng cách "đa số lớp đã làm".`);
     const scaled = quiz.sumgrades > 0;
     const activity = {
       ma_bai: `Q${quiz.id}`,
@@ -224,7 +222,7 @@ function mapAssignments(
   for (const a of data.assignments) {
     if (!a.duedate) {
       notes.push(
-        `Thực hành "${a.name}" không có hạn nộp (Due date) — bỏ qua, hãy đặt hạn nộp trên Moodle.`,
+        `Thực hành "${a.name}" không có hạn nộp (Due date), bỏ qua, hãy đặt hạn nộp trên Moodle.`,
       );
       continue;
     }

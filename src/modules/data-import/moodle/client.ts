@@ -24,7 +24,10 @@ export class MoodleError extends Error {
   constructor(
     /** `errorcode` của Moodle (VD `invalidtoken`, `accessexception`) hoặc `HTTP_<status>` / `TIMEOUT`. */
     readonly code: string,
+    /** Lời nhắn hiển thị cho Admin — không chứa tên hàm kỹ thuật (docs/rules/07). */
     message: string,
+    /** Hàm web service đang gọi, để đọc log khi điều tra lỗi. */
+    readonly wsfunction?: string,
   ) {
     super(message);
     this.name = 'MoodleError';
@@ -109,14 +112,16 @@ export function createMoodleClient(options: MoodleClientOptions): MoodleClient {
       throw new MoodleError(
         timedOut ? 'TIMEOUT' : 'NETWORK',
         timedOut
-          ? `Moodle không trả lời sau ${timeoutMs / 1000} giây (${wsfunction})`
-          : `Không kết nối được Moodle (${wsfunction})`,
+          ? `Moodle không trả lời sau ${timeoutMs / 1000} giây. Vui lòng thử lại.`
+          : 'Chưa kết nối được Moodle. Kiểm tra máy chủ Moodle rồi thử lại.',
+        wsfunction,
       );
     }
     if (!response.ok) {
       throw new MoodleError(
         `HTTP_${response.status}`,
-        `Moodle trả HTTP ${response.status} (${wsfunction})`,
+        `Máy chủ Moodle báo lỗi (mã ${response.status}). Vui lòng thử lại sau.`,
+        wsfunction,
       );
     }
     const text = await response.text();
@@ -124,7 +129,11 @@ export function createMoodleClient(options: MoodleClientOptions): MoodleClient {
     try {
       parsed = text === '' ? null : JSON.parse(text);
     } catch {
-      throw new MoodleError('INVALID_JSON', `Moodle trả dữ liệu không phải JSON (${wsfunction})`);
+      throw new MoodleError(
+        'INVALID_JSON',
+        'Moodle trả dữ liệu không đọc được. Kiểm tra lại cấu hình kết nối.',
+        wsfunction,
+      );
     }
     if (isMoodleException(parsed)) {
       throw new MoodleError(parsed.errorcode ?? 'moodle_exception', parsed.message ?? 'Lỗi Moodle');
