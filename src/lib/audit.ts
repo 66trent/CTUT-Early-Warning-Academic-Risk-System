@@ -48,6 +48,7 @@ export const AUDIT_ACTIONS = [
   'MOODLE_SYNC_REQUESTED',
   'MOODLE_SYNC_CONFIRMED',
   'MOODLE_SYNC_DISCARDED',
+  'MOODLE_SYNC_AUTO',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 

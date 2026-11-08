@@ -99,7 +99,13 @@ EWARS lấy **tổng số tiết** = tổng thời lượng mọi buổi đã t�
 
 - Web service + token: `npm run moodle:setup` in dòng "Moodle 5.3 …, tài khoản ewars_sync, 11 hàm được cấp".
 - Ghi lại JSON mẫu cho test: `npm run moodle:setup -- --reset --cutoff=2026-11-06` rồi `npm run moodle:fixtures` → `tests/fixtures/moodle/` (đủ 20 sinh viên + `_meta.json`; kiểm luôn quyền đọc dữ liệu mọi sinh viên). Xong thì `npm run moodle:setup -- --reset` để về ngày chốt hôm qua.
-- **Đồng bộ sang EWARS (Phase 10b — Chạy tay)**: đăng nhập Admin EWARS → menu **Kết nối Moodle** → chọn học kỳ **Học kỳ 1, 2026–2027** → bảng "Khóa học trên Moodle": **Bật đồng bộ** 2 khóa → **Đồng bộ ngay** (vài giây, trang tự cập nhật) → kiểm 3 lô (Điểm danh / Bài trắc nghiệm / Bài thực hành, bấm tên để xem từng dòng) → **Xác nhận nạp cả 3** → **Chạy đánh giá** (chọn học kỳ 2026–2027, mốc = ngày chốt) → kết quả như mục 3. Sửa dữ liệu trên Moodle rồi bấm Đồng bộ ngay lại: chỉ file thay đổi được nạp. Chế độ Tự động (thời gian thực): Phase 10c.
+- **Đồng bộ sang EWARS (Phase 10b — Chạy tay)**: đăng nhập Admin EWARS → menu **Kết nối Moodle** → chọn học kỳ **Học kỳ 1, 2026–2027** → bảng "Khóa học trên Moodle": **Bật đồng bộ** 2 khóa → **Đồng bộ ngay** (vài giây, trang tự cập nhật) → kiểm 3 lô (Điểm danh / Bài trắc nghiệm / Bài thực hành, bấm tên để xem từng dòng) → **Xác nhận nạp cả 3** → **Chạy đánh giá** (chọn học kỳ 2026–2027, mốc = ngày chốt) → kết quả như mục 3. Sửa dữ liệu trên Moodle rồi bấm Đồng bộ ngay lại: chỉ file thay đổi được nạp.
+- **Chế độ Tự động (Phase 10c)**: cần worker đang chạy và `MOODLE_WEBHOOK_SECRET` (do `npm run moodle:setup` tự sinh + cài vào plugin `local_ewars`; plugin tự cài khi container `moodle` khởi động). Moodle gọi EWARS ở `MOODLE_EVENTS_BASE_URL` (mặc định `http://host.docker.internal:3000` = app chạy ở máy; app chạy Docker → đặt `http://app:3000` rồi chạy lại `moodle:setup`). Trang Kết nối Moodle → **Bật Tự động** ở từng khóa (phải đã Xác nhận nạp ít nhất 1 lần). Thử không cần mở giao diện Moodle:
+  - Giảng viên điểm danh vắng: `docker compose exec -u www-data moodle php /var/www/html/ewars-cli/ewars_simulate.php --course=010100089201 --absent=KTPM2411906` → ≤ 1 phút (cron Moodle) + 30 giây gom → tự nạp + tự đánh giá → CVHT thấy cảnh báo đổi mức (đo được 34 giây: KTPM2411906 MEDIUM → HIGH).
+  - Hết hạn nộp: `… ewars_simulate.php --course=010100089201 --due-in=2 --assign="Thực hành 2"` → sau hạn 5 phút EWARS tự đánh giá lại.
+  - Git Bash: thêm `MSYS_NO_PATHCONV=1` trước lệnh `docker compose exec`.
+  - Điểm danh bằng app di động / web service của Attendance KHÔNG phát sự kiện (plugin ghi thẳng bảng) → chỉ lịch dò 10 phút bắt được.
+  - Thử xong / trước buổi trình diễn: `npm run moodle:setup -- --reset` (đưa dữ liệu Moodle về kịch bản gốc).
 
 ## 6. Giới hạn của Moodle demo
 

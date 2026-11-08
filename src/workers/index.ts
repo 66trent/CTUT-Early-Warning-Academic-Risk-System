@@ -5,11 +5,12 @@
 import 'dotenv/config';
 import { Worker, type Job } from 'bullmq';
 import { closeDataSource, getDataSource } from '@/db/data-source';
-import { getEnv } from '@/lib/env';
+import { getEnv, isMoodleConfigured } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { createRedisConnection } from '@/lib/queue/connection';
 import { getQueue, QUEUE_NAMES, type QueueName } from '@/lib/queue/queues';
 import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
+import { MOODLE_JOB } from '@/modules/data-import/services/moodle-queue';
 import { SCHEDULED_EVALUATION_JOB } from '@/modules/rule-engine/services/evaluation-queue';
 import { onEvaluationJobFailed, processEvaluationJob } from './processors/evaluation-run.processor';
 import { onImportJobFailed, processImportJob } from './processors/import-batch.processor';
@@ -47,6 +48,30 @@ const ON_FAILED: Record<QueueName, (job: Job | undefined) => Promise<void>> = {
   [QUEUE_NAMES.sendNotifications]: onNotificationJobFailed,
   [QUEUE_NAMES.moodleSync]: onMoodleSyncJobFailed,
 };
+
+/**
+ * Chế độ Tự động Moodle (Phase 10c): dò thay đổi mỗi MOODLE_SYNC_INTERVAL_MINUTES phút + kéo đủ mỗi
+ * đêm. Chạy cả khi DEMO_MODE=true (học kỳ Moodle demo theo ngày thật); chưa cấu hình Moodle → gỡ lịch.
+ */
+async function scheduleMoodleJobs(): Promise<void> {
+  const queue = getQueue(QUEUE_NAMES.moodleSync);
+  const env = getEnv();
+  if (!isMoodleConfigured(env)) {
+    await queue.removeJobScheduler(MOODLE_JOB.poll);
+    await queue.removeJobScheduler(MOODLE_JOB.nightly);
+    return;
+  }
+  await queue.upsertJobScheduler(
+    MOODLE_JOB.poll,
+    { every: env.MOODLE_SYNC_INTERVAL_MINUTES * 60_000 },
+    { name: MOODLE_JOB.poll },
+  );
+  await queue.upsertJobScheduler(
+    MOODLE_JOB.nightly,
+    { pattern: env.MOODLE_NIGHTLY_SCHEDULE, tz: 'Asia/Ho_Chi_Minh' },
+    { name: MOODLE_JOB.nightly },
+  );
+}
 
 async function main(): Promise<void> {
   getEnv();
@@ -86,6 +111,7 @@ async function main(): Promise<void> {
       { name: SCHEDULED_EVALUATION_JOB },
     );
   }
+  await scheduleMoodleJobs();
   logger.info({ queues: Object.keys(PROCESSORS) }, 'worker đã sẵn sàng');
 
   const shutdown = async (signal: string) => {

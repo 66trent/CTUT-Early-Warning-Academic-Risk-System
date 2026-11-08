@@ -7,14 +7,19 @@ import {
   validateImportBatch,
 } from '@/modules/data-import/services/import-processor.service';
 import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
+import { autoConfirmMoodleBatch } from '@/modules/data-import/services/moodle-auto.service';
 
 const jobData = z.object({ batchId: z.uuid() });
 
 /** Queue `import-batch-process`: kiểm tra lô, nạp lô đã xác nhận, tự hủy lô chờ quá hạn. */
 export async function processImportJob(job: Job): Promise<unknown> {
   switch (job.name) {
-    case IMPORT_JOB.validate:
-      return validateImportBatch(jobData.parse(job.data).batchId);
+    case IMPORT_JOB.validate: {
+      const { batchId } = jobData.parse(job.data);
+      await validateImportBatch(batchId);
+      // Lô Moodle của lần đồng bộ Tự động: lỗi ≤ 10% → hệ thống tự xác nhận (Phase 10c).
+      return { autoConfirm: await autoConfirmMoodleBatch(batchId) };
+    }
     case IMPORT_JOB.load:
       return loadImportBatch(jobData.parse(job.data).batchId, { retried: job.attemptsMade > 0 });
     case IMPORT_JOB.expireStaged:

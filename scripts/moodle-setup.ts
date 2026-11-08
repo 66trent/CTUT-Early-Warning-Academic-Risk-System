@@ -12,6 +12,7 @@
  */
 import 'dotenv/config';
 import { spawnSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { closeDataSource, getDataSource } from '../src/db/data-source';
 import { Term } from '../src/db/entities/term.entity';
@@ -24,12 +25,14 @@ const LOCAL_SPEC = 'docs/demo-data/moodle/moodle-demo.local.json';
 const LOCAL_SPEC_IN_CONTAINER = '/var/www/html/ewars-demo/moodle-demo.local.json';
 const ENV_PATH = '.env';
 const BASE_URL = process.env.MOODLE_BASE_URL || 'http://localhost:8080';
+/** Moodle (trong Docker) gọi EWARS: app chạy ở máy → host.docker.internal; app Docker → http://app:3000. */
+const EVENTS_BASE_URL = 'http://host.docker.internal:3000';
 
 const argv = process.argv.slice(2);
 const args = new Set(argv);
 const cutoff = argv.find((a) => a.startsWith('--cutoff='))?.split('=')[1] ?? yesterdayVn();
 
-function moodlePhp(script: string, extra: string[] = []): string {
+function moodlePhp(script: string, extra: string[] = [], input?: string): string {
   const result = spawnSync(
     'docker',
     [
@@ -45,7 +48,7 @@ function moodlePhp(script: string, extra: string[] = []): string {
       `/var/www/html/ewars-cli/${script}`,
       ...extra,
     ],
-    { encoding: 'utf8', env: { ...process.env, MSYS_NO_PATHCONV: '1' } },
+    { encoding: 'utf8', input, env: { ...process.env, MSYS_NO_PATHCONV: '1' } },
   );
   if (result.status !== 0) {
     throw new Error(
@@ -90,12 +93,24 @@ async function main(): Promise<void> {
   writeFileSync(LOCAL_SPEC, `${JSON.stringify(spec, null, 2)}\n`);
 
   process.stdout.write('\n▶ 1. Web service chỉ đọc trên Moodle\n');
-  const out = moodlePhp('ewars_setup.php', args.has('--rotate-token') ? ['--rotate'] : []);
+  // Phase 10c: khóa HMAC cho plugin local_ewars (giữ khóa cũ nếu đã có) — truyền qua STDIN.
+  let env = readFileSync(ENV_PATH, 'utf8');
+  const secret =
+    /^MOODLE_WEBHOOK_SECRET=(\S{32,})$/m.exec(env)?.[1] ?? randomBytes(32).toString('hex');
+  const eventsBase = (process.env.MOODLE_EVENTS_BASE_URL || EVENTS_BASE_URL).replace(/\/$/, '');
+  const out = moodlePhp(
+    'ewars_setup.php',
+    [
+      ...(args.has('--rotate-token') ? ['--rotate'] : []),
+      `--events-url=${eventsBase}/api/integrations/moodle/events`,
+    ],
+    `${secret}\n`,
+  );
   const token = /^TOKEN=(\S+)$/m.exec(out)?.[1];
   if (!token) throw new Error('Không đọc được token từ ewars_setup.php');
   process.stdout.write(out.replace(/^TOKEN=.*$/m, '  token: đã ghi vào .env (MOODLE_WS_TOKEN)'));
-  let env = readFileSync(ENV_PATH, 'utf8');
   env = setEnvVar(env, 'MOODLE_BASE_URL', BASE_URL);
+  env = setEnvVar(env, 'MOODLE_WEBHOOK_SECRET', secret);
   env = setEnvVar(env, 'MOODLE_WS_TOKEN', token);
   writeFileSync(ENV_PATH, env);
 

@@ -129,7 +129,7 @@ Học kỳ chọn trên form nhập (mặc định học kỳ hiện tại); c�
 10. Hủy batch `STAGED` chưa được dùng để tính RiskScore.
 11. Dữ liệu lỗi hoặc chưa đối soát MUST NOT vào Rule Engine (chỉ đọc dữ liệu từ batch `LOADED`/`RECONCILED`).
 
-## Đồng bộ Moodle (Phase 10b, chốt 2026-11-07/08 — `docs/tich-hop-moodle.md` mục 9, 9b)
+## Đồng bộ Moodle (Phase 10b–10c, chốt 2026-11-07/08 — `docs/tich-hop-moodle.md` mục 9, 9b, 9c)
 
 Bộ đồng bộ CHỈ ĐỌC Moodle (web service REST, token `MOODLE_WS_TOKEN`) → mapper thuần sinh file CSV ĐÚNG cột mẫu (1 file / khóa / loại) → đi qua ĐÚNG đường nạp nhiều file ở trên (kiểm tra dòng, tạo `Course`/`Enrollment`, thẻ học phần, lịch sử). Kết quả học phần KHÔNG đồng bộ (vẫn nạp file).
 
@@ -149,20 +149,28 @@ Bộ đồng bộ CHỈ ĐỌC Moodle (web service REST, token `MOODLE_WS_TOKEN`
 | lastSyncAt / lastError | DateTime / text | NULL | Lần đọc gần nhất; lỗi đọc khóa này (không chứa token) |
 | unknownStudents | Json | NOT NULL | Sinh viên Moodle chưa có trong EWARS ở lần gần nhất `[{ moodleUserId, idnumber, email }]` ≤ 500 |
 | updatedBy | String(20) | NOT NULL | Người sửa gần nhất (Audit Log `MOODLE_LINK_UPDATED`) |
+| syncMode | String(10) | NOT NULL | `MANUAL` (mặc định) / `AUTO` — Phase 10c |
+| fingerprint | String(64) | NULL | Dấu vân tay dữ liệu Moodle ở lần kéo đủ gần nhất (lịch dò thay đổi so) |
+| lastCheckedAt / pendingEventAt | DateTime | NULL | Lần dò gần nhất / có sự kiện chưa xử lý |
+| seenStudentIds / leftStudents | Json | NOT NULL | MSSV lần kéo đủ gần nhất / sinh viên đã rời khóa `[{ studentId, detectedAt }]` |
+| seenActivities / removedActivities | Json | NOT NULL | Bài lần gần nhất `[{ kind, id, name, dues }]` (`dues` = hạn chung + gia hạn, Unix giây) / bài đã xóa trên Moodle |
 
 ### MoodleSyncRun — `moodle_sync_runs`
 
-1 lần đồng bộ của 1 học kỳ: `trigger` (`MANUAL`; 10c thêm), `requestedBy`, `status` `QUEUED` → `RUNNING` → `STAGED` (đã tạo lô) / `NO_CHANGE` / `FAILED`, `batchIds` (`{ ATTENDANCE_SUMMARY?, LMS_QUIZ?, LMS_ASSIGNMENT? }`), `stats` (theo khóa: số dòng sinh, số SV chưa có, ghi chú, lỗi; số file không đổi theo loại), `errorMessage`, `createdAt`, `finishedAt`. Queue `moodle-sync`, `jobId` = id, chạy 1 job/lần.
+1 lần đồng bộ của 1 học kỳ, 1 chế độ: `trigger` (`MANUAL` / `EVENT` / `SCHEDULED` / `NIGHTLY` / `DUE_DATE`), `mode` (`MANUAL`/`AUTO` — chỉ đọc khóa cùng chế độ), `linkIds` (NULL = mọi khóa cùng chế độ), `requestedBy` (tự động = tài khoản hệ thống `SYSTEM_MOODLE`), `status` `QUEUED` → `RUNNING` → `STAGED` (đã tạo lô) / `NO_CHANGE` / `FAILED`, `batchIds` (`{ ATTENDANCE_SUMMARY?, LMS_QUIZ?, LMS_ASSIGNMENT? }`), `stats` (theo khóa: số dòng sinh, số SV chưa có, ghi chú, lỗi; số file không đổi theo loại), `errorMessage`, `createdAt`, `finishedAt`. Queue `moodle-sync`, `jobId` = id, chạy 1 job/lần.
 
 ### Quy tắc
 
-- Chỉ khóa `enabled` của học kỳ (chưa chốt). Chặn đồng bộ mới khi đang có lần `QUEUED`/`RUNNING` hoặc lần trước còn lô chưa xác nhận/hủy.
+- Chỉ khóa `enabled` của học kỳ (chưa chốt). Chạy tay: chặn đồng bộ mới khi đang có lần Chạy tay `QUEUED`/`RUNNING` hoặc lần trước còn lô chưa xác nhận/hủy. "Đồng bộ ngay" tạo tối đa 2 lần: khóa Chạy tay + khóa Tự động.
 - Khớp sinh viên: `user.idnumber` = MSSV (không phân biệt hoa thường); trống/không khớp → email đã lưu của sinh viên. KHÔNG suy MSSV từ email. Chỉ người có vai `student` trong khóa.
 - **Ngoại lệ của `00` (từ chối + ghi `ImportErrorRow`)**: sinh viên Moodle chưa có trong EWARS bị BỎ QUA và đếm riêng (`MoodleCourseLink.unknownStudents`, `stats`) — 1 khóa Moodle có thể có sinh viên khoa khác chưa nhập; ghi dòng lỗi sẽ lặp lại mỗi lần đồng bộ và đẩy tỷ lệ lỗi > 10%.
-- File sinh ra: tên `moodle-<mã lớp học phần>-<diem-danh|trac-nghiem|thuc-hanh>.csv`, UTF-8 có BOM. File trùng checksum với lô còn hiệu lực cùng loại, học kỳ → BỎ QUA (không đổi); cả 3 loại không đổi → `NO_CHANGE`, không tạo lô.
+- File sinh ra: tên `moodle-<mã lớp học phần>-<diem-danh|trac-nghiem|thuc-hanh>.csv`, UTF-8 có BOM. File trùng checksum với file MỚI NHẤT cùng tên (lô còn hiệu lực cùng loại, học kỳ) → BỎ QUA; cả 3 loại không đổi → `NO_CHANGE`, không tạo lô. Phase 10c: KHÔNG so với mọi lô cũ (sửa điểm danh A → P rồi lại → A sinh file giống 1 lô cũ mà vẫn phải nạp) → lô `MOODLE` không bị chặn "file đã nạp", checksum lô gắn id lô (chỉ số UNIQUE không chặn).
 - Chạy tay: lô `STAGED` → "Xác nhận nạp cả 3" (`MOODLE_SYNC_CONFIRMED`, mỗi lô vẫn ghi `IMPORT_CONFIRMED`) hoặc "Hủy" (`MOODLE_SYNC_DISCARDED`). Đánh giá sau nạp như nạp file (DEMO_MODE: Admin bấm chạy).
 - **Lô nguồn `MOODLE` không hoàn tác** — Moodle là nguồn gốc: sửa trên Moodle rồi đồng bộ lại.
 - Lỗi 1 khóa (mạng, quyền, Moodle) không chặn khóa khác; client thử lại lỗi tạm thời (mạng, quá giờ, HTTP 5xx, Moodle "Unable to acquire a lock") 2 lần; gọi Moodle TUẦN TỰ (gọi song song làm Moodle tranh khóa cache — gặp khi kiểm tay Phase 10b).
 - Quy đổi điểm danh: 1 ngày chốt cho MỖI NGÀY có buổi đã điểm danh (cộng dồn đến hết ngày); số tiết buổi = thời lượng ÷ `MOODLE_PERIOD_MINUTES` (mặc định 50, làm tròn, ≥ 1); ký hiệu `MOODLE_EXCUSED_ACRONYMS` (mặc định `E`) có phép, `MOODLE_UNEXCUSED_ACRONYMS` (mặc định `A`) không phép, còn lại có mặt; sinh viên không có trạng thái ở buổi đã điểm danh → không tính vắng; buổi theo nhóm tính cho cả lớp (giới hạn).
+- **Tự động (Phase 10c)**: Admin bật theo khóa sau khi đã xác nhận nạp ≥ 1 lần và không còn lô chờ. Nguồn kích hoạt: sự kiện plugin `local_ewars` (gom 30 giây / học kỳ, chỉ kéo khóa có sự kiện), lịch `MOODLE_SYNC_INTERVAL_MINUTES` (mặc định 10) chỉ DÒ dấu vân tay (phần rẻ + sổ điểm, không gọi lượt làm từng sinh viên) rồi kéo khóa đổi, mỗi đêm `MOODLE_NIGHTLY_SCHEDULE` kéo đủ + đánh giá, job hạn nộp `hạn + 5 phút` (cả hạn gia hạn riêng; hạn đã đổi → job bỏ qua) kéo khóa + đánh giá (không có gì mới vẫn đánh giá). Lô tự xác nhận (tài khoản `SYSTEM_MOODLE`) khi tỷ lệ lỗi ≤ 10% (`HIGH_ERROR_RATE`); > 10% → chờ Admin ("Cần Admin xem"). Nạp xong tự đánh giá kể cả `DEMO_MODE=true`. Chạy cả khi `DEMO_MODE=true`. Audit `MOODLE_SYNC_AUTO` khi lần tự động tạo lô. Bền vững: sự kiện chờ > 2 phút (job gom mất khi Redis khởi động lại) → lịch dò coi là có thay đổi; lần đồng bộ treo `QUEUED`/`RUNNING` > 15 phút (worker dừng giữa chừng) → lịch dò đánh dấu `FAILED` (dấu vân tay chưa đổi nên lần dò tự kéo lại).
+- **Chặn xác nhận dữ liệu cũ**: lần đồng bộ chờ xác nhận mà đã có lần mới hơn, chung khóa, có lô đã xác nhận/nạp → `SYNC_STALE`.
+- **Dữ liệu xóa trên Moodle** (người dùng chốt 2026-11-08): sinh viên rời khóa / bài bị xóa KHÔNG tự xóa ở EWARS — liệt kê ở trang Kết nối (`leftStudents`, `removedActivities`) để Admin đánh dấu Rút học phần.
 - File thực hành có cột tùy chọn **`han_rieng`** (hạn nộp riêng / gia hạn — Moodle *Grant extension*), nhận như `han_nop` (chỉ ngày → 23:59). Nạp file tay cũng dùng được.
 

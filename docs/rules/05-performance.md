@@ -12,6 +12,7 @@ Xem `00-project-context.md` cho glossary.
 ## Job nền (BullMQ)
 
 - MUST: ngoài chạy tự động sau nạp và chạy tay, có lịch chạy đánh giá cả học kỳ hiện tại mỗi đêm (job lặp BullMQ trên queue `evaluation-run`, giờ đọc từ biến môi trường, mặc định 02:00 giờ Việt Nam; `EvaluationRun.trigger = SCHEDULED`) — để bắt bài LMS mới đến hạn và điểm danh quá hạn khi không có file mới (người dùng chốt 2026-10-15, không có nút bật/tắt; TẮT khi `DEMO_MODE=true` vì dữ liệu demo có ngày cố định). MUST NOT chạy đánh giá đồng bộ trong request-response người dùng.
+- Đồng bộ Moodle Tự động (Phase 10c): lịch dò thay đổi mỗi `MOODLE_SYNC_INTERVAL_MINUTES` phút chỉ gọi ~9 hàm / khóa (không gọi lượt làm trắc nghiệm từng sinh viên — 1 lần / bài / sinh viên); chỉ khóa đổi dấu vân tay mới kéo đủ. Sự kiện gom 30 giây / học kỳ; đánh giá tự gộp nhờ chống trùng lần chạy đang chờ. Queue `moodle-sync` chạy 1 job/lần, gọi Moodle tuần tự. Lịch Moodle chạy cả khi `DEMO_MODE=true` (học kỳ Moodle demo theo ngày thật).
 - MUST: giới hạn concurrency worker phù hợp connection pool PostgreSQL (ví dụ `concurrency: 5`).
 - SHOULD: log thời gian thực thi mỗi job để phát hiện suy giảm hiệu năng theo thời gian.
 

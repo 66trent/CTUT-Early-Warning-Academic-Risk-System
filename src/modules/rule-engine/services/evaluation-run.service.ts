@@ -21,13 +21,16 @@ import {
 } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { getEnv } from '@/lib/env';
+import { isSystemAccount } from '@/lib/system-accounts';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import {
   invalidateAlertsAfterRollback,
   syncAlertsForChunk,
 } from '@/modules/alerts/services/alert-sync.service';
+import { type AlertEvent } from '@/modules/alerts/services/alert-sync.service';
 import { createNotificationsForEvents } from '@/modules/alerts/services/notification.service';
+import { notifyEvaluationCompleted } from '@/modules/alerts/services/update-notification.service';
 import {
   enqueueNotificationEmails,
   type NotificationEnqueuer,
@@ -286,13 +289,15 @@ export async function requestTermClosing(
 /**
  * Sau khi lô dữ liệu học tập nạp xong (RECONCILED). `DEMO_MODE=true`: KHÔNG tự chạy — dữ liệu demo
  * có ngày cố định, Admin chạy với mốc demo để kết quả khớp KET_QUA_MONG_DOI (người dùng chốt
- * 2026-10-15). Chạy lại sau hoàn tác lô vẫn tự chạy (`requestAutoEvaluation`).
+ * 2026-10-15). Chạy lại sau hoàn tác lô vẫn tự chạy (`requestAutoEvaluation`). Ngoại lệ: lô do đồng
+ * bộ Moodle TỰ ĐỘNG xác nhận (`confirmedBy` = tài khoản hệ thống) vẫn tự chạy — học kỳ Moodle demo
+ * theo ngày thật, mốc = bây giờ (docs/tich-hop-moodle.md 4a, Phase 10c).
  */
 export async function requestEvaluationAfterImport(
-  batch: { id: string; termId: string | null },
+  batch: { id: string; termId: string | null; summary?: { confirmedBy?: string } | null },
   enqueue: EvaluationEnqueuer = enqueueEvaluationJob,
 ): Promise<string | null> {
-  if (getEnv().DEMO_MODE) return null;
+  if (getEnv().DEMO_MODE && !isSystemAccount(batch.summary?.confirmedBy)) return null;
   return requestAutoEvaluation(batch, enqueue);
 }
 
@@ -317,7 +322,7 @@ async function persistChunk(
   ruleSet: ActiveRuleSet,
   results: StudentEvaluation[],
   rollback: boolean,
-): Promise<{ created: number; updated: number }> {
+): Promise<{ created: number; updated: number; events: AlertEvent[] }> {
   const now = new Date();
   const logIds = new Map(results.map((r) => [r.studentId, randomUUID()]));
   // Id trigger sinh trước: cảnh báo lưu "dấu hiệu hiện tại" theo id (docs/rules/08).
@@ -376,7 +381,7 @@ async function persistChunk(
   if (triggers.length > 0) await em.insert(RuleTrigger, triggers);
   // Bước 10: thông báo — tạo trong cùng transaction, gửi email sau khi lần chạy xong.
   await createNotificationsForEvents(em, sync.events, run.id);
-  return { created: sync.created, updated: sync.updated };
+  return { created: sync.created, updated: sync.updated, events: sync.events };
 }
 
 /** Chạy toàn bộ: lô 200 sinh viên, cập nhật tiến độ sau mỗi lô. */
@@ -403,6 +408,7 @@ async function executeRun(run: EvaluationRun): Promise<void> {
   let insufficient = 0;
   let alertsCreated = 0;
   let alertsUpdated = 0;
+  const events: AlertEvent[] = [];
   for (let i = 0; i < students.length; i += EVALUATION_CHUNK_SIZE) {
     const ids = students.slice(i, i + EVALUATION_CHUNK_SIZE);
     const inputs = await loadStudentInputs(em, { term, previousTerm }, ids, run.asOf, lms);
@@ -417,6 +423,7 @@ async function executeRun(run: EvaluationRun): Promise<void> {
       const counts = await persistChunk(tx, run, ruleSet, results, rollback);
       alertsCreated += counts.created;
       alertsUpdated += counts.updated;
+      events.push(...counts.events);
       await tx.update(EvaluationRun, { id: run.id }, { processedStudents: i + ids.length });
     });
   }
@@ -438,6 +445,10 @@ async function executeRun(run: EvaluationRun): Promise<void> {
     );
     if (run.trigger === EvaluationTrigger.TERM_CLOSING) await closeTermAfterFinalRun(tx, run);
   });
+  // Chuông "đánh giá đã cập nhật" (Admin + CVHT lớp liên quan) — lỗi không làm hỏng lần chạy.
+  await notifyEvaluationCompleted(run.id, events).catch((error: unknown) =>
+    logger.error({ runId: run.id, err: String(error) }, 'không tạo được thông báo cập nhật'),
+  );
 }
 
 /** Lần chạy chốt học kỳ xong → đặt `Term.closedAt` (docs/rules/08, chốt 2026-10-18). */

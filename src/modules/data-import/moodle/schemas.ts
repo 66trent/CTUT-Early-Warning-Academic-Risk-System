@@ -104,6 +104,26 @@ export const userFlagsSchema = z.object({
   ),
 });
 
+/** Sổ điểm cả lớp (`gradereport_user_get_grade_items`, `userid=0`) — chỉ dùng dò thay đổi (Phase 10c). */
+export const gradeItemsSchema = z.object({
+  usergrades: z.array(
+    z.object({
+      userid: int,
+      gradeitems: z
+        .array(
+          z.object({
+            id: int,
+            graderaw: z.number().nullable().optional(),
+            gradedatesubmitted: ts.nullable().optional(),
+            gradedategraded: ts.nullable().optional(),
+          }),
+        )
+        .default([]),
+    }),
+  ),
+});
+export type MoodleGradeItems = z.infer<typeof gradeItemsSchema>;
+
 export const attendanceSessionSchema = z.object({
   id: int,
   groupid: int.default(0),

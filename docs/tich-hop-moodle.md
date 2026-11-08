@@ -1,7 +1,7 @@
 # Tích hợp Moodle — nghiên cứu khả thi và đề xuất (2026-11-07)
 
 > Yêu cầu của giảng viên: lấy dữ liệu **điểm danh, bài trắc nghiệm, bài thực hành** từ Moodle (mã nguồn mở, trường đang dùng) và kết nối gần thời gian thực với CTUT-EWARS.
-> Trạng thái: **ĐÃ CHỐT HƯỚNG (mục 9), CHƯA CODE** — kế hoạch Phase 10 ở `docs/implement.md`. Đây là **mở rộng phạm vi** (trước đây `implement.md` ghi "Ngoài phạm vi: API đồng bộ SIS/LMS").
+> Trạng thái: **ĐÃ CHỐT (mục 9, 9b, 9c); 10a–10c ĐÃ LÀM** (Chạy tay + Tự động), 10d (trình diễn + báo cáo) chưa — kế hoạch ở `docs/implement.md`. Đây là **mở rộng phạm vi** (trước đây `implement.md` ghi "Ngoài phạm vi: API đồng bộ SIS/LMS").
 > Căn cứ: đọc trực tiếp mã nguồn `moodle/moodle` (nhánh `main` = 6.0dev, bản ổn định mới nhất `MOODLE_503_STABLE` = Moodle 5.3 LTS, phát hành 05/10/2026) và plugin điểm danh `danmarsden/moodle-mod_attendance` (nhánh `MOODLE_503_STABLE`, bản 2026090300, "Requires 5.3").
 
 ## 0. Trả lời ngắn
@@ -152,7 +152,10 @@ Lô nguồn Moodle **không hoàn tác** (Moodle là nguồn sự thật, lần 
 6. "Thời gian thực" = ~1 phút (cron Moodle) với plugin, 5–10 phút nếu chỉ kéo định kỳ.
 7. Buổi điểm danh theo nhóm (groupid ≠ 0) tính cho cả lớp — chưa đọc danh sách nhóm.
 8. Lượt trắc nghiệm "đã nộp" nhưng chưa có điểm (câu tự luận chờ chấm) → dòng lỗi "thiếu điểm" ở lô trắc nghiệm.
-9. Đọc lượt làm trắc nghiệm = 1 lần gọi / (bài, sinh viên) — hàm Moodle không có dạng cả lớp; 10c dùng sổ điểm (`gradereport_user_get_grade_items`) để chỉ gọi cho sinh viên có thay đổi.
+9. Đọc lượt làm trắc nghiệm = 1 lần gọi / (bài, sinh viên) — hàm Moodle không có dạng cả lớp; 10c: lịch 10 phút dò "dấu vân tay" (sổ điểm + các hàm rẻ) trước, chỉ kéo đủ khi khóa có thay đổi. Lượt làm đang dở (chưa nộp) không đổi sổ điểm → lịch 10 phút không thấy, đợi sự kiện khác / lịch đêm.
+10. Dữ liệu bị xóa trên Moodle (sinh viên rời khóa, bài bị xóa, lượt làm bị xóa) KHÔNG tự xóa ở EWARS (người dùng chốt 2026-11-08) — trang Kết nối liệt kê để Admin đánh dấu Rút học phần; bài đã xóa vẫn còn trong EWARS.
+11. Điểm danh qua web service / app di động của `mod_attendance` (`mod_attendance_update_user_status`) KHÔNG phát sự kiện (ghi thẳng bảng — phát hiện khi kiểm tay Phase 10c) → chỉ lịch dò 10 phút bắt được; điểm danh trên giao diện web có sự kiện `attendance_taken`.
+12. Redis mất job gom sự kiện (khởi động lại giữa chừng) → lịch dò coi sự kiện chờ > 2 phút là có thay đổi; trễ tối đa 1 chu kỳ dò. Worker dừng giữa 1 lần đồng bộ → lần đó treo, lịch dò đánh dấu lỗi sau 15 phút, dữ liệu được kéo lại ở lần dò.
 
 ## 9. Đã chốt với người dùng (2026-11-07)
 
@@ -170,6 +173,25 @@ Lô nguồn Moodle **không hoàn tác** (Moodle là nguồn sự thật, lần 
 2. **Admin bật từng khóa học** ở trang Kết nối Moodle (mặc định tắt); chỉ khóa có Course ID number 12 chữ số.
 3. **Sinh viên Moodle chưa có trong EWARS: bỏ qua, đếm riêng** — không ghi `ImportErrorRow`, hiện số lượng + danh sách MSSV/email ở trang Kết nối (ngoại lệ của `00`, `12` chỉ cho nguồn Moodle).
 4. **Chạy tay: 1 lần đồng bộ = 3 lô** (điểm danh / trắc nghiệm / thực hành, mỗi lô 1 file sinh tự động cho mỗi khóa) + nút **Xác nhận nạp cả 3** / **Hủy cả 3**; chi tiết từng lô vẫn xem ở trang Nhập dữ liệu. File không đổi so với lần nạp trước (cùng checksum) bị bỏ qua; cả 3 không đổi → "Không có thay đổi".
+
+### 9c. Chốt thêm trước Phase 10c (2026-11-08)
+
+Rà lại kế hoạch 10c với code 10b — người dùng chọn cả 4 đề xuất:
+
+1. **Tự xác nhận khi lỗi ≤ 10%** (ngưỡng "nhiều lỗi" sẵn có): lô Moodle tự động có tỷ lệ dòng lỗi ≤ 10% → tự xác nhận, nạp dòng hợp lệ; > 10% → giữ lô chờ, trang Kết nối Moodle báo **Cần Admin xem** (Admin xác nhận / hủy như Chạy tay).
+2. **Dữ liệu bị xóa trên Moodle** (sinh viên rời khóa, bài bị xóa): EWARS KHÔNG tự xóa — trang Kết nối liệt kê "sinh viên đã rời khóa / bài đã xóa trên Moodle" để Admin tự đánh dấu Rút học phần (`WITHDRAWN`, có sẵn ở hồ sơ sinh viên); ghi Giới hạn đã biết (mục 8).
+3. **Tài khoản hệ thống riêng** `SYSTEM_MOODLE` ("Đồng bộ Moodle", không đăng nhập được) làm người thực hiện lô / lần đồng bộ / Audit Log của chế độ Tự động.
+4. **Lịch 10 phút dò thay đổi trước**: gọi các hàm rẻ (không gọi lượt làm từng sinh viên) + sổ điểm → "dấu vân tay" của khóa; không đổi → bỏ qua, đổi → kéo đủ. Sự kiện, job hạn nộp và lịch đêm luôn kéo đủ.
+
+Quyết định kỹ thuật kèm theo (rà code 10b):
+
+- Chế độ theo từng khóa (`MoodleCourseLink.syncMode`, mặc định Chạy tay); bật Tự động chỉ khi khóa đã được nạp xác nhận ít nhất 1 lần và không còn lô chờ. Mỗi lần đồng bộ thuộc 1 chế độ: "Đồng bộ ngay" tạo tối đa 2 lần (khóa Chạy tay → xem trước; khóa Tự động → nạp luôn).
+- **Chặn xác nhận dữ liệu cũ**: lần đồng bộ Chạy tay đang chờ mà đã có lần đồng bộ mới hơn được nạp cho cùng khóa → từ chối "dữ liệu đã cũ, đồng bộ lại".
+- **Bỏ qua file không đổi so với file MỚI NHẤT của cùng khóa** (không phải với mọi lô còn hiệu lực): sửa điểm danh A → P rồi lại → A sinh file giống hệt 1 file cũ — 10b sẽ bỏ qua nhầm. Lô nguồn Moodle không chặn "file đã nạp".
+- `DEMO_MODE=true` vẫn tự đánh giá sau lô Moodle tự động (học kỳ Moodle theo ngày thật); lịch 10 phút / đêm của Moodle nhắm vào học kỳ có khóa Tự động (không phải học kỳ hiện tại — `HK1_2026` không là học kỳ hiện tại).
+- Gom: sự kiện đánh dấu khóa "có thay đổi" + 1 job trễ 30 giây / học kỳ; đánh giá tự gộp nhờ chống trùng lần chạy đang chờ.
+- Job hạn nộp: `hạn + 5 phút` (kể cả hạn gia hạn riêng); đổi hạn không cần hủy job — job cũ thấy hạn đã đổi thì bỏ qua.
+- Moodle chặn gọi ra địa chỉ nội bộ / cổng lạ (cURL security) → `moodle:setup` khai báo host + cổng EWARS cho bản demo; chạy thật qua HTTPS 443 không vướng.
 
 ## 10. Kế hoạch dự kiến (sau khi chốt)
 

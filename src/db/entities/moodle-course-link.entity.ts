@@ -9,6 +9,7 @@ import {
   type Relation,
   UpdateDateColumn,
 } from 'typeorm';
+import { type MoodleSyncMode } from '../enums';
 import { Term } from './term.entity';
 
 /** Sinh viên Moodle chưa có trong EWARS ở lần đồng bộ gần nhất (bỏ qua, đếm riêng — docs/rules/12). */
@@ -16,6 +17,27 @@ export interface MoodleUnknownStudent {
   moodleUserId: number;
   idnumber: string | null;
   email: string | null;
+}
+
+/** 1 bài trắc nghiệm / thực hành trên Moodle (`id` = quiz.id / assign.id = `ma_bai`). */
+export interface MoodleSeenActivity {
+  kind: 'QUIZ' | 'ASSIGNMENT';
+  id: number;
+  name: string;
+  /** Hạn nộp chung + hạn gia hạn riêng (Unix giây) — job hạn nộp kiểm hạn còn đúng không. */
+  dues?: number[];
+}
+
+/** Sinh viên đã có ở lần đồng bộ trước nhưng không còn ghi danh trên Moodle (Phase 10c). */
+export interface MoodleLeftStudent {
+  studentId: string;
+  /** ISO — lần đồng bộ đầu tiên không còn thấy. */
+  detectedAt: string;
+}
+
+/** Bài đã có ở lần đồng bộ trước nhưng không còn trên Moodle (Phase 10c). */
+export interface MoodleRemovedActivity extends MoodleSeenActivity {
+  detectedAt: string;
 }
 
 /**
@@ -69,6 +91,35 @@ export class MoodleCourseLink {
 
   @Column({ type: 'jsonb', default: () => "'[]'" })
   unknownStudents!: MoodleUnknownStudent[];
+
+  /** `MANUAL` (mặc định — xem trước rồi xác nhận) / `AUTO` (tự xác nhận + tự đánh giá) — Phase 10c. */
+  @Column({ type: 'varchar', length: 10, default: 'MANUAL' })
+  syncMode!: MoodleSyncMode;
+
+  /** Dấu vân tay dữ liệu Moodle ở lần kéo đủ gần nhất (lịch 10 phút so để bỏ qua khóa không đổi). */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  fingerprint!: string | null;
+
+  /** Lần dò thay đổi gần nhất của lịch 10 phút. */
+  @Column({ type: 'timestamptz', nullable: true })
+  lastCheckedAt!: Date | null;
+
+  /** Có sự kiện Moodle chưa xử lý (NULL = không) — job gom 30 giây kéo các khóa này. */
+  @Column({ type: 'timestamptz', nullable: true })
+  pendingEventAt!: Date | null;
+
+  /** MSSV ở lần kéo đủ gần nhất — so để phát hiện sinh viên rời khóa. */
+  @Column({ type: 'jsonb', default: () => "'[]'" })
+  seenStudentIds!: string[];
+
+  @Column({ type: 'jsonb', default: () => "'[]'" })
+  leftStudents!: MoodleLeftStudent[];
+
+  @Column({ type: 'jsonb', default: () => "'[]'" })
+  seenActivities!: MoodleSeenActivity[];
+
+  @Column({ type: 'jsonb', default: () => "'[]'" })
+  removedActivities!: MoodleRemovedActivity[];
 
   @Column({ type: 'varchar', length: 20 })
   updatedBy!: string;

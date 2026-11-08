@@ -1,7 +1,10 @@
 /**
  * Đọc toàn bộ dữ liệu của 1 khóa học Moodle cần cho 3 nguồn (docs/tich-hop-moodle.md mục 2) qua
  * web service CHỈ ĐỌC. Không đụng DB EWARS — kết quả đưa vào mapper thuần (`mappers.ts`).
+ * Phase 10c tách 2 bước: phần "rẻ" (~8 lần gọi / khóa) + lượt làm trắc nghiệm (1 lần gọi / bài /
+ * sinh viên) — lịch 10 phút chỉ gọi phần rẻ + sổ điểm để tính dấu vân tay.
  */
+import { createHash } from 'node:crypto';
 import { type z } from 'zod';
 import { type MoodleClient, type MoodleParams } from './client';
 import {
@@ -10,10 +13,12 @@ import {
   courseContentsSchema,
   coursesByFieldSchema,
   enrolledUsersSchema,
+  gradeItemsSchema,
   type MoodleAssignment,
   type MoodleAttendanceSession,
   type MoodleCourse,
   type MoodleEnrolledUser,
+  type MoodleGradeItems,
   type MoodleQuiz,
   type MoodleQuizAttempt,
   type MoodleSubmission,
@@ -23,19 +28,23 @@ import {
   userFlagsSchema,
 } from './schemas';
 
-export interface MoodleCourseData {
+/** Phần đọc được bằng vài lần gọi / khóa (không có lượt làm trắc nghiệm). */
+export interface MoodleCourseBase {
   course: MoodleCourse;
   /** Chỉ người có vai `student` (giảng viên không sinh dòng). */
   students: MoodleEnrolledUser[];
   quizzes: MoodleQuiz[];
-  /** quizId → userId → các lượt (kể cả lượt chưa nộp). */
-  attempts: Map<number, Map<number, MoodleQuizAttempt[]>>;
   assignments: MoodleAssignment[];
   /** assignmentId → userId → bài nộp mới nhất. */
   submissions: Map<number, Map<number, MoodleSubmission>>;
   /** assignmentId → userId → hạn gia hạn riêng (Unix giây). */
   extensions: Map<number, Map<number, number>>;
   sessions: MoodleAttendanceSession[];
+}
+
+export interface MoodleCourseData extends MoodleCourseBase {
+  /** quizId → userId → các lượt (kể cả lượt chưa nộp). */
+  attempts: Map<number, Map<number, MoodleQuizAttempt[]>>;
 }
 
 async function get<S extends z.ZodType>(
@@ -60,15 +69,34 @@ export async function listMoodleCourses(client: MoodleClient): Promise<MoodleCou
   return courses.filter((c) => c.id !== 1);
 }
 
-/**
- * `includeStudent`: chỉ đọc lượt làm trắc nghiệm của sinh viên này (bỏ qua sinh viên chưa có trong
- * EWARS — đỡ hàng chục lần gọi; họ vẫn có trong `students` để đếm riêng).
- */
-export async function fetchMoodleCourse(
+async function fetchAssignmentState(
+  client: MoodleClient,
+  assignments: MoodleAssignment[],
+): Promise<Pick<MoodleCourseBase, 'submissions' | 'extensions'>> {
+  const submissions = new Map<number, Map<number, MoodleSubmission>>();
+  const extensions = new Map<number, Map<number, number>>();
+  const assignmentids = assignments.map((a) => a.id);
+  if (assignmentids.length === 0) return { submissions, extensions };
+  const subs = await get(client, 'mod_assign_get_submissions', submissionsSchema, {
+    assignmentids,
+  });
+  const flags = await get(client, 'mod_assign_get_user_flags', userFlagsSchema, { assignmentids });
+  for (const a of subs.assignments) {
+    submissions.set(a.assignmentid, new Map(a.submissions.map((s) => [s.userid, s])));
+  }
+  for (const a of flags.assignments) {
+    const map = new Map<number, number>();
+    for (const f of a.userflags) if (f.extensionduedate) map.set(f.userid, f.extensionduedate);
+    extensions.set(a.assignmentid, map);
+  }
+  return { submissions, extensions };
+}
+
+/** Phần rẻ của 1 khóa (không gọi lượt làm từng sinh viên). */
+export async function fetchMoodleCourseBase(
   client: MoodleClient,
   moodleCourseId: number,
-  includeStudent: (user: MoodleEnrolledUser) => boolean = () => true,
-): Promise<MoodleCourseData> {
+): Promise<MoodleCourseBase> {
   const { courses } = await get(client, 'core_course_get_courses_by_field', coursesByFieldSchema, {
     field: 'id',
     value: moodleCourseId,
@@ -94,44 +122,7 @@ export async function fetchMoodleCourse(
   const students = users.filter((u) => u.roles.some((r) => r.shortname === 'student'));
   const quizzes = quizList.quizzes.filter((q) => q.course === course.id);
   const assignments = assignList.courses.find((c) => c.id === course.id)?.assignments ?? [];
-
-  const attempts = new Map<number, Map<number, MoodleQuizAttempt[]>>();
-  for (const quiz of quizzes) {
-    const byUser = new Map<number, MoodleQuizAttempt[]>();
-    // 1 lần gọi / (bài, sinh viên) — hàm đọc lượt làm của Moodle không có dạng cả lớp.
-    for (const student of students.filter(includeStudent)) {
-      const res = await get(client, 'mod_quiz_get_user_quiz_attempts', quizAttemptsSchema, {
-        quizid: quiz.id,
-        userid: student.id,
-        status: 'all',
-      });
-      byUser.set(
-        student.id,
-        res.attempts.filter((a) => a.preview === 0),
-      );
-    }
-    attempts.set(quiz.id, byUser);
-  }
-
-  const submissions = new Map<number, Map<number, MoodleSubmission>>();
-  const extensions = new Map<number, Map<number, number>>();
-  const assignmentids = assignments.map((a) => a.id);
-  if (assignmentids.length > 0) {
-    const subs = await get(client, 'mod_assign_get_submissions', submissionsSchema, {
-      assignmentids,
-    });
-    const flags = await get(client, 'mod_assign_get_user_flags', userFlagsSchema, {
-      assignmentids,
-    });
-    for (const a of subs.assignments) {
-      submissions.set(a.assignmentid, new Map(a.submissions.map((s) => [s.userid, s])));
-    }
-    for (const a of flags.assignments) {
-      const map = new Map<number, number>();
-      for (const f of a.userflags) if (f.extensionduedate) map.set(f.userid, f.extensionduedate);
-      extensions.set(a.assignmentid, map);
-    }
-  }
+  const state = await fetchAssignmentState(client, assignments);
 
   const sessions: MoodleAttendanceSession[] = [];
   const attendanceModules = contents
@@ -144,6 +135,80 @@ export async function fetchMoodleCourse(
       })),
     );
   }
+  return { course, students, quizzes, assignments, ...state, sessions };
+}
 
-  return { course, students, quizzes, attempts, assignments, submissions, extensions, sessions };
+/**
+ * Lượt làm trắc nghiệm — 1 lần gọi / (bài, sinh viên), hàm Moodle không có dạng cả lớp.
+ * `includeStudent`: bỏ qua sinh viên chưa có trong EWARS (vẫn có trong `students` để đếm riêng).
+ */
+export async function fetchQuizAttempts(
+  client: MoodleClient,
+  base: MoodleCourseBase,
+  includeStudent: (user: MoodleEnrolledUser) => boolean = () => true,
+): Promise<MoodleCourseData['attempts']> {
+  const attempts = new Map<number, Map<number, MoodleQuizAttempt[]>>();
+  for (const quiz of base.quizzes) {
+    const byUser = new Map<number, MoodleQuizAttempt[]>();
+    for (const student of base.students.filter(includeStudent)) {
+      const res = await get(client, 'mod_quiz_get_user_quiz_attempts', quizAttemptsSchema, {
+        quizid: quiz.id,
+        userid: student.id,
+        status: 'all',
+      });
+      byUser.set(
+        student.id,
+        res.attempts.filter((a) => a.preview === 0),
+      );
+    }
+    attempts.set(quiz.id, byUser);
+  }
+  return attempts;
+}
+
+export async function fetchMoodleCourse(
+  client: MoodleClient,
+  moodleCourseId: number,
+  includeStudent: (user: MoodleEnrolledUser) => boolean = () => true,
+): Promise<MoodleCourseData> {
+  const base = await fetchMoodleCourseBase(client, moodleCourseId);
+  return { ...base, attempts: await fetchQuizAttempts(client, base, includeStudent) };
+}
+
+/** Sổ điểm cả lớp — đổi khi sinh viên nộp bài trắc nghiệm / được chấm (dò thay đổi). */
+export async function fetchGradeItems(
+  client: MoodleClient,
+  moodleCourseId: number,
+): Promise<MoodleGradeItems> {
+  return get(client, 'gradereport_user_get_grade_items', gradeItemsSchema, {
+    courseid: moodleCourseId,
+    userid: 0,
+  });
+}
+
+const sortedEntries = <V>(map: Map<number, V>) => [...map.entries()].sort(([a], [b]) => a - b);
+
+/**
+ * Dấu vân tay của 1 khóa (thuần): phần rẻ + sổ điểm + danh sách MSSV EWARS khớp được (sinh viên mới
+ * được nhập vào EWARS cũng làm đổi dấu vân tay). Chỉ dùng trường đã qua Zod → ổn định giữa các lần.
+ */
+export function courseFingerprint(
+  base: MoodleCourseBase,
+  grades: MoodleGradeItems,
+  resolvedStudentIds: readonly string[],
+): string {
+  const payload = {
+    course: base.course,
+    students: base.students.map((s) => [s.id, s.idnumber ?? '', s.email ?? '']),
+    resolved: [...resolvedStudentIds].sort(),
+    quizzes: base.quizzes,
+    assignments: base.assignments,
+    submissions: sortedEntries(base.submissions).map(([id, m]) => [id, sortedEntries(m)]),
+    extensions: sortedEntries(base.extensions).map(([id, m]) => [id, sortedEntries(m)]),
+    sessions: base.sessions,
+    grades: [...grades.usergrades]
+      .sort((a, b) => a.userid - b.userid)
+      .map((u) => [u.userid, u.gradeitems]),
+  };
+  return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
 }

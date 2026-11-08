@@ -77,6 +77,12 @@ const envSchema = z
     /** Ký hiệu trạng thái điểm danh (mod_attendance) tính là vắng có phép / không phép, phân cách dấu phẩy. */
     MOODLE_EXCUSED_ACRONYMS: z.string().trim().min(1).default('E'),
     MOODLE_UNEXCUSED_ACRONYMS: z.string().trim().min(1).default('A'),
+    /** Khóa bí mật HMAC ký sự kiện plugin local_ewars (Phase 10c). Trống = không nhận sự kiện. */
+    MOODLE_WEBHOOK_SECRET: optionalString.pipe(z.string().min(32).optional()),
+    /** Chu kỳ dò thay đổi các khóa Tự động (phút). */
+    MOODLE_SYNC_INTERVAL_MINUTES: z.coerce.number().int().min(1).max(1440).default(10),
+    /** Đồng bộ đầy đủ mỗi đêm (cron, giờ Việt Nam). */
+    MOODLE_NIGHTLY_SCHEDULE: z.string().trim().min(9).default('30 1 * * *'),
   })
   .superRefine((env, ctx) => {
     if (!isStaffEmail(env.ADMIN_SEED_EMAIL, env.STAFF_EMAIL_DOMAIN)) {

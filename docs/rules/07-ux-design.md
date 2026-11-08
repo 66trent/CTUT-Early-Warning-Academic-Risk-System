@@ -36,7 +36,7 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 - MUST: sau khi kích hoạt luật mới, hiển thị lời gợi ý "Chạy đánh giá trên dữ liệu hiện có" ngay trên màn hình xác nhận.
 - SHOULD: trang tổng quan Admin hiển thị thống kê chất lượng nhập liệu (tỷ lệ dòng lỗi theo batch, số sinh viên `INSUFFICIENT`) ở vị trí dễ thấy.
 
-- Trang **Kết nối Moodle** (`/admin/moodle`, Phase 10b): thẻ trạng thái kết nối (tên site, phiên bản, số hàm được cấp — hoặc hướng dẫn cấu hình / lỗi dễ hiểu), chip chọn học kỳ, khung Đồng bộ (Đồng bộ ngay; lần gần nhất: 3 lô với trạng thái + số dòng + link chi tiết, file không đổi, ghi chú theo khóa; "Xác nhận nạp cả 3" / "Hủy" có xác nhận lần 2; tự làm mới khi đang chạy), bảng khóa học Moodle (Course ID number sai hiện rõ lý do; Bật/Tắt có xác nhận; Sửa mã/tên học phần + tổng tiết; danh sách sinh viên Moodle chưa có trong EWARS). Lịch sử nạp gắn nhãn "Moodle" cho lô do đồng bộ sinh.
+- Trang **Kết nối Moodle** (`/admin/moodle`, Phase 10b): thẻ trạng thái kết nối (tên site, phiên bản, số hàm được cấp — hoặc hướng dẫn cấu hình / lỗi dễ hiểu), chip chọn học kỳ, khung Đồng bộ (Đồng bộ ngay; lần gần nhất: 3 lô với trạng thái + số dòng + link chi tiết, file không đổi, ghi chú theo khóa; "Xác nhận nạp cả 3" / "Hủy" có xác nhận lần 2; tự làm mới khi đang chạy), bảng khóa học Moodle (Course ID number sai hiện rõ lý do; Bật/Tắt có xác nhận; Sửa mã/tên học phần + tổng tiết; danh sách sinh viên Moodle chưa có trong EWARS). Lịch sử nạp gắn nhãn "Moodle" cho lô do đồng bộ sinh. Phase 10c: mỗi khóa đang bật có nút "Bật Tự động" / "Về Chạy tay" (xác nhận lần 2, giải thích điều kiện), cột Đồng bộ ghi chế độ; khung trạng thái Tự động (số khóa, sự kiện gần nhất + số sự kiện 24 giờ hoặc cảnh báo thiếu `MOODLE_WEBHOOK_SECRET`, lần dò gần nhất); mỗi lần đồng bộ ghi chế độ + nguồn kích hoạt; lần Tự động nhiều lỗi hiện "Cần Admin xem (lỗi > 10%)" kèm hướng dẫn; lần chờ xác nhận luôn hiện đủ dù có lần tự động mới hơn; danh sách "sinh viên đã rời khóa / bài đã xóa trên Moodle" (bật lên) kèm hướng dẫn đánh dấu Rút học phần.
 
 ## Trạng thái rỗng, lỗi, đang tải
 
@@ -75,3 +75,8 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 - MUST: bộ lọc Khoa (suy ra qua lớp sinh hoạt) ở Tổng quan Admin, danh sách cảnh báo Admin và ô chọn học phần khi chạy đánh giá — người dùng chốt 2026-10-15.
 - MUST (Phase 9a, chốt 2026-10-22): bộ lọc **Ngành** (ngành của lớp sinh hoạt, gom mọi khóa) cạnh bộ lọc Khoa ở Tổng quan Admin, Cảnh báo sớm (Admin, kể cả xuất file), Sinh viên, Khoa và lớp (bảng có cột Ngành); danh sách ngành theo khoa đang chọn, đổi khoa thì bỏ lọc ngành; khoa chưa có danh mục ngành thì ẩn ô lọc. Form tạo / sửa lớp chọn ngành của khoa đã chọn.
 - MUST: trang Nhật ký kiểm toán (Admin, chỉ đọc, phân trang) lọc theo khoảng thời gian, loại hành động, người thực hiện (mã/email), đối tượng (MSSV, mã lô…) — người dùng chốt 2026-10-13.
+
+## Chuông thông báo (Phase 10c, người dùng chốt 2026-11-08)
+
+- Admin và Cố vấn học tập đều có chuông ở thanh trên. CVHT: thông báo cảnh báo (như cũ) + "đánh giá đã cập nhật"; Admin: "đánh giá đã cập nhật". Danh sách gộp, mới nhất trước (20 dòng), dòng chưa đọc tô nền; dòng cập nhật có biểu tượng làm mới, tiêu đề theo nguồn + số đếm; bấm → trang lần đánh giá (Admin) / Cảnh báo (CVHT). "Đánh dấu tất cả đã đọc".
+- Chuông tự tải lại mỗi 15 giây + khi quay lại tab. Có thông báo mới khi đang mở trang → toast kèm nút "Tải lại" (làm mới dữ liệu trang, không tải lại cả trang).

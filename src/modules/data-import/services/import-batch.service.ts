@@ -97,27 +97,39 @@ function checkFile(file: ImportFileInput): string {
 export const fileChecksum = sha256;
 
 /**
- * Checksum nào trong danh sách đã nằm trong 1 lô còn hiệu lực cùng loại, cùng học kỳ — bộ đồng bộ
- * Moodle bỏ qua file không đổi thay vì để bị từ chối "đã nạp" (docs/rules/12).
+ * Checksum lô Moodle gắn id lô: chỉ số UNIQUE "lô còn hiệu lực cùng checksum" không được chặn lô Moodle
+ * có nội dung giống 1 lô cũ (dữ liệu quay lại trạng thái cũ) — chống trùng do bộ đồng bộ tự làm.
  */
-export async function findLiveChecksums(
-  checksums: readonly string[],
+function moodleBatchChecksum(batchId: string, checksums: readonly string[]): string {
+  return sha256(Buffer.from(`moodle|${batchId}|${[...checksums].sort().join(',')}`, 'utf8'));
+}
+
+/**
+ * Tên file → checksum của file MỚI NHẤT cùng tên trong 1 lô còn hiệu lực cùng loại, cùng học kỳ.
+ * Bộ đồng bộ Moodle bỏ qua file trùng file mới nhất của chính khóa đó — KHÔNG so với mọi lô cũ:
+ * sửa điểm danh A → P rồi lại → A sinh file giống hệt 1 file cũ mà vẫn phải nạp (Phase 10c).
+ */
+export async function findLatestFileChecksums(
+  fileNames: readonly string[],
   dataType: string,
   termId: string | null,
-): Promise<Set<string>> {
-  if (checksums.length === 0) return new Set();
+): Promise<Map<string, string>> {
+  if (fileNames.length === 0) return new Map();
   const rows = await (
     await getDataSource()
   )
     .createQueryBuilder(ImportBatchFile, 'f')
     .innerJoin(ImportBatch, 'b', 'b.id = f.import_batch_id')
-    .select('f.source_checksum', 'checksum')
-    .where('f.source_checksum IN (:...checksums)', { checksums })
+    .select('DISTINCT ON (f.file_name) f.file_name', 'fileName')
+    .addSelect('f.source_checksum', 'checksum')
+    .where('f.file_name IN (:...fileNames)', { fileNames })
     .andWhere('b.data_type = :dataType', { dataType })
     .andWhere("COALESCE(b.term_id, '') = :termId", { termId: termId ?? '' })
     .andWhere('b.status IN (:...live)', { live: LIVE_STATUSES })
-    .getRawMany<{ checksum: string }>();
-  return new Set(rows.map((r) => r.checksum));
+    .orderBy('f.file_name')
+    .addOrderBy('b.created_at', 'DESC')
+    .getRawMany<{ fileName: string; checksum: string }>();
+  return new Map(rows.map((r) => [r.fileName, r.checksum]));
 }
 
 /** Chống nạp trùng TỪNG file: file đã nằm trong 1 lô còn hiệu lực cùng loại, cùng học kỳ. */
@@ -163,7 +175,11 @@ export async function beginImportUpload(
   const checksum = checkFile(file);
   const dataSource = await getDataSource();
   const scope = { dataType: meta.dataType, termId };
-  await assertFileNotLoaded(dataSource.manager, checksum, scope, file.fileName);
+  // Lô Moodle: bộ đồng bộ tự so với file mới nhất của khóa (`findLatestFileChecksums`) — 1 file giống
+  // lô cũ hơn vẫn phải nạp được (dữ liệu Moodle quay lại trạng thái cũ).
+  if (meta.source !== ImportSource.MOODLE) {
+    await assertFileNotLoaded(dataSource.manager, checksum, scope, file.fileName);
+  }
 
   const id = randomUUID();
   const objectKey = await storeFile(id, 1, file);
@@ -176,7 +192,8 @@ export async function beginImportUpload(
       courseId,
       source: meta.source ?? ImportSource.FILE,
       fileName,
-      sourceChecksum: checksum,
+      sourceChecksum:
+        meta.source === ImportSource.MOODLE ? moodleBatchChecksum(id, [checksum]) : checksum,
       performedBy: actorId,
       status: ImportBatchStatus.UPLOADING,
       parentBatchId: meta.parentBatchId,
@@ -236,7 +253,7 @@ export async function addImportFile(
         `File ${name} trùng nội dung với 1 file khác trong lần nạp này.`,
       );
     }
-    await assertFileNotLoaded(em, checksum, batch, name);
+    if (batch.source !== ImportSource.MOODLE) await assertFileNotLoaded(em, checksum, batch, name);
     const order = Math.max(0, ...files.map((f) => f.fileOrder)) + 1;
     await em.insert(ImportBatchFile, {
       importBatchId: batchId,
@@ -264,14 +281,19 @@ export async function finishImportUpload(
       order: { fileOrder: 'ASC' },
     });
     const checksum =
-      files.length === 1
-        ? batch.sourceChecksum
-        : sha256(
-            files
-              .map((f) => f.sourceChecksum)
-              .sort()
-              .join(','),
-          );
+      batch.source === ImportSource.MOODLE
+        ? moodleBatchChecksum(
+            batchId,
+            files.map((f) => f.sourceChecksum),
+          )
+        : files.length === 1
+          ? batch.sourceChecksum
+          : sha256(
+              files
+                .map((f) => f.sourceChecksum)
+                .sort()
+                .join(','),
+            );
     await em.update(
       ImportBatch,
       { id: batchId },
