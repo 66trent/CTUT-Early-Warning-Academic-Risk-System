@@ -42,4 +42,5 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   MOODLE_SYNC_REQUESTED: 'Đồng bộ Moodle',
   MOODLE_SYNC_CONFIRMED: 'Xác nhận nạp dữ liệu Moodle',
   MOODLE_SYNC_DISCARDED: 'Hủy lần đồng bộ Moodle',
+  MOODLE_SYNC_AUTO: 'Đồng bộ Moodle tự động',
 };

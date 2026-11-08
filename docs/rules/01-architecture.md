@@ -6,7 +6,7 @@ Xem `00-project-context.md` cho định nghĩa entity/enum. File này quy địn
 
 - MUST: dùng Next.js App Router làm nền tảng duy nhất. Không dựng Express/Fastify riêng.
 - MUST: mọi truy cập dữ liệu đi qua Server Component, Server Action, hoặc Route Handler. Client Component KHÔNG BAO GIỜ import TypeORM/`DataSource`.
-- MUST: dùng Route Handler (`app/api/**/route.ts`) chỉ cho: endpoint của Better Auth, export file (GET), endpoint gọi bởi worker. Mọi thao tác khác dùng Server Action.
+- MUST: dùng Route Handler (`app/api/**/route.ts`) chỉ cho: endpoint của Better Auth, export file (GET), endpoint gọi bởi worker, endpoint nhận sự kiện từ hệ thống ngoài (Phase 10c: `POST /api/integrations/moodle/events` — xác thực HMAC, không dùng phiên; `06`). Mọi thao tác khác dùng Server Action.
 - MUST: tổ chức code theo 4 module nghiệp vụ, không import chéo trực tiếp giữa các module (giao tiếp qua service):
   `data-import` (nhập CSV) · `rule-engine` (tính luật/RiskScore) · `alerts` (cảnh báo, can thiệp, thông báo, màn hình CVHT/sinh viên) · `admin` (tài khoản, cấu hình luật, tổng quan).
 
@@ -75,7 +75,7 @@ tests/                 # Vitest; dùng docs/demo-data làm fixture nghiệm thu
 ## BullMQ Worker
 
 - MUST: worker chạy container Docker riêng, không chung process với Next.js server; worker tự khởi tạo `DataSource` riêng.
-- MUST: có các queue: `import-batch-process`, `evaluation-run` (kèm 1 job lặp chạy mỗi đêm — xem `05`), `send-notifications`, `moodle-sync` (Phase 10b — 1 job / lần đồng bộ Moodle, chạy 1 job/lần; `12`). Mỗi `EvaluationRun` là 1 job (`jobId` = `EvaluationRun.id`) tính cả RiskScore lẫn 10 luật theo lô 200 sinh viên — `08` yêu cầu 2 đường kích hoạt dùng chung 1 job (thay cho 2 queue `calculate-risk-score`/`evaluate-hard-triggers` cũ).
+- MUST: có các queue: `import-batch-process`, `evaluation-run` (kèm 1 job lặp chạy mỗi đêm — xem `05`), `send-notifications`, `moodle-sync` (Phase 10b–10c — chạy 1 job/lần; job: 1 lần đồng bộ, gom sự kiện 30 giây / học kỳ, dò thay đổi định kỳ, đồng bộ đêm, hạn nộp; `12`). jobId BullMQ không được chứa `:`. Mỗi `EvaluationRun` là 1 job (`jobId` = `EvaluationRun.id`) tính cả RiskScore lẫn 10 luật theo lô 200 sinh viên — `08` yêu cầu 2 đường kích hoạt dùng chung 1 job (thay cho 2 queue `calculate-risk-score`/`evaluate-hard-triggers` cũ).
 - MUST: mọi job idempotent — dùng khóa nghiệp vụ làm BullMQ `jobId` để chặn job trùng.
 - MUST: job lỗi có retry giới hạn (`attempts: 3`, backoff exponential), không để lỗi biến mất âm thầm.
 
@@ -95,7 +95,7 @@ tests/                 # Vitest; dùng docs/demo-data làm fixture nghiệm thu
 
 - MUST: `docker-compose.yml` gồm tối thiểu: `app`, `worker`, `postgres`, `redis`, `minio` (lưu file CSV gốc của `ImportBatch`), `mailhog` (chỉ profile `dev`). Phase 10a: profile `moodle` = `moodle-db` (PostgreSQL 17 — Moodle 5.3 đòi ≥ 17, DB riêng, không chung DB EWARS) + `moodle` (Moodle 5.3 LTS + `mod_attendance`, `integrations/moodle/docker`, cổng `127.0.0.1:8080`) — chỉ để phát triển/trình diễn đồng bộ (`docs/huong-dan-moodle.md`). Biến `${...}` của service profile phụ dùng dạng `:-` (không `:?`) vì Compose nội suy cả file kể cả profile không bật.
 - App build Next.js `output: 'standalone'`; worker đóng gói bằng esbuild (`npm run worker:build`) — esbuild KHÔNG phát `emitDecoratorMetadata`, nên quy tắc "khai báo kiểu cột tường minh, quan hệ dạng arrow" ở mục TypeORM là bắt buộc để worker chạy đúng. Port chỉ mở trên `127.0.0.1`.
-- MUST: validate biến môi trường bằng Zod khi khởi động (`src/lib/env.ts`) — app phải crash ngay nếu thiếu biến bắt buộc. Biến tính năng tùy chọn (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `MOODLE_BASE_URL`, `MOODLE_WS_TOKEN` — Phase 10, trống = tắt đồng bộ Moodle) được phép trống. Bắt buộc có: `DATABASE_URL`, `REDIS_URL`, `AUTH_SECRET`, `STAFF_EMAIL_DOMAIN`, `ADMIN_SEED_EMAIL`, `ADMIN_SEED_PASSWORD`, `DEMO_MODE`, `NEXT_PUBLIC_APP_NAME`, `MINIO_ENDPOINT`, `MINIO_PORT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`. `DEMO_ADVISOR_PASSWORD` bắt buộc khi `DEMO_MODE=true`. `PROCESS_ROLE` (`web`/`worker`) chọn kích thước pool DB. `getEnv()` parse lười (để `next build` không cần secret) và được gọi lúc khởi động trong `src/instrumentation.ts`, worker, scripts.
+- MUST: validate biến môi trường bằng Zod khi khởi động (`src/lib/env.ts`) — app phải crash ngay nếu thiếu biến bắt buộc. Biến tính năng tùy chọn (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `MOODLE_BASE_URL`, `MOODLE_WS_TOKEN` — Phase 10, trống = tắt đồng bộ Moodle; `MOODLE_WEBHOOK_SECRET` ≥ 32 ký tự — Phase 10c, trống = không nhận sự kiện) được phép trống. Bắt buộc có: `DATABASE_URL`, `REDIS_URL`, `AUTH_SECRET`, `STAFF_EMAIL_DOMAIN`, `ADMIN_SEED_EMAIL`, `ADMIN_SEED_PASSWORD`, `DEMO_MODE`, `NEXT_PUBLIC_APP_NAME`, `MINIO_ENDPOINT`, `MINIO_PORT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`. `DEMO_ADVISOR_PASSWORD` bắt buộc khi `DEMO_MODE=true`. `PROCESS_ROLE` (`web`/`worker`) chọn kích thước pool DB. `getEnv()` parse lười (để `next build` không cần secret) và được gọi lúc khởi động trong `src/instrumentation.ts`, worker, scripts.
 
 ## CI và sao lưu
 

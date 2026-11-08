@@ -363,9 +363,16 @@ Chốt 2026-11-08 (`docs/tich-hop-moodle.md` mục 9b): ATT-02 so với ngày ch
 **Kết quả 10b (2026-11-08):** nghiệm thu `moodle-sync-acceptance` (máy chủ Moodle giả từ fixture) khớp `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`: 3 lô nguồn MOODLE 480 · 121 · 120 dòng, 0 lỗi; 12 dấu hiệu, 9 cảnh báo; đồng bộ lại → "Không có thay đổi"; lô Moodle không hoàn tác. Kiểm tay với Moodle 5.3 Docker: bật 2 khóa → Đồng bộ ngay → 721 dòng → Xác nhận nạp cả 3 → chạy đánh giá mốc 07/11 → 9/20 sinh viên, 12 dấu hiệu; Hủy hoạt động; trang điện thoại không tràn ngang. Phát hiện + sửa trong phase: ATT-02 không báo khi ngày chốt dày (đổi sang cửa sổ 14 ngày — người dùng chốt); gia hạn riêng cần lưu (`han_rieng` → `LmsAssignmentSubmission.extendedDueAt`, LMS-03/04); Moodle chỉ trả Course ID number khi có `moodle/course:update`; gọi song song → Moodle "Unable to acquire a lock" (gọi tuần tự + thử lại).
 
 ### Phase 10c — Chế độ Tự động (thời gian thực)
-- [ ] Plugin `integrations/moodle/local_ewars` (observer + adhoc task + HMAC) theo bảng sự kiện mục 4b.
-- [ ] `POST /api/integrations/moodle/events` (HMAC, chống gửi lại, idempotent `MoodleEventInbox`) → gom job theo khóa → tự xác nhận → tự đánh giá.
-- [ ] Job hẹn giờ lúc hết hạn nộp (mục 4c) + lịch 10 phút + đồng bộ đầy đủ mỗi đêm.
+
+Chốt 2026-11-08 (`docs/tich-hop-moodle.md` mục 9c): tự xác nhận khi lỗi ≤ 10%, > 10% chờ Admin; dữ liệu xóa trên Moodle → liệt kê cho Admin, không tự xóa; tài khoản hệ thống `SYSTEM_MOODLE`; lịch 10 phút dò dấu vân tay trước.
+
+- [x] Chế độ theo khóa (`syncMode`), lần đồng bộ theo chế độ, chặn xác nhận dữ liệu cũ, bỏ qua file theo file mới nhất của khóa, tài khoản hệ thống, danh sách rời khóa / bài đã xóa.
+- [x] Plugin `integrations/moodle/local_ewars` (observer + adhoc task + HMAC) theo bảng sự kiện mục 4b; `moodle:setup` cấu hình URL + khóa bí mật + cURL demo.
+- [x] `POST /api/integrations/moodle/events` (HMAC, chống gửi lại, idempotent `MoodleEventInbox`) → gom job theo học kỳ → tự xác nhận → tự đánh giá (kể cả `DEMO_MODE`).
+- [x] Job hẹn giờ lúc hết hạn nộp (mục 4c) + lịch 10 phút (dò dấu vân tay) + đồng bộ đầy đủ mỗi đêm.
+- [x] Trang Kết nối Moodle: chọn chế độ, trạng thái tự động, "Cần Admin xem", rời khóa / bài đã xóa.
+
+**Kết quả 10c (2026-11-08):** nghiệm thu `moodle-auto-acceptance` (máy chủ Moodle giả, 10 ca): chưa xác nhận lần nào / còn lô chờ → không bật được Tự động; sự kiện điểm danh 901 vắng → chỉ lô điểm danh khóa đó, tự xác nhận (tài khoản `SYSTEM_MOODLE`), ATT-01 CRITICAL; sửa lại như cũ vẫn nạp; lô > 10% lỗi chờ Admin + xác nhận lô cũ bị chặn `SYNC_STALE`; dò 10 phút không đổi → không tạo gì, rời khóa → liệt kê; job hạn nộp đã đổi hạn → bỏ qua; mất job gom / lần đồng bộ treo → lịch dò tự bắt. 468 test, typecheck, lint, format, migration:check, build xanh; bộ v3 không đổi. Kiểm tay với Moodle 5.3 Docker + plugin `local_ewars`: bật Tự động 2 khóa trên giao diện → `ewars_simulate.php --absent=KTPM2411906` → sự kiện `attendance_taken` → tự nạp → cảnh báo MEDIUM → HIGH sau **34 giây**; `--due-in=2` → hạn 11:14 → 11:19:05 job hạn nộp kéo lại + đánh giá xong 11:19:10; trang điện thoại không tràn ngang. Phát hiện: điểm danh qua web service / app di động của Attendance không phát sự kiện (chỉ lịch dò bắt); Docker dừng làm mất job gom và để lần đồng bộ treo → thêm tự phục hồi ở lịch dò.
 
 ### Phase 10d — Trình diễn + báo cáo
 - [ ] Kịch bản demo Moodle (giảng viên điểm danh / sinh viên nộp bài → CVHT thấy cảnh báo), sơ đồ tích hợp cho báo cáo, ảnh chụp.

@@ -1,7 +1,7 @@
 'use client';
 
 import { type ColumnDef } from '@tanstack/react-table';
-import { BookOpen, Loader2, Pencil, TriangleAlert, UserX } from 'lucide-react';
+import { BookOpen, FileX, Loader2, Pencil, TriangleAlert, UserMinus, UserX } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DataTable } from '@/components/data-table/data-table';
@@ -22,7 +22,10 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { formatVnDateTime } from '@/lib/dates';
 import { toast } from '@/lib/notify';
-import { setMoodleLinkAction } from '@/modules/data-import/actions/moodle.actions';
+import {
+  setMoodleLinkAction,
+  setMoodleSyncModeAction,
+} from '@/modules/data-import/actions/moodle.actions';
 import type { MoodleCourseRowDto } from '@/modules/data-import/services/moodle-link.service';
 
 type Link = NonNullable<MoodleCourseRowDto['link']>;
@@ -118,11 +121,81 @@ function EditLinkDialog({
   );
 }
 
+/** Danh sách bật lên (popover) — sinh viên chưa có / đã rời khóa, bài đã xóa trên Moodle. */
+function ListPopover({
+  icon: Icon,
+  label,
+  note,
+  items,
+}: {
+  icon: typeof UserX;
+  label: string;
+  note: string;
+  items: { key: string; text: string }[];
+}) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="link"
+          size="sm"
+          className="h-auto justify-start p-0 text-left whitespace-normal text-amber-700 dark:text-amber-400"
+        >
+          <Icon aria-hidden />
+          {label}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="max-h-64 w-80 overflow-y-auto text-sm">
+        <p className="mb-2 text-muted-foreground">{note}</p>
+        <ul className="space-y-1">
+          {items.map((item) => (
+            <li key={item.key}>{item.text}</li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function Departures({ link }: { link: Link }) {
+  return (
+    <>
+      {link.leftStudents.length > 0 && (
+        <ListPopover
+          icon={UserMinus}
+          label={`${link.leftStudents.length} sinh viên đã rời khóa trên Moodle`}
+          note="EWARS không tự xóa dữ liệu. Nếu sinh viên đã rút học phần, hãy đánh dấu Rút học phần ở hồ sơ sinh viên để không bị cảnh báo oan."
+          items={link.leftStudents.map((s) => ({
+            key: s.studentId,
+            text: `${s.studentId} · phát hiện ${formatVnDateTime(s.detectedAt)}`,
+          }))}
+        />
+      )}
+      {link.removedActivities.length > 0 && (
+        <ListPopover
+          icon={FileX}
+          label={`${link.removedActivities.length} bài đã xóa trên Moodle`}
+          note="Bài vẫn còn trong EWARS (giới hạn đã biết) — kiểm tra lại nếu sinh viên bị cảnh báo vì bài này."
+          items={link.removedActivities.map((a) => ({
+            key: `${a.kind}-${a.name}-${a.detectedAt}`,
+            text: `${a.kind === 'QUIZ' ? 'Trắc nghiệm' : 'Thực hành'}: ${a.name}`,
+          }))}
+        />
+      )}
+    </>
+  );
+}
+
 function SyncState({ link }: { link: Link | null }) {
   if (!link?.lastSyncAt) return <span className="text-muted-foreground">Chưa đồng bộ</span>;
   return (
     <div className="flex flex-col gap-1">
       <span>{formatVnDateTime(link.lastSyncAt)}</span>
+      {link.syncMode === 'AUTO' && link.lastCheckedAt && (
+        <span className="text-muted-foreground">
+          Dò thay đổi lúc {formatVnDateTime(link.lastCheckedAt)}
+        </span>
+      )}
       {link.lastError && (
         <span className="flex items-start gap-1 text-destructive">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
@@ -130,33 +203,39 @@ function SyncState({ link }: { link: Link | null }) {
         </span>
       )}
       {link.unknownStudents.length > 0 && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="link"
-              size="sm"
-              className="h-auto justify-start p-0 text-amber-700 dark:text-amber-400"
-            >
-              <UserX aria-hidden />
-              {link.unknownStudents.length} sinh viên Moodle chưa có trong EWARS
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="max-h-64 w-80 overflow-y-auto text-sm">
-            <p className="mb-2 text-muted-foreground">
-              Bỏ qua khi đồng bộ (không tính là lỗi). Nạp danh sách sinh viên của họ rồi đồng bộ
-              lại.
-            </p>
-            <ul className="space-y-1">
-              {link.unknownStudents.map((u, i) => (
-                <li key={`${u.idnumber ?? ''}-${u.email ?? ''}-${i}`}>
-                  {u.idnumber || '(trống ID number)'} · {u.email ?? '—'}
-                </li>
-              ))}
-            </ul>
-          </PopoverContent>
-        </Popover>
+        <ListPopover
+          icon={UserX}
+          label={`${link.unknownStudents.length} sinh viên Moodle chưa có trong EWARS`}
+          note="Bỏ qua khi đồng bộ (không tính là lỗi). Nạp danh sách sinh viên của họ rồi đồng bộ lại."
+          items={link.unknownStudents.map((u, i) => ({
+            key: `${u.idnumber ?? ''}-${u.email ?? ''}-${i}`,
+            text: `${u.idnumber || '(trống ID number)'} · ${u.email ?? '—'}`,
+          }))}
+        />
       )}
+      <Departures link={link} />
     </div>
+  );
+}
+
+function ModeButton({ link, name }: { link: Link; name: string }) {
+  const auto = link.syncMode === 'AUTO';
+  return (
+    <ConfirmActionButton
+      trigger={auto ? 'Về Chạy tay' : 'Bật Tự động'}
+      triggerVariant="outline"
+      title={auto ? `Chuyển ${name} về Chạy tay?` : `Bật Tự động cho ${name}?`}
+      description={
+        auto
+          ? 'Dữ liệu Moodle chỉ được nạp khi bạn bấm Đồng bộ ngay rồi Xác nhận.'
+          : 'Có thay đổi trên Moodle (điểm danh, bài nộp, bài mới) là EWARS tự kéo về, tự nạp (lô lỗi > 10% sẽ chờ bạn xem) và tự chạy đánh giá; đến hạn nộp cũng tự đánh giá lại. Cần đã xác nhận nạp ít nhất 1 lần.'
+      }
+      confirmLabel={auto ? 'Về Chạy tay' : 'Bật Tự động'}
+      successMessage={auto ? 'Đã chuyển về Chạy tay' : 'Đã bật Tự động — đang kéo dữ liệu lần đầu'}
+      onConfirm={() =>
+        setMoodleSyncModeAction({ linkId: link.id, syncMode: auto ? 'MANUAL' : 'AUTO' })
+      }
+    />
   );
 }
 
@@ -189,6 +268,7 @@ function RowActions({
           setMoodleLinkAction({ termId, moodleCourseId: row.moodleCourseId, enabled: !enabled })
         }
       />
+      {row.link && enabled && <ModeButton link={row.link} name={row.fullname} />}
       {row.link && <EditLinkDialog termId={termId} row={row} link={row.link} />}
     </div>
   );
@@ -242,9 +322,14 @@ function buildColumns(termId: string, canEdit: boolean): ColumnDef<MoodleCourseR
       enableSorting: false,
       cell: ({ row }) =>
         row.original.link?.enabled ? (
-          <Badge variant="unstyled" className="border-transparent bg-primary-soft text-primary">
-            Đang bật
-          </Badge>
+          <div className="flex flex-col items-start gap-1">
+            <Badge variant="unstyled" className="border-transparent bg-primary-soft text-primary">
+              Đang bật
+            </Badge>
+            <span className="text-muted-foreground">
+              {row.original.link.syncMode === 'AUTO' ? 'Tự động' : 'Chạy tay'}
+            </span>
+          </div>
         ) : (
           <span className="text-muted-foreground">Tắt</span>
         ),

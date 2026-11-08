@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { type RawSearchParams } from '@/lib/list-params';
+import { formatVnDateTime } from '@/lib/dates';
+import { getEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
 import { getImportFormOptions } from '@/modules/data-import/services/import-query.service';
 import {
@@ -16,14 +18,39 @@ import {
   listMoodleCourseRows,
   type MoodleCourseRowDto,
 } from '@/modules/data-import/services/moodle-link.service';
+import {
+  getMoodleAutoStatus,
+  type MoodleAutoStatusDto,
+} from '@/modules/data-import/services/moodle-auto.service';
 import { listMoodleSyncRuns } from '@/modules/data-import/services/moodle-sync.service';
 
 export const metadata: Metadata = { title: 'Kết nối Moodle' };
 
 /**
- * Kết nối Moodle (Phase 10b — docs/tich-hop-moodle.md, docs/huong-dan-moodle.md): trạng thái web
- * service chỉ đọc, bật khóa học Moodle cho 1 học kỳ, "Đồng bộ ngay" → 3 lô chờ "Xác nhận nạp cả 3".
+ * Kết nối Moodle (Phase 10b–10c — docs/tich-hop-moodle.md, docs/huong-dan-moodle.md): trạng thái web
+ * service chỉ đọc, bật khóa học Moodle cho 1 học kỳ, chế độ Chạy tay ("Đồng bộ ngay" → 3 lô chờ "Xác
+ * nhận nạp cả 3") / Tự động (sự kiện, dò định kỳ, mỗi đêm, hạn nộp → tự nạp + tự đánh giá).
  */
+function AutoStatus({ status }: { status: MoodleAutoStatusDto }) {
+  const events = status.webhookConfigured
+    ? status.lastEventAt
+      ? `Sự kiện Moodle gần nhất: ${formatVnDateTime(status.lastEventAt)} · ${status.eventsLast24h} sự kiện trong 24 giờ`
+      : 'Chưa nhận sự kiện nào từ Moodle (plugin local_ewars).'
+    : 'Chưa đặt MOODLE_WEBHOOK_SECRET — không nhận sự kiện, chỉ dò thay đổi định kỳ.';
+  const checked = status.lastCheckedAt
+    ? `Dò thay đổi gần nhất: ${formatVnDateTime(status.lastCheckedAt)}`
+    : 'Chưa dò thay đổi lần nào.';
+  return (
+    <div className="flex flex-col gap-1 rounded-lg border border-dashed p-3 text-sm">
+      <span className="font-medium">Tự động: {status.autoCourses} khóa học</span>
+      <span className="text-muted-foreground">{events}</span>
+      <span className="text-muted-foreground">
+        {checked} · Mỗi đêm đồng bộ đầy đủ; đến hạn nộp bài tự đánh giá lại.
+      </span>
+    </div>
+  );
+}
+
 export default async function MoodlePage({
   searchParams,
 }: {
@@ -46,13 +73,16 @@ export default async function MoodlePage({
       listError = describeMoodleError(error);
     }
   }
-  const runs = term ? await listMoodleSyncRuns(term.termId) : [];
+  const runs = term ? await listMoodleSyncRuns(term.termId, 10) : [];
+  const auto = term
+    ? await getMoodleAutoStatus(term.termId, Boolean(getEnv().MOODLE_WEBHOOK_SECRET))
+    : null;
   const enabled = rows.filter((r) => r.link?.enabled).length;
   const syncHint = !connection.ok
     ? 'Cần kết nối được Moodle.'
     : enabled === 0
       ? 'Bật ít nhất 1 khóa học ở bảng bên dưới.'
-      : `${enabled} khóa học đang bật — đọc điểm danh, trắc nghiệm, thực hành rồi chờ bạn xác nhận.`;
+      : `${enabled} khóa học đang bật — khóa Chạy tay chờ bạn xác nhận, khóa Tự động nạp luôn.`;
   const connectionText = connection.ok
     ? `${connection.siteName ?? ''} — Moodle ${connection.release ?? ''} · tài khoản ${connection.username ?? ''} · ${connection.functionCount} hàm chỉ đọc được cấp · ${connection.baseUrl ?? ''}`
     : connection.configured
@@ -117,11 +147,13 @@ export default async function MoodlePage({
               <CardTitle>Đồng bộ — {term.termName}</CardTitle>
               <CardDescription>
                 Chạy tay: mỗi lần đồng bộ tạo tối đa 3 lô (điểm danh / trắc nghiệm / thực hành, mỗi
-                khóa 1 file). Dữ liệu chỉ được ghi sau khi bạn bấm Xác nhận. Sinh viên Moodle chưa
-                có trong EWARS được bỏ qua và đếm riêng.
+                khóa 1 file), dữ liệu chỉ được ghi sau khi bạn bấm Xác nhận. Tự động: có thay đổi
+                trên Moodle là tự nạp và tự chạy đánh giá. Sinh viên Moodle chưa có trong EWARS được
+                bỏ qua và đếm riêng.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-4">
+              {auto && auto.autoCourses > 0 && <AutoStatus status={auto} />}
               <SyncPanel
                 termId={term.termId}
                 runs={runs}

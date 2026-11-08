@@ -24,8 +24,17 @@ const TYPE_LABELS: Record<MoodleSyncRunDto['batches'][number]['dataType'], strin
   LMS_ASSIGNMENT: 'Bài thực hành',
 };
 
+const TRIGGER_LABELS: Record<MoodleSyncRunDto['trigger'], string> = {
+  MANUAL: 'Admin bấm Đồng bộ ngay',
+  EVENT: 'Sự kiện từ Moodle',
+  SCHEDULED: 'Dò thay đổi định kỳ',
+  NIGHTLY: 'Đồng bộ đầy đủ mỗi đêm',
+  DUE_DATE: 'Hết hạn nộp bài',
+};
+
 /** Nhãn lần đồng bộ — suy từ trạng thái các lô (đã xác nhận / đã hủy / còn chờ). */
 function runLabel(run: MoodleSyncRunDto): string {
+  if (run.needsReview) return 'Cần Admin xem (lỗi > 10%)';
   if (run.status === 'QUEUED') return 'Đang chờ';
   if (run.status === 'RUNNING') return 'Đang đọc Moodle';
   if (run.status === 'NO_CHANGE') return 'Không có thay đổi';
@@ -39,7 +48,8 @@ function runLabel(run: MoodleSyncRunDto): string {
   }
   if (run.canConfirm) return 'Chờ xác nhận';
   if (run.batches.every((b) => b.status === ImportBatchStatus.DISCARDED)) return 'Đã hủy';
-  return run.busy ? 'Đang nạp' : 'Đã nạp';
+  if (run.busy) return 'Đang nạp';
+  return run.mode === 'AUTO' ? 'Đã tự nạp' : 'Đã nạp';
 }
 
 function SyncNowButton({ termId, disabled }: { termId: string; disabled: boolean }) {
@@ -66,12 +76,21 @@ function LatestRun({ run }: { run: MoodleSyncRunDto }) {
     <div className="flex flex-col gap-4 rounded-lg border p-4">
       <AutoRefresh active={run.busy} />
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-medium">Lần gần nhất: {formatVnDateTime(run.createdAt)}</span>
+        <span className="font-medium">{formatVnDateTime(run.createdAt)}</span>
         <Badge variant="outline" className="gap-1">
           {run.busy && <Loader2 className="animate-spin" aria-hidden />}
           {runLabel(run)}
         </Badge>
+        <span className="text-sm text-muted-foreground">
+          {run.mode === 'AUTO' ? 'Tự động' : 'Chạy tay'} · {TRIGGER_LABELS[run.trigger]}
+        </span>
       </div>
+      {run.needsReview && (
+        <p className="text-sm text-amber-700 dark:text-amber-400">
+          Lô có hơn 10% dòng lỗi nên hệ thống không tự nạp. Xem dòng lỗi ở từng lô rồi Xác nhận (nạp
+          dòng hợp lệ) hoặc Hủy.
+        </p>
+      )}
       {run.errorMessage && (
         <p className="flex items-start gap-2 text-destructive">
           <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
@@ -160,15 +179,19 @@ export function SyncPanel({
   canSync: boolean;
   syncHint: string | null;
 }) {
-  const [latest, ...older] = runs;
+  const latest = runs[0];
+  // Lần chờ xác nhận luôn hiện đủ, kể cả khi các lần tự động mới hơn đẩy nó xuống.
+  const featured = runs.filter((r, i) => i === 0 || r.canConfirm || r.canDiscard);
+  const older = runs.filter((r) => !featured.includes(r));
+  const manualBusy = runs.some((r) => r.mode === 'MANUAL' && r.busy);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <SyncNowButton termId={termId} disabled={!canSync || Boolean(latest?.busy)} />
+        <SyncNowButton termId={termId} disabled={!canSync || manualBusy} />
         {syncHint && <span className="text-sm text-muted-foreground">{syncHint}</span>}
       </div>
       {latest ? (
-        <LatestRun run={latest} />
+        featured.map((run) => <LatestRun key={run.id} run={run} />)
       ) : (
         <p className="text-sm text-muted-foreground">Chưa đồng bộ lần nào cho học kỳ này.</p>
       )}
@@ -178,7 +201,7 @@ export function SyncPanel({
           <ul className="mt-2 flex flex-col gap-1">
             {older.map((run) => (
               <li key={run.id}>
-                {formatVnDateTime(run.createdAt)} — {runLabel(run)}
+                {formatVnDateTime(run.createdAt)} — {runLabel(run)} · {TRIGGER_LABELS[run.trigger]}
                 {run.batches.length > 0
                   ? ` (${run.batches.map((b) => `${TYPE_LABELS[b.dataType]} ${b.successRows}`).join(', ')})`
                   : ''}

@@ -69,8 +69,8 @@ const client = createFixtureMoodleClient({
 const syncAt = endOf(fixtureCutoff());
 
 async function sync(): Promise<MoodleSyncRun> {
-  const { runId } = await requestMoodleSync(TERM, IMPORT_ACTOR, noEnqueue);
-  return runMoodleSync(runId, {
+  const { runIds } = await requestMoodleSync(TERM, IMPORT_ACTOR, noEnqueue);
+  return runMoodleSync(runIds[0] ?? '', {
     client,
     enqueueImport: noEnqueue,
     now: syncAt,

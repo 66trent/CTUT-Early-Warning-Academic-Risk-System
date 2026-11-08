@@ -1,6 +1,6 @@
 <?php
 // CTUT-EWARS — cấu hình web service CHỈ ĐỌC trên Moodle demo (Phase 10a, docs/tich-hop-moodle.md mục 2, 6).
-// Chạy trong container: php /var/www/html/ewars-cli/ewars_setup.php [--rotate]
+// Chạy trong container: php /var/www/html/ewars-cli/ewars_setup.php [--rotate] [--events-url=<url> < khóa]
 // Idempotent: chạy lại không tạo trùng. Dòng cuối in `TOKEN=<token>` cho scripts/moodle-setup.ts.
 //
 // Tài khoản dịch vụ `ewars_sync` có vai trò hệ thống `ewarssync`. Một số hàm đọc của Moodle đòi quyền
@@ -15,7 +15,7 @@ require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/webservice/lib.php');
 
-[$options] = cli_get_params(['rotate' => false, 'help' => false], ['h' => 'help']);
+[$options] = cli_get_params(['rotate' => false, 'events-url' => '', 'help' => false], ['h' => 'help']);
 if ($options['help']) {
     echo "Cấu hình web service chỉ đọc cho EWARS. --rotate: tạo token mới (thu hồi token cũ).\n";
     exit(0);
@@ -155,6 +155,31 @@ $token = $DB->get_field('external_tokens', 'token', $conditions, IGNORE_MULTIPLE
 if (!$token) {
     $token = \core_external\util::generate_token(EXTERNAL_TOKEN_PERMANENT, $service, $user->id, $syscontext, 0, '', 'EWARS');
     cli_writeln('+ token mới');
+}
+
+// 6. Plugin local_ewars (Phase 10c): URL nhận sự kiện + khóa bí mật (đọc từ STDIN — không đặt trên
+// dòng lệnh). Moodle mặc định chặn cURL tới địa chỉ nội bộ và cổng lạ → CHỈ bản demo: bỏ chặn dải
+// mạng riêng (Docker) và cho cổng của EWARS. Chạy thật qua HTTPS 443 tên miền công khai không cần.
+if ($options['events-url']) {
+    if (!core_plugin_manager::instance()->get_plugin_info('local_ewars')) {
+        cli_error('Chưa cài plugin local_ewars — khởi động lại container moodle (npm run moodle:up).');
+    }
+    $secret = trim((string) fgets(STDIN));
+    if (strlen($secret) < 32) {
+        cli_error('Khóa bí mật (STDIN) phải ≥ 32 ký tự.');
+    }
+    set_config('eventsurl', $options['events-url'], 'local_ewars');
+    set_config('secret', $secret, 'local_ewars');
+    $blocked = preg_split('/\R/', (string) get_config('core', 'curlsecurityblockedhosts'), -1, PREG_SPLIT_NO_EMPTY);
+    $private = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
+    set_config('curlsecurityblockedhosts', implode("\n", array_values(array_diff(array_map('trim', $blocked), $private))));
+    $port = (string) (parse_url($options['events-url'], PHP_URL_PORT) ?: '');
+    $ports = preg_split('/\R/', (string) get_config('core', 'curlsecurityallowedport'), -1, PREG_SPLIT_NO_EMPTY);
+    if ($port !== '' && $ports && !in_array($port, array_map('trim', $ports), true)) {
+        $ports[] = $port;
+        set_config('curlsecurityallowedport', implode("\n", $ports));
+    }
+    cli_writeln('OK: plugin local_ewars gửi sự kiện tới ' . $options['events-url']);
 }
 
 cli_writeln('OK: web service chỉ đọc, ' . count(EWARS_FUNCTIONS) . ' hàm, tài khoản ' . EWARS_USER);

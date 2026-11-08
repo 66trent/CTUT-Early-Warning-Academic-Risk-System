@@ -21,6 +21,7 @@ import {
 } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { getEnv } from '@/lib/env';
+import { isSystemAccount } from '@/lib/system-accounts';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import {
@@ -286,13 +287,15 @@ export async function requestTermClosing(
 /**
  * Sau khi lô dữ liệu học tập nạp xong (RECONCILED). `DEMO_MODE=true`: KHÔNG tự chạy — dữ liệu demo
  * có ngày cố định, Admin chạy với mốc demo để kết quả khớp KET_QUA_MONG_DOI (người dùng chốt
- * 2026-10-15). Chạy lại sau hoàn tác lô vẫn tự chạy (`requestAutoEvaluation`).
+ * 2026-10-15). Chạy lại sau hoàn tác lô vẫn tự chạy (`requestAutoEvaluation`). Ngoại lệ: lô do đồng
+ * bộ Moodle TỰ ĐỘNG xác nhận (`confirmedBy` = tài khoản hệ thống) vẫn tự chạy — học kỳ Moodle demo
+ * theo ngày thật, mốc = bây giờ (docs/tich-hop-moodle.md 4a, Phase 10c).
  */
 export async function requestEvaluationAfterImport(
-  batch: { id: string; termId: string | null },
+  batch: { id: string; termId: string | null; summary?: { confirmedBy?: string } | null },
   enqueue: EvaluationEnqueuer = enqueueEvaluationJob,
 ): Promise<string | null> {
-  if (getEnv().DEMO_MODE) return null;
+  if (getEnv().DEMO_MODE && !isSystemAccount(batch.summary?.confirmedBy)) return null;
   return requestAutoEvaluation(batch, enqueue);
 }
 

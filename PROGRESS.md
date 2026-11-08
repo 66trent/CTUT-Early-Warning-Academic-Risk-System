@@ -211,3 +211,12 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - Việc còn lại: Phase 10c (plugin `local_ewars` đẩy sự kiện, chế độ Tự động, job hẹn giờ hết hạn, lịch 10 phút/đêm).
 - Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → đăng nhập Admin EWARS → Kết nối Moodle → làm theo `docs/huong-dan-moodle.md` mục 5.
 
+## Phase 10c — Đồng bộ Moodle, chế độ Tự động (2026-11-08)
+
+- Rà kế hoạch trước code (người dùng chọn 4 đề xuất, `docs/tich-hop-moodle.md` 9c): tự xác nhận khi lỗi ≤ 10%; dữ liệu xóa trên Moodle chỉ liệt kê; tài khoản hệ thống `SYSTEM_MOODLE`; lịch 10 phút dò dấu vân tay. Kèm: chế độ theo khóa, chặn xác nhận dữ liệu cũ, bỏ qua file theo file mới nhất của khóa (sửa lỗi 10b), DEMO_MODE vẫn tự đánh giá lô Moodle tự động.
+- Làm: migration `Phase10cMoodleAuto` (cột chế độ / dấu vân tay / rời khóa, bảng `moodle_event_inbox`); `moodle-{auto,event}.service.ts`, `moodle-queue.ts`, `moodle/{webhook,departures}.ts`; route `POST /api/integrations/moodle/events` (HMAC + chống gửi lại + giới hạn tần suất); worker: tự xác nhận sau kiểm tra, job gom / dò / đêm / hạn nộp; plugin PHP `integrations/moodle/local_ewars` (observer + adhoc task); `moodle:setup` cài URL + khóa bí mật + mở cURL demo; script mô phỏng `ewars_simulate.php`; trang Kết nối Moodle (Bật Tự động, trạng thái, Cần Admin xem, rời khóa / bài đã xóa).
+- Kiểm tra: typecheck, lint, format, migration:check, 468 test (+ unit `moodle-auto`, nghiệm thu `moodle-auto-acceptance`), build — xanh. Kiểm tay Moodle Docker: điểm danh vắng → cảnh báo đổi mức sau 34 giây; hết hạn nộp → đánh giá lại sau 5 phút.
+- Phát hiện: điểm danh qua web service / app di động của Attendance không phát sự kiện; Docker dừng giữa chừng → mất job gom + lần đồng bộ treo (đã thêm tự phục hồi).
+- DB dev: 2 khóa `HK1_2026` ở chế độ Tự động; hạn "Thực hành 2" trên Moodle đã bị đổi khi thử → `npm run moodle:setup -- --reset`.
+- Việc còn lại: Phase 10d (kịch bản trình diễn Moodle, sơ đồ tích hợp, ảnh chụp).
+- Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → chạy app + worker → Kết nối Moodle → Bật Tự động → làm theo `docs/huong-dan-moodle.md` mục 5 (lệnh `ewars_simulate.php`).

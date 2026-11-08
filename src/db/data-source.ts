@@ -22,6 +22,7 @@ import { LmsAssignmentSubmission } from './entities/lms-assignment-submission.en
 import { LmsQuizAttempt } from './entities/lms-quiz-attempt.entity';
 import { Major } from './entities/major.entity';
 import { MoodleCourseLink } from './entities/moodle-course-link.entity';
+import { MoodleEventInbox } from './entities/moodle-event-inbox.entity';
 import { MoodleSyncRun } from './entities/moodle-sync-run.entity';
 import { Notification } from './entities/notification.entity';
 import { RiskScoreLog } from './entities/risk-score-log.entity';
@@ -44,6 +45,7 @@ import { Phase8fImportFiles1792505510980 } from './migrations/1792505510980-Phas
 import { Phase9aMajors1792659703130 } from './migrations/1792659703130-Phase9aMajors';
 import { Phase10bMoodleSync1794090492630 } from './migrations/1794090492630-Phase10bMoodleSync';
 import { Phase10bExtendedDue1794091272457 } from './migrations/1794091272457-Phase10bExtendedDue';
+import { Phase10cMoodleAuto1794093584029 } from './migrations/1794093584029-Phase10cMoodleAuto';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
@@ -75,6 +77,7 @@ export const ENTITIES = [
   Notification,
   MoodleCourseLink,
   MoodleSyncRun,
+  MoodleEventInbox,
 ];
 const MIGRATIONS = [
   Phase1Identity1791766886196,
@@ -90,6 +93,7 @@ const MIGRATIONS = [
   Phase9aMajors1792659703130,
   Phase10bMoodleSync1794090492630,
   Phase10bExtendedDue1794091272457,
+  Phase10cMoodleAuto1794093584029,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

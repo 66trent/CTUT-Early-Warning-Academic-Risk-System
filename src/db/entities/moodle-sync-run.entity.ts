@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   type Relation,
 } from 'typeorm';
-import { type MoodleSyncStatus, type MoodleSyncTrigger } from '../enums';
+import { type MoodleSyncMode, type MoodleSyncStatus, type MoodleSyncTrigger } from '../enums';
 import { Term } from './term.entity';
 
 /** Kết quả đọc 1 khóa học trong 1 lần đồng bộ (Zod: `moodleSyncStatsSchema`). */
@@ -47,9 +47,17 @@ export class MoodleSyncRun {
   @Column({ type: 'varchar', length: 10 })
   termId!: string;
 
-  /** `MANUAL` (Admin bấm Đồng bộ ngay); 10c thêm `EVENT` / `SCHEDULED` / `DUE_DATE`. */
+  /** Nguồn kích hoạt — `MOODLE_SYNC_TRIGGERS`. */
   @Column({ type: 'varchar', length: 20 })
   trigger!: MoodleSyncTrigger;
+
+  /** Chế độ của các khóa trong lần này: `MANUAL` → lô chờ xác nhận; `AUTO` → tự xác nhận (Phase 10c). */
+  @Column({ type: 'varchar', length: 10, default: 'MANUAL' })
+  mode!: MoodleSyncMode;
+
+  /** Khóa được đọc (NULL = mọi khóa đã bật cùng chế độ của học kỳ). */
+  @Column({ type: 'jsonb', nullable: true })
+  linkIds!: string[] | null;
 
   @Column({ type: 'varchar', length: 20 })
   requestedBy!: string;

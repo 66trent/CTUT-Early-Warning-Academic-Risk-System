@@ -153,6 +153,8 @@ services:
     volumes:
       - moodle_data:/var/www/moodledata
       - ./integrations/moodle/cli:/var/www/html/ewars-cli:ro
+      # Plugin local_ewars (Phase 10c) — container khởi động chạy upgrade → tự cài / nâng cấp plugin.
+      - ./integrations/moodle/local_ewars:/var/www/html/public/local/ewars:ro
       - ./docs/demo-data/moodle:/var/www/html/ewars-demo:ro
     depends_on:
       moodle-db:

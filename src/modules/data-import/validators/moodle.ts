@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MOODLE_SYNC_MODES } from '@/db/enums';
 
 const termId = z.string().trim().min(1, 'Chọn học kỳ.').max(10);
 
@@ -17,3 +18,7 @@ export const moodleLinkSchema = z.object({
 
 export const moodleSyncRequestSchema = z.object({ termId });
 export const moodleSyncRunSchema = z.object({ runId: z.uuid() });
+export const moodleSyncModeSchema = z.object({
+  linkId: z.uuid(),
+  syncMode: z.enum(MOODLE_SYNC_MODES),
+});

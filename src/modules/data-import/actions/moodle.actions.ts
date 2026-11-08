@@ -3,6 +3,7 @@
 import { UserRole } from '@/db/enums';
 import { runAction } from '@/lib/action';
 import { type ActionResult } from '@/lib/errors';
+import { setMoodleSyncMode } from '../services/moodle-auto.service';
 import { setMoodleLink } from '../services/moodle-link.service';
 import {
   confirmMoodleSync,
@@ -12,6 +13,7 @@ import {
 import {
   moodleLinkSchema,
   moodleSyncRequestSchema,
+  moodleSyncModeSchema,
   moodleSyncRunSchema,
 } from '../validators/moodle';
 
@@ -33,7 +35,7 @@ export async function setMoodleLinkAction(raw: unknown): Promise<ActionResult<nu
 
 export async function requestMoodleSyncAction(
   raw: unknown,
-): Promise<ActionResult<{ runId: string }>> {
+): Promise<ActionResult<{ runIds: string[] }>> {
   return runAction(raw, {
     roles: ADMIN,
     schema: moodleSyncRequestSchema,
@@ -61,5 +63,18 @@ export async function discardMoodleSyncAction(
     schema: moodleSyncRunSchema,
     revalidate: REVALIDATE,
     run: (input, user) => discardMoodleSync(input.runId, user.userId),
+  });
+}
+
+/** Chạy tay ↔ Tự động cho 1 khóa (Phase 10c). */
+export async function setMoodleSyncModeAction(raw: unknown): Promise<ActionResult<null>> {
+  return runAction(raw, {
+    roles: ADMIN,
+    schema: moodleSyncModeSchema,
+    revalidate: REVALIDATE,
+    run: async (input, user) => {
+      await setMoodleSyncMode(input, user.userId);
+      return null;
+    },
   });
 }

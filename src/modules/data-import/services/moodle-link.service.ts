@@ -5,6 +5,7 @@
 import { getDataSource } from '@/db/data-source';
 import { MoodleCourseLink } from '@/db/entities/moodle-course-link.entity';
 import { Term } from '@/db/entities/term.entity';
+import { type MoodleSyncMode } from '@/db/enums';
 import { writeAuditLog } from '@/lib/audit';
 import { getEnv, isMoodleConfigured } from '@/lib/env';
 import { AppError } from '@/lib/errors';
@@ -93,6 +94,12 @@ export interface MoodleCourseRowDto {
     lastSyncAt: string | null;
     lastError: string | null;
     unknownStudents: { idnumber: string | null; email: string | null }[];
+    syncMode: MoodleSyncMode;
+    lastCheckedAt: string | null;
+    /** Sinh viên đã rời khóa trên Moodle (Admin tự đánh dấu Rút học phần — Phase 10c). */
+    leftStudents: { studentId: string; detectedAt: string }[];
+    /** Bài đã xóa trên Moodle (vẫn còn trong EWARS). */
+    removedActivities: { kind: 'QUIZ' | 'ASSIGNMENT'; name: string; detectedAt: string }[];
   } | null;
 }
 
@@ -107,6 +114,17 @@ function toLinkDto(link: MoodleCourseLink): NonNullable<MoodleCourseRowDto['link
     lastSyncAt: link.lastSyncAt?.toISOString() ?? null,
     lastError: link.lastError,
     unknownStudents: link.unknownStudents.map((u) => ({ idnumber: u.idnumber, email: u.email })),
+    syncMode: link.syncMode,
+    lastCheckedAt: link.lastCheckedAt?.toISOString() ?? null,
+    leftStudents: link.leftStudents.map((x) => ({
+      studentId: x.studentId,
+      detectedAt: x.detectedAt,
+    })),
+    removedActivities: link.removedActivities.map((a) => ({
+      kind: a.kind,
+      name: a.name,
+      detectedAt: a.detectedAt,
+    })),
   };
 }
 

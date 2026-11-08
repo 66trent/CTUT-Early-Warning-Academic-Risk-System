@@ -172,10 +172,26 @@ export enum ImportSource {
 }
 
 // ── Đồng bộ Moodle (Phase 10, docs/rules/12) — lưu varchar, kiểm bằng union ─────────
-export const MOODLE_SYNC_TRIGGERS = ['MANUAL'] as const;
+/**
+ * `MANUAL` Admin bấm Đồng bộ ngay · `EVENT` sự kiện từ plugin `local_ewars` · `SCHEDULED` lịch 10 phút
+ * (đã dò thấy thay đổi) · `NIGHTLY` đồng bộ đầy đủ mỗi đêm · `DUE_DATE` đúng lúc hết hạn nộp (Phase 10c).
+ */
+export const MOODLE_SYNC_TRIGGERS = [
+  'MANUAL',
+  'EVENT',
+  'SCHEDULED',
+  'NIGHTLY',
+  'DUE_DATE',
+] as const;
 export type MoodleSyncTrigger = (typeof MOODLE_SYNC_TRIGGERS)[number];
 export const MOODLE_SYNC_STATUSES = ['QUEUED', 'RUNNING', 'STAGED', 'NO_CHANGE', 'FAILED'] as const;
 export type MoodleSyncStatus = (typeof MOODLE_SYNC_STATUSES)[number];
+/** Chế độ đồng bộ của 1 khóa (docs/tich-hop-moodle.md 4a): Chạy tay (xem trước) / Tự động (tự xác nhận). */
+export const MOODLE_SYNC_MODES = ['MANUAL', 'AUTO'] as const;
+export type MoodleSyncMode = (typeof MOODLE_SYNC_MODES)[number];
+/** Sự kiện đã nhận: `QUEUED` đã đặt job gom · `IGNORED` khóa không liên kết / không ở chế độ Tự động. */
+export const MOODLE_EVENT_OUTCOMES = ['QUEUED', 'IGNORED'] as const;
+export type MoodleEventOutcome = (typeof MOODLE_EVENT_OUTCOMES)[number];
 
 export enum ImportBatchStatus {
   UPLOADING = 'UPLOADING',
