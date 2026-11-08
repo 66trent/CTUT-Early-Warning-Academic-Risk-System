@@ -21,10 +21,11 @@ export function TermFilter({ terms, value }: { terms: TermOptionDto[]; value: st
         const next = new URLSearchParams(params.toString());
         next.set('term', termId);
         next.delete('alert');
+        next.delete('page');
         router.push(`?${next.toString()}`);
       }}
     >
-      <SelectTrigger aria-label="Học kỳ" className="w-64">
+      <SelectTrigger aria-label="Học kỳ" className="w-72 max-w-full">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

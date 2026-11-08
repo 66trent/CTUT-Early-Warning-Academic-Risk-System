@@ -53,7 +53,10 @@ function conditionSchemaOf(ruleCode: string): ConditionSchema | null {
     ruleCode === RISK_SCORE_RULE_CODE
       ? riskScoreConfigSchema
       : getRuleDefinition(ruleCode)?.conditionSchema;
-  return schema ? (z.toJSONSchema(schema, { io: 'input' }) as ConditionSchema) : null;
+  // toJSONSchema trả object có prototype lạ → sao chép thành dữ liệu thuần trước khi đưa xuống Client.
+  return schema
+    ? (JSON.parse(JSON.stringify(z.toJSONSchema(schema, { io: 'input' }))) as ConditionSchema)
+    : null;
 }
 
 function toVersionDto(v: RuleVersion): RuleVersionDto {
@@ -71,7 +74,7 @@ function toVersionDto(v: RuleVersion): RuleVersionDto {
   };
 }
 
-/** 10 luật + RISK-SCORE kèm phiên bản đang áp dụng, theo thứ tự xử lý (`priority`). */
+/** 12 luật + RISK-SCORE kèm phiên bản đang áp dụng, theo thứ tự xử lý (`priority`). */
 export async function listRules(): Promise<RuleListItemDto[]> {
   const ds = await getDataSource();
   const [rules, versions] = await Promise.all([

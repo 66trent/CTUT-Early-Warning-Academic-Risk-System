@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -63,7 +63,7 @@ export function RegisterForm({ staffEmailDomain }: { staffEmailDomain: string })
       <Card className="shadow-sm">
         <CardHeader>
           <MailCheck aria-hidden className="size-10 text-primary" />
-          <CardTitle className="text-2xl">Đã gửi đăng ký</CardTitle>
+          <h1>Đã gửi đăng ký</h1>
           <CardDescription>
             Chúng tôi đã gửi liên kết xác minh tới <strong>{registeredEmail}</strong>. Sau khi xác
             minh email, tài khoản cần Quản trị viên duyệt trước khi sử dụng.
@@ -81,7 +81,7 @@ export function RegisterForm({ staffEmailDomain }: { staffEmailDomain: string })
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Đăng ký Cố vấn học tập</CardTitle>
+        <h1>Đăng ký Cố vấn học tập</h1>
         <CardDescription>
           Tài khoản cần Quản trị viên duyệt trước khi sử dụng. {staffEmailHint(staffEmailDomain)}
         </CardDescription>

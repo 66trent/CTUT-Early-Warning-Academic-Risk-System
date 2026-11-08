@@ -8,7 +8,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 const DIR = 'public/templates';
-const DATE_COLUMNS = new Set(['ngay_chot', 'ngay_cong_bo']);
+const DATE_COLUMNS = new Set(['ngay_chot', 'ngay_cong_bo', 'han_nop']);
 const DATETIME_COLUMNS = new Set(['thoi_diem_bat_dau', 'thoi_diem_nop']);
 /** Cột mã/văn bản — giữ dạng chữ để Excel không tự đổi (VD bỏ số 0 đầu). */
 const TEXT_COLUMNS = new Set([
@@ -23,6 +23,11 @@ const TEXT_COLUMNS = new Set([
   'ma_bai',
   'ten_bai',
   'trang_thai',
+  'trang_thai_nop',
+  'ho_dem',
+  'ten',
+  'duoc_du_thi',
+  'vang_thi',
   'diem_chu',
   'ket_qua',
   'hoc_ky',

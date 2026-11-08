@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
-import { AlertTriangle, ArrowLeft, Download, RotateCw } from 'lucide-react';
+import { AlertTriangle, Download, RotateCw } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
-import { AutoRefresh, RollbackAction, StagedActions } from '@/components/imports/batch-actions';
+import {
+  AutoRefresh,
+  RollbackAction,
+  StagedActions,
+  UploadingActions,
+} from '@/components/imports/batch-actions';
+import { BatchFilesTable } from '@/components/imports/batch-files-table';
 import { BatchStatusBadge } from '@/components/imports/batch-status-badge';
+import { DataPagination } from '@/components/data-table/data-pagination';
+import { CourseCards } from '@/components/imports/course-cards';
+import { ErrorRowsTable } from '@/components/imports/error-rows-table';
 import { Button } from '@/components/ui/button';
+import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -18,18 +28,20 @@ import {
 import { ImportBatchStatus, UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { formatVnDateTime } from '@/lib/dates';
+import { parseListParams, type RawSearchParams } from '@/lib/list-params';
+import { isSystemAccount } from '@/lib/system-accounts';
+import { formatFileSize } from '@/lib/utils';
 import { errorReasonLabel } from '@/modules/data-import/labels';
 import {
-  ERROR_ROWS_PAGE_SIZE,
   getImportBatchDetail,
   listErrorRows,
 } from '@/modules/data-import/services/import-query.service';
 
-export const metadata: Metadata = { title: 'Chi tiết lô nhập' };
+export const metadata: Metadata = { title: 'Chi tiết đợt nhập' };
 
 interface BatchPageProps {
   params: Promise<{ batchId: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<RawSearchParams>;
 }
 
 function Stat({ label, value }: { label: string; value: number | string }) {
@@ -47,32 +59,40 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
   if (!batchId.success) notFound();
   const batch = await getImportBatchDetail(batchId.data);
   if (!batch) notFound();
-  const page = Math.max(1, Number((await searchParams).page) || 1);
-  const errors = batch.errorRows > 0 ? await listErrorRows(batch.id, page) : [];
-  const lastErrorPage = Math.max(1, Math.ceil(batch.errorRows / ERROR_ROWS_PAGE_SIZE));
+  const query = await searchParams;
+  const errors =
+    batch.errorRows > 0
+      ? await listErrorRows(batch.id, parseListParams(query, [], { size: 50 }))
+      : { items: [], total: 0, page: 1, size: 50 };
   const staged = batch.status === ImportBatchStatus.STAGED && !batch.confirmed;
   const loaded =
     batch.status === ImportBatchStatus.RECONCILED || batch.status === ImportBatchStatus.LOADED;
-  const errorHeaders = batch.columns ?? (errors[0] ? Object.keys(errors[0].rawData) : []);
+  const errorHeaders =
+    batch.columns ?? (errors.items[0] ? Object.keys(errors.items[0].rawData) : []);
+  const multi = batch.files.length > 1;
+  const courseName = new Map(batch.courses.map((c) => [c.courseId, c.courseName]));
+  const fileLabel = multi ? `${batch.files.length} file` : batch.fileName;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <AutoRefresh active={batch.busy} />
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link href="/admin/imports">
-            <ArrowLeft aria-hidden />
-            Nhập dữ liệu
-          </Link>
-        </Button>
+        <PageBreadcrumbs
+          items={[{ label: 'Nhập dữ liệu', href: '/admin/imports' }, { label: fileLabel }]}
+        />
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1>{batch.dataTypeLabel}</h1>
+          <h1>
+            {batch.dataTypeLabel}
+            {batch.courses.length === 1 ? ` · ${batch.courses[0]?.courseName}` : ''}
+          </h1>
           <BatchStatusBadge status={batch.status} />
         </div>
         <p className="mt-1 text-muted-foreground">
-          {batch.fileName}
-          {batch.termName ? ` · ${batch.termName}` : ''} · tải lên{' '}
-          {formatVnDateTime(batch.createdAt)} bởi {batch.performedBy}
+          {fileLabel}
+          {batch.termName ? ` · ${batch.termName}` : ''}
+          {batch.selectedCourseId ? ` · chỉ học phần ${batch.selectedCourseId}` : ''} · tải lên{' '}
+          {formatVnDateTime(batch.createdAt)}
+          {isSystemAccount(batch.performedBy) ? ' · đồng bộ tự động' : ` bởi ${batch.performedBy}`}
         </p>
       </div>
 
@@ -95,8 +115,46 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
 
       {batch.busy && (
         <Card className="shadow-sm">
-          <CardContent className="text-muted-foreground">
-            Hệ thống đang {batch.confirmed ? 'nạp dữ liệu' : 'kiểm tra file'} — trang tự cập nhật.
+          <CardContent className="flex flex-col gap-3 text-muted-foreground">
+            {batch.status === ImportBatchStatus.UPLOADING ? (
+              <>
+                <p>
+                  Đang tải lên, đã nhận {batch.files.length} file. Nếu đã đóng trang giữa chừng, hãy
+                  hủy lần nhập này rồi nhập lại.
+                </p>
+                <div>
+                  <UploadingActions batchId={batch.id} />
+                </div>
+              </>
+            ) : (
+              <p>
+                Hệ thống đang {batch.confirmed ? 'nhập dữ liệu' : 'kiểm tra file'} — trang tự cập
+                nhật.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {multi && (
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Các file trong lần nhập ({batch.files.length})</CardTitle>
+            <CardDescription>
+              Cả {batch.files.length} file được kiểm tra, xác nhận và nhập cùng lúc như 1 đợt nhập.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BatchFilesTable
+              files={batch.files.map((f) => ({
+                fileName: f.fileName,
+                sizeLabel: f.sizeBytes > 0 ? formatFileSize(f.sizeBytes) : '',
+                totalRows: f.totalRows,
+                successRows: f.successRows,
+                errorRows: f.errorRows,
+                courses: f.courseIds.map((id) => courseName.get(id) ?? id),
+              }))}
+            />
           </CardContent>
         </Card>
       )}
@@ -104,7 +162,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
       {batch.status === ImportBatchStatus.REJECTED && batch.errorMessage && (
         <Card className="border-destructive/30 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-destructive">Không nạp được file</CardTitle>
+            <CardTitle className="text-destructive">Không nhập được file</CardTitle>
             <CardDescription>{batch.errorMessage}</CardDescription>
           </CardHeader>
         </Card>
@@ -115,8 +173,8 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
           <CardHeader>
             <CardTitle>Xem trước và xác nhận</CardTitle>
             <CardDescription>
-              Dữ liệu CHƯA được ghi. Kiểm tra vài dòng đầu bên dưới rồi xác nhận nạp. Lô chờ quá 7
-              ngày sẽ tự hủy.
+              Dữ liệu chưa được ghi. Kiểm tra vài dòng đầu bên dưới rồi xác nhận nhập. Đợt nhập chờ
+              quá 7 ngày sẽ tự hủy.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -127,10 +185,19 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
               >
                 <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
                 <p>
-                  Hơn 10% số dòng bị lỗi. Nạp thiếu nhiều dòng có thể làm kết quả đánh giá thiếu
-                  chính xác — nên sửa file lỗi trước khi nạp.
+                  Hơn 10% số dòng bị lỗi. Nhập thiếu nhiều dòng có thể làm kết quả đánh giá thiếu
+                  chính xác, nên sửa file lỗi trước khi nhập.
                 </p>
               </div>
+            )}
+            {batch.courses.length > 0 && (
+              <section className="flex flex-col gap-2" aria-label="Hệ thống đọc được">
+                <h3 className="text-sm font-semibold">
+                  Hệ thống đọc được {batch.courses.length} học phần trong{' '}
+                  {multi ? `${batch.files.length} file` : 'file'}
+                </h3>
+                <CourseCards cards={batch.courses} staged />
+              </section>
             )}
             {batch.preview.length > 0 && (
               <div className="overflow-x-auto rounded-md border">
@@ -166,15 +233,16 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
       {loaded && (
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Đã nạp dữ liệu</CardTitle>
+            <CardTitle>Đã nhập dữ liệu</CardTitle>
             <CardDescription>
               Thêm mới {batch.inserted ?? 0} · cập nhật {batch.updated ?? 0} · không đổi{' '}
               {batch.unchanged ?? 0}
-              {batch.completedAt ? ` · xong lúc ${formatVnDateTime(batch.completedAt)}` : ''}. Nạp
-              nhầm file thì có thể hoàn tác khi lô chỉ thêm mới dữ liệu.
+              {batch.completedAt ? ` · xong lúc ${formatVnDateTime(batch.completedAt)}` : ''}. Nhập
+              nhầm file thì có thể hoàn tác khi đợt nhập chỉ thêm mới dữ liệu.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
+            <CourseCards cards={batch.courses} staged={false} />
             <RollbackAction
               batchId={batch.id}
               allowed={batch.rollback.allowed}
@@ -189,7 +257,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
           <CardHeader>
             <CardTitle>Cảnh báo ({batch.warnings.length})</CardTitle>
             <CardDescription>
-              Các dòng này vẫn được nạp, nhưng nên kiểm tra lại với nơi xuất dữ liệu.
+              Các dòng này vẫn được nhập, nhưng nên kiểm tra lại với nơi xuất dữ liệu.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -201,7 +269,10 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
                     className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
                   />
                   <span>
-                    <span className="font-medium tabular-nums">Dòng {w.row}:</span> {w.message}
+                    <span className="font-medium tabular-nums">
+                      {w.file ? `${w.file} · ` : ''}Dòng {w.row}:
+                    </span>{' '}
+                    {w.message}
                   </span>
                 </li>
               ))}
@@ -215,7 +286,7 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
           <CardHeader>
             <CardTitle>Dòng lỗi ({batch.errorRows})</CardTitle>
             <CardDescription>
-              Tải file lỗi về, sửa theo cột “lý do” rồi nạp lại — chỉ những dòng đã sửa được thêm.
+              Tải file lỗi về, sửa theo cột “lý do” rồi nhập lại, chỉ những dòng đã sửa được thêm.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -229,63 +300,30 @@ export default async function BatchPage({ params, searchParams }: BatchPageProps
               <Button asChild size="sm" variant="outline">
                 <Link href={`/admin/imports?parent=${batch.id}`}>
                   <RotateCw aria-hidden />
-                  Nạp lại file đã sửa
+                  Nhập lại file đã sửa
                 </Link>
               </Button>
             </div>
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Dòng</TableHead>
-                    <TableHead>Lý do lỗi</TableHead>
-                    {errorHeaders.map((h) => (
-                      <TableHead key={h}>{h}</TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {errors.map((row) => (
-                    <TableRow key={row.sourceRowNumber} className="even:bg-muted">
-                      <TableCell className="tabular-nums">{row.sourceRowNumber}</TableCell>
-                      <TableCell>
-                        <span className="inline-flex flex-col">
-                          <span className="w-fit rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-950 dark:text-red-300">
-                            {errorReasonLabel(row.errorReason)}
-                          </span>
-                          {row.errorDetail && (
-                            <span className="mt-1 text-xs text-muted-foreground">
-                              {row.errorDetail}
-                            </span>
-                          )}
-                        </span>
-                      </TableCell>
-                      {errorHeaders.map((h) => (
-                        <TableCell key={h}>{row.rawData[h]}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            {lastErrorPage > 1 && (
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>
-                  Trang {page}/{lastErrorPage}
-                </span>
-                <div className="flex gap-2">
-                  {page > 1 && (
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/admin/imports/${batch.id}?page=${page - 1}`}>Trang trước</Link>
-                    </Button>
-                  )}
-                  {page < lastErrorPage && (
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/admin/imports/${batch.id}?page=${page + 1}`}>Trang sau</Link>
-                    </Button>
-                  )}
-                </div>
-              </div>
+            <ErrorRowsTable
+              headers={errorHeaders}
+              showFile={multi}
+              rows={errors.items.map((r) => ({
+                sourceRowNumber: r.sourceRowNumber,
+                sourceFileName: r.sourceFileName,
+                reasonLabel: errorReasonLabel(r.errorReason),
+                errorDetail: r.errorDetail,
+                rawData: r.rawData,
+              }))}
+            />
+            {errors.total > errors.size && (
+              <DataPagination
+                basePath={`/admin/imports/${batch.id}`}
+                params={query}
+                total={errors.total}
+                page={errors.page}
+                size={errors.size}
+                unit="dòng lỗi"
+              />
             )}
           </CardContent>
         </Card>

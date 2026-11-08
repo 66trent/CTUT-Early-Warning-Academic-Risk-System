@@ -1,10 +1,12 @@
 /**
- * npm run demo:load — nạp 4 file nguồn học tập của docs/demo-data (02–05) vào DB theo đúng thứ
- * tự trong KET_QUA_MONG_DOI.md, qua ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử
- * lý). Chỉ khi DEMO_MODE=true. Cần đã nạp `01_sinh_vien.csv` và chạy `npm run seed:demo`.
+ * npm run demo:load — nhập bộ demo v4 của docs/demo-data theo đúng thứ tự trong KET_QUA_MONG_DOI.md,
+ * qua ĐÚNG quy trình nhập 2 bước (MinIO + hàng đợi thật; worker xử lý). Chỉ khi DEMO_MODE=true.
+ * Mỗi thư mục = 1 lô nhiều file (1 file / lớp học phần như trường xuất — Phase 8f).
+ * Mặc định nhập 02–09 (cần đã nạp `01_sinh_vien.csv` + `npm run seed:demo`); `--with-students`
+ * nạp cả 01 trước (dùng trong `demo:reset`). `--only=02,03` chỉ nạp các bước đó (VD sau `demo:reset --no-data`).
  */
 import 'dotenv/config';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { closeDataSource, getDataSource } from '../src/db/data-source';
 import { ImportBatch } from '../src/db/entities/import-batch.entity';
 import { ImportBatchStatus } from '../src/db/enums';
@@ -16,12 +18,33 @@ import {
   createImportBatch,
 } from '../src/modules/data-import/services/import-batch.service';
 
+const DIR = 'docs/demo-data';
+const STUDENTS_FILE = ['01_sinh_vien.csv', 'STUDENT', null] as const;
 const FILES = [
-  ['02_HK2_2025_ket_qua_hoc_phan.csv', 'COURSE_RESULT', 'HK2_2025'],
-  ['03_HK1_2026_diem_danh_tong_hop.csv', 'ATTENDANCE_SUMMARY', 'HK1_2026'],
-  ['04_HK1_2026_lms_bai_kiem_tra.csv', 'LMS_QUIZ', 'HK1_2026'],
-  ['05_HK1_2026_ket_qua_giua_ky.csv', 'COURSE_RESULT', 'HK1_2026'],
+  ['02_HK2_2024_ket_qua', 'COURSE_RESULT', 'HK2_2024'],
+  ['03_HK3_2024_ket_qua', 'COURSE_RESULT', 'HK3_2024'],
+  ['04_HK1_2025_diem_danh_dot_1', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
+  ['05_HK1_2025_diem_danh_dot_2', 'ATTENDANCE_SUMMARY', 'HK1_2025'],
+  ['06_HK1_2025_trac_nghiem', 'LMS_QUIZ', 'HK1_2025'],
+  ['07_HK1_2025_thuc_hanh', 'LMS_ASSIGNMENT', 'HK1_2025'],
+  ['08_HK1_2025_ket_qua_logic_hoc', 'COURSE_RESULT', 'HK1_2025'],
+  ['09_HK1_2025_ket_qua_cuoi_ky', 'COURSE_RESULT', 'HK1_2025'],
 ] as const;
+
+/** File của 1 bước: thư mục → mọi file `.csv` (theo tên); file → chính nó. */
+function filesOf(entry: string): { fileName: string; data: Buffer }[] {
+  const path = `${DIR}/${entry}`;
+  const names = statSync(path).isDirectory()
+    ? readdirSync(path)
+        .filter((f) => f.endsWith('.csv'))
+        .sort()
+        .map((f) => `${entry}/${f}`)
+    : [entry];
+  return names.map((name) => ({
+    fileName: name.split('/').at(-1) ?? name,
+    data: readFileSync(`${DIR}/${name}`),
+  }));
+}
 
 /** Chờ worker xử lý lô tới trạng thái mong muốn (tối đa 60 giây). */
 async function waitFor(batchId: string, done: (b: ImportBatch) => boolean): Promise<ImportBatch> {
@@ -36,10 +59,16 @@ async function waitFor(batchId: string, done: (b: ImportBatch) => boolean): Prom
 
 async function main(): Promise<void> {
   if (!getEnv().DEMO_MODE) throw new Error('demo:load chỉ chạy khi DEMO_MODE=true.');
-  for (const [file, dataType, termId] of FILES) {
-    const data = readFileSync(`docs/demo-data/${file}`);
+  const all = process.argv.includes('--with-students') ? [STUDENTS_FILE, ...FILES] : FILES;
+  // `--only=03,04`: chỉ nạp các thư mục / file có tiền tố số đó (cứu nhanh khi nạp tay trên giao diện lỗi).
+  const only = process.argv
+    .find((a) => a.startsWith('--only='))
+    ?.slice('--only='.length)
+    .split(',');
+  const files = only ? all.filter(([file]) => only.some((n) => file.startsWith(n))) : all;
+  for (const [file, dataType, termId] of files) {
     const { batchId } = await createImportBatch(
-      { dataType, termId, parentBatchId: null, fileName: file, data },
+      { dataType, termId, parentBatchId: null, files: filesOf(file) },
       SEED_ADMIN_USER_ID,
     );
     const staged = await waitFor(batchId, (b) => b.status !== ImportBatchStatus.VALIDATING);

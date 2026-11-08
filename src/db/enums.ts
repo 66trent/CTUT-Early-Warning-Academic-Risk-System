@@ -47,9 +47,17 @@ export enum QuizAttemptStatus {
   ABANDONED = 'ABANDONED',
 }
 
-export enum CourseResultStatus {
-  PROCESS_ONLY = 'PROCESS_ONLY',
-  FINAL = 'FINAL',
+/** Loại bài trên LMS (docs/rules/10): trắc nghiệm / bài thực hành nộp file. */
+export enum LmsActivityType {
+  QUIZ = 'QUIZ',
+  ASSIGNMENT = 'ASSIGNMENT',
+}
+
+/** Trạng thái nộp 1 bài thực hành theo file (docs/rules/10). */
+export enum SubmissionStatus {
+  ON_TIME = 'ON_TIME',
+  LATE = 'LATE',
+  NOT_SUBMITTED = 'NOT_SUBMITTED',
 }
 
 // ── Trạng thái dữ liệu 2 tầng (00) ────────────────────────────────
@@ -142,6 +150,10 @@ export enum NotificationStatus {
 export enum EvaluationTrigger {
   AUTO_AFTER_IMPORT = 'AUTO_AFTER_IMPORT',
   MANUAL = 'MANUAL',
+  /** Lịch chạy mỗi đêm cho học kỳ hiện tại (docs/rules/05). */
+  SCHEDULED = 'SCHEDULED',
+  /** Lần chạy cuối khi chốt học kỳ — xong thì đặt `Term.closedAt` (docs/rules/08). */
+  TERM_CLOSING = 'TERM_CLOSING',
 }
 
 export enum EvaluationRunStatus {
@@ -155,7 +167,31 @@ export enum EvaluationRunStatus {
 /** Tên `ImportSource` (không phải `DataSource`) để tránh trùng class của TypeORM. */
 export enum ImportSource {
   FILE = 'FILE',
+  /** Đồng bộ chỉ đọc từ Moodle (Phase 10 — docs/tich-hop-moodle.md): file CSV do hệ thống sinh. */
+  MOODLE = 'MOODLE',
 }
+
+// ── Đồng bộ Moodle (Phase 10, docs/rules/12) — lưu varchar, kiểm bằng union ─────────
+/**
+ * `MANUAL` Admin bấm Đồng bộ ngay · `EVENT` sự kiện từ plugin `local_ewars` · `SCHEDULED` lịch 10 phút
+ * (đã dò thấy thay đổi) · `NIGHTLY` đồng bộ đầy đủ mỗi đêm · `DUE_DATE` đúng lúc hết hạn nộp (Phase 10c).
+ */
+export const MOODLE_SYNC_TRIGGERS = [
+  'MANUAL',
+  'EVENT',
+  'SCHEDULED',
+  'NIGHTLY',
+  'DUE_DATE',
+] as const;
+export type MoodleSyncTrigger = (typeof MOODLE_SYNC_TRIGGERS)[number];
+export const MOODLE_SYNC_STATUSES = ['QUEUED', 'RUNNING', 'STAGED', 'NO_CHANGE', 'FAILED'] as const;
+export type MoodleSyncStatus = (typeof MOODLE_SYNC_STATUSES)[number];
+/** Chế độ đồng bộ của 1 khóa (docs/tich-hop-moodle.md 4a): Chạy tay (xem trước) / Tự động (tự xác nhận). */
+export const MOODLE_SYNC_MODES = ['MANUAL', 'AUTO'] as const;
+export type MoodleSyncMode = (typeof MOODLE_SYNC_MODES)[number];
+/** Sự kiện đã nhận: `QUEUED` đã đặt job gom · `IGNORED` khóa không liên kết / không ở chế độ Tự động. */
+export const MOODLE_EVENT_OUTCOMES = ['QUEUED', 'IGNORED'] as const;
+export type MoodleEventOutcome = (typeof MOODLE_EVENT_OUTCOMES)[number];
 
 export enum ImportBatchStatus {
   UPLOADING = 'UPLOADING',
@@ -172,6 +208,7 @@ export const IMPORT_DATA_TYPES = [
   'STUDENT',
   'ATTENDANCE_SUMMARY',
   'LMS_QUIZ',
+  'LMS_ASSIGNMENT',
   'COURSE_RESULT',
 ] as const;
 export type ImportDataType = (typeof IMPORT_DATA_TYPES)[number];
@@ -183,7 +220,7 @@ export const IMPORT_ERROR_REASONS = [
   'DUPLICATE',
   'OUT_OF_RANGE',
   'TERM_MISMATCH',
-  'RESULT_ALREADY_FINAL',
+  'COURSE_MISMATCH',
 ] as const;
 export type ImportErrorReason = (typeof IMPORT_ERROR_REASONS)[number];
 

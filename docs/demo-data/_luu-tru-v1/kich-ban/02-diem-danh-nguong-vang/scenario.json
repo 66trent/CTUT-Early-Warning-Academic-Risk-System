@@ -1,0 +1,72 @@
+{
+  "id": "02",
+  "title": "ATT-01 — tỷ lệ vắng: các mức và ca sát ngưỡng",
+  "students": [
+    "KTPM2311201",
+    "KTPM2311202",
+    "KTPM2311203",
+    "KTPM2311204",
+    "KTPM2311205",
+    "KTPM2311206",
+    "KTPM2311207",
+    "KTPM2311208",
+    "KTPM2311209"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null
+    },
+    {
+      "file": "02_diem_danh.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026"
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [
+        "KTPM2311202|KTPM521|ATT-01|MEDIUM",
+        "KTPM2311203|KTPM521|ATT-01|MEDIUM",
+        "KTPM2311204|KTPM521|ATT-01|HIGH",
+        "KTPM2311205|KTPM521|ATT-01|HIGH",
+        "KTPM2311206|KTPM521|ATT-01|CRITICAL",
+        "KTPM2311208|KTPM521|ATT-01|MEDIUM",
+        "KTPM2311209|KTPM521|ATT-01|MEDIUM"
+      ],
+      "alerts": [
+        [
+          "KTPM2311202",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311203",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311204",
+          "HIGH"
+        ],
+        [
+          "KTPM2311205",
+          "HIGH"
+        ],
+        [
+          "KTPM2311206",
+          "CRITICAL"
+        ],
+        [
+          "KTPM2311208",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311209",
+          "MEDIUM"
+        ]
+      ]
+    }
+  ]
+}

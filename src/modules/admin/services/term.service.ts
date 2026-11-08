@@ -1,4 +1,4 @@
-import { type EntityManager, IsNull } from 'typeorm';
+import { type EntityManager } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { Term } from '@/db/entities/term.entity';
 import { writeAuditLog } from '@/lib/audit';
@@ -109,28 +109,6 @@ export async function setCurrentTerm(termId: string, actorId: string): Promise<T
         targetId: termId,
         detail: { previousTermId: previous?.termId ?? null },
       },
-      em,
-    );
-    return toTermDto(await em.findOneByOrFail(Term, { termId }));
-  });
-}
-
-/**
- * Chốt học kỳ sau khi nhập kết quả cuối kỳ: không nhận thêm dữ liệu điểm danh/LMS,
- * không tạo lần chạy đánh giá mới (docs/rules/08, 09). Không mở lại được.
- */
-export async function closeTerm(termId: string, actorId: string): Promise<TermDto> {
-  const dataSource = await getDataSource();
-  return dataSource.transaction(async (em) => {
-    const result = await em.update(Term, { termId, closedAt: IsNull() }, { closedAt: new Date() });
-    if (!result.affected) {
-      const exists = await em.existsBy(Term, { termId });
-      throw exists
-        ? new AppError('TERM_ALREADY_CLOSED', 'Học kỳ đã được chốt trước đó.')
-        : new AppError('TERM_NOT_FOUND', 'Không tìm thấy học kỳ.');
-    }
-    await writeAuditLog(
-      { actorId, action: 'TERM_CLOSED', targetType: 'Term', targetId: termId },
       em,
     );
     return toTermDto(await em.findOneByOrFail(Term, { termId }));

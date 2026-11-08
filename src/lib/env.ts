@@ -56,10 +56,33 @@ const envSchema = z
     /** Bắt buộc khi DEMO_MODE=true (mật khẩu tài khoản CVHT demo do seed:demo tạo). */
     DEMO_ADVISOR_PASSWORD: optionalString,
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+    /** Lịch chạy đánh giá học kỳ hiện tại (cron 5 trường, giờ Việt Nam) — docs/rules/05. */
+    EVALUATION_SCHEDULE: z
+      .string()
+      .trim()
+      .regex(/^(\S+\s+){4}\S+$/, 'Dạng cron 5 trường, VD "0 2 * * *"')
+      .default('0 2 * * *'),
     /** Trang chính sách dữ liệu cá nhân (docs/rules/04) — trống thì hiện "[Cần nhà trường xác nhận]". */
     PRIVACY_CONTROLLER_NAME: optionalString,
     PRIVACY_CONTACT: optionalString,
     PRIVACY_RETENTION: optionalString,
+    /**
+     * Đồng bộ Moodle (Phase 10 — docs/tich-hop-moodle.md). Trống = tắt tính năng (như Google OAuth).
+     * Token web service CHỈ ĐỌC — bí mật, không ghi log.
+     */
+    MOODLE_BASE_URL: optionalString.pipe(z.url().optional()),
+    MOODLE_WS_TOKEN: optionalString,
+    /** Quy đổi điểm danh Moodle (buổi có thời lượng) → tiết: 1 tiết = 50 phút (người dùng xác nhận 2026-11-07). */
+    MOODLE_PERIOD_MINUTES: z.coerce.number().int().min(1).max(240).default(50),
+    /** Ký hiệu trạng thái điểm danh (mod_attendance) tính là vắng có phép / không phép, phân cách dấu phẩy. */
+    MOODLE_EXCUSED_ACRONYMS: z.string().trim().min(1).default('E'),
+    MOODLE_UNEXCUSED_ACRONYMS: z.string().trim().min(1).default('A'),
+    /** Khóa bí mật HMAC ký sự kiện plugin local_ewars (Phase 10c). Trống = không nhận sự kiện. */
+    MOODLE_WEBHOOK_SECRET: optionalString.pipe(z.string().min(32).optional()),
+    /** Chu kỳ dò thay đổi các khóa Tự động (phút). */
+    MOODLE_SYNC_INTERVAL_MINUTES: z.coerce.number().int().min(1).max(1440).default(10),
+    /** Đồng bộ đầy đủ mỗi đêm (cron, giờ Việt Nam). */
+    MOODLE_NIGHTLY_SCHEDULE: z.string().trim().min(9).default('30 1 * * *'),
   })
   .superRefine((env, ctx) => {
     if (!isStaffEmail(env.ADMIN_SEED_EMAIL, env.STAFF_EMAIL_DOMAIN)) {
@@ -95,6 +118,11 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
 export function getEnv(): Env {
   cached ??= parseEnv(process.env);
   return cached;
+}
+
+/** Kết nối Moodle chỉ bật khi đủ địa chỉ + token. */
+export function isMoodleConfigured(env: Env = getEnv()): boolean {
+  return Boolean(env.MOODLE_BASE_URL && env.MOODLE_WS_TOKEN);
 }
 
 /** Google OAuth chỉ bật khi đủ cả 2 biến (tránh lỗi PROVIDER_NOT_FOUND). */

@@ -30,7 +30,19 @@
     "prepare": "husky || true",
     "worker:build": "esbuild src/workers/index.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outfile=dist/worker/index.mjs",
     "templates:build": "tsx scripts/build-templates.ts",
-    "demo:load": "tsx scripts/load-demo-data.ts"
+    "demo:load": "tsx scripts/load-demo-data.ts",
+    "perf:seed": "tsx scripts/perf-seed.ts",
+    "perf:measure": "tsx scripts/perf-measure.ts",
+    "backup": "tsx scripts/db-backup.ts backup",
+    "restore": "tsx scripts/db-backup.ts restore",
+    "demo:reset": "tsx scripts/demo-reset.ts",
+    "test:e2e": "playwright test",
+    "screenshots": "tsx scripts/screenshots.ts",
+    "moodle:up": "docker compose --profile moodle up -d --build moodle-db moodle",
+    "moodle:down": "docker compose --profile moodle stop moodle moodle-db",
+    "moodle:setup": "tsx scripts/moodle-setup.ts",
+    "moodle:spec": "tsx scripts/moodle-spec.ts",
+    "moodle:fixtures": "tsx scripts/moodle-record-fixtures.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [
@@ -48,6 +60,7 @@
     "bullmq": "^6.3.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "cn": "^0.4.0",
     "csv-parse": "^7.0.3",
     "dotenv": "^16.6.1",
@@ -55,7 +68,7 @@
     "ioredis": "^5.11.1",
     "lucide-react": "^1.55.0",
     "minio": "^8.0.7",
-    "next": "^16.4.0",
+    "next": "^16.4.3",
     "next-themes": "^0.4.6",
     "nodemailer": "^10.1.0",
     "pg": "^8.23.1",
@@ -74,7 +87,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
-    "@playwright/test": "^1.64.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.20.5",
     "@types/nodemailer": "^8.0.2",
@@ -84,7 +97,7 @@
     "@vitest/coverage-v8": "^5.0.3",
     "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.4.0",
+    "eslint-config-next": "^16.4.3",
     "husky": "^9.1.7",
     "jszip": "^3.10.2",
     "lint-staged": "^17.6.0",
@@ -97,5 +110,10 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.3"
+  },
+  "overrides": {
+    "query-string": {
+      "decode-uri-component": "0.5.1"
+    }
   }
 }

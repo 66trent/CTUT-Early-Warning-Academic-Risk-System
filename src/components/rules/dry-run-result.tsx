@@ -93,7 +93,7 @@ export function DryRunResult({ result }: { result: DryRunResultDto }) {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted-foreground">
-        Đã xét {result.studentsEvaluated} sinh viên của học kỳ {result.termId}, mốc dữ liệu{' '}
+        Đã xét {result.studentsEvaluated} sinh viên của học kỳ {result.termId}, tính đến{' '}
         {formatVnDateTime(result.asOf)}. Chạy thử không tạo cảnh báo, không gửi thông báo.
       </p>
       <div className="overflow-x-auto rounded-md border">
@@ -119,7 +119,7 @@ export function DryRunResult({ result }: { result: DryRunResultDto }) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-medium">Điểm rủi ro trung bình</TableCell>
+              <TableCell className="font-medium">Điểm ưu tiên trung bình</TableCell>
               <TableCell className="tabular-nums">{fmtRisk(result.current.averageRisk)}</TableCell>
               <TableCell className="tabular-nums">{fmtRisk(result.proposed.averageRisk)}</TableCell>
             </TableRow>

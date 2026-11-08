@@ -101,16 +101,43 @@ describe('Hiển thị dấu hiệu cho Cố vấn học tập', () => {
   it('bằng chứng chi tiết có nhãn tiếng Việt, tỷ lệ dạng %, thứ tự cố định (jsonb không giữ thứ tự)', () => {
     expect(
       evidenceRows({
-        snapshotDate: '2026-10-09',
+        snapshotDate: '2025-10-09',
         rate: 0.2333,
-        denominatorType: 'PLANNED',
-        quiz1: 'Q03',
+        totalPeriods: 45,
+        quiz1: 'Bài Q03',
+        eligibleForExam: false,
       }),
     ).toEqual([
-      { label: 'Ngày chốt số liệu', value: '2026-10-09' },
-      { label: 'Loại mẫu số', value: 'Buổi theo kế hoạch' },
+      { label: 'Ngày chốt số liệu', value: '2025-10-09' },
+      { label: 'Tổng số tiết học phần', value: '45' },
       { label: 'Tỷ lệ vắng', value: '23,3%' },
-      { label: 'Bài 1', value: 'Q03' },
+      { label: 'Được dự thi', value: 'Không' },
+      { label: 'Bài 1', value: 'Bài Q03' },
     ]);
+  });
+});
+
+describe('Lần chạy theo 1 học phần chỉ được TĂNG mức (docs/rules/08, chốt 2026-10-15)', () => {
+  const partial = (e: ExistingAlertState | null, signals: Signal[]) =>
+    decideAlertUpdate(e, signals, { asOf, now, cooldownHours: 0, partial: true });
+
+  it('đang Rất cao vì học phần khác, chạy riêng học phần chỉ có mức Thấp → giữ Rất cao, không thông báo', () => {
+    expect(
+      partial(existing({ severity: Severity.CRITICAL }), [sig('LMS-04', Severity.LOW, 'KTPM202')]),
+    ).toEqual({ action: 'UPDATE', severity: Severity.CRITICAL, event: null });
+  });
+
+  it('nặng hơn mức hiện tại → tăng mức và thông báo', () => {
+    expect(partial(existing(), [sig('ATT-01', Severity.HIGH)])).toEqual({
+      action: 'UPDATE',
+      severity: Severity.HIGH,
+      event: 'SEVERITY_INCREASED',
+    });
+  });
+
+  it('lần chạy cả học kỳ vẫn hạ mức theo lần chạy gần nhất', () => {
+    expect(
+      decide(existing({ severity: Severity.CRITICAL }), [sig('LMS-04', Severity.LOW)]),
+    ).toEqual({ action: 'UPDATE', severity: Severity.LOW, event: null });
   });
 });

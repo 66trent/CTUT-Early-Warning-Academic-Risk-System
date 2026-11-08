@@ -73,11 +73,11 @@ export default function DesignCheckPage() {
       user={{ fullName: 'Người dùng mẫu', role: UserRole.ADMIN }}
       currentTermName="Học kỳ 1, 2026–2027"
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         <div>
           <h1>Kiểm tra giao diện</h1>
           <p className="mt-1 text-muted-foreground">
-            Đổi giao diện sáng/tối bằng nút trên thanh tiêu đề để so sánh màu.
+            Đổi giao diện sáng/tối trong menu tài khoản để so sánh màu.
           </p>
         </div>
 

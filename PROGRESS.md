@@ -80,3 +80,205 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - DoD (Docker, DB rỗng chỉ `seed`, backup `backups/before-phase6-dod-20261013.dump`): làm theo trang "Bắt đầu" trên giao diện — đăng ký GV001/GV002 (xác minh qua MailHog) → duyệt → tạo 2 lớp → 2 học kỳ → nạp 5 file demo (0 lỗi) → chạy HK2 mốc 15/06 (4 dấu hiệu) và HK1 mốc 10/10 (13 dấu hiệu) → GV001 thấy 3 + 8 cảnh báo, GV002 chỉ KHMT2311012. Không sửa DB tay.
 - Còn lại (Phase 7): bảo mật, hiệu năng, backup/restore, responsive/dark mode, kịch bản demo.
 - Tự kiểm tra: Admin → Bắt đầu; Cấu hình luật → ATT-03 → sửa "Số lần đi trễ từ" = 1 → Lưu bản nháp → Chạy thử (mốc 2026-10-10) → xem 3 sinh viên thêm vào → Bỏ bản nháp; Sinh viên → tìm KTPM2311003 → Đánh dấu đã rút; Nhật ký hệ thống → lọc "Đánh dấu rút học phần".
+
+## Phase 7 — Hoàn thiện và demo (2026-10-15)
+
+- Sửa logic (chốt với người dùng): chạy theo 1 học phần không hạ mức; cảnh báo lưu "dấu hiệu hiện tại" (`currentTriggerIds`) — điểm danh quá hạn thì GIỮ dấu hiệu cũ, không hạ mức; hết dấu hiệu → nhãn "Lần đánh giá gần nhất không còn dấu hiệu" (không tự đóng); lịch chạy mỗi đêm `SCHEDULED` (tắt khi demo); demo không tự chạy sau nạp; bộ lọc Khoa (Tổng quan, cảnh báo Admin, chọn học phần). 2 migration (sao lưu trước khi chạy).
+- Bảo mật: rà STRIDE + checklist `06` (`docs/bao-cao/01`), thêm header bảo mật, sinh `AUTH_SECRET` mới, `STAFF_EMAIL_DOMAIN=@ctuet.edu.vn`; `npm audit` 0 high/critical (6 moderate gián tiếp qua exceljs/minio).
+- Hiệu năng (`docs/bao-cao/02`, DB `ewars_perf`): 5.000 SV, đánh giá cả học kỳ ~22 giây; mọi danh sách < 110 ms → giữ phân trang hiện tại. Sao lưu/khôi phục `npm run backup|restore`, diễn tập khớp 100% số dòng, khôi phục 5.000 SV 3,7 giây (`docs/bao-cao/03`).
+- Demo: `README.md` (máy sạch, TLS, Google OAuth, đặt lịch sao lưu), `npm run demo:reset -- --yes [--evaluate]`, 8 kịch bản nhỏ `docs/demo-data/kich-ban/` + `npm run demo:scenario -- <số>`, `docs/demo-script.md` (10 phút + "hội đồng hỏi gì → mở gì"), 40 ảnh `docs/screenshots/` (`npm run screenshots`, 0 trang tràn ngang).
+- Kiểm tra: typecheck, lint, format, migration, test 356 (gồm 8 kịch bản nghiệm thu), độ phủ rule-engine 91,4% / data-import 89,2% / khác ≥ 60%, Playwright 2/2, build — xanh (`docs/bao-cao/04`).
+- Kiểm tay (Docker): `demo:reset --evaluate` → đúng 12 cảnh báo; GV001/GV002/sinh viên; cấu hình luật chạy thử; kịch bản 02 nạp qua worker → đúng 7 cảnh báo.
+- DoD máy sạch: clone mới từ GitHub → làm đúng README (npm ci, docker compose up --build, db:init, migration:run, seed, demo:reset --evaluate) trên stack Docker riêng → đúng 12 cảnh báo, Playwright 2/2, kịch bản 08 nạp 2 đợt đúng kết quả.
+- Còn lại: ẩn danh hóa sinh viên (hoãn); TLS/Google OAuth khi triển khai thật.
+- Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md`; `npm run demo:scenario -- 8 --evaluate` rồi đọc `docs/demo-data/kich-ban/08-vong-doi-canh-bao/README.md`.
+
+## Phase 8a — Điều chỉnh theo dữ liệu thật của trường (2026-10-19)
+
+- Căn cứ: `docs/doi-soat-du-lieu-truong.md` (ảnh hệ thống trường + Quy chế 336). Rules `00`, `08`–`12` viết lại; 12 luật: ATT-01/02 (theo tiết), LMS-01–04 (trắc nghiệm + bài thực hành có hạn nộp), ACA-01–04 (Điều 11, A = 3,8, ACA-04 so học kỳ trước), COMB-01/02. Bỏ ATT-03 và điểm giữa kỳ.
+- Dữ liệu: sao lưu `backups/before-phase8a-20261018.dump` rồi migration làm sạch; bảng mới `lms_activities`, `lms_assignment_submissions`; điểm danh theo tiết; kết quả có được dự thi / vắng thi; `Enrollment.sectionCode`; chốt học kỳ = lần chạy `TERM_CLOSING` rồi mới `closedAt`.
+- Nhập: 5 mẫu file mới, mã học phần tự suy từ mã lớp học phần, cảnh báo sai tên / đổi hạn nộp / lệch thang điểm 4, chọn học phần tùy chọn (`COURSE_MISMATCH`), thẻ nhận diện học phần ở màn xem trước, tự tìm dòng tiêu đề.
+- Demo v2: lớp KTPM2411, 20 SV giả, 3 môn, HK1 2025–2026, 3 mốc → 10/13/16 cảnh báo (`KET_QUA_MONG_DOI.md`). Demo cũ + 8 kịch bản lưu ở `_luu-tru-v1/` (viết lại Phase 9).
+- Kiểm tra: typecheck, lint, format, migration:check, 365 test, build — xanh. Kiểm tay 3 mục DoD đạt. Playwright chưa sửa (8b).
+- Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → Admin → Nhập dữ liệu → mở lô điểm danh (thẻ học phần, cảnh báo sai tên) → GV001 xem KTPM2411908 (LMS-03) → Admin → Học kỳ → Chốt học kỳ (mốc 2025-12-31).
+
+## Phase 8b — Nền tảng giao diện dùng chung (2026-10-19)
+
+- Kế hoạch giao diện chia 8b–8f (`docs/implement.md`); giữ shadcn, thêm `pagination`, `breadcrumb`, `command` (cmdk), `popover`, `progress`, `collapsible`, `scroll-area`.
+- Phân trang + sắp xếp phía server (`src/lib/list-params.ts`, `DataPagination`, cột `meta.sortKey`): tài khoản, sinh viên, lô nhập, dòng lỗi, lần chạy đánh giá, cảnh báo Admin (trước giới hạn 500), nhật ký. Cỡ trang 20/50/100, giữ bộ lọc, trang vượt quá có nút về trang cuối.
+- `DataTable`: < 768px mỗi dòng thành thẻ. Menu gom 4 nhóm (Admin), 768–1023px thu thành biểu tượng. `loading.tsx`/`error.tsx`/`not-found.tsx` cho 3 khu vực + gốc; `EmptyState`; breadcrumb thay nút "Quay lại"; nút "?" mở đúng bước trang Bắt đầu.
+- Tìm nhanh Ctrl+K (Admin, CVHT): MSSV/họ tên gõ không dấu, CVHT chỉ lớp mình, 60 lần/phút; đo 20 ms / 5.000 SV (`ewars_perf`, không cần index). Toast lỗi giữ 10 giây (`@/lib/notify`).
+- Rules: `03` (thành phần, phân trang, thẻ điện thoại, menu), `07` (tải/lỗi/trống, Ctrl+K, breadcrumb, nút "?").
+- Kiểm tra: typecheck, lint, format, migration:check, 376 test, build — xanh. Kiểm tay trên trình duyệt đạt (xem `implement.md`); chưa thử tắt DB để xem trang lỗi.
+- Tự kiểm tra: Admin → Nhật ký hệ thống → đổi trang / số dòng / bấm tiêu đề cột; Ctrl+K gõ "le van cuong"; thu nhỏ cửa sổ < 768px xem bảng thành thẻ.
+
+## Phase 8c — Trang quản trị (2026-10-19)
+
+- Rà trước khi code, người dùng chốt: họ tên sắp theo tên rồi họ; RiskScore giữ 0–1 + thanh; danh mục khoa = chip lọc + mục thu gọn.
+- Bắt đầu: tài liệu hướng dẫn 4 phần, mỗi bước "Làm gì / Vì sao cần / Cần chuẩn bị (file mẫu)", thanh tiến độ, bước tiếp theo, mục lục, hỏi đáp; thêm bước "Xem lại luật cảnh báo" (nội dung `getting-started-content.ts`).
+- Tài khoản: cột Lớp (CVHT: lớp phụ trách + sĩ số, "Chưa gán lớp"; sinh viên: lớp), lọc "CVHT chưa gán lớp", thẻ đếm chờ duyệt / hoạt động / bị khóa bấm để lọc.
+- Khoa và lớp: chip khoa (số lớp, SV), bảng phẳng phân trang (khóa mới trước, cột cảnh báo đang mở), tìm + lọc khóa / chưa có CVHT, ô chọn CVHT có tìm kiếm; danh mục khoa thu gọn.
+- Kết quả đánh giá: 1 bảng theo sinh viên (SQL tổng hợp, phân trang DB, bỏ giới hạn 500), mở dấu hiệu trong dòng, lọc có dấu hiệu / mức / lớp / luật. Bảng luật dạng thẻ trên điện thoại.
+- Rules `03`, `07`. Kiểm tra: typecheck, lint, format, migration:check, 378 test, build — xanh; kiểm tay đạt (xem `implement.md`).
+- Tự kiểm tra: Admin → Bắt đầu; Tài khoản → lọc Cố vấn học tập; Khoa và lớp → bấm chip khoa, "Đổi Cố vấn" gõ tìm; Chạy đánh giá → mở 1 lần chạy → bấm "N dấu hiệu".
+
+## Phase 8d — Hai trang tổng quan (2026-10-19)
+
+- Rà trước khi code, người dùng chốt: xu hướng theo các lần đánh giá (mốc dữ liệu), học phần chậm dữ liệu so với ngày dữ liệu mới nhất của học kỳ.
+- Service dùng chung `alerts/services/dashboard.service.ts` (+ `advisor-dashboard.service.ts`): tóm tắt cảnh báo, diễn biến, nguồn, học phần, lớp × mức; Admin thêm độ mới dữ liệu, lô lỗi, lớp chưa có CVHT, nhắc thiết lập (`overview.service.ts` viết lại).
+- Tổng quan Admin: dải Cần chú ý, 4 thẻ số, tiến độ xử lý + theo mức, biểu đồ diễn biến, nguồn, top học phần, bảng lớp × mức, độ mới dữ liệu; chọn học kỳ + khoa. Mọi khối bấm sang danh sách đã lọc.
+- Tổng quan CVHT (`/advisor`): cần chú ý (chờ xác nhận, quá 7 ngày, hẹn theo dõi), 4 thẻ, theo mức / nguồn, lớp phụ trách, 5 SV cần chú ý, diễn biến, hẹn đến hạn, hoạt động gần đây. Danh sách cảnh báo chuyển `/advisor/alerts` (email, chuông, link cũ chuyển hướng).
+- Hiệu năng: tạo lại `ewars_perf` theo cấu trúc 8a, đo lại toàn bộ (`docs/bao-cao/02`): tổng quan ≤ 76 ms.
+- Kiểm tra: typecheck, lint, format, migration:check, 385 test, build — xanh; kiểm tay Admin + GV001, điện thoại, chế độ tối.
+- Tự kiểm tra: Admin → Tổng quan → bấm mục trong "Cần chú ý" / ô bảng lớp × mức; đăng nhập GV001 → Tổng quan → bấm "Cần xử lý".
+
+## Phase 8e — Màn hình CVHT và sinh viên (2026-10-19)
+
+- Rà trước khi code, người dùng chốt: ma trận sinh viên × học phần; dòng thời gian = cảnh báo + can thiệp (chỉ loại) + ngày chốt dữ liệu. Vạch vắng đọc từ ATT-01 đang áp dụng.
+- Danh sách cảnh báo (CVHT + Admin): phân trang server, lý do = dấu hiệu nặng nhất, nhãn quá 7 ngày, lọc từ khóa / lớp / mức / nguồn / trạng thái; xuất `.xlsx` + CSV (`/api/alerts/export`, `src/lib/spreadsheet.ts`, Audit Log `ALERT_EXPORT`).
+- Thông báo: trang `/advisor/notifications` (tất cả / chưa đọc, đánh dấu từng cái / tất cả), chuông không tự đánh dấu hết, có "Xem tất cả".
+- Ma trận `/advisor/matrix` (`class-matrix.service.ts`); hồ sơ sinh viên thêm mức theo nguồn, biểu đồ vắng, ĐTB các học kỳ, dòng thời gian (`student-insights.service.ts`, `rule-engine/services/student-academic.service.ts`).
+- Trang sinh viên: thẻ từng học phần với thanh vắng so với vạch, bỏ nhãn "Ổn định"; thẻ "Lần đầu dùng?" cho CVHT và sinh viên.
+- Rules `06`, `07`. Kiểm tra: typecheck, lint, format, migration:check, 395 test, build — xanh; kiểm tay GV001 + sinh viên, điện thoại.
+- Tự kiểm tra: GV001 → Cảnh báo cần xử lý → lọc + Xuất Excel; Ma trận lớp → bấm 1 ô; mở 1 sinh viên → biểu đồ vắng; đăng nhập sinh viên KTPM2411903 → thẻ học phần.
+
+## Phase 8f — Nạp nhiều file và chốt giao diện (2026-10-20)
+
+- Rà trước khi code, người dùng chốt: 1 lô thật nhiều file (không "nhóm lô"), tối đa 50 file / lô, bảng độ mới theo cách của 8d.
+- Nạp nhiều file: bảng mới `import_batch_files` + `import_error_rows.source_file_name` (migration `Phase8fImportFiles`, điền 1 dòng cho lô cũ); tải lên lần lượt từng file (`beginImportUpload` / `addImportFile` / `finishImportUpload`, trạng thái `UPLOADING`); xử lý đọc lần lượt các file, trùng khóa xuyên file, trần 50.000 dòng cả lô; rate-limit 30 lô / giờ.
+- Giao diện nhập: kéo thả nhiều file, thanh tiến độ tải lên; xem trước có bảng từng file, dòng lỗi / cảnh báo ghi tên file; file lỗi thêm cột `ten_file`; lịch sử lọc loại / học phần / khoa; bảng "Học phần nào cần nạp dữ liệu" (`getDataFreshness` thêm từng học phần).
+- Playwright 2 luồng viết lại theo demo v2; `npm run screenshots` 22 trang (62 ảnh); `docs/demo-script.md` viết lại; README mục 6 ảnh; demo `docs/demo-data/nhieu-file/`.
+- Rà 3 khổ + tối + bàn phím: sửa tràn ngang form luật (bảng mức cảnh báo).
+- Rules `07`, `12`. Kiểm tra: typecheck, lint, format, migration:check, 402 test, build, e2e (cả image Docker) — xanh.
+- Tự kiểm tra: Admin → Nhập dữ liệu → loại "Điểm danh" → kéo 3 file trong `docs/demo-data/nhieu-file/` → xem bảng từng file → Hủy lô; xem bảng "Học phần nào cần nạp dữ liệu"; lọc lịch sử theo học phần.
+
+## Phase 9a — Danh mục Ngành, 5 lớp, tài khoản demo (2026-10-22)
+
+- Rà trước (người dùng chốt, đối chiếu chương trình khung KTPM2311): toàn Khoa CNTT khóa 2024, 5 lớp theo mẫu `KTPM2411`, danh mục Ngành, mỗi lớp 1 CVHT, làm lại KTPM theo HK4 thật (9b), GDTC/GDQP bỏ qua. Kế hoạch 9a/9b/9c ở `implement.md`.
+- Bảng `majors` + `administrative_classes.major_id` (migration `Phase9aMajors`), seed 5 ngành; lớp chọn ngành cùng khoa (`MAJOR_DEPARTMENT_MISMATCH`, `MAJOR_NOT_FOUND`).
+- Lọc Ngành: Khoa và lớp (cột + lọc), Tổng quan Admin, Cảnh báo sớm (+ xuất file), Sinh viên (`DashboardScope.majorId`, `MajorFilter`).
+- Seed demo: 5 lớp, GV001–GV005, học kỳ `HK3_2024` + `HK1_2025`; đăng nhập nhanh Admin + 5 CVHT + 5 SV gom theo lớp (`src/lib/demo-accounts.ts`).
+- Rules `06`, `07`, `08`, `09`; `KET_QUA_MONG_DOI.md` (dữ liệu nền), `demo-script.md` cập nhật theo seed mới.
+- Kiểm tra: typecheck, lint, format, migration:check, 406 test, build, e2e — xanh.
+- Tự kiểm tra: Admin → Khoa và lớp → lọc Ngành; Tạo lớp → chọn khoa CNTT → chọn ngành; Tổng quan → ô Ngành; trang đăng nhập → tab Cán bộ → nút theo lớp.
+
+## Phase 9b — Bộ demo v3 + nghiệm thu (2026-10-23)
+
+- Rà rủi ro giả định trước (người dùng chốt): SV KHDL chuyển đến, ghi `ma_hoc_phan` ở file học lại / HK3, SV sạch theo thiết kế, vòng đời chỉ trong test + thao tác tay, 3–4 học phần / lớp.
+- `KET_QUA_MONG_DOI.md` v3 (5 lớp × 1 chủ đề, học phần HK4 thật, `HK3_2024`) viết và duyệt trước; bộ v2 + `nhieu-file` lưu `_luu-tru-v2/`.
+- `gen_demo_v3.py`: 100 SV, 1 file / lớp học phần / nguồn (30 + 32 + 10 + 9 + 4 + 12 file), `minh-hoa-loi/`; `demo:load` nạp mỗi thư mục thành 1 lô nhiều file.
+- Test nghiệm thu mới `demo-v3-acceptance.test.ts` (helper `tests/helpers/demo-v3.ts`): khớp 100% bảng tính tay ngay lần đầu; test tính năng cũ giữ fixture v2.
+- Kiểm tra: typecheck, lint, format, migration:check, 415 test, build — xanh; `demo:reset --evaluate` 24 → 29 → 35.
+- Phát hiện: `npm audit` báo Next.js 16.4.0 có lỗ hổng critical (RCE Image Optimization, DoS Server Actions) — chưa nâng cấp, chờ người dùng quyết.
+- Tự kiểm tra: `npm run demo:reset -- --yes --evaluate=2` → đăng nhập nhanh từng CVHT GV001–GV005 → Cảnh báo cần xử lý; sinh viên `<lớp>903`.
+
+## Nâng cấp bảo mật Next.js 16.4.3 (2026-10-23)
+
+- `next` + `eslint-config-next` 16.4.0 → 16.4.3 (bản vá mới nhất dòng 16.x), không đổi tính năng; sửa phát hiện ở Phase 9b (RCE Image Optimization API với SVG, DoS App Router qua Server Actions).
+- `npm audit --omit=dev --audit-level=high`: 0 high/critical. Còn 6 moderate gián tiếp, chưa có bản vá không phá vỡ: `minio` (qua `query-string`/`decode-uri-component`, `stream-json`) và `exceljs` (qua `uuid` < 11.1.1) — theo dõi lại mỗi phase.
+- Kiểm tra: typecheck, lint, format, migration:check, 415 test, build — xanh; image Docker app/worker build lại (Next 16.4.3); `demo:reset --evaluate=2` + e2e 2/2 — xanh.
+- Lưu ý: chạy `demo:reset` từ worktree cần `COMPOSE_PROJECT_NAME=ewars` (script gọi `docker compose exec postgres`).
+
+## Phase 9c — Kịch bản trình diễn theo lớp (2026-10-24)
+
+- Rà rủi ro giả định trước (người dùng chốt 8 phương án): vòng đời KHMT lồng vào kịch bản chính trước Chạy 2; chốt học kỳ là bước cuối; kịch bản phụ ghi "số nào đổi"; video dự phòng; mỗi vai 1 cửa sổ (giới hạn đăng nhập nhanh 10/phút); bảng câu hỏi theo lời đời thường; gỡ `demo:scenario`; thêm bộ ảnh sau chốt.
+- `docs/demo-script.md` viết lại theo v3 (12 bước, bảng hỏi phủ 12 luật + cột "khi nào", kịch bản phụ A–F); lời nói `docs/bao-cao/kich-ban-thuyet-trinh.md`.
+- Gỡ `npm run demo:scenario` + `scripts/load-scenario.ts`; `_luu-tru-v1/README.md` ghi lưu trữ.
+- `npm run screenshots` chụp lại theo v3 (62 ảnh) + `-- --closed` (4 ảnh luật học lực sau chốt); README mục 6.
+- Báo cáo Word cập nhật theo trạng thái sau 9b (12 luật, bộ v3, 6 sơ đồ vẽ lại, ảnh v3, Hình 8.11–8.13, độ phủ + diễn tập khôi phục đo lại); `docs/bao-cao/03`, `04` cập nhật số đo.
+- Kiểm tra: typecheck, lint, format, migration:check, 415 test (độ phủ rule-engine 92,3%, data-import 89,3%), build, e2e 2/2 (image Docker) — xanh.
+- Chạy tay trên giao diện: 24 → 29 → 35 cảnh báo, KHMT2411905 mở lại + email, hộp thoại chốt 2 SV, GV002 bị chặn hồ sơ KTPM.
+- Tự kiểm tra: `npm run demo:reset -- --yes` → làm theo `docs/demo-script.md` từ bước 1 đến 12.
+
+## Phase 10a — Moodle 5.3 Docker + dữ liệu demo (2026-11-07)
+
+- Làm: nghiên cứu + chốt hướng tích hợp (`docs/tich-hop-moodle.md`); profile Docker `moodle` (Moodle 5.3 LTS ghim SHA-256 + `mod_attendance` ghim commit, PostgreSQL 17 riêng, cổng 127.0.0.1:8080); script PHP `integrations/moodle/cli/{ewars_setup,ewars_seed_demo}.php` (web service chỉ đọc 11 hàm + token; dựng khóa học / điểm danh / trắc nghiệm / thực hành theo JSON); bộ sinh `docs/demo-data/moodle/gen_moodle_demo.py`; lệnh `moodle:up|down|setup|fixtures`; client REST `src/modules/data-import/moodle/client.ts`; env tùy chọn `MOODLE_BASE_URL`, `MOODLE_WS_TOKEN`; học kỳ `HK1_2026` (không đặt hiện tại).
+- File chính: `integrations/moodle/**`, `scripts/moodle-{setup,record-fixtures}.ts`, `docs/huong-dan-moodle.md`, `tests/fixtures/moodle/*.json`, `tests/unit/data-import/moodle-client.test.ts`.
+- Kiểm tra: typecheck, lint, format, test (+5 test client), build — xanh. `moodle:fixtures` xác nhận tài khoản dịch vụ đọc được dữ liệu cả 20 sinh viên, khớp tình huống thiết kế.
+- Ghi chú: thêm commit riêng cho chế độ tự nhập demo (`demo:reset --no-data`, `demo:load --only`) làm từ trước, chưa commit.
+- CI đỏ ở `npm audit` (2026-11-07): GHSA-qr28-fpjm-wq7f (high, công bố 29/10) ở `decode-uri-component ≤ 0.5.0` qua `minio@8.0.7 → query-string@7`. Sửa bằng `overrides` ép `decode-uri-component@0.5.1` (bản ESM) chỉ dưới `query-string`: minio chỉ gọi `stringify` (không giải mã) — đã kiểm put/stat/tag/get MinIO + test nạp. KHÔNG ép `query-string@9/10` (chỉ có default export ESM → `qs.stringify` của minio thành undefined). Bỏ override khi minio dùng `query-string` đã vá. Còn 8 lỗ hổng moderate (CI chỉ chặn high).
+- Rà soát sau phase (2026-11-08): (1) dữ liệu demo neo ngày cố định → quá 24/11 cả lớp bị báo bỏ bài chương 3 → viết lại bộ sinh bằng TypeScript `scripts/lib/moodle-demo-spec.ts` neo theo ngày chốt (`moodle:setup --cutoff`, mặc định hôm qua), bỏ bản Python; (2) fixture ghi đủ 20 sinh viên + `_meta.json` ở ngày chốt 06/11; (3) container app/worker gọi Moodle bằng `http://moodle`; (4) phát hiện ATT-02 so 2 ngày chốt liền nhau → đồng bộ liên tục làm ATT-02 không bao giờ báo — cần chốt ở 10b.
+- Việc còn lại: Phase 10b (đồng bộ kéo + chế độ Chạy tay + trang Kết nối Moodle + kết quả mong đợi chính thức).
+- Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → mở http://localhost:8080, đăng nhập `gv.moodle` (mật khẩu `MOODLE_DEMO_PASSWORD` trong `.env`) → 2 khóa học HK1 2026–2027, mục Điểm danh có 15 buổi (12 đã điểm danh), 3 bài trắc nghiệm, 3 bài thực hành; đăng nhập `ktpm2411905` thấy chưa làm 2 bài trắc nghiệm Hệ điều hành.
+
+## Phase 10b — Đồng bộ Moodle, chế độ Chạy tay (2026-11-08)
+
+- Chốt trước code (`docs/tich-hop-moodle.md` 9b): ATT-02 so với ngày chốt cũ nhất trong 14 ngày; Admin bật từng khóa; SV Moodle chưa có trong EWARS bỏ qua + đếm riêng; 1 lần đồng bộ = 3 lô + Xác nhận nạp cả 3. Kết quả mong đợi viết trước: `docs/demo-data/moodle/KET_QUA_MONG_DOI.md`.
+- Làm: bảng `moodle_course_links`, `moodle_sync_runs`, `ImportSource.MOODLE`, cột `lms_assignment_submissions.extended_due_at` (2 migration); `data-import/moodle/{schemas,fetch-course,mappers}.ts` (mapper thuần → CSV đúng mẫu), `services/moodle-{link,sync}.service.ts`, queue `moodle-sync` + processor, Server Action `moodle.actions.ts`, trang `/admin/moodle` (`components/moodle/*`), nhãn "Moodle" ở lịch sử nạp; cột tùy chọn `han_rieng` (gia hạn) cho file thực hành + LMS-03/04 dùng hạn riêng; client thử lại lỗi tạm thời.
+- Kiểm tra: typecheck, lint, format, migration:check, test (unit + nghiệm thu `moodle-sync-acceptance` + v3/v2 không đổi), build — xanh. Kiểm tay trên giao diện với Moodle 5.3 Docker: bật 2 khóa → Đồng bộ ngay → 480 · 121 · 120 dòng, 0 lỗi → Xác nhận nạp cả 3 → Chạy đánh giá mốc 07/11 → 9/20 SV, 12 dấu hiệu (đúng bảng mong đợi); Hủy chạy đúng; điện thoại không tràn ngang.
+- Phát hiện khi làm: Moodle giấu Course ID number nếu thiếu `moodle/course:update`; gọi song song → "Unable to acquire a lock for caching" (đổi sang tuần tự + thử lại); luật suy ra "không nộp" khi thiếu dòng → bỏ dòng gia hạn không đủ, phải lưu hạn riêng.
+- Dữ liệu DB dev: học kỳ `HK1_2026` có 3 lô Moodle đã nạp + 9 cảnh báo của lần chạy thử (dọn: `demo:reset` rồi `moodle:setup`).
+- Việc còn lại: Phase 10c (plugin `local_ewars` đẩy sự kiện, chế độ Tự động, job hẹn giờ hết hạn, lịch 10 phút/đêm).
+- Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → đăng nhập Admin EWARS → Kết nối Moodle → làm theo `docs/huong-dan-moodle.md` mục 5.
+
+## Phase 10c — Đồng bộ Moodle, chế độ Tự động (2026-11-08)
+
+- Rà kế hoạch trước code (người dùng chọn 4 đề xuất, `docs/tich-hop-moodle.md` 9c): tự xác nhận khi lỗi ≤ 10%; dữ liệu xóa trên Moodle chỉ liệt kê; tài khoản hệ thống `SYSTEM_MOODLE`; lịch 10 phút dò dấu vân tay. Kèm: chế độ theo khóa, chặn xác nhận dữ liệu cũ, bỏ qua file theo file mới nhất của khóa (sửa lỗi 10b), DEMO_MODE vẫn tự đánh giá lô Moodle tự động.
+- Làm: migration `Phase10cMoodleAuto` (cột chế độ / dấu vân tay / rời khóa, bảng `moodle_event_inbox`); `moodle-{auto,event}.service.ts`, `moodle-queue.ts`, `moodle/{webhook,departures}.ts`; route `POST /api/integrations/moodle/events` (HMAC + chống gửi lại + giới hạn tần suất); worker: tự xác nhận sau kiểm tra, job gom / dò / đêm / hạn nộp; plugin PHP `integrations/moodle/local_ewars` (observer + adhoc task); `moodle:setup` cài URL + khóa bí mật + mở cURL demo; script mô phỏng `ewars_simulate.php`; trang Kết nối Moodle (Bật Tự động, trạng thái, Cần Admin xem, rời khóa / bài đã xóa).
+- Kiểm tra: typecheck, lint, format, migration:check, 468 test (+ unit `moodle-auto`, nghiệm thu `moodle-auto-acceptance`), build — xanh. Kiểm tay Moodle Docker: điểm danh vắng → cảnh báo đổi mức sau 34 giây; hết hạn nộp → đánh giá lại sau 5 phút.
+- Phát hiện: điểm danh qua web service / app di động của Attendance không phát sự kiện; Docker dừng giữa chừng → mất job gom + lần đồng bộ treo (đã thêm tự phục hồi).
+- DB dev: 2 khóa `HK1_2026` ở chế độ Tự động; hạn "Thực hành 2" trên Moodle đã bị đổi khi thử → `npm run moodle:setup -- --reset`.
+- Việc còn lại: Phase 10d (kịch bản trình diễn Moodle, sơ đồ tích hợp, ảnh chụp).
+- Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → chạy app + worker → Kết nối Moodle → Bật Tự động → làm theo `docs/huong-dan-moodle.md` mục 5 (lệnh `ewars_simulate.php`).
+
+## Phase 10c bổ sung — Chuông cập nhật + kịch bản Moodle trọng tâm (2026-11-08)
+
+- Người dùng chốt: chuông cho Admin + CVHT lớp liên quan; 1 thông báo / lần đánh giá xong (mọi nguồn); tự tải lại 15 giây; kịch bản thuyết trình lấy Moodle làm trọng tâm.
+- Làm: bảng `update_notifications` + `alerts/services/update-notification.service.ts` (gọi khi lần đánh giá xong), `data-import/services/import-describe.service.ts` (mô tả lô / lần đồng bộ Moodle), chuông `notification-bell.tsx` cho Admin + CVHT (toast "Tải lại" 20 giây), action `listMyBellAction` / `markUpdatesReadAction`; viết lại `docs/bao-cao/kich-ban-thuyet-trinh.md` (16 slide, demo M1–M9, hỏi đáp Moodle) và `docs/demo-script.md` (A. Moodle, B. nạp file); `ewars_simulate.php --session=N`.
+- Diễn tập thật lộ 4 lỗi (đã sửa + test): lô kiểm tra trước khi lần đồng bộ ghi xong; tự coi mình là lần mới hơn (micro-giây); job nạp mất khi worker dừng; plugin không thử lại 404. Gốc: Docker tự bật container cũ (bẫy #0).
+- Kiểm tra: typecheck, lint, format, migration:check, 472 test, build — xanh. Kiểm tay: GV001 giải quyết 906 → Moodle điểm danh vắng → chuông "Lớp KTPM2411: 1 mở lại" + email; toast chuông hiện sau 38 giây.
+- DB dev: học kỳ `HK1_2026` đã bị diễn tập nhiều lần; trước buổi bảo vệ làm đúng mục Chuẩn bị của `docs/demo-script.md` (demo:reset + moodle:setup --reset + đặt học kỳ hiện tại).
+- Tự kiểm tra: đăng nhập Admin hoặc GV001 → chuông góc trên; thao tác trên Moodle (hoặc lệnh `ewars_simulate.php`) → ~1 phút có toast "… vừa cập nhật" + nút Tải lại.
+
+## Phase 11 đợt 0 — Sửa lỗi giao diện và từ ngữ (2026-11-08)
+
+- Rà soát 30 màn hình, báo cáo: https://claude.ai/artifact/BZPB8MSLscXmY1uVLQS1nG. Người dùng chốt: sidebar navy, nền đặc cho mức Rất cao + Cao, đổi thuật ngữ, ẩn mã luật với CVHT, "Điểm ưu tiên" (ghi `07`).
+- Lỗi đã sửa: trang sửa luật báo "Only plain objects"; bảng Tài khoản cắt cột thao tác (email gộp cột họ tên, ẩn `SYSTEM_MOODLE`); ô học kỳ cắt chữ; nút Moodle "cả 3" (đếm đúng nguồn chờ xác nhận); thanh "SV có cảnh báo" màu xanh lá; "· và N dấu hiệu" thừa dấu chấm; điểm ưu tiên CVHT thiếu badge độ đầy dữ liệu; lưới hướng dẫn 3 ô.
+- Từ ngữ: Nạp → Nhập, lô → đợt nhập, Chạy tay → Thủ công, Mốc dữ liệu → Tính đến, bỏ chữ demo, bỏ gạch dài (trừ dòng bắt buộc của `03`), lời nhắn Moodle không còn tên hàm / biến môi trường. Lý do COMB-01/02 ghi tên nguồn + mức (`describeSignals`).
+- Kịch bản `docs/demo-script.md`, `docs/bao-cao/kich-ban-thuyet-trinh.md` đã đổi thuật ngữ; báo cáo Word chưa (đợt 4).
+- Kiểm tra: typecheck, lint, format, 473 test xanh; kiểm trên app 16 trang, không còn từ cũ, không lỗi console. Chưa chạy Playwright e2e và build.
+- Còn: bảng Lịch sử nhập (21px) và bảng Lớp (42px) vẫn cuộn nhẹ, xử lý ở đợt 3. Cảnh báo đã có trong DB giữ lý do cũ có mã luật đến lần đánh giá sau.
+- Tự kiểm tra: Admin → Tài khoản, Cấu hình luật → ATT-01; CVHT → Tổng quan, mở 1 cảnh báo.
+
+## Phase 11 đợt 1 — Màu, khung, cỡ chữ (2026-11-08)
+
+- Token: sidebar navy `#0F2A5C`, nền làm việc `#F1F5FB`, chữ phụ `#475569`, tiêu đề trang 26px, `text-xs` = 13px. Mức Rất cao + Cao nền đặc chữ trắng, Trung bình + Thấp nền nhạt (`globals.css`, ghi `03`).
+- Khung: sidebar navy + logo trên đĩa trắng + tên trường đủ 2 dòng; menu tài khoản `layout/user-menu.tsx` (avatar, đổi giao diện, chính sách dữ liệu, đăng xuất), bỏ `theme-toggle.tsx`; cụm học kỳ nổi hơn; nhóm menu "Bắt đầu" đổi thành "Tổng hợp".
+- Độ rộng đặt 1 lần ở `AppShell`: 12 trang Admin đo mép trái đều 280px (trước đó 280–464px).
+- Kiểm tra: typecheck, lint, 473 test xanh; xem trên app desktop, tablet, điện thoại, chế độ tối; điện thoại không tràn ngang; đăng xuất qua menu chạy được. Chưa chạy Playwright e2e và build.
+- Còn: đợt 2 (Tổng quan, danh sách + chi tiết cảnh báo, Ma trận, trang Sinh viên, đăng nhập).
+- Tự kiểm tra: đăng nhập Admin, xem sidebar + cột Mức ở Cảnh báo sớm; bấm tên góc phải mở menu tài khoản.
+
+## Phase 11 đợt 2 — Sáu màn hình trọng tâm (2026-11-08)
+
+- Tổng quan Admin + Cố vấn: băng rôn đỏ kèm nút đi thẳng tới việc cần làm, 1 thẻ số nền navy, thanh tiến độ đúng màu trạng thái, bảng theo lớp dùng màu mức, Độ mới dữ liệu gọn 4 ô. Khối hướng dẫn tự thu gọn từ lần xem thứ hai.
+- Cảnh báo: vạch màu đầu dòng, gom theo mức, bấm cả dòng để mở, bỏ cột Trạng thái ở tab Cần xử lý, bộ lọc thu vào 1 nút. `DataTable` thêm `rowClassName`, `onRowClick`, `groupLabel`.
+- Chi tiết: đầu Sheet ghi "N dấu hiệu: nguồn", nút Xác nhận + Ghi can thiệp ghim đáy, thao tác phụ vào menu Khác.
+- Ma trận: ô cùng kích thước, màu đặc, "Cả học kỳ" lên đầu, bỏ dấu chấm thừa. Trang Sinh viên: 3 thẻ số, khối "Việc nên làm" chỉ hiện khi có, tông hổ phách thay đỏ, thẻ 3 cột.
+- Đăng nhập: nửa trái navy, thêm `h1`, Tài khoản trình diễn thu gọn (đã đổi `tests/e2e/helpers.ts`, `scripts/screenshots.ts`). Ghi `03`, `07`.
+- Kiểm tra: typecheck, lint, 473 test xanh; xem trên app desktop + điện thoại, không tràn ngang. Chưa chạy Playwright e2e và build.
+- Còn: đợt 3 (Nhập dữ liệu, Chạy đánh giá, Moodle, Nhật ký, Bắt đầu, Cấu hình luật), đợt 4.
+- Tự kiểm tra: GV001 → Tổng quan → Xử lý ngay → bấm 1 dòng; Ma trận lớp; sinh viên → Tình hình học tập.
+
+## Phase 11 đợt 3 — Trang quản trị (2026-11-08)
+
+- Nhập dữ liệu: 3 tab theo URL (Nhập mới, Cần nhập, Lịch sử), dải nhắc đợt nhập chờ xác nhận, trạng thái có màu, số dòng lỗi đỏ, gom 10 nút mẫu vào 1 menu, hết cắt cột.
+- Chạy đánh giá: khối lần chạy gần nhất, cụm số theo mức ở lịch sử, lọc theo học kỳ (mặc định hiện tại), cột Tính đến ghi "Lúc chạy" khi trùng thời điểm. Trang kết quả dùng thẻ số mới.
+- Nhật ký: tên đối tượng và nhãn tiếng Việt, JSON + mã lỗi gấp vào "Thông tin kỹ thuật" (`presentAuditDetail`, test mới). Bắt đầu: gấp giai đoạn đã xong (3.250 → 2.467px). Luật: gom theo nhóm, trang sửa còn 1 bảng + báo số giá trị đã đổi.
+- Moodle: khung trạng thái có màu, câu dẫn ngắn, cột "Mã lớp học phần". Học kỳ: nút Chốt kiểu cảnh báo. Lớp: gộp Khoa + Ngành, hết cắt cột. Chi tiết đợt nhập: tiêu đề kèm học phần, "đồng bộ tự động", rút gọn ngày chốt.
+- Kiểm tra: typecheck, lint, format, 475 test xanh; xem 14 trang desktop + 5 trang điện thoại, không tràn ngang, không lỗi console. Chưa chạy Playwright e2e và build.
+- Còn: đợt 4 (điện thoại, chế độ tối, trang trống, dữ liệu trình diễn, ảnh, báo cáo Word; cột mức ở danh sách Sinh viên).
+- Tự kiểm tra: Admin → Nhập dữ liệu (3 tab), Chạy đánh giá, Nhật ký hệ thống, Bắt đầu, Cấu hình luật.
+
+## Phase 11 đợt 4 — Hoàn thiện, bộ demo v4 (2026-11-08)
+
+- Bộ demo v4 làm lại từ đầu (người dùng chốt): 6 lớp, 110 sinh viên mỗi người một tên, cố vấn có tên người, lớp năm nhất `KTPM2511`, thêm `GV006`, `GV007` (chờ duyệt), `HK2_2024`, điểm danh 4 ngày chốt, 9 đợt nhập, 7 file minh họa lỗi. Bộ v3 lưu ở `_luu-tru-v3/`.
+- `KET_QUA_MONG_DOI.md` viết tay trước, có ma trận bao phủ từng nhánh luật. Engine khớp ngay: 52 → 44 → 42 dấu hiệu, 32 → 40 → 50 cảnh báo, thông báo 32/30 · 11/11 · 11/11.
+- Test `demo-v4-acceptance` thêm: đủ trạng thái cảnh báo KHMT (Đang xử lý, Bỏ qua, Mở lại, Không còn hiệu lực + cảnh báo mới), học lại lần 3, học kỳ đầu khóa, 7 file lỗi.
+- Giao diện: thẻ cảnh báo điện thoại gọn (167 → 116px), trang Sinh viên phụ trách thành thẻ + tìm kiếm + mức cao lên đầu, cột Cảnh báo ở danh sách Sinh viên, màu chữ chế độ tối đạt 4,5:1, thay các câu trống bằng `EmptyState`, trang 404 canh giữa. Ghi `03`, `07`.
+- Sửa `demo-script.md`, `kich-ban-thuyet-trinh.md`, README, e2e, script ảnh theo v4.
+- Ảnh chụp lại 66 tấm, không tràn ngang. Báo cáo Word bản hội đồng: đổi thuật ngữ, số liệu v4, 13 ảnh mới, thêm câu giải thích "Điểm ưu tiên", vẫn 83 trang (bản cũ `backups/Bao-cao-do-an-CTUT-EWARS.truoc-dot4-20261108.docx`).
+- Kiểm tra: typecheck, lint, format, migration:check, 484 test, build, e2e 2/2 xanh; kiểm trên app desktop + điện thoại + chế độ tối, 0 chữ dưới 4,5:1.
+- DB dev đã `demo:reset -- --yes` (có tự sao lưu): chưa chạy đánh giá. Moodle demo chưa dựng lại.
+- Còn: báo cáo kỹ thuật Word vẫn 10 luật (ngoài đợt này); chạy `npm run moodle:setup -- --reset` trước khi thử Moodle.
+- Tự kiểm tra: Admin → Sinh viên (cột Cảnh báo); chạy đánh giá mốc 2025-10-10 → 32 cảnh báo; GV006 → sinh viên năm nhất sau chốt; mở điện thoại xem Cảnh báo cần xử lý.

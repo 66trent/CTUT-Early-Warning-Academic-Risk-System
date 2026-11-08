@@ -1,0 +1,56 @@
+{
+  "id": "03",
+  "title": "ATT-02 vắng tăng nhanh, ATT-03 đi trễ, điểm danh quá hạn, số liệu bị sửa",
+  "students": [
+    "KTPM2311301",
+    "KTPM2311302",
+    "KTPM2311303",
+    "KTPM2311304",
+    "KTPM2311305",
+    "KTPM2311306",
+    "KTPM2311307"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null
+    },
+    {
+      "file": "02_diem_danh.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026"
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [
+        "KTPM2311301|KTPM531|ATT-02|HIGH",
+        "KTPM2311303|KTPM531|ATT-01|MEDIUM",
+        "KTPM2311304|KTPM531|ATT-03|LOW"
+      ],
+      "alerts": [
+        [
+          "KTPM2311301",
+          "HIGH"
+        ],
+        [
+          "KTPM2311303",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311304",
+          "LOW"
+        ]
+      ],
+      "warnings": [
+        "KTPM2311306|ATTENDANCE_DECREASED"
+      ],
+      "riskLevels": {
+        "KTPM2311307": "INSUFFICIENT"
+      }
+    }
+  ]
+}

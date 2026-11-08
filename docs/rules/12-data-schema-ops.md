@@ -1,17 +1,18 @@
 # 12 — Data Schema Reference: Import & Operational Exceptions
 
-Xem `00-project-context.md` trước. File này đặc tả các bảng vận hành của module `data-import` (`ImportBatch`, `ImportErrorRow`) và checklist chức năng nhập file. Chỉ có 4 loại nhập: danh sách sinh viên và 3 nguồn dữ liệu học tập. Nhận file **CSV** và **Excel `.xlsx`** (đọc sheet đầu tiên).
+Xem `00-project-context.md` trước. File này đặc tả các bảng vận hành của module `data-import` (`ImportBatch`, `ImportErrorRow`) và checklist chức năng nhập file. Có 5 loại nhập: danh sách sinh viên + 4 nguồn dữ liệu học tập (điểm danh, bài trắc nghiệm, bài thực hành, kết quả học phần — Phase 8a, chốt 2026-10-18). Nhận file **CSV** và **Excel `.xlsx`** (đọc sheet đầu tiên).
 
 ## ImportBatch
 
 | Field | Kiểu | Null? | Khóa | Ghi chú |
 |---|---|---|---|---|
 | id | String (uuid) | NOT NULL | PK | |
-| dataType | String(40) | NOT NULL | | Kiểu TS `ImportDataType` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `STUDENT`/`ATTENDANCE_SUMMARY`/`LMS_QUIZ`/`COURSE_RESULT` |
+| dataType | String(40) | NOT NULL | | Kiểu TS `ImportDataType` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `STUDENT`/`ATTENDANCE_SUMMARY`/`LMS_QUIZ`/`LMS_ASSIGNMENT`/`COURSE_RESULT` |
+| courseId | String(20) | NULL | FK → Course | Học phần Admin chọn trên form (tùy chọn, mặc định "tự nhận diện từ file") — có thì dòng thuộc học phần khác → `COURSE_MISMATCH` |
 | termId | String(10) | NULL | FK → Term | Bắt buộc với mọi loại trừ `STUDENT`. Chọn trên form nhập, mặc định học kỳ `isCurrent` |
-| source | ImportSource (enum) | NOT NULL | | `FILE` (MVP chỉ nhập file CSV/XLSX). Tên enum `ImportSource` để tránh trùng class `DataSource` của TypeORM |
-| fileName | String(255) | NOT NULL | | Tên file gốc người dùng tải lên (chỉ hiển thị) |
-| sourceChecksum | String(64) | NOT NULL | | SHA-256 nội dung file — chống nạp trùng (xem RÀNG BUỘC) |
+| source | ImportSource (enum) | NOT NULL | | `FILE` (người dùng tải lên) / `MOODLE` (file CSV do bộ đồng bộ Moodle sinh — Phase 10b, xem "Đồng bộ Moodle" cuối file). Tên enum `ImportSource` để tránh trùng class `DataSource` của TypeORM |
+| fileName | String(255) | NOT NULL | | Tên file đầu tiên của lô (chỉ hiển thị; lô nhiều file hiện thêm "+ N file") |
+| sourceChecksum | String(64) | NOT NULL | | SHA-256 nội dung file (lô 1 file) / SHA-256 của danh sách checksum các file đã sắp xếp (lô nhiều file) — chống nạp trùng (xem RÀNG BUỘC) |
 | performedBy | String(20) | NOT NULL | FK → User | |
 | status | ImportBatchStatus (enum) | NOT NULL | | `UPLOADING`→`VALIDATING`→`STAGED`→`LOADED`→`RECONCILED` / `REJECTED` / `DISCARDED` |
 | totalRows | Int | NOT NULL | | |
@@ -23,12 +24,12 @@ Xem `00-project-context.md` trước. File này đặc tả các bảng vận h�
 | loadedAt | DateTime | NULL | | Lúc ghi xong — điều kiện hoàn tác lô |
 | errorMessage | String (text) | NULL | | Lý do khi `REJECTED` (lỗi cả file) |
 | parentBatchId | String (uuid) | NULL | FK → ImportBatch | Liên kết batch sửa lỗi với batch gốc |
-| originalFilePath | String(255) | NOT NULL | | Lưu trong MinIO — xem `01-architecture.md` |
+| originalFilePath | String(255) | NOT NULL | | File đầu tiên trong MinIO — xem `01-architecture.md`; danh sách đầy đủ ở `ImportBatchFile` |
 | createdAt | DateTime | NOT NULL | | |
 | completedAt | DateTime | NULL | | |
 
 Quy trình 2 bước (người dùng chọn) — trạng thái:
-- `UPLOADING`: đang nhận file, lưu file gốc vào MinIO.
+- `UPLOADING`: đang nhận file, lưu file gốc vào MinIO. Lô nhiều file: trình duyệt gửi lần lượt từng file (mỗi lần ≤ 20MB — giới hạn thân request Server Action), file cuối kèm cờ kết thúc → `VALIDATING`. Lô `UPLOADING` quá 1 ngày (tải lên dở) → tự `DISCARDED`.
 - `VALIDATING`: job `import-batch-process` đọc file theo stream, kiểm tra từng dòng, ghi `ImportErrorRow`. KHÔNG ghi dữ liệu nghiệp vụ.
 - `STAGED`: kiểm tra xong, chờ Admin xem trước ("X dòng hợp lệ, Y dòng lỗi") rồi bấm **Xác nhận nạp** hoặc **Hủy** (`DISCARDED`).
 - `LOADED`: đã ghi các dòng hợp lệ (đọc lại file gốc từ MinIO, không dùng bảng tạm), theo lô ≤ 500 dòng/transaction; mọi thao tác là upsert theo khóa nghiệp vụ → chạy lại an toàn khi job lỗi giữa chừng.
@@ -37,11 +38,13 @@ Quy trình 2 bước (người dùng chọn) — trạng thái:
 - `ROLLED_BACK`: lô đã nạp bị hoàn tác (xem "Hoàn tác lô").
 
 RÀNG BUỘC:
-- Chỉ hủy được (`DISCARDED`) khi `status = STAGED` (chưa ghi dữ liệu nghiệp vụ nào). Lô `STAGED` quá 7 ngày không xác nhận → tự `DISCARDED` (job hằng ngày).
+- Chỉ hủy được (`DISCARDED`) khi `status = STAGED` hoặc `UPLOADING` (chưa ghi dữ liệu nghiệp vụ nào). Lô `STAGED` quá 7 ngày không xác nhận → tự `DISCARDED` (job hằng ngày).
 - **Kiểm tra lại khi xác nhận**: bước `LOADED` MUST kiểm tra lại mọi dòng với dữ liệu nền tại thời điểm nạp (sinh viên, lớp, học kỳ có thể đã đổi từ lúc xem trước); dòng mới thành lỗi được thêm vào `ImportErrorRow`, `successRows`/`errorRows` cập nhật lại.
 - **Màn xem trước**: hiện số dòng hợp lệ/lỗi, vài dòng mẫu; tỷ lệ lỗi > 10% → cảnh báo nổi bật (với `LMS_QUIZ`, thiếu dòng làm lệch tỷ lệ "phần lớn lớp đã làm" của `LMS-01`).
+- **Thẻ nhận diện** (chốt 2026-10-18): màn xem trước hiện 1 thẻ cho mỗi học phần trong file — tên, mã lớp học phần, mã học phần (ghi "tự suy" nếu suy từ mã lớp học phần), số tiết / danh sách bài + hạn nộp / ngày chốt (kèm ngày chốt lần nạp trước), số sinh viên chia theo lớp sinh hoạt và khoa, nhãn "Khớp học kỳ" / "Học phần mới, sẽ tạo", số dòng lỗi và cảnh báo của học phần đó. Lưu ở `summary.courses` (validate Zod). Nút xác nhận ghi rõ số dòng sẽ nạp. KHÔNG chọn khoa/lớp sinh hoạt khi nạp (1 lớp học phần có sinh viên nhiều lớp, nhiều khoa). Lịch sử nạp có cột Học phần (khi lô chỉ có 1 học phần) và lọc theo học phần.
 - **Nạp đồng thời**: bước nạp giữ khóa theo `(dataType, termId)` (PostgreSQL advisory lock) — lô thứ hai cùng loại, cùng học kỳ chờ lô đầu xong.
-- **Giới hạn file**: ≤ 20MB tải lên, ≤ 50.000 dòng dữ liệu (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`.
+- **Giới hạn file**: ≤ 20MB mỗi file, ≤ 50 file mỗi lô, ≤ 50.000 dòng dữ liệu TỔNG cả lô (CSV và XLSX); XLSX: dung lượng sau giải nén ≤ 100MB (chống zip bomb), chỉ đọc giá trị ô (bỏ công thức, macro, sheet khác). Vượt → `REJECTED`. Giới hạn tần suất: 30 lô / giờ / Admin (đếm theo lô, không theo file).
+- **Nạp nhiều file 1 lần** (chốt 2026-10-20, Phase 8f — trường xuất 1 file / lớp học phần / lần): 1 lô nhận 1–50 file CÙNG loại, CÙNG học kỳ (được trộn `.csv` và `.xlsx`; mỗi file có dòng tiêu đề và thứ tự cột riêng). Cả lô chung 1 lần xem trước, 1 lần xác nhận, 1 lần chạy đánh giá sau nạp, hoàn tác cả lô. 1 file lỗi cả file (không đọc được, thiếu cột) → `REJECTED` cả lô, `errorMessage` ghi tên file. Kiểm tra trùng khóa chạy xuyên các file: dòng trùng dòng của file trước → `DUPLICATE` "Trùng với dòng N của file X". Chống nạp trùng theo TỪNG file: file đã nằm trong 1 lô còn hiệu lực khác (cùng loại, học kỳ) hoặc chọn 2 lần trong cùng lô → từ chối khi tải lên. Màn xem trước có bảng từng file (số dòng, hợp lệ, lỗi, học phần nhận diện) + thẻ học phần gộp cả lô. Lịch sử nạp lọc theo học phần (học phần chọn trên form hoặc nhận diện trong `summary.courses`) và theo khoa (khoa của lớp sinh hoạt trong thẻ học phần).
 
 **Hoàn tác lô** (người dùng chọn "có điều kiện") — Admin bấm "Hoàn tác" trên lô `LOADED`/`RECONCILED`, xác nhận lần 2 (AlertDialog), chỉ khi ĐỦ cả 2 điều kiện (người dùng bỏ điều kiện "chưa có `EvaluationRun`" vì mỗi lô nạp xong đều tự chạy đánh giá, điều kiện đó khiến lô học tập không bao giờ hoàn tác được):
 1. Lô chỉ THÊM dòng mới, không cập nhật dòng có sẵn (`summary.updated = 0`), và job nạp không phải chạy lại sau sự cố (`summary.retried` khác true).
@@ -59,14 +62,32 @@ Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `
 | id | String (uuid) | NOT NULL | PK | |
 | importBatchId | String (uuid) | NOT NULL | FK → ImportBatch | |
 | sourceRowNumber | Int | NOT NULL | | Số dòng trong file gốc, để người nhập đối chiếu khi sửa |
+| sourceFileName | String(255) | NULL | | Tên file chứa dòng lỗi (lô nhiều file — Phase 8f); NULL ở lô cũ trước 8f |
 | rawData | Json | NOT NULL | | Dữ liệu nguyên trạng dòng lỗi |
 | errorDetail | String(255) | NULL | | Diễn giải cụ thể bằng tiếng Việt (VD "Lớp KTPM9999 chưa có trong hệ thống") |
-| errorReason | String(40) | NOT NULL | | Kiểu TS `ImportErrorReason` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `INVALID_FORMAT`/`STUDENT_NOT_FOUND`/`CLASS_NOT_FOUND`/`DUPLICATE`/`OUT_OF_RANGE`/`TERM_MISMATCH`/`RESULT_ALREADY_FINAL` |
+| errorReason | String(40) | NOT NULL | | Kiểu TS `ImportErrorReason` (union + Zod, KHÔNG dùng enum Postgres — xem `01`): `INVALID_FORMAT`/`STUDENT_NOT_FOUND`/`CLASS_NOT_FOUND`/`DUPLICATE`/`OUT_OF_RANGE`/`TERM_MISMATCH`/`COURSE_MISMATCH` |
 | resolved | Boolean | NOT NULL, default `false` | | |
 
-`STUDENT_NOT_FOUND`: `mssv` chưa có trong danh sách sinh viên — MUST NOT tự tạo sinh viên. `TERM_MISMATCH`: cột `hoc_ky` khác học kỳ đã chọn, hoặc ngày chốt điểm danh / giờ bắt đầu làm bài nằm ngoài thời gian học kỳ. `DUPLICATE`: trùng khóa với 1 dòng trước đó trong CÙNG file (giữ dòng đầu), hoặc email sinh viên đã thuộc tài khoản khác. `RESULT_ALREADY_FINAL`: dòng chỉ có điểm quá trình cho kết quả đã chốt cuối kỳ.
+`STUDENT_NOT_FOUND`: `mssv` chưa có trong danh sách sinh viên — MUST NOT tự tạo sinh viên. `TERM_MISMATCH`: cột `hoc_ky` khác học kỳ đã chọn, hoặc ngày chốt điểm danh / giờ bắt đầu làm bài nằm ngoài thời gian học kỳ. `DUPLICATE`: trùng khóa với 1 dòng trước đó trong CÙNG lô (cùng file hoặc file trước — giữ dòng đầu), hoặc email sinh viên đã thuộc tài khoản khác. `COURSE_MISMATCH`: Admin đã chọn 1 học phần trên form nhưng dòng thuộc học phần khác.
 
-**File lỗi tải về** (Route Handler GET — export file, chỉ Admin): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), chống chèn công thức (xem `06`), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`).
+**File lỗi tải về** (Route Handler GET — export file, chỉ Admin): CSV UTF-8 có BOM (Excel mở đúng tiếng Việt), chống chèn công thức (xem `06`), cột `dong` (số dòng gốc), `ly_do` (diễn giải tiếng Việt), `ma_loi`, (lô nhiều file: `ten_file`), rồi các cột gốc của dòng — sửa xong nạp lại được ngay (batch mới có `parentBatchId`; các cột thêm được bỏ qua).
+
+## ImportBatchFile (Phase 8f)
+
+1 file của 1 lô. Lô trước 8f được migration điền 1 dòng từ cột của `ImportBatch`.
+
+| Field | Kiểu | Null? | Khóa | Ghi chú |
+|---|---|---|---|---|
+| id | String (uuid) | NOT NULL | PK | |
+| importBatchId | String (uuid) | NOT NULL | FK → ImportBatch (CASCADE) | |
+| fileOrder | Int | NOT NULL | UNIQUE cùng `importBatchId` | Thứ tự tải lên, từ 1 |
+| fileName | String(255) | NOT NULL | | |
+| sourceChecksum | String(64) | NOT NULL | INDEX | SHA-256 nội dung file — chống nạp trùng từng file |
+| originalFilePath | String(255) | NOT NULL | | Khóa đối tượng MinIO |
+| sizeBytes | Int | NOT NULL | | |
+| totalRows / successRows / errorRows | Int | NOT NULL, default 0 | | Cập nhật sau kiểm tra và sau nạp |
+| courseIds | String(20)[] | NOT NULL, default `{}` | | Học phần nhận diện trong file (bảng từng file ở màn xem trước) |
+| createdAt | DateTime | NOT NULL | | |
 
 ## Định dạng file và cột — header tiếng Việt không dấu
 
@@ -76,32 +97,80 @@ Hoàn tác = trong 1 transaction: xóa các dòng nguồn lô đã tạo; xóa `
 
 **Đọc CSV** (RFC 4180): bỏ BOM; tự nhận dấu phân cách `,` hoặc `;` (Excel máy tiếng Việt hay lưu `;`); khi phân cách là `;`, số thập phân dạng `7,5` được hiểu là 7.5. **Đọc XLSX**: sheet đầu tiên, dòng 1 là header; ô ngày kiểu Excel đọc theo giá trị ngày, ô văn bản đọc như CSV. Đọc theo stream (`05`).
 
-**Header**: bỏ dấu, chữ thường, ký tự khác chữ/số → `_` rồi so khớp tên chuẩn (VD `Mã học phần` → `ma_hoc_phan`) + vài bí danh phổ biến (`ma_sv`, `ma_so_sinh_vien` → `mssv`). Thiếu cột bắt buộc → `REJECTED` cả file, báo rõ cột thiếu.
+**Dòng tiêu đề**: dòng đầu tiên trong 10 dòng đầu chứa cột `mssv` (hoặc bí danh) — để dán cả vùng bảng có dòng tiêu đề phụ phía trên; số dòng báo lỗi vẫn là số dòng thật. **Header**: bỏ dấu, chữ thường, ký tự khác chữ/số → `_` rồi so khớp tên chuẩn (VD `Mã học phần` → `ma_hoc_phan`) + vài bí danh phổ biến (`ma_sv`, `ma_so_sinh_vien` → `mssv`). Thiếu cột bắt buộc → `REJECTED` cả file, báo rõ cột thiếu.
 
-Học kỳ chọn trên form nhập (mặc định học kỳ hiện tại); cột `hoc_ky` là tùy chọn, nếu có MUST khớp. Ngày: `YYYY-MM-DD` hoặc `DD/MM/YYYY` với ngày và tháng đủ 2 chữ số (VD `05/10/2026`); ngày giờ: `YYYY-MM-DD HH:mm`, `DD/MM/YYYY HH:mm`, `HH:mm DD/MM/YYYY`. Dạng không đủ 2 chữ số mà ngày, tháng đều ≤ 12 và khác nhau (VD `10/2/2026` — Excel máy cài kiểu Mỹ tự đổi) hoặc tháng > 12 (VD `9/14/2026`) MUST báo `INVALID_FORMAT` với hướng dẫn dùng `YYYY-MM-DD` — KHÔNG đoán. Ô ngày trong XLSX đọc theo giá trị ngày của Excel. Số dòng báo lỗi = số dòng thật trong file (header = dòng 1). Parser MUST chấp nhận thêm dạng xuất phổ biến của LMS Việt Nam: `HH:mm DD/MM/YYYY`, điểm `8/10`, thời lượng `12 phút`, trạng thái tiếng Việt (`Đã nộp`, `Đạt`, `Không đạt`) — chuẩn hóa về kiểu ở `10` trước khi validate. Cột thừa (VD: `ho_ten`, `lop`) được bỏ qua, không báo lỗi.
+Học kỳ chọn trên form nhập (mặc định học kỳ hiện tại); cột `hoc_ky` là tùy chọn, nếu có MUST khớp. Ngày: `YYYY-MM-DD` hoặc `DD/MM/YYYY` với ngày và tháng đủ 2 chữ số (VD `05/10/2026`); ngày giờ: `YYYY-MM-DD HH:mm`, `DD/MM/YYYY HH:mm`, `HH:mm DD/MM/YYYY`. Dạng không đủ 2 chữ số mà ngày, tháng đều ≤ 12 và khác nhau (VD `10/2/2026` — Excel máy cài kiểu Mỹ tự đổi) hoặc tháng > 12 (VD `9/14/2026`) MUST báo `INVALID_FORMAT` với hướng dẫn dùng `YYYY-MM-DD` — KHÔNG đoán. Ô ngày trong XLSX đọc theo giá trị ngày của Excel. Số dòng báo lỗi = số dòng thật trong file (header = dòng 1). Parser MUST chấp nhận thêm dạng xuất phổ biến của LMS Việt Nam: `HH:mm DD/MM/YYYY`, điểm `8/10`, thời lượng `12 phút`, trạng thái tiếng Việt/Anh của Moodle (`Đã nộp`, `Nộp trễ`, `Chưa nộp`, `Chưa làm`, `Submitted for grading`, `No submission`, `Finished`, `Never submitted`) — chuẩn hóa về kiểu ở `10` trước khi validate. Cột thừa (VD: `lop`, `ngay_sinh`) được bỏ qua, không báo lỗi.
 
 - `STUDENT`: `mssv,ho_ten,email,ma_lop_sinh_hoat,trang_thai_hoc_vu`. Lớp sinh hoạt MUST tồn tại (sai → `CLASS_NOT_FOUND`). Email MUST đuôi `@student.ctuet.edu.vn` (sai → `INVALID_FORMAT`). `trang_thai_hoc_vu` ∈ `OfficialAcademicStatus` (chấp nhận nhãn tiếng Việt: Đang học/Bảo lưu/Đình chỉ/Tốt nghiệp/Buộc thôi học). Tạo/cập nhật `Student` + `User` (`role = STUDENT`, `accountStatus = ACTIVE`, `authUserId = NULL`); sinh viên không có trong file KHÔNG bị xóa. Đây là đường DUY NHẤT ghi `Student.officialAcademicStatus`.
-- `ATTENDANCE_SUMMARY`: `mssv,ma_hoc_phan,ten_hoc_phan,ngay_chot,tong_buoi,co_mat,di_tre,vang_co_phep,vang_khong_phep` + tùy chọn `tong_buoi_ke_hoach,ma_lop_hoc_phan`. → `AttendanceSummary`.
-- `LMS_QUIZ`: `mssv,ma_hoc_phan,ma_bai,ten_bai,lan_lam,thoi_diem_bat_dau,thoi_diem_nop,thoi_gian_lam_phut,diem,diem_toi_da,trang_thai` + tùy chọn `ma_lop_hoc_phan`, `ten_hoc_phan` (file LMS thường không có tên học phần — học phần mới tạm lấy tên = mã, được thay khi file điểm danh/kết quả có tên thật). `trang_thai`: `SUBMITTED`/`IN_PROGRESS`/`ABANDONED` (chấp nhận `Đã nộp`/`Đang làm`/`Bỏ dở`). `ma_bai` trống → dùng `ten_bai` chuẩn hóa làm khóa. → `LmsQuizAttempt`.
-- `COURSE_RESULT`: `mssv,ma_hoc_phan,ten_hoc_phan,so_tin_chi,diem_qua_trinh,diem_thi,diem_tong_ket,diem_chu,ket_qua` + tùy chọn `ngay_cong_bo`. `ket_qua`: `DAT`/`KHONG_DAT` (chấp nhận `Đạt`/`Không đạt`). Chỉ có `diem_qua_trinh` → `PROCESS_ONLY`; có `diem_tong_ket`, `diem_chu` hoặc `ket_qua` → `FINAL`; không có điểm nào → `INVALID_FORMAT`. `so_tin_chi` 1–30 (trống = không đổi). → `CourseResult`, cập nhật `Course.credits`. Cảnh báo (`warnings`, không chặn nạp): `LETTER_GRADE_MISMATCH` (`diem_chu` lệch `diem_tong_ket`, nạp theo `diem_chu`), `RESULT_MISMATCH` (`ket_qua` lệch điểm chữ, nạp theo `ket_qua`).
+**Cột chung 4 loại học tập** (chốt 2026-10-18): `mssv`, `ma_lop_hoc_phan` (bắt buộc), tùy chọn `ma_hoc_phan` (trống → `ma_lop_hoc_phan` bỏ 2 ký tự cuối, VD `010100240802` → `0101002408` — giả định chưa xác nhận chính thức, màn xem trước ghi "tự suy"), `ho_dem` + `ten` (đối chiếu với `Student.fullName` sau khi bỏ dấu, chữ thường, gộp khoảng trắng — lệch → cảnh báo `NAME_MISMATCH` "có thể sai MSSV", không chặn), `hoc_ky` (khớp học kỳ đã chọn). Dòng hợp lệ đầu tiên của `(mssv, mã học phần)` trong học kỳ MUST upsert `Course` và tạo `Enrollment` nếu chưa có (`09`), cập nhật `Enrollment.sectionCode`, trong cùng transaction với việc nạp dòng.
 
-Ánh xạ cột → field (`10`): `ngay_chot`→`snapshotDate`, `tong_buoi`→`totalSessions`, `tong_buoi_ke_hoach`→`plannedSessions`, `co_mat`→`present`, `di_tre`→`late`, `vang_co_phep`→`excusedAbsence`, `vang_khong_phep`→`unexcusedAbsence`, `ma_lop_hoc_phan`→`sectionCode`; `ma_bai`→`quizKey`, `ten_bai`→`quizName`, `lan_lam`→`attemptNumber`, `thoi_diem_bat_dau`→`startedAt`, `thoi_diem_nop`→`submittedAt`, `thoi_gian_lam_phut`→`durationMinutes`, `diem`→`score`, `diem_toi_da`→`maxScore`, `trang_thai`→`status`; `diem_qua_trinh`→`processScore`, `diem_thi`→`examScore`, `diem_tong_ket`→`finalScore`, `diem_chu`→`letterGrade`, `ket_qua`→`passed`, `ngay_cong_bo`→`publishedAt`, `so_tin_chi`→`Course.credits`.
+- `ATTENDANCE_SUMMARY`: chung + `ten_hoc_phan, ngay_chot, tong_so_tiet, vang_co_phep, vang_khong_phep` + tùy chọn `ty_le_vang` (đối chiếu). Đơn vị TIẾT. → `AttendanceSummary`.
+- `LMS_QUIZ`: chung + `ma_bai, ten_bai, trang_thai` + tùy chọn `ten_hoc_phan, han_nop, lan_lam, thoi_diem_bat_dau, thoi_diem_nop, thoi_gian_lam_phut, diem, diem_toi_da, so_cau_dung, tong_so_cau`. `trang_thai`: `SUBMITTED`/`IN_PROGRESS`/`ABANDONED`/`NOT_STARTED` (chấp nhận `Đã nộp`/`Đang làm`/`Bỏ dở`/`Chưa làm`, Moodle `Finished`/`In progress`/`Never submitted`). Khác `NOT_STARTED` thì `thoi_diem_bat_dau` bắt buộc. Học phần mới chưa có tên → tạm lấy tên = mã. → `LmsActivity` (QUIZ) + `LmsQuizAttempt`.
+- `LMS_ASSIGNMENT`: chung + `ma_bai, ten_bai, han_nop, trang_thai_nop` + tùy chọn `ten_hoc_phan, thoi_diem_nop`. `trang_thai_nop`: `ON_TIME`/`LATE`/`NOT_SUBMITTED` (chấp nhận `Đã nộp`/`Nộp trễ`/`Chưa nộp`, Moodle `Submitted for grading`/`No submission`). `thoi_diem_nop` bắt buộc khi đã nộp. → `LmsActivity` (ASSIGNMENT) + `LmsAssignmentSubmission`.
+- `COURSE_RESULT`: chung + `ten_hoc_phan, so_tin_chi, diem_chu` + tùy chọn `diem_thuong_xuyen, duoc_du_thi, diem_cuoi_ky, vang_thi, thang_diem_4, ngay_cong_bo`. `so_tin_chi` 1–30 (bắt buộc — file trường không có, Admin điền theo chương trình đào tạo). `duoc_du_thi`/`vang_thi`: `Có`/`Không` (chấp nhận `x`, `1`/`0`, `TRUE`/`FALSE`). Chỉ nạp khi học phần đã khóa điểm. → `CourseResult`, cập nhật `Course.credits`. Cảnh báo: `GRADE_POINT_MISMATCH` (`thang_diem_4` lệch quy đổi của `diem_chu`).
 
-Cả 3 loại học tập nhận thêm cột tùy chọn `hoc_ky` (khớp học kỳ đã chọn, sai → `TERM_MISMATCH`). Với 3 loại sau `STUDENT`: dòng hợp lệ đầu tiên của `(mssv, ma_hoc_phan)` trong học kỳ MUST upsert `Course` và tạo `Enrollment` nếu chưa có (xem `09-data-schema-identity.md`), trong cùng transaction với việc nạp dòng.
+Ánh xạ cột → field (`10`): `ngay_chot`→`snapshotDate`, `tong_so_tiet`→`totalPeriods`, `vang_co_phep`→`excusedAbsence`, `vang_khong_phep`→`unexcusedAbsence`, `ma_lop_hoc_phan`→`sectionCode`; `ma_bai`→`activityKey`, `ten_bai`→`activityName`, `han_nop`→`dueAt`, `lan_lam`→`attemptNumber`, `thoi_diem_bat_dau`→`startedAt`, `thoi_diem_nop`→`submittedAt`, `thoi_gian_lam_phut`→`durationMinutes`, `diem`→`score`, `diem_toi_da`→`maxScore`, `so_cau_dung`→`correctCount`, `tong_so_cau`→`totalQuestions`, `trang_thai`→`status`, `trang_thai_nop`→`LmsAssignmentSubmission.status`; `diem_thuong_xuyen`→`processScore`, `diem_cuoi_ky`→`examScore`, `diem_chu`→`letterGrade`, `duoc_du_thi`→`eligibleForExam`, `vang_thi`→`absentFromExam`, `ngay_cong_bo`→`publishedAt`, `so_tin_chi`→`Course.credits`.
 
 ## Quan hệ tóm tắt
 
-`ImportBatch 1—n ImportErrorRow` · `ImportBatch 1—n` (AttendanceSummary, LmsQuizAttempt, CourseResult — xem `10`) · `ImportBatch 0..1—n ImportBatch` (qua `parentBatchId`) · `ImportBatch n—0..1 Term`.
+`ImportBatch 1—n ImportErrorRow` · `ImportBatch 1—n` (AttendanceSummary, LmsActivity, LmsQuizAttempt, LmsAssignmentSubmission, CourseResult — xem `10`) · `ImportBatch 0..1—n ImportBatch` (qua `parentBatchId`) · `ImportBatch n—0..1 Term`.
 
 ## Chức năng module data-import — checklist bắt buộc
 
 1. Nhập danh sách sinh viên.
 2. Nhập điểm danh tổng hợp theo ngày chốt.
-3. Nhập kết quả làm bài kiểm tra LMS.
-4. Nhập kết quả học phần (giữa kỳ: điểm quá trình; cuối kỳ: đầy đủ).
-5. Xem lịch sử các lần nhập (danh sách `ImportBatch`) và số dòng thành công/lỗi.
-6. Tải file dòng lỗi kèm lý do diễn giải tiếng Việt.
-7. Nhập lại các dòng đã sửa, liên kết batch gốc (`parentBatchId`).
-8. Chống nhập trùng file bằng `sourceChecksum`.
-9. Hủy batch `STAGED` chưa được dùng để tính RiskScore.
-10. Dữ liệu lỗi hoặc chưa đối soát MUST NOT vào Rule Engine (chỉ đọc dữ liệu từ batch `LOADED`/`RECONCILED`).
+3. Nhập kết quả bài trắc nghiệm LMS.
+4. Nhập trạng thái nộp bài thực hành LMS.
+5. Nhập kết quả học phần đã khóa điểm.
+6. Xem lịch sử các lần nhập (danh sách `ImportBatch`) và số dòng thành công/lỗi.
+7. Tải file dòng lỗi kèm lý do diễn giải tiếng Việt.
+8. Nhập lại các dòng đã sửa, liên kết batch gốc (`parentBatchId`).
+9. Chống nhập trùng file bằng `sourceChecksum`.
+10. Hủy batch `STAGED` chưa được dùng để tính RiskScore.
+11. Dữ liệu lỗi hoặc chưa đối soát MUST NOT vào Rule Engine (chỉ đọc dữ liệu từ batch `LOADED`/`RECONCILED`).
+
+## Đồng bộ Moodle (Phase 10b–10c, chốt 2026-11-07/08 — `docs/tich-hop-moodle.md` mục 9, 9b, 9c)
+
+Bộ đồng bộ CHỈ ĐỌC Moodle (web service REST, token `MOODLE_WS_TOKEN`) → mapper thuần sinh file CSV ĐÚNG cột mẫu (1 file / khóa / loại) → đi qua ĐÚNG đường nạp nhiều file ở trên (kiểm tra dòng, tạo `Course`/`Enrollment`, thẻ học phần, lịch sử). Kết quả học phần KHÔNG đồng bộ (vẫn nạp file).
+
+### MoodleCourseLink — `moodle_course_links`
+
+| Field | Kiểu | Null? | Ghi chú |
+|---|---|---|---|
+| id | uuid | NOT NULL | PK |
+| moodleCourseId | Int | NOT NULL | `course.id` Moodle; UNIQUE (`moodleCourseId`, `termId`) |
+| termId | String(10) | NOT NULL | FK → Term (xóa học kỳ → xóa liên kết) |
+| sectionCode | String(30) | NOT NULL | = Course ID number (12 chữ số) của khóa Moodle |
+| courseId | String(20) | NOT NULL | Mã học phần — mặc định bỏ 2 số cuối, Admin sửa được |
+| courseName | String(150) | NOT NULL | Mặc định từ tên khóa Moodle (bỏ phần "(nhóm …) — …") |
+| moodleShortname / moodleFullname | String(255) | NOT NULL | Hiển thị |
+| enabled | Boolean | NOT NULL | Mặc định `false` — Admin bật từng khóa |
+| totalPeriodsOverride | Int | NULL | Ghi đè tổng số tiết (NULL = tổng thời lượng các buổi ÷ `MOODLE_PERIOD_MINUTES`) |
+| lastSyncAt / lastError | DateTime / text | NULL | Lần đọc gần nhất; lỗi đọc khóa này (không chứa token) |
+| unknownStudents | Json | NOT NULL | Sinh viên Moodle chưa có trong EWARS ở lần gần nhất `[{ moodleUserId, idnumber, email }]` ≤ 500 |
+| updatedBy | String(20) | NOT NULL | Người sửa gần nhất (Audit Log `MOODLE_LINK_UPDATED`) |
+| syncMode | String(10) | NOT NULL | `MANUAL` (mặc định) / `AUTO` — Phase 10c |
+| fingerprint | String(64) | NULL | Dấu vân tay dữ liệu Moodle ở lần kéo đủ gần nhất (lịch dò thay đổi so) |
+| lastCheckedAt / pendingEventAt | DateTime | NULL | Lần dò gần nhất / có sự kiện chưa xử lý |
+| seenStudentIds / leftStudents | Json | NOT NULL | MSSV lần kéo đủ gần nhất / sinh viên đã rời khóa `[{ studentId, detectedAt }]` |
+| seenActivities / removedActivities | Json | NOT NULL | Bài lần gần nhất `[{ kind, id, name, dues }]` (`dues` = hạn chung + gia hạn, Unix giây) / bài đã xóa trên Moodle |
+
+### MoodleSyncRun — `moodle_sync_runs`
+
+1 lần đồng bộ của 1 học kỳ, 1 chế độ: `trigger` (`MANUAL` / `EVENT` / `SCHEDULED` / `NIGHTLY` / `DUE_DATE`), `mode` (`MANUAL`/`AUTO` — chỉ đọc khóa cùng chế độ), `linkIds` (NULL = mọi khóa cùng chế độ), `requestedBy` (tự động = tài khoản hệ thống `SYSTEM_MOODLE`), `status` `QUEUED` → `RUNNING` → `STAGED` (đã tạo lô) / `NO_CHANGE` / `FAILED`, `batchIds` (`{ ATTENDANCE_SUMMARY?, LMS_QUIZ?, LMS_ASSIGNMENT? }`), `stats` (theo khóa: số dòng sinh, số SV chưa có, ghi chú, lỗi; số file không đổi theo loại), `errorMessage`, `createdAt`, `finishedAt`. Queue `moodle-sync`, `jobId` = id, chạy 1 job/lần.
+
+### Quy tắc
+
+- Chỉ khóa `enabled` của học kỳ (chưa chốt). Chạy tay: chặn đồng bộ mới khi đang có lần Chạy tay `QUEUED`/`RUNNING` hoặc lần trước còn lô chưa xác nhận/hủy. "Đồng bộ ngay" tạo tối đa 2 lần: khóa Chạy tay + khóa Tự động.
+- Khớp sinh viên: `user.idnumber` = MSSV (không phân biệt hoa thường); trống/không khớp → email đã lưu của sinh viên. KHÔNG suy MSSV từ email. Chỉ người có vai `student` trong khóa.
+- **Ngoại lệ của `00` (từ chối + ghi `ImportErrorRow`)**: sinh viên Moodle chưa có trong EWARS bị BỎ QUA và đếm riêng (`MoodleCourseLink.unknownStudents`, `stats`) — 1 khóa Moodle có thể có sinh viên khoa khác chưa nhập; ghi dòng lỗi sẽ lặp lại mỗi lần đồng bộ và đẩy tỷ lệ lỗi > 10%.
+- File sinh ra: tên `moodle-<mã lớp học phần>-<diem-danh|trac-nghiem|thuc-hanh>.csv`, UTF-8 có BOM. File trùng checksum với file MỚI NHẤT cùng tên (lô còn hiệu lực cùng loại, học kỳ) → BỎ QUA; cả 3 loại không đổi → `NO_CHANGE`, không tạo lô. Phase 10c: KHÔNG so với mọi lô cũ (sửa điểm danh A → P rồi lại → A sinh file giống 1 lô cũ mà vẫn phải nạp) → lô `MOODLE` không bị chặn "file đã nạp", checksum lô gắn id lô (chỉ số UNIQUE không chặn).
+- Chạy tay: lô `STAGED` → "Xác nhận nạp cả 3" (`MOODLE_SYNC_CONFIRMED`, mỗi lô vẫn ghi `IMPORT_CONFIRMED`) hoặc "Hủy" (`MOODLE_SYNC_DISCARDED`). Đánh giá sau nạp như nạp file (DEMO_MODE: Admin bấm chạy).
+- **Lô nguồn `MOODLE` không hoàn tác** — Moodle là nguồn gốc: sửa trên Moodle rồi đồng bộ lại.
+- Lỗi 1 khóa (mạng, quyền, Moodle) không chặn khóa khác; client thử lại lỗi tạm thời (mạng, quá giờ, HTTP 5xx, Moodle "Unable to acquire a lock") 2 lần; gọi Moodle TUẦN TỰ (gọi song song làm Moodle tranh khóa cache — gặp khi kiểm tay Phase 10b).
+- Quy đổi điểm danh: 1 ngày chốt cho MỖI NGÀY có buổi đã điểm danh (cộng dồn đến hết ngày); số tiết buổi = thời lượng ÷ `MOODLE_PERIOD_MINUTES` (mặc định 50, làm tròn, ≥ 1); ký hiệu `MOODLE_EXCUSED_ACRONYMS` (mặc định `E`) có phép, `MOODLE_UNEXCUSED_ACRONYMS` (mặc định `A`) không phép, còn lại có mặt; sinh viên không có trạng thái ở buổi đã điểm danh → không tính vắng; buổi theo nhóm tính cho cả lớp (giới hạn).
+- **Tự động (Phase 10c)**: Admin bật theo khóa sau khi đã xác nhận nạp ≥ 1 lần và không còn lô chờ. Nguồn kích hoạt: sự kiện plugin `local_ewars` (gom 30 giây / học kỳ, chỉ kéo khóa có sự kiện), lịch `MOODLE_SYNC_INTERVAL_MINUTES` (mặc định 10) chỉ DÒ dấu vân tay (phần rẻ + sổ điểm, không gọi lượt làm từng sinh viên) rồi kéo khóa đổi, mỗi đêm `MOODLE_NIGHTLY_SCHEDULE` kéo đủ + đánh giá, job hạn nộp `hạn + 5 phút` (cả hạn gia hạn riêng; hạn đã đổi → job bỏ qua) kéo khóa + đánh giá (không có gì mới vẫn đánh giá). Lô tự xác nhận (tài khoản `SYSTEM_MOODLE`) khi tỷ lệ lỗi ≤ 10% (`HIGH_ERROR_RATE`); > 10% → chờ Admin ("Cần Admin xem"). Nạp xong tự đánh giá kể cả `DEMO_MODE=true`. Chạy cả khi `DEMO_MODE=true`. Audit `MOODLE_SYNC_AUTO` khi lần tự động tạo lô. Bền vững: sự kiện chờ > 2 phút (job gom mất khi Redis khởi động lại) → lịch dò coi là có thay đổi; lần đồng bộ treo `QUEUED`/`RUNNING` > 15 phút (worker dừng giữa chừng) → lịch dò đánh dấu `FAILED` (dấu vân tay chưa đổi nên lần dò tự kéo lại).
+- **Chặn xác nhận dữ liệu cũ**: lần đồng bộ chờ xác nhận mà đã có lần mới hơn, chung khóa, có lô đã xác nhận/nạp → `SYNC_STALE`.
+- **Dữ liệu xóa trên Moodle** (người dùng chốt 2026-11-08): sinh viên rời khóa / bài bị xóa KHÔNG tự xóa ở EWARS — liệt kê ở trang Kết nối (`leftStudents`, `removedActivities`) để Admin đánh dấu Rút học phần.
+- File thực hành có cột tùy chọn **`han_rieng`** (hạn nộp riêng / gia hạn — Moodle *Grant extension*), nhận như `han_nop` (chỉ ngày → 23:59). Nạp file tay cũng dùng được.
+

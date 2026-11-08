@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

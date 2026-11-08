@@ -1,0 +1,69 @@
+{
+  "id": "05",
+  "title": "ACA-01 điểm quá trình, ACA-02 rớt học phần, ACA-03 điểm trung bình học kỳ",
+  "students": [
+    "KTPM2311501",
+    "KTPM2311502",
+    "KTPM2311503",
+    "KTPM2311504",
+    "KTPM2311505",
+    "KTPM2311506",
+    "KTPM2311507"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null
+    },
+    {
+      "file": "03_HK2_ket_qua_cuoi_ky.csv",
+      "dataType": "COURSE_RESULT",
+      "termId": "HK2_2025"
+    },
+    {
+      "file": "02_HK1_ket_qua_giua_ky.csv",
+      "dataType": "COURSE_RESULT",
+      "termId": "HK1_2026"
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK2_2025",
+      "asOf": "2026-06-15",
+      "triggers": [
+        "KTPM2311503|KTPM2311503|ACA-02|CRITICAL",
+        "KTPM2311503|KTPM2311503|ACA-03|HIGH",
+        "KTPM2311504|KTPM2311504|ACA-02|HIGH",
+        "KTPM2311505|KTPM2311505|ACA-03|HIGH"
+      ],
+      "alerts": [
+        [
+          "KTPM2311503",
+          "CRITICAL"
+        ],
+        [
+          "KTPM2311504",
+          "HIGH"
+        ],
+        [
+          "KTPM2311505",
+          "HIGH"
+        ]
+      ]
+    },
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [
+        "KTPM2311501|KTPM551|ACA-01|HIGH"
+      ],
+      "alerts": [
+        [
+          "KTPM2311501",
+          "HIGH"
+        ]
+      ]
+    }
+  ]
+}

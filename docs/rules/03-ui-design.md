@@ -7,28 +7,32 @@ Xem `00-project-context.md` cho glossary (đặc biệt: enum `Severity`, `DataC
 - MUST: dùng shadcn/ui cho mọi thành phần chuẩn (Form, Table, Dialog, Dropdown, Badge, Tabs, Sheet, Toast).
 - MUST: dùng biểu đồ (Recharts qua shadcn `Chart`) chỉ cho khu vực biểu đồ/KPI (màn hình tổng quan của CVHT và trang tổng quan ADMIN). MUST NOT dùng biểu đồ cho form nhập liệu hoặc bảng có thao tác dòng — dùng shadcn `Table`.
 - MUST NOT: cài thêm UI kit thứ 3 (Ant Design, MUI...). Nhu cầu mới chưa có trong shadcn/ui thì tự dựng bằng Radix primitives + Tailwind.
+- Phase 8b (chốt 2026-10-19) thêm thành phần shadcn: `pagination` (dùng `next/link`), `breadcrumb`, `command` (cmdk — tìm nhanh), `popover`, `progress`, `collapsible`, `scroll-area`. Thành phần tự dựng dùng chung: `EmptyState`, `PageSkeleton`, `RouteError`, `NotFoundView`, `DataPagination`, `PageHeader` (breadcrumb + nút "?"). Toast import từ `@/lib/notify` (lỗi hiện 10 giây), không import thẳng `sonner`.
 
-## Nhận diện giao diện — trắng và xanh dương (chuẩn hệ thống quản lý trường học)
+## Nhận diện giao diện — trắng, xanh dương và navy của trường
 
-Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với sinh viên và giảng viên. Nền trắng là chủ đạo, xanh dương dùng cho hành động và điểm nhấn.
+Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với sinh viên và giảng viên. Nền nội dung sáng, sidebar navy lấy từ logo trường (người dùng chốt 2026-11-08, Phase 11), xanh dương dùng cho hành động và điểm nhấn.
 
 - MUST: khai báo token màu 1 lần trong `globals.css` (Tailwind 4 `@theme` + biến shadcn), MUST NOT hard-code mã hex trong component. Dùng đúng bảng sau cho light mode:
 
 | Token | Giá trị | Dùng cho |
 |---|---|---|
-| `--background` | `#FFFFFF` | Nền trang, card, sidebar, header |
-| `--muted` / nền vùng làm việc | `#F8FAFC` (slate-50) | Nền khu vực nội dung phía sau card, hàng xen kẽ của bảng |
+| `--background` | `#FFFFFF` | Nền card, header |
+| `--workspace` | `#F1F5FB` | Nền khu vực nội dung phía sau card |
+| `--muted` | `#F8FAFC` (slate-50) | Hàng xen kẽ của bảng |
+| `--sidebar` | `#0F2A5C` (navy) | Nền sidebar; chữ `#DBE5F5`, chữ phụ `#A8BBDD`, mục đang chọn nền `#2563EB` chữ trắng |
 | `--primary` | `#2563EB` (blue-600) | Nút chính, link, mục menu đang chọn, focus ring |
 | `--primary-hover` | `#1D4ED8` (blue-700) | Hover/active của nút chính |
 | `--primary-soft` | `#EFF6FF` (blue-50) | Nền mục menu đang chọn, hàng được chọn, vùng nhấn nhẹ |
 | `--accent-strong` | `#1E3A8A` (blue-900) | Tiêu đề lớn, logo, số KPI |
 | `--foreground` | `#0F172A` (slate-900) | Văn bản chính |
-| `--muted-foreground` | `#64748B` (slate-500) | Văn bản phụ |
+| `--muted-foreground` | `#475569` (slate-600) | Văn bản phụ (đạt AA cả trên nền xanh nhạt) |
 | `--border` | `#E2E8F0` (slate-200) | Viền card, bảng, input |
 
-- MUST: bố cục chuẩn quản lý trường học: sidebar trắng bên trái có logo trường ở đầu (mục đang chọn nền `--primary-soft`, chữ và icon `--primary`), header trắng mỏng có tên người dùng + vai trò, vùng nội dung nền `#F8FAFC` chứa các card trắng bo góc `rounded-lg` viền `--border` và bóng nhẹ (`shadow-sm`). Mobile: sidebar thu thành Sheet.
+- MUST: bố cục chuẩn quản lý trường học: sidebar navy bên trái có logo trường trên đĩa trắng ở đầu (mục đang chọn nền `--sidebar-primary`, chữ trắng), header trắng mỏng có học kỳ hiện tại + menu tài khoản (tên, vai trò, đổi giao diện, chính sách dữ liệu, đăng xuất), vùng nội dung nền `--workspace` chứa các card trắng bo góc `rounded-lg` viền `--border` và bóng nhẹ (`shadow-sm`). Mobile: sidebar thu thành Sheet.
+- MUST (Phase 11): độ rộng nội dung đặt 1 lần ở `AppShell` (`max-w-6xl`, căn giữa); trang đọc (thông báo, liên hệ, trang sinh viên) chỉ được thu hẹp bằng `max-w-*` canh trái, MUST NOT tự `mx-auto` — mép trái nội dung không nhảy khi đổi trang.
 - MUST: chỉ 1 nút chính (`--primary`) nổi bật trên mỗi vùng thao tác; hành động phụ dùng `outline`/`ghost`. MUST NOT dùng nhiều màu nhấn khác ngoài xanh dương cho điều hướng và nút.
-- MUST: font `Be Vietnam Pro` (hỗ trợ đầy đủ tiếng Việt) nạp qua `next/font/google` với subset `vietnamese` + `latin`; font phụ fallback `system-ui`. Cỡ chữ nội dung tối thiểu 14px, tiêu đề trang 24px.
+- MUST: font `Be Vietnam Pro` (hỗ trợ đầy đủ tiếng Việt) nạp qua `next/font/google` với subset `vietnamese` + `latin`; font phụ fallback `system-ui`. Cỡ chữ nội dung tối thiểu 14px, tiêu đề trang 26px. `text-xs` của dự án là 13px (đổi ở `@theme`), chỉ dùng cho thông tin phụ: mã số, ngày, nhãn huy hiệu, chú thích.
 - MUST: radius thống nhất `0.5rem`; khoảng cách theo thang 4px của Tailwind; MUST NOT dùng gradient sặc sỡ, hình nền nặng hoặc hiệu ứng động gây xao nhãng. Chuyển động chỉ ≤200ms, dùng cho hover/mở Sheet.
 - MUST: tương phản chữ/nền tối thiểu WCAG AA (4.5:1). Chữ trắng trên `--primary` đạt chuẩn — MUST NOT dùng blue-400 trở nhạt làm nền nút có chữ trắng.
 - MUST: biểu đồ cấu hình theo thang xanh dương (`blue`, `sky`, `slate`) cho biểu đồ thông thường. Biểu đồ phân bố theo Severity MUST dùng đúng bảng màu Severity bên dưới, không dùng thang xanh.
@@ -38,12 +42,14 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 
 | Severity | Class Tailwind |
 |---|---|
-| `LOW` | `bg-slate-100 text-slate-700` |
-| `MEDIUM` | `bg-amber-100 text-amber-700` |
-| `HIGH` | `bg-orange-100 text-orange-700` |
-| `CRITICAL` | `bg-red-100 text-red-700` |
+| `LOW` | `bg-slate-200 text-slate-700` |
+| `MEDIUM` | `bg-amber-100 text-amber-900` |
+| `HIGH` | `bg-orange-700 text-white` (nền đặc — người dùng chốt 2026-11-08) |
+| `CRITICAL` | `bg-red-700 text-white` (nền đặc — người dùng chốt 2026-11-08) |
 
 - MUST: định nghĩa bảng màu này 1 lần trong `tailwind.config`/CSS variables, import dùng lại — không hard-code màu Severity ở từng component.
+- MUST (Phase 11): dòng / thẻ cảnh báo có vạch màu đầu dòng theo mức (`row-severity-*`), gom theo mức khi đang sắp theo mức. Ma trận lớp và bảng theo lớp dùng đúng `severity-*`. Riêng trang sinh viên không dùng nền đặc đỏ/cam: học phần cần lưu ý dùng tông hổ phách và nhãn "Cần trao đổi".
+- MUST (Phase 11): nguy cấp ở Tổng quan là băng rôn đỏ `bg-red-700` chữ trắng kèm 1 nút trắng đi thẳng tới việc đó — ngoại lệ duy nhất của quy tắc "nút màu xanh dương". Thẻ số quan trọng nhất của trang nền navy (`StatCard tone="hero"`), mỗi trang tối đa 1 thẻ.
 - MUST: `DataCompletenessLevel` dùng badge viền (outline) màu slate, phân biệt bằng icon/nét viền chứ không bằng màu: `FULL` = icon tròn đầy, `PARTIAL` = icon tròn nửa, `INSUFFICIENT` = viền nét đứt. MUST NOT dùng đỏ-vàng-xanh hay xanh dương thương hiệu — đây là 2 khái niệm độc lập với Severity, tránh hiểu nhầm "thiếu dữ liệu" thành "rủi ro cao/thấp".
 - MUST NOT: dùng đỏ/xanh lá cho `AlertStatus`, và MUST NOT dùng xanh dương thuần (trùng màu nút/link thương hiệu). Dùng: `OPEN` violet, `ACKNOWLEDGED` cyan, `IN_PROGRESS` indigo, `REOPENED` violet viền, `RESOLVED` slate kèm icon dấu tick, `DISMISSED`/`INVALIDATED` slate nhạt. Luôn kèm nhãn chữ.
 
@@ -55,9 +61,15 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 
 ## Bảng dữ liệu
 
-- MUST: dùng `@tanstack/react-table` + shadcn `Table` cho mọi danh sách có lọc/sắp xếp/phân trang.
+- MUST: dùng `@tanstack/react-table` + shadcn `Table` cho mọi danh sách có lọc/sắp xếp/phân trang — qua component `DataTable` dùng chung.
+- MUST (Phase 8b): danh sách có thể dài phân trang PHÍA SERVER: URL `?page=&size=&sort=&dir=` (đọc bằng `parseListParams`, cỡ trang 20/50/100, mặc định 20), service nhận `ListParams` và trả `Paged<T>` (`items, total, page, size`), thanh `DataPagination` ("Hiển thị 21–40 / 135", giữ bộ lọc khi đổi trang). Sắp xếp: cột khai báo `meta.sortKey`, service ánh xạ khóa → cột theo danh sách cho phép (MUST NOT nối chuỗi từ URL vào ORDER BY); thêm cột phụ ổn định bằng `applyOrder`/`findOrder` (QueryBuilder ghi đè khi trùng cột). Offset — keyset chỉ khi > 300ms (`05`). Đang áp: tài khoản, sinh viên, lô nhập, dòng lỗi, lần chạy đánh giá, cảnh báo Admin, nhật ký.
+- MUST (Phase 8b): màn hình < 768px `DataTable` hiển thị mỗi dòng thành 1 thẻ (cột `meta.mobile: 'title'` làm tiêu đề, cột `actions`/`'footer'` ở cuối, còn lại dạng "nhãn: giá trị"), không cuộn ngang. Cột có `header` không phải chuỗi khai báo `meta.label`.
 - MUST: bảng dòng lỗi nhập liệu có cột "Lý do lỗi" (Badge đỏ nhạt) và nút "Tải xuống" ở đầu bảng.
-- MUST: bảng danh sách sinh viên nguy cơ mặc định sắp xếp Severity giảm dần, `CRITICAL` luôn ở trên cùng.
+- MUST: bảng danh sách sinh viên nguy cơ mặc định sắp xếp Severity giảm dần, `CRITICAL` luôn ở trên cùng. Service phân trang nhận `ListParams` không có cột (`sort: null`) thì dùng cột + hướng mặc định của danh sách (`resolveSort`), không lấy hướng `asc` mặc định.
+- MUST (Phase 8c, người dùng chốt 2026-10-19): cột "Họ tên" sắp theo TÊN rồi họ (chữ cuối của họ tên — `givenNameSql`), áp ở danh sách sinh viên và tài khoản.
+- MUST (Phase 8c, người dùng chốt 2026-10-19): RiskScore hiển thị thang 0–1, 2 chữ số lẻ, dấu phẩy (VD 0,62) kèm thanh ngang nhỏ; chưa tính được → "Chưa tính được", KHÔNG hiện 0.
+- Trang kết quả lần chạy (Phase 8c): 1 bảng theo sinh viên (mức cao nhất, RiskScore, mức dữ liệu, số dấu hiệu — bấm mở từng luật ngay trong dòng), phân trang ở DB, mặc định chỉ sinh viên có dấu hiệu.
+- Chọn Cố vấn học tập (tạo lớp, đổi Cố vấn) dùng ô chọn có tìm kiếm `AdvisorCombobox` (Popover + Command), gõ không dấu được.
 
 ## Form
 
@@ -67,7 +79,8 @@ Cảm giác cần đạt: sáng, sạch, đáng tin cậy, thân thiện với s
 ## Responsive & Dark mode
 
 - MUST: responsive tối thiểu 3 breakpoint: mobile (<640px), tablet (640–1024px), desktop (>1024px).
-- MUST: light mode là mặc định và là giao diện chính; dùng `next-themes` cho dark mode (nền slate-900, `--primary` sáng hơn `#3B82F6`, chữ trên nút primary dùng slate-950 vì chữ trắng trên `#3B82F6` chỉ đạt 3.7:1 < AA) — dùng `useTheme` của `next-themes` cho nút chuyển, không tự viết cơ chế lưu theme riêng.
+- Menu bên (Phase 8b): ≥ 1024px đầy đủ, gom nhóm có tiêu đề (Admin: Bắt đầu · Dữ liệu nền · Hằng tuần · Cấu hình và giám sát); 768–1023px thu thành cột biểu tượng có tooltip; < 768px mở bằng nút menu (Sheet).
+- MUST: light mode là mặc định và là giao diện chính; dùng `next-themes` cho dark mode (nền slate-900, `--primary` sáng hơn `#3B82F6`, chữ trên nút primary dùng slate-950 vì chữ trắng trên `#3B82F6` chỉ đạt 3.7:1 < AA) — dùng `useTheme` của `next-themes` cho nút chuyển, không tự viết cơ chế lưu theme riêng. Phase 11: ở dark mode, chữ màu chính (`.text-primary`) và mục menu đang chọn dùng `#93C5FD` để đạt 4,5:1 trên nền thẻ.
 
 ## Giao diện Sinh viên — tách biệt khỏi giao diện CVHT/Admin
 

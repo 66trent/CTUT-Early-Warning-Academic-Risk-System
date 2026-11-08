@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ConditionEditor } from '@/components/rules/condition-editor';
 import { RuleConfigurator } from '@/components/rules/rule-configurator';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -38,14 +36,11 @@ export default async function RuleDetailPage({
   if (!rule) notFound();
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link href="/admin/rules">
-            <ArrowLeft aria-hidden />
-            Cấu hình luật
-          </Link>
-        </Button>
+        <PageBreadcrumbs
+          items={[{ label: 'Cấu hình luật', href: '/admin/rules' }, { label: rule.ruleCode }]}
+        />
         <h1 className="mt-2">
           {rule.ruleCode} · {rule.ruleName}
         </h1>
@@ -65,7 +60,8 @@ export default async function RuleDetailPage({
               : 'Chưa có phiên bản đang áp dụng.'}
           </CardDescription>
         </CardHeader>
-        {rule.active && (
+        {/* Chưa có bản nháp: form bên dưới đã điền sẵn giá trị đang áp dụng, không lặp bảng. */}
+        {rule.active && rule.draft && (
           <CardContent>
             <ConditionEditor
               ruleCode={rule.ruleCode}

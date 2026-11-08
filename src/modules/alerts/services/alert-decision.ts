@@ -53,13 +53,18 @@ export function hasNewOrWorseSignal(
 /**
  * Quyết định cập nhật cảnh báo của 1 sinh viên × học kỳ từ dấu hiệu của 1 lần chạy (docs/rules/08,
  * bước 7–9). Hàm thuần. `signals` không rỗng. `existing` = cảnh báo chưa INVALIDATED (hoặc null).
+ * `partial` = lần chạy chỉ 1 học phần: không thấy dấu hiệu học phần khác → chỉ được TĂNG mức.
  */
 export function decideAlertUpdate(
   existing: ExistingAlertState | null,
   signals: readonly Signal[],
-  ctx: { asOf: Date; now: Date; cooldownHours: number },
+  ctx: { asOf: Date; now: Date; cooldownHours: number; partial?: boolean },
 ): AlertDecision {
-  const severity = maxOf(signals);
+  const runSeverity = maxOf(signals);
+  const severity =
+    ctx.partial && existing && rank(existing.severity) > rank(runSeverity)
+      ? existing.severity
+      : runSeverity;
   if (!existing) return { action: 'CREATE', severity, event: 'CREATED' };
   // Lần chạy mốc cũ hơn dữ liệu đã áp dụng (VD chạy lại mốc quá khứ khi demo): chỉ thêm bằng chứng.
   if (ctx.asOf < existing.lastAsOf) return { action: 'EVIDENCE_ONLY' };

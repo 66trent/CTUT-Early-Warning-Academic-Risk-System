@@ -11,3 +11,15 @@ export const DEPARTMENTS = [
   { departmentId: 'K.KTQL', departmentName: 'Khoa Kinh tế - Quản lý công nghiệp' },
   { departmentId: 'K.KHXH', departmentName: 'Khoa Khoa học Xã hội' },
 ] as const;
+
+/**
+ * Danh mục ngành do người dùng cung cấp (docs/rules/09, chốt 2026-10-22). Mã ngắn tự đặt theo tiền
+ * tố mã lớp; ngành của khoa khác chưa có — KHÔNG tự thêm.
+ */
+export const MAJORS = [
+  { majorId: 'CNTT', majorName: 'Công nghệ thông tin', departmentId: 'K.CNTT' },
+  { majorId: 'KTPM', majorName: 'Kỹ thuật phần mềm', departmentId: 'K.CNTT' },
+  { majorId: 'HTTT', majorName: 'Hệ thống thông tin', departmentId: 'K.CNTT' },
+  { majorId: 'KHMT', majorName: 'Khoa học máy tính', departmentId: 'K.CNTT' },
+  { majorId: 'KHDL', majorName: 'Khoa học dữ liệu', departmentId: 'K.CNTT' },
+] as const;

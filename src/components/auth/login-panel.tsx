@@ -1,14 +1,15 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Form,
   FormControl,
@@ -20,15 +21,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authClient } from '@/lib/auth-client';
+import { DEMO_CLASS_ACCOUNTS, demoStudentOf } from '@/lib/demo-accounts';
 import { signInMessage } from '@/lib/sign-in-messages';
 
-const DEMO_BUTTONS = [
-  { account: 'ADMIN', label: 'Quản trị viên' },
-  { account: 'GV001', label: 'Cố vấn học tập GV001' },
-  { account: 'GV002', label: 'Cố vấn học tập GV002' },
-  { account: 'KTPM2311003', label: 'Sinh viên KTPM2311003' },
-  { account: 'KTPM2311001', label: 'Sinh viên KTPM2311001' },
-] as const;
+/** Đăng nhập nhanh theo lớp demo (Phase 9a): mỗi lớp 1 Cố vấn học tập + 1 sinh viên tiêu biểu. */
+const DEMO_ROWS = DEMO_CLASS_ACCOUNTS.map((c) => ({
+  classId: c.classId,
+  majorName: c.majorName,
+  advisorId: c.advisorId,
+  studentId: demoStudentOf(c.classId),
+}));
 
 interface LoginPanelProps {
   errorCode: string | null;
@@ -55,8 +57,7 @@ function StudentTab({ googleEnabled }: { googleEnabled: boolean }) {
   if (!googleEnabled) {
     return (
       <p className="text-sm text-muted-foreground">
-        Đăng nhập bằng Google chưa được cấu hình. Quản trị viên cần khai báo mã ứng dụng Google
-        (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) rồi khởi động lại hệ thống.
+        Đăng nhập bằng Google chưa được bật. Vui lòng liên hệ phòng Đào tạo hoặc Quản trị viên.
       </p>
     );
   }
@@ -95,6 +96,34 @@ const staffSchema = z.object({
   password: z.string().min(1, 'Nhập mật khẩu'),
 });
 type StaffValues = z.infer<typeof staffSchema>;
+
+function DemoButton({
+  account,
+  label,
+  ariaLabel,
+  pending,
+  onClick,
+}: {
+  account: string;
+  label: string;
+  ariaLabel?: string;
+  pending: string | null;
+  onClick: (account: string) => Promise<void>;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      aria-label={ariaLabel}
+      title={ariaLabel}
+      disabled={pending !== null}
+      onClick={() => void onClick(account)}
+    >
+      {pending === account && <Loader2 className="animate-spin" />}
+      {label}
+    </Button>
+  );
+}
 
 function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: string | null }) {
   const router = useRouter();
@@ -178,24 +207,53 @@ function StaffTab({ demoMode, demoEmail }: { demoMode: boolean; demoEmail: strin
         </Link>
       </p>
       {demoMode && (
-        <div className="border-t pt-4">
-          <p className="mb-2 text-xs font-medium text-muted-foreground uppercase">
-            Đăng nhập nhanh (chế độ demo)
-          </p>
-          <div className="flex flex-col gap-2">
-            {DEMO_BUTTONS.map(({ account, label }) => (
-              <Button
-                key={account}
-                variant="outline"
-                disabled={demoPending !== null}
-                onClick={() => void quickLogin(account)}
-              >
-                {demoPending === account && <Loader2 className="animate-spin" />}
-                {label}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <Collapsible className="border-t pt-2">
+          <CollapsibleTrigger className="group flex min-h-11 w-full items-center justify-between gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
+            Tài khoản trình diễn
+            <ChevronDown
+              aria-hidden
+              className="size-4 transition-transform group-data-[state=open]:rotate-180"
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-2 pt-1">
+            <DemoButton
+              account="ADMIN"
+              label="Quản trị viên"
+              pending={demoPending}
+              onClick={quickLogin}
+            />
+            <ul className="flex flex-col gap-2" aria-label="Lớp trình diễn">
+              {DEMO_ROWS.map((row) => (
+                <li
+                  key={row.classId}
+                  className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
+                >
+                  <span className="flex min-w-0 flex-col text-sm">
+                    <span className="font-medium">{row.classId}</span>
+                    <span className="truncate text-xs text-muted-foreground">{row.majorName}</span>
+                  </span>
+                  <DemoButton
+                    account={row.advisorId}
+                    label={row.advisorId}
+                    ariaLabel={`Cố vấn học tập ${row.advisorId}`}
+                    pending={demoPending}
+                    onClick={quickLogin}
+                  />
+                  <DemoButton
+                    account={row.studentId}
+                    label="Sinh viên"
+                    ariaLabel={`Sinh viên ${row.studentId}`}
+                    pending={demoPending}
+                    onClick={quickLogin}
+                  />
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Sinh viên đăng nhập được khi đã có hồ sơ (sau khi nhập danh sách sinh viên).
+            </p>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   );
@@ -205,8 +263,8 @@ export function LoginPanel({ errorCode, googleEnabled, demoMode, demoEmail }: Lo
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Đăng nhập</CardTitle>
-        <CardDescription>Chọn đúng đối tượng của bạn.</CardDescription>
+        <h1>Đăng nhập</h1>
+        <CardDescription>Bạn là sinh viên hay cán bộ?</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {errorCode && <ErrorBanner message={signInMessage(errorCode)} />}

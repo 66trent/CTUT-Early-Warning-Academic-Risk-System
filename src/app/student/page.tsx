@@ -1,16 +1,19 @@
 import type { Metadata } from 'next';
-import { CircleCheck, Lightbulb, Mail } from 'lucide-react';
-import { CourseSnapshotTable } from '@/components/alerts/student-profile-view';
+import { Lightbulb, Mail } from 'lucide-react';
+import { StudentCourseCards } from '@/components/alerts/student-course-cards';
+import { StatCard } from '@/components/dashboard/dashboard-parts';
+import { QuickGuide } from '@/components/quick-guide';
 import { ReferenceOnlyNotice } from '@/components/domain/reference-only-notice';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
 import { assertScope } from '@/lib/authz';
+import { STUDENT_GUIDE } from '@/modules/alerts/guide-content';
 import { SOURCE_LABELS } from '@/modules/alerts/services/alert-presentation';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 import { getStudentOverview } from '@/modules/alerts/services/student-profile.service';
+import { getAttendanceThreshold } from '@/modules/rule-engine/services/student-academic.service';
 
 export const metadata: Metadata = { title: 'Tình hình học tập của bạn' };
 
@@ -22,11 +25,23 @@ export default async function StudentHomePage() {
   const user = await requireUser([UserRole.STUDENT]);
   await assertScope(user, { studentId: user.userId, resourceType: 'Student' });
   const term = pickTerm(await listTermOptions());
-  const overview = term ? await getStudentOverview(user.userId, term.termId) : null;
-  const attention = overview?.level === 'NEEDS_ATTENTION';
+  const [overview, threshold] = await Promise.all([
+    term ? getStudentOverview(user.userId, term.termId) : null,
+    getAttendanceThreshold(),
+  ]);
+  const courses = overview?.profile.courses ?? [];
+  const work = courses.reduce(
+    (sum, c) => ({
+      done: sum.done + c.quizzes.submitted + c.assignments.submitted,
+      total: sum.total + c.quizzes.total + c.assignments.total,
+    }),
+    { done: 0, total: 0 },
+  );
+  const graded = courses.filter((c) => c.result).length;
+  const focus = overview?.focus ?? [];
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div>
         <h1>Tình hình học tập của bạn</h1>
         <p className="mt-1 text-muted-foreground">
@@ -35,26 +50,22 @@ export default async function StudentHomePage() {
         </p>
       </div>
 
-      <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex flex-wrap items-center gap-2">
-            Tổng quan
-            <Badge variant="outline" className="gap-1">
-              {attention ? <Lightbulb aria-hidden /> : <CircleCheck aria-hidden />}
-              {attention ? 'Cần chú ý' : 'Ổn định'}
-            </Badge>
-          </CardTitle>
-          <CardDescription>
-            {attention
-              ? 'Cố vấn học tập của bạn đã ghi nhận vài điểm nên cải thiện. Các gợi ý bên dưới có thể giúp bạn.'
-              : overview?.resolved
-                ? 'Cố vấn học tập đã cùng bạn trao đổi các điểm cần chú ý. Hãy tiếp tục theo kế hoạch đã thống nhất nhé!'
-                : 'Bạn đang theo kịp học kỳ. Hãy tiếp tục duy trì nhé!'}
-          </CardDescription>
-        </CardHeader>
-        {overview && overview.focus.length > 0 && (
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label="Học phần trong học kỳ" value={courses.length} tone="hero" />
+        <StatCard label="Bài đã hoàn thành" value={work.done} suffix={`/ ${work.total}`} />
+        <StatCard label="Học phần đã có kết quả" value={graded} suffix={`/ ${courses.length}`} />
+      </div>
+
+      {focus.length > 0 && (
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Việc nên làm</CardTitle>
+            <CardDescription>
+              Cố vấn học tập của bạn đã ghi nhận vài điểm nên cải thiện.
+            </CardDescription>
+          </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            {overview.focus.map((f, i) => (
+            {focus.map((f, i) => (
               <div key={i} className="rounded-md border p-3 text-sm">
                 <p className="font-medium">
                   {SOURCE_LABELS[f.source]} · {f.course}
@@ -68,15 +79,26 @@ export default async function StudentHomePage() {
             ))}
             <ReferenceOnlyNotice />
           </CardContent>
-        )}
-      </Card>
+        </Card>
+      )}
+      {focus.length === 0 && overview?.resolved && (
+        <p className="rounded-xl border bg-card px-4 py-3 text-sm shadow-sm">
+          Cố vấn học tập đã cùng bạn trao đổi các điểm cần chú ý. Tiếp tục theo kế hoạch đã thống
+          nhất nhé.
+        </p>
+      )}
+
+      <QuickGuide guide={STUDENT_GUIDE} storageKey="ewars:guide:student" />
 
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Các học phần trong học kỳ</CardTitle>
+          <CardDescription>
+            Số liệu lấy theo lần nhập dữ liệu gần nhất của nhà trường.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <CourseSnapshotTable courses={overview?.profile.courses ?? []} />
+          <StudentCourseCards courses={courses} threshold={threshold} />
         </CardContent>
       </Card>
 
@@ -86,7 +108,7 @@ export default async function StudentHomePage() {
           <CardDescription>
             {overview?.advisor
               ? `Cố vấn học tập của bạn: ${overview.advisor.fullName}.`
-              : 'Lớp của bạn chưa có Cố vấn học tập phụ trách — hãy liên hệ phòng Đào tạo.'}
+              : 'Lớp của bạn chưa có Cố vấn học tập phụ trách, hãy liên hệ phòng Đào tạo.'}
           </CardDescription>
         </CardHeader>
         {overview?.advisor && (

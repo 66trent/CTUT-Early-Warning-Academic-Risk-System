@@ -21,6 +21,8 @@ export interface RiskComponent {
   /** Tỷ lệ vắng / tỷ lệ bỏ bài / điểm trung bình; NULL khi nhóm không AVAILABLE. */
   rawValue: number | null;
   normalized: number | null;
+  /** Nhóm học lực: ĐTB của học kỳ này hay học kỳ liền trước (docs/rules/08). */
+  basis?: 'CURRENT_TERM' | 'PREVIOUS_TERM';
 }
 
 /**

@@ -1,6 +1,6 @@
 # 11 — Data Schema Reference: Rule Engine & Alerts
 
-Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File này đặc tả 10 bảng — phạm vi module `rule-engine` và `alerts`.
+Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File này đặc tả các bảng — phạm vi module `rule-engine` và `alerts`.
 
 ## Rule
 
@@ -22,7 +22,7 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | ruleCode | String(20) | NOT NULL | FK → Rule | |
 | version | Int | NOT NULL | | Tăng dần |
 | condition | Json | NOT NULL | | Ngưỡng/toán tử cụ thể — MUST validate bằng Zod trước khi ghi |
-| severity | Severity (enum) | NOT NULL | | `LOW`/`MEDIUM`/`HIGH`/`CRITICAL`. Luật nhiều mức (`ATT-01`, `LMS-01`, `ACA-02`, `COMB-02`): các mức nằm trong `condition`, cột này = mức cao nhất luật có thể ra (chỉ hiển thị) |
+| severity | Severity (enum) | NOT NULL | | `LOW`/`MEDIUM`/`HIGH`/`CRITICAL`. Luật nhiều mức (`ATT-01`, `LMS-01`, `LMS-03`, `ACA-02`, `ACA-03`, `ACA-04`, `COMB-02`): các mức nằm trong `condition`, cột này = mức cao nhất luật có thể ra (chỉ hiển thị) |
 | action | Json | NOT NULL | | Danh sách hành động khi kích hoạt |
 | effectiveFrom | DateTime | NOT NULL | | |
 | effectiveTo | DateTime | NULL | | NULL = đang dùng |
@@ -30,7 +30,7 @@ Xem `00-project-context.md` và `08-business-rules-catalog.md` trước. File n�
 | configuredBy | String(20) | NOT NULL | FK → User | |
 | lastDryRunAt | DateTime | NULL | | Thời điểm chạy thử (dry-run) gần nhất. MUST NOT chuyển `status` sang `ACTIVE` khi còn NULL. Chạy thử trên học kỳ hiện tại, không ghi DB ngoài cột này; hiển thị số sinh viên kích hoạt theo bản `ACTIVE` vs bản nháp và danh sách sinh viên thêm/bớt (tối đa 50 dòng) — người dùng chốt 2026-10-13 |
 
-RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastDryRunAt` = thời điểm seed (ngưỡng mặc định của `08` coi như đã chạy thử). Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
+RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 12 luật `ACTIVE` (Phase 8a: `ATT-01/02`, `LMS-01–04`, `ACA-01–04`, `COMB-01/02`) với `lastDryRunAt` = thời điểm seed (ngưỡng mặc định của `08` coi như đã chạy thử). Rule Engine CHỈ đọc `RuleVersion` có `status = ACTIVE`. Chỉ `ADMIN` được tạo/sửa/kích hoạt (mọi thay đổi ghi Audit Log); không có bước duyệt riêng.
 
 ## RuleTrigger — bằng chứng, KHÔNG hiển thị trực tiếp cho người dùng
 
@@ -58,7 +58,7 @@ RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastD
 | termId | String(10) | NOT NULL | FK → Term | |
 | riskScoreValue | Float | NULL | | NULL nếu `dataCompletenessLevel = INSUFFICIENT` |
 | dataCompletenessLevel | DataCompletenessLevel (enum) | NOT NULL | | `FULL`/`PARTIAL`/`INSUFFICIENT` — xem tầng 2 trong `00-project-context.md` |
-| componentsUsed | Json | NOT NULL | | `[{ group: ATTENDANCE/LMS/ACADEMIC, status, weight, rawValue, normalized }]` — validate Zod |
+| componentsUsed | Json | NOT NULL | | `[{ group: ATTENDANCE/LMS/ACADEMIC, status, weight, rawValue, normalized, basis? }]` — `basis` của ACADEMIC: `CURRENT_TERM`/`PREVIOUS_TERM` (`08`) — validate Zod |
 | ruleVersionId | String (uuid) | NOT NULL | FK → RuleVersion | Phiên bản `RISK-SCORE` (trọng số) dùng để tính |
 | evaluationRunId | String (uuid) | NOT NULL | FK → EvaluationRun | Lần chạy tạo bản ghi — job chạy lại xóa và ghi lại theo lần chạy (idempotent) |
 | calculatedAt | DateTime | NOT NULL | | |
@@ -76,7 +76,9 @@ RÀNG BUỘC: UNIQUE `(ruleCode, version)`. Seed 10 luật `ACTIVE` với `lastD
 | lastDetectedAt | DateTime | NOT NULL | | |
 | assignedAdvisorId | String(20) | NULL | FK → User | Cố vấn học tập phụ trách lúc tạo/chuyển — dùng cho thông báo và lịch sử; QUYỀN XEM/XỬ LÝ luôn suy ra qua lớp sinh hoạt hiện tại (`06`). NULL khi lớp chưa có Cố vấn học tập — Admin thấy ở mục "Chưa có Cố vấn học tập phụ trách"; gán người cho lớp thì chuyển cảnh báo đang mở |
 | lastAsOf | DateTime | NOT NULL | | Mốc `asOf` mới nhất đã áp dụng (lần chạy mốc cũ hơn chỉ thêm bằng chứng — `08`) |
-| lastEvaluationRunId | String (uuid) | NOT NULL | | Lần chạy gần nhất ĐÃ ÁP DỤNG — trigger của lần này là "dấu hiệu hiện tại" hiển thị cho Cố vấn học tập |
+| lastEvaluationRunId | String (uuid) | NOT NULL | | Lần chạy cả học kỳ gần nhất đã áp dụng (hoặc lần chạy học phần đã tạo cảnh báo) — mốc dữ liệu hiển thị |
+| currentTriggerIds | uuid[] | NOT NULL, default `{}` | | "Dấu hiệu hiện tại" (id `RuleTrigger`) — cập nhật khi gộp: lần chạy cả học kỳ thay toàn bộ trừ dấu hiệu điểm danh của học phần quá hạn; lần chạy học phần chỉ thay học phần đó (`08`) — Phase 7 |
+| signalsClearedAt | DateTime | NULL | | Lần chạy cả học kỳ gần nhất KHÔNG còn dấu hiệu của sinh viên (cảnh báo vẫn mở, hiện nhãn cho Cố vấn học tập). Có dấu hiệu trở lại → NULL — Phase 7 |
 | closedAt | DateTime | NULL | | Lúc chuyển `RESOLVED`/`DISMISSED`/`INVALIDATED` gần nhất (tính `cooldown` khi bật) |
 | riskScoreLogId | String (uuid) | NULL | FK → RiskScoreLog | NULL nếu `Alert` chỉ phát sinh từ luật cứng |
 | closedReason | String (text) | NULL | | Lý do khi chuyển `DISMISSED`/`INVALIDATED` — MUST NOT NULL ở hai trạng thái này |
@@ -119,6 +121,10 @@ RÀNG BUỘC chuyển trạng thái (MUST validate ở service, không chỉ ở
 | evaluationRunId | String (uuid) | NOT NULL | | Lần chạy làm phát sinh sự kiện. UNIQUE `(alertId, channel, event, evaluationRunId)` chặn trùng khi job chạy lại |
 | createdAt | DateTime | NOT NULL | | |
 
+### UpdateNotification — `update_notifications` (Phase 10c, người dùng chốt 2026-11-08)
+
+Chuông "dữ liệu vừa cập nhật / đánh giá đã cập nhật": 1 dòng / lần đánh giá xong (`COMPLETED`) / người nhận. Trường: `id` (uuid), `recipientId` (FK `users`, xóa theo), `evaluationRunId` (FK, xóa theo), `termId`, `title` (≤ 200, theo nguồn: "Moodle: Điểm danh — Mạng máy tính vừa cập nhật" / "Nạp file: …" / "Admin chạy đánh giá" / "Đánh giá tự động theo lịch" / "Chốt học kỳ — đánh giá lần cuối"), `body` (≤ 300, số đếm: "Đánh giá xong 20 sinh viên · 1 cảnh báo mới · 1 tăng mức" hoặc "Lớp KTPM2411: …"), `link`, `readAt`, `createdAt`. UNIQUE (`evaluationRunId`, `recipientId`) — idempotent. Người nhận: mọi `ADMIN` `ACTIVE` (tài khoản hệ thống `SUSPENDED` không nhận) + `ADVISOR` `ACTIVE` của lớp có cảnh báo mới / mở lại / tăng mức trong lần chạy HOẶC có sinh viên học các học phần của lô vừa nạp (lô Moodle: gộp mọi lô cùng lần đồng bộ). Chỉ trong ứng dụng, không email, không dữ liệu cá nhân sinh viên.
+
 RÀNG BUỘC: không có cơ chế chống gửi trùng / giới hạn tần suất (người dùng quyết định bỏ). `Notification` chỉ được tạo khi có sự kiện ở `06-security.md` (mục "Thông báo và email sinh viên"); index `(alertId, createdAt)`.
 
 ## AlertStateHistory — append-only
@@ -154,7 +160,7 @@ RÀNG BUỘC: không expose `UPDATE`/`DELETE` ở tầng ứng dụng (xem `06-s
 | id | String (uuid) | NOT NULL | PK | Dùng làm `jobId` gốc của BullMQ |
 | termId | String(10) | NOT NULL | FK → Term | |
 | courseId | String(20) | NULL | FK → Course | NULL = toàn bộ học kỳ |
-| trigger | EvaluationTrigger (enum) | NOT NULL | | `AUTO_AFTER_IMPORT`/`MANUAL` |
+| trigger | EvaluationTrigger (enum) | NOT NULL | | `AUTO_AFTER_IMPORT`/`MANUAL`/`SCHEDULED` (lịch mỗi đêm — `05`)/`TERM_CLOSING` (lần chạy cuối khi chốt học kỳ — xong thì đặt `Term.closedAt`, `08`) |
 | asOf | DateTime | NOT NULL | | Mốc dữ liệu được dùng khi tính — xem `08` (mặc định = `createdAt`) |
 | triggeredBy | String(20) | NULL | FK → User | NULL khi `AUTO_AFTER_IMPORT` |
 | importBatchId | String (uuid) | NULL | FK → ImportBatch | Có khi `AUTO_AFTER_IMPORT` |
@@ -170,7 +176,7 @@ RÀNG BUỘC: không expose `UPDATE`/`DELETE` ở tầng ứng dụng (xem `06-s
 | finishedAt | DateTime | NULL | | |
 | createdAt | DateTime | NOT NULL | | |
 
-RÀNG BUỘC: không cho 2 `EvaluationRun` `QUEUED`/`RUNNING` cùng `(termId, courseId)` — MUST từ chối lần bấm thứ hai (`MANUAL`) và báo "đang chạy". `AUTO_AFTER_IMPORT` khi đã có lần `QUEUED` cùng phạm vi → gộp vào lần đó; khi chỉ có lần `RUNNING` → tạo lần `QUEUED` mới, chạy sau (khóa advisory theo phạm vi). Partial unique index `(termId, COALESCE(courseId, ''))` `WHERE status = 'QUEUED'` (viết tay trong migration).
+RÀNG BUỘC: không cho 2 `EvaluationRun` `QUEUED`/`RUNNING` cùng `(termId, courseId)` — MUST từ chối lần bấm thứ hai (`MANUAL`) và báo "đang chạy". `AUTO_AFTER_IMPORT`/`SCHEDULED` khi đã có lần `QUEUED` cùng phạm vi → gộp vào lần đó; khi chỉ có lần `RUNNING` → tạo lần `QUEUED` mới, chạy sau (khóa advisory theo phạm vi). Partial unique index `(termId, COALESCE(courseId, ''))` `WHERE status = 'QUEUED'` (viết tay trong migration).
 
 ## Quan hệ tóm tắt
 

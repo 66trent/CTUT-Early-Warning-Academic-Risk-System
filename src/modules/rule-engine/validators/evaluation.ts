@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { Severity } from '@/db/enums';
 
 const asOfDate = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày mốc dạng YYYY-MM-DD.')
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày dạng YYYY-MM-DD.')
   .optional()
   .or(z.literal(''));
 
@@ -13,6 +14,16 @@ export const requestEvaluationSchema = z.object({
   asOfDate,
 });
 export type RequestEvaluationInput = z.infer<typeof requestEvaluationSchema>;
+
+export const termOnlySchema = z.object({
+  termId: z.string().trim().min(1, 'Chọn học kỳ.').max(10),
+});
+
+/** Chốt học kỳ: (chỉ DEMO_MODE) mốc asOf của lần chạy cuối. */
+export const closeTermSchema = z.object({
+  termId: z.string().trim().min(1, 'Chọn học kỳ.').max(10),
+  asOfDate,
+});
 
 /** Tạo phiên bản nháp — `condition` được kiểm tra bằng Zod của chính luật ở service. */
 export const createRuleVersionSchema = z.object({
@@ -26,4 +37,16 @@ export const dryRunSchema = z.object({
   versionId: z.uuid('Phiên bản không hợp lệ.'),
   termId: z.string().trim().min(1, 'Chọn học kỳ.').max(10),
   asOfDate,
+});
+
+/** Bộ lọc trang kết quả lần chạy — đọc từ URL; giá trị sai bị bỏ qua (trang chỉ đọc). */
+export const runStudentFilterSchema = z.object({
+  all: z
+    .literal('1')
+    .optional()
+    .catch(undefined)
+    .transform((v) => v === '1'),
+  severity: z.enum(Severity).optional().catch(undefined),
+  classId: z.string().trim().max(20).optional().catch(undefined),
+  ruleCode: z.string().trim().max(20).optional().catch(undefined),
 });

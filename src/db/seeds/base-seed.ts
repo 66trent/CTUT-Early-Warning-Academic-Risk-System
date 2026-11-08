@@ -2,10 +2,11 @@ import { type DataSource } from 'typeorm';
 import { type Auth } from '@/lib/auth';
 import { type Env } from '@/lib/env';
 import { Department } from '../entities/department.entity';
+import { Major } from '../entities/major.entity';
 import { User } from '../entities/user.entity';
 import { UserAccountStatus, UserRole } from '../enums';
 import { seedRules } from '@/modules/rule-engine/services/rule-config.service';
-import { DEPARTMENTS } from './departments';
+import { DEPARTMENTS, MAJORS } from './departments';
 
 /** Mã cán bộ của Admin đầu tiên (Admin khác do Admin tạo). */
 export const SEED_ADMIN_USER_ID = 'ADMIN';
@@ -18,6 +19,7 @@ export interface SeedReport {
 
 async function seedDepartments(dataSource: DataSource): Promise<number> {
   await dataSource.getRepository(Department).upsert([...DEPARTMENTS], ['departmentId']);
+  await dataSource.getRepository(Major).upsert([...MAJORS], ['majorId']);
   return DEPARTMENTS.length;
 }
 
@@ -71,7 +73,7 @@ export async function seedBase(dataSource: DataSource, auth: Auth, env: Env): Pr
     role: UserRole.ADMIN,
     password: env.ADMIN_SEED_PASSWORD,
   });
-  // 10 luật + RISK-SCORE với ngưỡng mặc định (docs/rules/08) — cần Admin làm người cấu hình.
+  // 12 luật + RISK-SCORE với ngưỡng mặc định (docs/rules/08) — cần Admin làm người cấu hình.
   const rulesCreated = await dataSource.transaction((em) => seedRules(em, SEED_ADMIN_USER_ID));
   return { departments, adminCreated, rulesCreated };
 }

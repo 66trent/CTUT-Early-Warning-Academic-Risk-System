@@ -5,7 +5,9 @@ import { PageHeader } from '@/components/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { UserRole } from '@/db/enums';
 import { requireUser } from '@/lib/auth-server';
+import { HELP_LINKS } from '@/lib/help-links';
 import { toVnIsoDate } from '@/lib/dates';
+import { getEnv } from '@/lib/env';
 import { listTerms } from '@/modules/admin/services/term.service';
 
 export const metadata: Metadata = { title: 'Học kỳ' };
@@ -21,15 +23,16 @@ export default async function TermsPage() {
   const terms = await listTerms();
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
+        helpHref={HELP_LINKS.terms}
         title="Học kỳ"
-        description="Mỗi thời điểm chỉ có 1 học kỳ hiện tại. Chốt học kỳ sau khi đã nhập kết quả cuối kỳ."
+        description="Mỗi thời điểm chỉ có 1 học kỳ hiện tại. Chốt học kỳ sau khi đã nhập kết quả học phần. Hệ thống chạy đánh giá lần cuối, sau đó chốt học kỳ."
         action={<CreateTermDialog defaultStartYear={currentAcademicStartYear()} />}
       />
       <Card className="shadow-sm">
         <CardContent>
-          <TermsTable terms={terms} />
+          <TermsTable terms={terms} canChooseAsOf={getEnv().DEMO_MODE} />
         </CardContent>
       </Card>
     </div>

@@ -19,7 +19,7 @@ function chunked(data: Buffer, size = 7): Readable {
 }
 
 describe('Bộ đọc CSV', () => {
-  it('đọc đủ file demo danh sách sinh viên (UTF-8, 13 dòng)', async () => {
+  it('đọc đủ file demo danh sách sinh viên (UTF-8, 110 dòng, 6 lớp)', async () => {
     const source = await openRowSource(
       'csv',
       chunked(readFileSync('docs/demo-data/01_sinh_vien.csv')),
@@ -32,18 +32,18 @@ describe('Bộ đọc CSV', () => {
       'trang_thai_hoc_vu',
     ]);
     const rows = await collect(source.rows);
-    expect(rows).toHaveLength(13);
+    expect(rows).toHaveLength(110);
     expect(rows[0]).toEqual({
       rowNumber: 2,
       values: [
-        'KTPM2311001',
-        'Nguyễn Minh An',
-        'an.ktpm2311001@student.ctuet.edu.vn',
-        'KTPM2311',
+        'CNTT2411901',
+        'Nguyễn Văn An',
+        'an.cntt2411901@student.ctuet.edu.vn',
+        'CNTT2411',
         'ACTIVE',
       ],
     });
-    expect(rows.at(-1)?.rowNumber).toBe(14);
+    expect(rows.at(-1)?.rowNumber).toBe(111);
   });
 
   it('bỏ BOM, nhận dấu ; và đánh dấu số thập phân dạng 7,5', async () => {

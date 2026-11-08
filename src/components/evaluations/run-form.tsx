@@ -3,7 +3,7 @@
 import { Loader2, Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,7 @@ import {
 import { requestEvaluationAction } from '@/modules/rule-engine/actions/evaluation.actions';
 import type { EvaluationFormOptionsDto } from '@/modules/rule-engine/services/evaluation-query.service';
 
-/** Giá trị Select cho "cả học kỳ" (Radix Select không nhận chuỗi rỗng). */
+/** Giá trị Select cho "tất cả" (Radix Select không nhận chuỗi rỗng). */
 const ALL_COURSES = '__all__';
 
 /**
@@ -28,10 +28,16 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
   const router = useRouter();
   const current = options.terms.find((t) => t.isCurrent) ?? options.terms[0];
   const [termId, setTermId] = useState(current?.termId ?? '');
+  const [departmentId, setDepartmentId] = useState(ALL_COURSES);
   const [courseId, setCourseId] = useState(ALL_COURSES);
   const [asOfDate, setAsOfDate] = useState('');
   const [pending, setPending] = useState(false);
-  const courses = options.courses.filter((c) => c.termId === termId);
+  // Khoa chỉ để lọc danh sách học phần — lần chạy vẫn theo học kỳ / học phần (docs/rules/08).
+  const courses = options.courses.filter(
+    (c) =>
+      c.termId === termId &&
+      (departmentId === ALL_COURSES || c.departmentIds.includes(departmentId)),
+  );
 
   const submit = async () => {
     setPending(true);
@@ -57,7 +63,7 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
         void submit();
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="grid gap-2">
           <Label htmlFor="run-term">Học kỳ</Label>
           <Select
@@ -81,6 +87,28 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
           </Select>
         </div>
         <div className="grid gap-2">
+          <Label htmlFor="run-department">Lọc học phần theo khoa</Label>
+          <Select
+            value={departmentId}
+            onValueChange={(value) => {
+              setDepartmentId(value);
+              setCourseId(ALL_COURSES);
+            }}
+          >
+            <SelectTrigger id="run-department" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_COURSES}>Tất cả khoa</SelectItem>
+              {options.departments.map((d) => (
+                <SelectItem key={d.departmentId} value={d.departmentId}>
+                  {d.departmentName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
           <Label htmlFor="run-course">Học phần</Label>
           <Select value={courseId} onValueChange={setCourseId}>
             <SelectTrigger id="run-course" className="w-full">
@@ -98,7 +126,9 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
         </div>
         {options.canChooseAsOf && (
           <div className="grid gap-2">
-            <Label htmlFor="run-as-of">Mốc dữ liệu (chế độ demo, để trống = bây giờ)</Label>
+            <Label htmlFor="run-as-of" title="Để trống là hôm nay">
+              Tính đến ngày
+            </Label>
             <Input
               id="run-as-of"
               type="date"
@@ -115,7 +145,7 @@ export function RunForm({ options, busy }: { options: EvaluationFormOptionsDto; 
         </Button>
         {busy && (
           <span className="text-sm text-muted-foreground">
-            Đang có lần chạy chưa xong — chờ xong rồi chạy lại.
+            Đang có lần chạy chưa xong, chờ xong rồi chạy lại.
           </span>
         )}
       </div>

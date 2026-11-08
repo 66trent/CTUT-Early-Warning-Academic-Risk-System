@@ -182,21 +182,56 @@ async function openXlsx(stream: Readable): Promise<RowSource> {
   return { headers: toValues(headerRow), decimalComma: false, rows: rows() };
 }
 
-/** Giới hạn số dòng dữ liệu (docs/rules/12). */
-async function* limitRows(rows: AsyncIterable<RawRow>): AsyncIterable<RawRow> {
+/**
+ * Giới hạn số dòng dữ liệu (docs/rules/12): `maxRows` = số dòng còn lại của cả lô (lô nhiều file
+ * dùng chung trần 50.000 dòng).
+ */
+async function* limitRows(rows: AsyncIterable<RawRow>, maxRows: number): AsyncIterable<RawRow> {
   let count = 0;
   for await (const row of rows) {
     count += 1;
-    if (count > IMPORT_LIMITS.maxDataRows) {
+    if (count > maxRows) {
       throw new FileRejectedError(
-        `File có hơn ${IMPORT_LIMITS.maxDataRows.toLocaleString('vi-VN')} dòng dữ liệu. Hãy tách thành nhiều file.`,
+        `Đợt nhập có hơn ${IMPORT_LIMITS.maxDataRows.toLocaleString('vi-VN')} dòng dữ liệu. Hãy tách thành nhiều file hoặc nhiều lần nhập.`,
       );
     }
     yield row;
   }
 }
 
-export async function openRowSource(kind: ImportFileKind, stream: Readable): Promise<RowSource> {
+export async function openRowSource(
+  kind: ImportFileKind,
+  stream: Readable,
+  maxRows: number = IMPORT_LIMITS.maxDataRows,
+): Promise<RowSource> {
   const source = kind === 'csv' ? await openCsv(stream) : await openXlsx(stream);
-  return { ...source, rows: limitRows(source.rows) };
+  return { ...source, rows: limitRows(source.rows, maxRows) };
+}
+
+/** Số dòng đầu file được dò để tìm dòng tiêu đề (docs/rules/12). */
+export const HEADER_SCAN_ROWS = 10;
+
+/**
+ * Dòng tiêu đề = dòng đầu tiên trong 10 dòng đầu có đủ cột bắt buộc `isHeader` — để dán cả vùng
+ * bảng có dòng tiêu đề phụ phía trên (VD tên lớp học phần). Các dòng trước tiêu đề bị bỏ qua;
+ * số dòng báo lỗi vẫn là số dòng thật trong file.
+ */
+export async function locateHeader(
+  source: RowSource,
+  isHeader: (headers: string[]) => boolean,
+): Promise<RowSource> {
+  if (isHeader(source.headers)) return source;
+  const iterator = source.rows[Symbol.asyncIterator]();
+  for (let i = 1; i < HEADER_SCAN_ROWS; i += 1) {
+    const next = await iterator.next();
+    if (next.done) break;
+    if (isHeader(next.value.values)) {
+      return {
+        ...source,
+        headers: next.value.values,
+        rows: { [Symbol.asyncIterator]: () => iterator },
+      };
+    }
+  }
+  return source;
 }

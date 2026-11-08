@@ -13,10 +13,18 @@ import { CourseResult } from './entities/course-result.entity';
 import { Department } from './entities/department.entity';
 import { Enrollment } from './entities/enrollment.entity';
 import { EvaluationRun } from './entities/evaluation-run.entity';
+import { ImportBatchFile } from './entities/import-batch-file.entity';
 import { ImportBatch } from './entities/import-batch.entity';
 import { ImportErrorRow } from './entities/import-error-row.entity';
 import { Intervention } from './entities/intervention.entity';
+import { LmsActivity } from './entities/lms-activity.entity';
+import { LmsAssignmentSubmission } from './entities/lms-assignment-submission.entity';
 import { LmsQuizAttempt } from './entities/lms-quiz-attempt.entity';
+import { Major } from './entities/major.entity';
+import { MoodleCourseLink } from './entities/moodle-course-link.entity';
+import { MoodleEventInbox } from './entities/moodle-event-inbox.entity';
+import { MoodleSyncRun } from './entities/moodle-sync-run.entity';
+import { UpdateNotification } from './entities/update-notification.entity';
 import { Notification } from './entities/notification.entity';
 import { RiskScoreLog } from './entities/risk-score-log.entity';
 import { RuleTrigger } from './entities/rule-trigger.entity';
@@ -31,21 +39,34 @@ import { Phase3bSourceRecords1791810699905 } from './migrations/1791810699905-Ph
 import { Phase4ProcessPublishedAt1791826670549 } from './migrations/1791826670549-Phase4ProcessPublishedAt';
 import { Phase4RuleEngine1791825968315 } from './migrations/1791825968315-Phase4RuleEngine';
 import { Phase5Alerts1791894767461 } from './migrations/1791894767461-Phase5Alerts';
+import { Phase7AlertsSchedule1792054500276 } from './migrations/1792054500276-Phase7AlertsSchedule';
+import { Phase7CurrentSignals1792056820711 } from './migrations/1792056820711-Phase7CurrentSignals';
+import { Phase8aSourceRecordsV21792338213883 } from './migrations/1792338213883-Phase8aSourceRecordsV2';
+import { Phase8fImportFiles1792505510980 } from './migrations/1792505510980-Phase8fImportFiles';
+import { Phase9aMajors1792659703130 } from './migrations/1792659703130-Phase9aMajors';
+import { Phase10bMoodleSync1794090492630 } from './migrations/1794090492630-Phase10bMoodleSync';
+import { Phase10bExtendedDue1794091272457 } from './migrations/1794091272457-Phase10bExtendedDue';
+import { Phase10cMoodleAuto1794093584029 } from './migrations/1794093584029-Phase10cMoodleAuto';
+import { Phase10cUpdateNotifications1794112792767 } from './migrations/1794112792767-Phase10cUpdateNotifications';
 
 // Entity và migration: import trực tiếp từng class — KHÔNG dùng glob (docs/rules/01).
 export const ENTITIES = [
   User,
   Department,
+  Major,
   AdministrativeClass,
   Student,
   Term,
   AuditLog,
   ImportBatch,
+  ImportBatchFile,
   ImportErrorRow,
   Course,
   Enrollment,
   AttendanceSummary,
+  LmsActivity,
   LmsQuizAttempt,
+  LmsAssignmentSubmission,
   CourseResult,
   Rule,
   RuleVersion,
@@ -56,6 +77,10 @@ export const ENTITIES = [
   AlertStateHistory,
   Intervention,
   Notification,
+  MoodleCourseLink,
+  MoodleSyncRun,
+  MoodleEventInbox,
+  UpdateNotification,
 ];
 const MIGRATIONS = [
   Phase1Identity1791766886196,
@@ -64,6 +89,15 @@ const MIGRATIONS = [
   Phase4RuleEngine1791825968315,
   Phase4ProcessPublishedAt1791826670549,
   Phase5Alerts1791894767461,
+  Phase7AlertsSchedule1792054500276,
+  Phase7CurrentSignals1792056820711,
+  Phase8aSourceRecordsV21792338213883,
+  Phase8fImportFiles1792505510980,
+  Phase9aMajors1792659703130,
+  Phase10bMoodleSync1794090492630,
+  Phase10bExtendedDue1794091272457,
+  Phase10cMoodleAuto1794093584029,
+  Phase10cUpdateNotifications1794112792767,
 ];
 
 const POOL_MAX = { web: 20, worker: 10 } as const;

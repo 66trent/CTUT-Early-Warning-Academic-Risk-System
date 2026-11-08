@@ -11,10 +11,13 @@ export interface SetupCounts {
   classesWithoutAdvisor: number;
   students: number;
   currentTerm: { termId: string; termName: string; closed: boolean } | null;
+  /** Luật cảnh báo đang có phiên bản áp dụng (không tính cấu hình RiskScore). */
+  activeRules: number;
   /** Các số dưới đây tính trong học kỳ hiện tại. */
   attendanceRows: number;
   lmsRows: number;
-  processResults: number;
+  assignmentRows: number;
+  /** Kết quả học phần đã khóa điểm. */
   finalResults: number;
   completedRuns: number;
   alerts: number;
@@ -41,10 +44,10 @@ export interface SetupStep {
 }
 
 export const SETUP_PHASE_LABELS: Record<SetupPhase, string> = {
-  FOUNDATION: 'Dữ liệu nền (đầu khóa)',
+  FOUNDATION: 'Thiết lập ban đầu (đầu khóa)',
   TERM: 'Mỗi học kỳ',
-  DURING_TERM: 'Trong học kỳ',
-  END_OF_TERM: 'Cuối học kỳ',
+  DURING_TERM: 'Hằng tuần',
+  END_OF_TERM: 'Cuối kỳ',
 };
 
 type StepDraft = Omit<SetupStep, 'next'>;
@@ -55,9 +58,12 @@ function foundationSteps(c: SetupCounts): StepDraft[] {
       key: 'departments',
       phase: 'FOUNDATION',
       title: 'Danh mục khoa',
-      description: 'Khoa được tạo sẵn khi cài đặt (npm run seed).',
+      description: 'Danh mục khoa chính thức của trường, có sẵn khi cài đặt hệ thống.',
       done: c.departments > 0,
-      status: c.departments > 0 ? `${c.departments} khoa` : 'Chưa có khoa — chạy npm run seed',
+      status:
+        c.departments > 0
+          ? `${c.departments} khoa`
+          : 'Chưa có khoa, báo người cài đặt hệ thống nhập danh mục khoa',
       href: '/admin/classes',
       actionLabel: 'Xem khoa',
       blockedReason: null,
@@ -101,14 +107,14 @@ function foundationSteps(c: SetupCounts): StepDraft[] {
       status: c.students > 0 ? `${c.students} sinh viên` : 'Chưa có sinh viên',
       href: '/admin/imports',
       actionLabel: 'Nhập dữ liệu',
-      blockedReason: c.classes === 0 ? 'Chưa có lớp sinh hoạt — tạo lớp trước.' : null,
+      blockedReason: c.classes === 0 ? 'Chưa có lớp sinh hoạt, tạo lớp trước.' : null,
     },
   ];
 }
 
 /** Lý do chưa nhập được dữ liệu học tập của học kỳ hiện tại. */
 function academicBlock(c: SetupCounts): string | null {
-  if (c.students === 0) return 'Chưa có sinh viên — nhập danh sách sinh viên trước.';
+  if (c.students === 0) return 'Chưa có sinh viên, nhập danh sách sinh viên trước.';
   if (!c.currentTerm) return 'Chưa đặt học kỳ hiện tại.';
   if (c.currentTerm.closed) return 'Học kỳ hiện tại đã chốt.';
   return null;
@@ -116,13 +122,13 @@ function academicBlock(c: SetupCounts): string | null {
 
 function termSteps(c: SetupCounts): StepDraft[] {
   const block = academicBlock(c);
-  const hasAcademic = c.attendanceRows + c.lmsRows + c.processResults + c.finalResults > 0;
+  const hasAcademic = c.attendanceRows + c.lmsRows + c.assignmentRows + c.finalResults > 0;
   return [
     {
       key: 'term',
       phase: 'TERM',
       title: 'Tạo học kỳ và đặt học kỳ hiện tại',
-      description: 'Không cần nhập lớp học phần hay đăng ký học phần — hệ thống tự tạo từ dữ liệu.',
+      description: 'Không cần nhập lớp học phần hay đăng ký học phần, hệ thống tự tạo từ dữ liệu.',
       done: c.currentTerm !== null,
       status: c.currentTerm ? `Hiện tại: ${c.currentTerm.termName}` : 'Chưa đặt học kỳ hiện tại',
       href: '/admin/terms',
@@ -130,10 +136,23 @@ function termSteps(c: SetupCounts): StepDraft[] {
       blockedReason: null,
     },
     {
+      key: 'rules',
+      phase: 'TERM',
+      title: 'Xem lại luật cảnh báo',
+      description:
+        'Luật có sẵn ngưỡng mặc định; chỉnh nếu nhà trường muốn báo sớm hơn hoặc muộn hơn.',
+      done: c.activeRules > 0,
+      status:
+        c.activeRules > 0 ? `${c.activeRules} luật đang áp dụng` : 'Chưa có luật nào đang áp dụng',
+      href: '/admin/rules',
+      actionLabel: 'Cấu hình luật',
+      blockedReason: null,
+    },
+    {
       key: 'attendance',
       phase: 'DURING_TERM',
-      title: 'Nhập điểm danh tổng hợp',
-      description: 'Hằng tuần, mỗi lần 1 ngày chốt số liệu.',
+      title: 'Nhập điểm danh',
+      description: 'Hằng tuần, mỗi lần 1 ngày chốt số liệu (số tiết vắng).',
       done: c.attendanceRows > 0,
       status: c.attendanceRows > 0 ? `${c.attendanceRows} dòng điểm danh` : 'Chưa có',
       href: '/admin/imports',
@@ -143,21 +162,13 @@ function termSteps(c: SetupCounts): StepDraft[] {
     {
       key: 'lms',
       phase: 'DURING_TERM',
-      title: 'Nhập kết quả bài kiểm tra LMS',
-      description: 'Hằng tuần, xuất từ LMS.',
-      done: c.lmsRows > 0,
-      status: c.lmsRows > 0 ? `${c.lmsRows} lượt làm bài` : 'Chưa có',
-      href: '/admin/imports',
-      actionLabel: 'Nhập dữ liệu',
-      blockedReason: block,
-    },
-    {
-      key: 'process-results',
-      phase: 'DURING_TERM',
-      title: 'Nhập điểm quá trình (giữa kỳ)',
-      description: 'File kết quả học phần chỉ có điểm quá trình.',
-      done: c.processResults + c.finalResults > 0,
-      status: c.processResults > 0 ? `${c.processResults} kết quả` : 'Chưa có',
+      title: 'Nhập bài LMS (trắc nghiệm, thực hành)',
+      description: 'Hằng tuần, xuất từ LMS kèm hạn nộp của từng bài.',
+      done: c.lmsRows + c.assignmentRows > 0,
+      status:
+        c.lmsRows + c.assignmentRows > 0
+          ? `${c.lmsRows} lượt làm trắc nghiệm · ${c.assignmentRows} bài thực hành`
+          : 'Chưa có',
       href: '/admin/imports',
       actionLabel: 'Nhập dữ liệu',
       blockedReason: block,
@@ -166,7 +177,7 @@ function termSteps(c: SetupCounts): StepDraft[] {
       key: 'evaluation',
       phase: 'DURING_TERM',
       title: 'Chạy đánh giá',
-      description: 'Tự chạy sau mỗi lần nạp; Admin có thể chạy ngay.',
+      description: 'Áp dụng các luật cảnh báo lên dữ liệu đã nhập.',
       done: c.completedRuns > 0,
       status: c.completedRuns > 0 ? `${c.completedRuns} lần chạy xong` : 'Chưa chạy',
       href: '/admin/evaluations',
@@ -196,11 +207,11 @@ function endOfTermSteps(c: SetupCounts): StepDraft[] {
     {
       key: 'final-results',
       phase: 'END_OF_TERM',
-      title: 'Nhập kết quả cuối kỳ và chạy đánh giá',
+      title: 'Nhập kết quả học phần (khi khóa điểm)',
       description:
-        'Kết quả cuối kỳ dùng cho luật rớt học phần, điểm trung bình và nhận diện học lại.',
+        'Học phần nào khóa điểm thì nhập ngay, dùng cho luật không đạt học phần, tín chỉ không đạt, điểm trung bình và nhận diện học lại.',
       done: c.finalResults > 0,
-      status: c.finalResults > 0 ? `${c.finalResults} kết quả cuối kỳ` : 'Chưa có',
+      status: c.finalResults > 0 ? `${c.finalResults} kết quả học phần` : 'Chưa có',
       href: '/admin/imports',
       actionLabel: 'Nhập dữ liệu',
       blockedReason: academicBlock(c),
@@ -209,7 +220,8 @@ function endOfTermSteps(c: SetupCounts): StepDraft[] {
       key: 'close-term',
       phase: 'END_OF_TERM',
       title: 'Chốt học kỳ',
-      description: 'Sau khi chốt, học kỳ không nhận thêm dữ liệu điểm danh/LMS.',
+      description:
+        'Hệ thống chạy đánh giá lần cuối (tín chỉ không đạt, điểm trung bình) rồi chốt; sau đó không nhận thêm dữ liệu.',
       done: c.currentTerm?.closed ?? false,
       status: c.currentTerm?.closed ? 'Đã chốt' : 'Chưa chốt',
       href: '/admin/terms',
@@ -218,7 +230,7 @@ function endOfTermSteps(c: SetupCounts): StepDraft[] {
         !c.currentTerm || c.currentTerm.closed
           ? null
           : c.finalResults === 0
-            ? 'Chưa có kết quả cuối kỳ.'
+            ? 'Chưa có kết quả học phần.'
             : null,
     },
   ];

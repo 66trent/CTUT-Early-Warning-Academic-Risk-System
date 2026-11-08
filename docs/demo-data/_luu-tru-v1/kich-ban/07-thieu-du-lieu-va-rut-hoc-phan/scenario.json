@@ -1,0 +1,65 @@
+{
+  "id": "07",
+  "title": "Mức đủ dữ liệu của điểm rủi ro (Đủ / Thiếu một phần / Chưa đủ) và rút học phần",
+  "students": [
+    "KTPM2311701",
+    "KTPM2311702",
+    "KTPM2311703",
+    "KTPM2311704",
+    "KTPM2311705"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null
+    },
+    {
+      "file": "02_diem_danh.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026"
+    },
+    {
+      "file": "03_lms_bai_kiem_tra.csv",
+      "dataType": "LMS_QUIZ",
+      "termId": "HK1_2026"
+    },
+    {
+      "file": "04_ket_qua_giua_ky.csv",
+      "dataType": "COURSE_RESULT",
+      "termId": "HK1_2026"
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [
+        "KTPM2311701|KTPM571|ATT-01|MEDIUM",
+        "KTPM2311705|KTPM573|ATT-01|CRITICAL"
+      ],
+      "alerts": [
+        [
+          "KTPM2311701",
+          "MEDIUM"
+        ],
+        [
+          "KTPM2311705",
+          "CRITICAL"
+        ]
+      ],
+      "riskLevels": {
+        "KTPM2311701": "FULL",
+        "KTPM2311702": "PARTIAL",
+        "KTPM2311703": "PARTIAL",
+        "KTPM2311704": "INSUFFICIENT"
+      }
+    }
+  ],
+  "withdraw": {
+    "student": "KTPM2311705",
+    "courseId": "KTPM573",
+    "termId": "HK1_2026",
+    "asOf": "2026-10-10"
+  }
+}

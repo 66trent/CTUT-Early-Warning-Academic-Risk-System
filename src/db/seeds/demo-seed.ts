@@ -2,56 +2,70 @@ import { type DataSource } from 'typeorm';
 import { type Auth } from '@/lib/auth';
 import { vnEndOfDay, vnStartOfDay } from '@/lib/dates';
 import { staffDomainForSamples } from '@/lib/email-domains';
+import {
+  DEMO_ADVISOR_IDS,
+  DEMO_ADVISOR_NAMES,
+  DEMO_CLASS_ACCOUNTS,
+  DEMO_PENDING_ADVISOR,
+} from '@/lib/demo-accounts';
 import { type Env } from '@/lib/env';
 import { AdministrativeClass } from '../entities/administrative-class.entity';
 import { Term } from '../entities/term.entity';
-import { UserRole } from '../enums';
+import { User } from '../entities/user.entity';
+import { UserAccountStatus, UserRole } from '../enums';
 import { ensureStaffAccount } from './base-seed';
 
 /**
  * Dữ liệu nền demo — đúng bảng "Dữ liệu nền" trong docs/demo-data/KET_QUA_MONG_DOI.md.
  * Đổi dữ liệu demo: sửa file kết quả mong đợi trước, rồi mới sửa ở đây.
  */
-export const DEMO_ADVISORS = [
-  { userId: 'GV001', fullName: 'Cố vấn học tập GV001' },
-  { userId: 'GV002', fullName: 'Cố vấn học tập GV002' },
-] as const;
+export const DEMO_ADVISORS = DEMO_ADVISOR_IDS.map((userId) => ({
+  userId,
+  fullName: DEMO_ADVISOR_NAMES[userId],
+}));
 
-export const DEMO_CLASSES = [
-  {
-    classId: 'KTPM2311',
-    className: 'Kỹ thuật phần mềm K2023',
-    departmentId: 'K.CNTT',
-    cohortYear: '2023',
-    advisorId: 'GV001',
-  },
-  {
-    classId: 'KHMT2311',
-    className: 'Khoa học máy tính K2023',
-    departmentId: 'K.CNTT',
-    cohortYear: '2023',
-    advisorId: 'GV002',
-  },
-] as const;
+/**
+ * Khoa CNTT (bản v4): 6 lớp mã theo mẫu `KTPM2411`, tên "<Ngành> K<khóa>", mỗi lớp 1 Cố vấn học tập.
+ */
+export const DEMO_CLASSES = DEMO_CLASS_ACCOUNTS.map((c) => ({
+  classId: c.classId,
+  className: `${c.majorName} K${c.cohortYear}`,
+  departmentId: 'K.CNTT',
+  majorId: c.majorId,
+  cohortYear: c.cohortYear,
+  advisorId: c.advisorId,
+}));
 
+/**
+ * Học kỳ ĐÃ QUA để mọi mốc demo (10/10, 20/11, 31/12) ở quá khứ — chế độ demo không cho chọn mốc
+ * tương lai. `HK2_2024` chỉ có 1 dòng (học lại lần 3). `HK3_2024` = học kỳ liền trước (chỉ kết quả, cho
+ * `ACA-04`, học lại; ngày là giá trị demo). `HK1_2025` = HK4 chương trình khung, học kỳ hiện tại.
+ */
 export const DEMO_TERMS = [
   {
-    termId: 'HK2_2025',
-    termName: 'Học kỳ 2, 2025–2026',
-    academicYear: '2025-2026',
-    startDate: '2026-01-05',
-    endDate: '2026-05-31',
+    termId: 'HK2_2024',
+    termName: 'Học kỳ 2, 2024–2025',
+    academicYear: '2024-2025',
+    startDate: '2025-01-06',
+    endDate: '2025-04-27',
   },
   {
-    termId: 'HK1_2026',
-    termName: 'Học kỳ 1, 2026–2027',
-    academicYear: '2026-2027',
-    startDate: '2026-08-17',
-    endDate: '2026-12-27',
+    termId: 'HK3_2024',
+    termName: 'Học kỳ 3, 2024–2025',
+    academicYear: '2024-2025',
+    startDate: '2025-05-04',
+    endDate: '2025-08-10',
+  },
+  {
+    termId: 'HK1_2025',
+    termName: 'Học kỳ 1, 2025–2026',
+    academicYear: '2025-2026',
+    startDate: '2025-08-18',
+    endDate: '2025-12-28',
   },
 ] as const;
 
-export const DEMO_CURRENT_TERM_ID = 'HK1_2026';
+export const DEMO_CURRENT_TERM_ID = 'HK1_2025';
 
 export interface DemoSeedReport {
   advisorsCreated: number;
@@ -81,8 +95,18 @@ export async function seedDemo(
     if (created) advisorsCreated += 1;
   }
 
+  await dataSource.getRepository(User).upsert(
+    {
+      ...DEMO_PENDING_ADVISOR,
+      email: `${DEMO_PENDING_ADVISOR.userId.toLowerCase()}${domain}`,
+      role: UserRole.ADVISOR,
+      accountStatus: UserAccountStatus.PENDING_APPROVAL,
+    },
+    ['userId'],
+  );
+
   await dataSource.transaction(async (em) => {
-    await em.getRepository(AdministrativeClass).upsert([...DEMO_CLASSES], ['classId']);
+    await em.getRepository(AdministrativeClass).upsert(DEMO_CLASSES, ['classId']);
     await em.getRepository(Term).upsert(
       DEMO_TERMS.map((t) => ({
         termId: t.termId,

@@ -18,7 +18,7 @@ export async function rollbackSourceRows<T extends { importBatchId: string }>(
   if (stillOwned !== createdKeys.length) {
     return {
       blocked:
-        'Một số dòng của lô đã được lô nạp sau cập nhật — không hoàn tác được, hãy nạp file đúng để sửa.',
+        'Một số dòng đã được đợt nhập sau đó cập nhật nên không hoàn tác được. Hãy nhập file đúng để sửa.',
     };
   }
   await em.delete(entity, where);

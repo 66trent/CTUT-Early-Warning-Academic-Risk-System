@@ -108,7 +108,7 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
       if (!knownClasses.has(row.classId)) {
         errors.set(i, {
           reason: 'CLASS_NOT_FOUND',
-          detail: `Lớp ${row.classId} chưa có trong hệ thống — tạo lớp trước rồi nhập lại.`,
+          detail: `Lớp ${row.classId} chưa có trong hệ thống, tạo lớp trước rồi nhập lại.`,
         });
       } else if (roleById.has(row.studentId) && roleById.get(row.studentId) !== UserRole.STUDENT) {
         errors.set(i, {
@@ -206,11 +206,11 @@ export const studentImport: ImportTypeDefinition<StudentRow> = {
       where: { userId: In([...createdKeys]), authUserId: Not(IsNull()) },
     });
     if (loggedIn > 0) {
-      return `${loggedIn} sinh viên trong lô đã đăng nhập hệ thống — không hoàn tác được, hãy nạp file đúng để cập nhật.`;
+      return `${loggedIn} sinh viên trong đợt nhập đã đăng nhập hệ thống, không hoàn tác được, hãy nhập file đúng để cập nhật.`;
     }
     const withData = await em.count(Enrollment, { where: { studentId: In([...createdKeys]) } });
     if (withData > 0) {
-      return 'Sinh viên trong lô đã có dữ liệu học tập — không hoàn tác được, hãy nạp file đúng để cập nhật.';
+      return 'Sinh viên trong đợt nhập đã có dữ liệu học tập, không hoàn tác được, hãy nhập file đúng để cập nhật.';
     }
     await em.delete(Student, { studentId: In([...createdKeys]) });
     await em.delete(User, {

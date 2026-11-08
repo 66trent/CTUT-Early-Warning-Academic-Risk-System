@@ -1,17 +1,20 @@
 /**
  * Entry point của BullMQ worker — chạy container riêng, tự khởi tạo DataSource riêng (pool 10).
- * Processor: nhập dữ liệu (Phase 3), đánh giá luật (Phase 4), thông báo (Phase 5).
+ * Processor: nhập dữ liệu (Phase 3), đánh giá luật (Phase 4), thông báo (Phase 5), đồng bộ Moodle (10b).
  */
 import 'dotenv/config';
 import { Worker, type Job } from 'bullmq';
 import { closeDataSource, getDataSource } from '@/db/data-source';
-import { getEnv } from '@/lib/env';
+import { getEnv, isMoodleConfigured } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { createRedisConnection } from '@/lib/queue/connection';
 import { getQueue, QUEUE_NAMES, type QueueName } from '@/lib/queue/queues';
 import { IMPORT_JOB } from '@/modules/data-import/services/import-queue';
+import { MOODLE_JOB } from '@/modules/data-import/services/moodle-queue';
+import { SCHEDULED_EVALUATION_JOB } from '@/modules/rule-engine/services/evaluation-queue';
 import { onEvaluationJobFailed, processEvaluationJob } from './processors/evaluation-run.processor';
 import { onImportJobFailed, processImportJob } from './processors/import-batch.processor';
+import { onMoodleSyncJobFailed, processMoodleSyncJob } from './processors/moodle-sync.processor';
 import {
   onNotificationJobFailed,
   processNotificationJob,
@@ -28,13 +31,47 @@ type Processor = (job: Job) => Promise<unknown>;
 const CONCURRENCY: Partial<Record<QueueName, number>> = {
   [QUEUE_NAMES.importBatchProcess]: 1,
   [QUEUE_NAMES.evaluationRun]: 1,
+  // Mỗi lần đồng bộ gọi Moodle hàng trăm lần — chạy lần lượt để không dồn tải lên Moodle.
+  [QUEUE_NAMES.moodleSync]: 1,
 };
 
 const PROCESSORS: Record<QueueName, Processor> = {
   [QUEUE_NAMES.importBatchProcess]: processImportJob,
   [QUEUE_NAMES.evaluationRun]: processEvaluationJob,
   [QUEUE_NAMES.sendNotifications]: processNotificationJob,
+  [QUEUE_NAMES.moodleSync]: processMoodleSyncJob,
 };
+
+const ON_FAILED: Record<QueueName, (job: Job | undefined) => Promise<void>> = {
+  [QUEUE_NAMES.importBatchProcess]: onImportJobFailed,
+  [QUEUE_NAMES.evaluationRun]: onEvaluationJobFailed,
+  [QUEUE_NAMES.sendNotifications]: onNotificationJobFailed,
+  [QUEUE_NAMES.moodleSync]: onMoodleSyncJobFailed,
+};
+
+/**
+ * Chế độ Tự động Moodle (Phase 10c): dò thay đổi mỗi MOODLE_SYNC_INTERVAL_MINUTES phút + kéo đủ mỗi
+ * đêm. Chạy cả khi DEMO_MODE=true (học kỳ Moodle demo theo ngày thật); chưa cấu hình Moodle → gỡ lịch.
+ */
+async function scheduleMoodleJobs(): Promise<void> {
+  const queue = getQueue(QUEUE_NAMES.moodleSync);
+  const env = getEnv();
+  if (!isMoodleConfigured(env)) {
+    await queue.removeJobScheduler(MOODLE_JOB.poll);
+    await queue.removeJobScheduler(MOODLE_JOB.nightly);
+    return;
+  }
+  await queue.upsertJobScheduler(
+    MOODLE_JOB.poll,
+    { every: env.MOODLE_SYNC_INTERVAL_MINUTES * 60_000 },
+    { name: MOODLE_JOB.poll },
+  );
+  await queue.upsertJobScheduler(
+    MOODLE_JOB.nightly,
+    { pattern: env.MOODLE_NIGHTLY_SCHEDULE, tz: 'Asia/Ho_Chi_Minh' },
+    { name: MOODLE_JOB.nightly },
+  );
+}
 
 async function main(): Promise<void> {
   getEnv();
@@ -50,13 +87,7 @@ async function main(): Promise<void> {
     );
     worker.on('failed', (job, error) => {
       logger.error({ queue: name, jobId: job?.id, err: error.message }, 'job lỗi');
-      const onFailed =
-        name === QUEUE_NAMES.importBatchProcess
-          ? onImportJobFailed
-          : name === QUEUE_NAMES.evaluationRun
-            ? onEvaluationJobFailed
-            : onNotificationJobFailed;
-      onFailed?.(job).catch((e: unknown) =>
+      ON_FAILED[name as QueueName](job).catch((e: unknown) =>
         logger.error({ queue: name, err: String(e) }, 'không đánh dấu được job lỗi'),
       );
     });
@@ -68,6 +99,19 @@ async function main(): Promise<void> {
     { pattern: '0 2 * * *', tz: 'Asia/Ho_Chi_Minh' },
     { name: IMPORT_JOB.expireStaged },
   );
+  // Chạy đánh giá cả học kỳ hiện tại mỗi đêm (docs/rules/05) — giờ đọc từ EVALUATION_SCHEDULE.
+  // DEMO_MODE=true: TẮT (dữ liệu demo có ngày cố định — người dùng chốt 2026-10-15).
+  const evaluationQueue = getQueue(QUEUE_NAMES.evaluationRun);
+  if (getEnv().DEMO_MODE) {
+    await evaluationQueue.removeJobScheduler(SCHEDULED_EVALUATION_JOB);
+  } else {
+    await evaluationQueue.upsertJobScheduler(
+      SCHEDULED_EVALUATION_JOB,
+      { pattern: getEnv().EVALUATION_SCHEDULE, tz: 'Asia/Ho_Chi_Minh' },
+      { name: SCHEDULED_EVALUATION_JOB },
+    );
+  }
+  await scheduleMoodleJobs();
   logger.info({ queues: Object.keys(PROCESSORS) }, 'worker đã sẵn sàng');
 
   const shutdown = async (signal: string) => {

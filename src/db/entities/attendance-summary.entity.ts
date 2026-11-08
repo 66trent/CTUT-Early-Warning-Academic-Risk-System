@@ -12,7 +12,7 @@ import { Enrollment } from './enrollment.entity';
 import { ImportBatch } from './import-batch.entity';
 
 /**
- * Số liệu điểm danh tổng hợp của 1 Enrollment tại 1 ngày chốt (docs/rules/10).
+ * Số liệu điểm danh tổng hợp của 1 Enrollment tại 1 ngày chốt, đơn vị TIẾT (docs/rules/10).
  * Giữ mọi ngày chốt (ATT-02 cần lịch sử); nạp lại cùng ngày chốt = cập nhật.
  */
 @Entity('attendance_summaries')
@@ -29,28 +29,21 @@ export class AttendanceSummary {
   @Column({ type: 'timestamptz' })
   snapshotDate!: Date;
 
-  /** Số buổi ĐÃ học tính đến ngày chốt. */
+  /** Tổng số tiết của học phần (`tong_so_tiet`) — mẫu số ATT-01. */
   @Column({ type: 'int' })
-  totalSessions!: number;
+  totalPeriods!: number;
 
-  /** Tổng số buổi theo kế hoạch (nếu nguồn có). */
-  @Column({ type: 'int', nullable: true })
-  plannedSessions!: number | null;
-
-  @Column({ type: 'int' })
-  present!: number;
-
-  @Column({ type: 'int' })
-  late!: number;
-
+  /** Số tiết vắng có phép, cộng dồn đến ngày chốt. */
   @Column({ type: 'int' })
   excusedAbsence!: number;
 
+  /** Số tiết vắng không phép, cộng dồn đến ngày chốt. */
   @Column({ type: 'int' })
   unexcusedAbsence!: number;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
-  sectionCode!: string | null;
+  /** Mã lớp học phần của dòng (`ma_lop_hoc_phan`). */
+  @Column({ type: 'varchar', length: 30 })
+  sectionCode!: string;
 
   /** Lô cập nhật gần nhất. */
   @Column({ type: 'uuid' })

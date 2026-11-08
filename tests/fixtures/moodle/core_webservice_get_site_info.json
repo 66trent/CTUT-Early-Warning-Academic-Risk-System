@@ -1,0 +1,131 @@
+[
+  {
+    "params": {},
+    "response": {
+      "sitename": "Moodle demo CTUT-EWARS",
+      "username": "ewars_sync",
+      "firstname": "EWARS",
+      "lastname": "Đồng bộ",
+      "fullname": "EWARS Đồng bộ",
+      "lang": "en",
+      "userid": 3,
+      "siteurl": "http://localhost:8080",
+      "userpictureurl": "http://localhost:8080/theme/image.php/boost/core/1794091044/u/f1",
+      "functions": [
+        {
+          "name": "core_webservice_get_site_info",
+          "version": "2026100500"
+        },
+        {
+          "name": "core_course_get_courses_by_field",
+          "version": "2026100500"
+        },
+        {
+          "name": "core_course_get_contents",
+          "version": "2026100500"
+        },
+        {
+          "name": "core_enrol_get_enrolled_users",
+          "version": "2026100500"
+        },
+        {
+          "name": "mod_quiz_get_quizzes_by_courses",
+          "version": "2026100500"
+        },
+        {
+          "name": "mod_quiz_get_user_quiz_attempts",
+          "version": "2026100500"
+        },
+        {
+          "name": "gradereport_user_get_grade_items",
+          "version": "2026100500"
+        },
+        {
+          "name": "mod_assign_get_assignments",
+          "version": "2026100500"
+        },
+        {
+          "name": "mod_assign_get_submissions",
+          "version": "2026100500"
+        },
+        {
+          "name": "mod_assign_get_user_flags",
+          "version": "2026100500"
+        },
+        {
+          "name": "mod_attendance_get_sessions",
+          "version": "2026090300"
+        }
+      ],
+      "downloadfiles": 0,
+      "uploadfiles": 0,
+      "release": "5.3 (Build: 20261005)",
+      "version": "2026100500",
+      "mobilecssurl": "",
+      "advancedfeatures": [
+        {
+          "name": "usecomments",
+          "value": 1
+        },
+        {
+          "name": "usetags",
+          "value": 1
+        },
+        {
+          "name": "enablenotes",
+          "value": 1
+        },
+        {
+          "name": "messaging",
+          "value": 1
+        },
+        {
+          "name": "enableblogs",
+          "value": 1
+        },
+        {
+          "name": "enablecompletion",
+          "value": 1
+        },
+        {
+          "name": "enablebadges",
+          "value": 1
+        },
+        {
+          "name": "messagingallusers",
+          "value": 0
+        },
+        {
+          "name": "enablecustomreports",
+          "value": 1
+        },
+        {
+          "name": "enableglobalsearch",
+          "value": 0
+        },
+        {
+          "name": "mnet_dispatcher_mode",
+          "value": 0
+        },
+        {
+          "name": "enablecompetencies",
+          "value": 1
+        }
+      ],
+      "usercanmanageownfiles": true,
+      "userquota": 104857600,
+      "usermaxuploadfilesize": 209715200,
+      "userhomepage": 1,
+      "userprivateaccesskey": "a9844418d5f69ca620e88284ef42afb5",
+      "siteid": 1,
+      "sitecalendartype": "gregorian",
+      "usercalendartype": "gregorian",
+      "userissiteadmin": false,
+      "theme": "boost",
+      "limitconcurrentlogins": 0,
+      "policyagreed": 0,
+      "usercanchangeconfig": false,
+      "usercanviewconfig": false
+    }
+  }
+]

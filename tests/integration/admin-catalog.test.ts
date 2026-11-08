@@ -10,6 +10,7 @@ import {
   changeAccountStatus,
   changeRole,
   changeStaffCode,
+  countAccountsByStatus,
   listAccounts,
 } from '@/modules/admin/services/account.service';
 import {
@@ -17,14 +18,17 @@ import {
   createClass,
   listAssignableAdvisors,
   listClasses,
+  listCohortYears,
+  listDepartmentSummaries,
+  searchClasses,
   listDepartments,
 } from '@/modules/admin/services/class.service';
+import { createTerm, listTerms, setCurrentTerm } from '@/modules/admin/services/term.service';
 import {
-  closeTerm,
-  createTerm,
-  listTerms,
-  setCurrentTerm,
-} from '@/modules/admin/services/term.service';
+  processEvaluationRun,
+  requestTermClosing,
+} from '@/modules/rule-engine/services/evaluation-run.service';
+import { firstPage } from '@/lib/list-params';
 import { cleanupIdentityFixtures, createIdentityFixtures, FX } from '../helpers/identity-fixtures';
 
 /** Học kỳ thử dùng năm 2091–2093 để không đụng dữ liệu thật/demo. */
@@ -37,6 +41,7 @@ async function cleanupTerms() {
   await ds.query(
     `DELETE FROM audit_logs WHERE target_type = 'Term' AND target_id LIKE 'HK%\\_209%'`,
   );
+  await ds.query(`DELETE FROM evaluation_runs WHERE ${TEST_TERM_FILTER}`);
   await ds.query(`DELETE FROM terms WHERE ${TEST_TERM_FILTER}`);
 }
 
@@ -110,13 +115,23 @@ describe('Học kỳ — tối đa 1 học kỳ hiện tại', () => {
     await expect(createTerm(term(1, 2092), ACTOR)).rejects.toMatchObject({ code: 'TERM_EXISTS' });
   });
 
-  it('chốt học kỳ: không chốt lại được, không đặt làm hiện tại được', async () => {
+  it('chốt học kỳ = lần chạy đánh giá cuối rồi mới chốt; không chốt lại được, không đặt làm hiện tại được', async () => {
     await createTerm(term(1, 2093), ACTOR);
-    const closed = await closeTerm('HK1_2093', ACTOR);
-    expect(closed.closedAt).not.toBeNull();
-    await expect(closeTerm('HK1_2093', ACTOR)).rejects.toMatchObject({
-      code: 'TERM_ALREADY_CLOSED',
-    });
+    const noEnqueue = () => Promise.resolve();
+    const runId = await requestTermClosing(
+      { termId: 'HK1_2093', asOf: new Date(), actorId: ACTOR },
+      noEnqueue,
+    );
+    expect(
+      (await ds.getRepository(Term).findOneByOrFail({ termId: 'HK1_2093' })).closedAt,
+    ).toBeNull();
+    await processEvaluationRun(runId, noEnqueue);
+    expect(
+      (await ds.getRepository(Term).findOneByOrFail({ termId: 'HK1_2093' })).closedAt,
+    ).not.toBeNull();
+    await expect(
+      requestTermClosing({ termId: 'HK1_2093', asOf: new Date(), actorId: ACTOR }, noEnqueue),
+    ).rejects.toMatchObject({ code: 'TERM_CLOSED' });
     await expect(setCurrentTerm('HK1_2093', ACTOR)).rejects.toMatchObject({ code: 'TERM_CLOSED' });
   });
 
@@ -148,6 +163,25 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
     expectPlain(await listAssignableAdvisors());
   });
 
+  it('tìm lớp: lọc khoa / khóa / chưa có CVHT / từ khóa, phân trang, thẻ khoa có số SV', async () => {
+    const base = { q: 'TSTCLS', department: undefined, cohort: undefined, noAdvisor: false };
+    const all = await searchClasses(base, firstPage({ size: 100 }));
+    expect(all.items.map((c) => c.classId).sort()).toEqual([FX.classA, FX.classB]);
+    expectPlain(all.items);
+    expect(all.items.find((c) => c.classId === FX.classA)).toMatchObject({
+      studentCount: 1,
+      advisorId: FX.advisorA,
+    });
+    expect((await searchClasses({ ...base, department: FX.departmentId })).total).toBe(2);
+    expect((await searchClasses({ ...base, cohort: '1999' })).total).toBe(0);
+    expect((await searchClasses({ ...base, noAdvisor: true })).total).toBe(0);
+    const paged = await searchClasses(base, firstPage({ size: 20, page: 2 }));
+    expect(paged).toMatchObject({ items: [], total: 2 });
+    const dept = (await listDepartmentSummaries()).find((d) => d.departmentId === FX.departmentId);
+    expect(dept?.studentCount).toBeGreaterThanOrEqual(2);
+    expect(await listCohortYears()).toContain('2023');
+  });
+
   it('chỉ gán được Cố vấn học tập đang hoạt động', async () => {
     await expect(
       createClass(
@@ -155,6 +189,7 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
           classId: 'TSTCLS_X',
           className: 'Lớp X',
           departmentId: FX.departmentId,
+          majorId: null,
           cohortYear: '2024',
           advisorId: FX.advisorPending,
         },
@@ -177,9 +212,37 @@ describe('Lớp sinh hoạt — sĩ số và gán Cố vấn học tập', () =>
 
 describe('Tài khoản — duyệt, khóa, đổi vai trò', () => {
   it('danh sách tài khoản: chờ duyệt lên đầu, DTO thuần', async () => {
-    const page = await listAccounts({ role: 'STAFF', page: 1, q: 'TSTGV', status: undefined });
+    const page = await listAccounts({
+      role: 'STAFF',
+      q: 'TSTGV',
+      status: undefined,
+      noClass: false,
+    });
     expect(page.items[0]?.accountStatus).toBe(UserAccountStatus.PENDING_APPROVAL);
     expectPlain(page.items);
+  });
+
+  it('cột Lớp: CVHT kèm lớp phụ trách + sĩ số, sinh viên kèm lớp sinh hoạt; lọc CVHT chưa gán lớp; thẻ đếm', async () => {
+    const base = { q: 'TSTGV', status: undefined, noClass: false } as const;
+    const advisors = await listAccounts({ ...base, role: UserRole.ADVISOR });
+    expect(advisors.items.find((a) => a.userId === FX.advisorA)?.advisedClasses).toEqual([
+      { classId: FX.classA, studentCount: 1 },
+    ]);
+    const noClass = await listAccounts({ ...base, role: 'STAFF', noClass: true });
+    expect(noClass.items.map((a) => a.userId)).toContain(FX.advisorPending);
+    expect(noClass.items.map((a) => a.userId)).not.toContain(FX.advisorA);
+    const counts = await countAccountsByStatus({ ...base, role: UserRole.ADVISOR });
+    expect(counts.PENDING_APPROVAL).toBeGreaterThanOrEqual(1);
+    expect(counts.ACTIVE).toBeGreaterThanOrEqual(2);
+
+    const students = await listAccounts(
+      { q: 'TSTSV', status: undefined, noClass: false, role: UserRole.STUDENT },
+      firstPage({ sort: 'fullName', dir: 'desc' }),
+    );
+    expect(students.items.map((s) => [s.userId, s.classId])).toEqual([
+      [FX.studentB, FX.classB],
+      [FX.studentA, FX.classA],
+    ]);
   });
 
   it('không được tự thay đổi tài khoản của chính mình', async () => {

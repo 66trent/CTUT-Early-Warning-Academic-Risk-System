@@ -6,22 +6,24 @@ import {
 } from '@/modules/rule-engine/evaluator/config';
 import { getRuleDefinition, RULES } from '@/modules/rule-engine/evaluator/rules';
 
-describe('Registry 10 luật (docs/rules/08)', () => {
-  it('đúng 10 mã luật theo định dạng NHÓM-số, không trùng', () => {
+describe('Registry 12 luật (docs/rules/08 bản 2)', () => {
+  it('đúng 12 mã luật theo định dạng NHÓM-số, không trùng', () => {
     const codes = RULES.map((r) => r.meta.ruleCode);
     expect(codes).toEqual([
       'ATT-01',
       'ATT-02',
-      'ATT-03',
       'LMS-01',
       'LMS-02',
+      'LMS-03',
+      'LMS-04',
       'ACA-01',
       'ACA-02',
       'ACA-03',
+      'ACA-04',
       'COMB-01',
       'COMB-02',
     ]);
-    expect(new Set(codes).size).toBe(10);
+    expect(new Set(codes).size).toBe(12);
     expect(codes.every((c) => /^[A-Z]+-\d{2}$/.test(c))).toBe(true);
   });
 
@@ -29,12 +31,14 @@ describe('Registry 10 luật (docs/rules/08)', () => {
     const expected: Record<string, Severity> = {
       'ATT-01': Severity.CRITICAL,
       'ATT-02': Severity.HIGH,
-      'ATT-03': Severity.LOW,
       'LMS-01': Severity.HIGH,
       'LMS-02': Severity.MEDIUM,
+      'LMS-03': Severity.HIGH,
+      'LMS-04': Severity.LOW,
       'ACA-01': Severity.HIGH,
       'ACA-02': Severity.CRITICAL,
-      'ACA-03': Severity.HIGH,
+      'ACA-03': Severity.CRITICAL,
+      'ACA-04': Severity.CRITICAL,
       'COMB-01': Severity.CRITICAL,
       'COMB-02': Severity.CRITICAL,
     };
@@ -47,11 +51,17 @@ describe('Registry 10 luật (docs/rules/08)', () => {
     }
   });
 
-  it('phạm vi: ACA-02/ACA-03 theo sinh viên, còn lại theo học phần; COMB-* chạy sau cùng', () => {
+  it('phạm vi: ACA-02/03/04 theo sinh viên, còn lại theo học phần; COMB-* chạy sau cùng; ACA-01 xét học phần đã có kết quả', () => {
     expect(RULES.filter((r) => r.kind === 'PER_STUDENT').map((r) => r.meta.ruleCode)).toEqual([
       'ACA-02',
       'ACA-03',
+      'ACA-04',
     ]);
+    expect(
+      RULES.filter((r) => r.kind === 'PER_COURSE' && r.appliesTo === 'COMPLETED').map(
+        (r) => r.meta.ruleCode,
+      ),
+    ).toEqual(['ACA-01']);
     const combined = RULES.filter((r) => r.kind === 'PER_COURSE' && r.stage === 'COMBINED');
     expect(combined.map((r) => r.meta.ruleCode)).toEqual(['COMB-01', 'COMB-02']);
   });
@@ -67,5 +77,12 @@ describe('Registry 10 luật (docs/rules/08)', () => {
     };
     expect(riskScoreConfigSchema.safeParse(zeroWeights).success).toBe(false);
     expect(riskScoreConfigSchema.safeParse(DEFAULT_RISK_SCORE_CONFIG).success).toBe(true);
+    // Quy chế 336: A = 3,8 (1 chữ số thập phân hợp lệ, 3,85 thì không).
+    expect(DEFAULT_RISK_SCORE_CONFIG.academic.gradeScale.A).toBe(3.8);
+    const badScale = {
+      ...DEFAULT_RISK_SCORE_CONFIG,
+      academic: { ...DEFAULT_RISK_SCORE_CONFIG.academic, gradeScale: { A: 3.85 } },
+    };
+    expect(riskScoreConfigSchema.safeParse(badScale).success).toBe(false);
   });
 });

@@ -15,7 +15,7 @@ function isValidDate(year: number, month: number, day: number): boolean {
   return day <= new Date(Date.UTC(year, month, 0)).getUTCDate();
 }
 
-const AMBIGUOUS_HINT = 'Ngày có thể hiểu 2 cách — hãy ghi dạng YYYY-MM-DD (VD 2026-10-05).';
+const AMBIGUOUS_HINT = 'Ngày có thể hiểu 2 cách, hãy ghi dạng YYYY-MM-DD (VD 2026-10-05).';
 
 /**
  * Ngày → `YYYY-MM-DD`. Nhận `YYYY-MM-DD` hoặc `DD/MM/YYYY` (ngày, tháng đủ 2 chữ số).
@@ -88,7 +88,7 @@ export function hasLostDiacritics(text: string): boolean {
 }
 
 export const LOST_DIACRITICS_HINT =
-  'có ký tự "?" — file bị lưu sai bảng mã nên mất dấu tiếng Việt. Dùng file mẫu .xlsx, hoặc trong Excel lưu dạng "CSV UTF-8 (Comma delimited)".';
+  'có ký tự "?", file bị lưu sai bảng mã nên mất dấu tiếng Việt. Dùng file mẫu .xlsx, hoặc trong Excel lưu dạng "CSV UTF-8 (Comma delimited)".';
 
 /** Bỏ dấu tiếng Việt, chữ thường. */
 export function stripDiacritics(text: string): string {

@@ -1,5 +1,6 @@
 'use server';
 
+import { z } from 'zod';
 import { UserRole } from '@/db/enums';
 import { runAction } from '@/lib/action';
 import { writeAuditLog } from '@/lib/audit';
@@ -20,8 +21,14 @@ import {
 import {
   type InAppNotificationDto,
   listInAppNotifications,
+  markInAppNotificationRead,
   markInAppNotificationsRead,
 } from '../services/notification.service';
+import {
+  listUpdateNotifications,
+  markUpdateNotificationsRead,
+  type UpdateNotificationDto,
+} from '../services/update-notification.service';
 import {
   alertIdSchema,
   changeAlertStatusSchema,
@@ -32,6 +39,8 @@ import {
 
 const VIEWERS = [UserRole.ADVISOR, UserRole.ADMIN] as const;
 const ADVISOR = [UserRole.ADVISOR] as const;
+const notificationIdSchema = z.object({ notificationId: z.uuid() });
+
 const REVALIDATE = ['/advisor', '/admin/alerts', '/student'];
 
 /** Phạm vi qua lớp sinh hoạt (docs/rules/06) — "không có quyền" và "không tồn tại" cùng 1 lỗi. */
@@ -144,6 +153,17 @@ export async function listMyNotificationsAction(): Promise<
   );
 }
 
+export async function markNotificationReadAction(raw: unknown): Promise<ActionResult<null>> {
+  return runAction(raw, {
+    roles: ADVISOR,
+    schema: notificationIdSchema,
+    run: async ({ notificationId }, user) => {
+      await markInAppNotificationRead(user.userId, notificationId);
+      return null;
+    },
+  });
+}
+
 export async function markNotificationsReadAction(): Promise<ActionResult<null>> {
   return runAction(
     {},
@@ -156,4 +176,51 @@ export async function markNotificationsReadAction(): Promise<ActionResult<null>>
       },
     },
   );
+}
+
+export interface BellDto {
+  /** Thông báo cảnh báo (chỉ Cố vấn học tập). */
+  alerts: InAppNotificationDto[];
+  /** "Dữ liệu vừa cập nhật / đánh giá đã cập nhật" (Admin + Cố vấn học tập). */
+  updates: UpdateNotificationDto[];
+  unread: number;
+}
+
+/** Chuông (Phase 10c): Admin + Cố vấn học tập — chỉ thông báo của chính người gọi. */
+export async function listMyBellAction(): Promise<ActionResult<BellDto>> {
+  return runAction(
+    {},
+    {
+      roles: VIEWERS,
+      schema: termIdSchema.partial(),
+      run: async (_, user) => {
+        const [alerts, updates] = await Promise.all([
+          user.role === UserRole.ADVISOR
+            ? listInAppNotifications(user.userId)
+            : Promise.resolve({ items: [], unread: 0 }),
+          listUpdateNotifications(user.userId),
+        ]);
+        return {
+          alerts: alerts.items,
+          updates: updates.items,
+          unread: alerts.unread + updates.unread,
+        };
+      },
+    },
+  );
+}
+
+const updateIdSchema = z.object({ id: z.uuid().optional() });
+
+/** Đánh dấu đã đọc thông báo cập nhật (`id` trống = tất cả) — của chính người gọi. */
+export async function markUpdatesReadAction(raw: unknown): Promise<ActionResult<null>> {
+  return runAction(raw, {
+    roles: VIEWERS,
+    schema: updateIdSchema,
+    run: async ({ id }, user) => {
+      await markUpdateNotificationsRead(user.userId, id);
+      if (!id && user.role === UserRole.ADVISOR) await markInAppNotificationsRead(user.userId);
+      return null;
+    },
+  });
 }

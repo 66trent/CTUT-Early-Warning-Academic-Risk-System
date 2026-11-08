@@ -47,7 +47,7 @@ function severityOf(ruleCode: string, condition: unknown): Severity {
   return def ? def.maxSeverity(condition) : Severity.LOW;
 }
 
-/** Nạp phiên bản ACTIVE của 10 luật + RISK-SCORE. Chỉ đọc RuleVersion ACTIVE (docs/rules/11). */
+/** Nạp phiên bản ACTIVE của 12 luật + RISK-SCORE. Chỉ đọc RuleVersion ACTIVE (docs/rules/11). */
 export async function loadActiveRuleSet(em: EntityManager): Promise<ActiveRuleSet> {
   const versions = await em.find(RuleVersion, { where: { status: RuleStatus.ACTIVE } });
   const activeRules = new Map<string, ActiveRule>();
@@ -63,13 +63,16 @@ export async function loadActiveRuleSet(em: EntityManager): Promise<ActiveRuleSe
     }
   }
   if (!config) {
-    throw new AppError('RULES_NOT_SEEDED', 'Chưa có cấu hình RiskScore — chạy npm run seed.');
+    throw new AppError(
+      'RULES_NOT_SEEDED',
+      'Chưa có cấu hình điểm ưu tiên. Liên hệ người cài đặt hệ thống.',
+    );
   }
   return { activeRules, config: config.value, configVersionId: config.id };
 }
 
 /**
- * Seed 10 luật + RISK-SCORE với ngưỡng mặc định của docs/rules/08 (idempotent: luật đã có
+ * Seed 12 luật + RISK-SCORE với ngưỡng mặc định của docs/rules/08 (idempotent: luật đã có
  * phiên bản thì giữ nguyên). Phiên bản 1 ACTIVE, `lastDryRunAt` = lúc seed (docs/rules/11).
  */
 export async function seedRules(em: EntityManager, actorId: string): Promise<number> {
@@ -141,7 +144,7 @@ export async function createRuleVersion(
   if (await em.existsBy(RuleVersion, { ruleCode, status: RuleStatus.DRAFT })) {
     throw new AppError(
       'DRAFT_EXISTS',
-      'Luật này đang có bản nháp — kích hoạt hoặc bỏ bản nháp trước.',
+      'Luật này đang có bản nháp, kích hoạt hoặc bỏ bản nháp trước.',
     );
   }
   const severity = severityOf(ruleCode, parsed);

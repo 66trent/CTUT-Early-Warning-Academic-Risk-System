@@ -2,8 +2,9 @@
 
 import { type ColumnDef } from '@tanstack/react-table';
 import { CircleCheck, CircleDashed, Clock, Loader2, Lock, MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notify';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DataTable } from '@/components/data-table/data-table';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserAccountStatus, UserRole } from '@/db/enums';
 import { ACCOUNT_STATUS_LABELS, ROLE_LABELS } from '@/lib/labels';
+import type { SortDir } from '@/lib/list-params';
 import {
   changeAccountStatusAction,
   changeRoleAction,
@@ -123,7 +125,7 @@ function AccountActions({
           description={
             account.emailVerified
               ? 'Cố vấn học tập sẽ đăng nhập và sử dụng được hệ thống.'
-              : 'Email chưa được xác minh — sau khi duyệt, người dùng vẫn phải xác minh email mới đăng nhập được.'
+              : 'Email chưa được xác minh, sau khi duyệt, người dùng vẫn phải xác minh email mới đăng nhập được.'
           }
           confirmLabel="Duyệt"
           successMessage="Đã duyệt tài khoản"
@@ -147,7 +149,7 @@ function AccountActions({
   if (account.accountStatus === UserAccountStatus.ACTIVE) {
     const nextRole = account.role === UserRole.ADVISOR ? UserRole.ADMIN : UserRole.ADVISOR;
     return (
-      <div className="flex flex-wrap justify-end gap-2">
+      <div className="flex flex-nowrap justify-end gap-2">
         <ConfirmActionButton
           trigger={`Đổi thành ${ROLE_LABELS[nextRole]}`}
           title={`Đổi vai trò của ${name}?`}
@@ -187,45 +189,82 @@ function AccountActions({
   return <MoreHorizontal aria-hidden className="ml-auto size-4 text-muted-foreground" />;
 }
 
+/** Cố vấn học tập: các lớp phụ trách (bấm sang trang lớp); sinh viên: lớp sinh hoạt. */
+function AccountClasses({ account }: { account: AccountDto }) {
+  if (account.role === UserRole.STUDENT) {
+    return <span className="tabular-nums">{account.classId ?? '—'}</span>;
+  }
+  if (
+    account.role !== UserRole.ADVISOR ||
+    account.accountStatus === UserAccountStatus.PENDING_APPROVAL
+  ) {
+    return <span className="text-muted-foreground">—</span>;
+  }
+  if (account.advisedClasses.length === 0) {
+    return (
+      <Badge variant="outline" className="text-amber-700 dark:text-amber-400">
+        Chưa gán lớp
+      </Badge>
+    );
+  }
+  return (
+    <span className="flex flex-wrap gap-1">
+      {account.advisedClasses.map((c) => (
+        <Link
+          key={c.classId}
+          href={`/admin/classes?q=${encodeURIComponent(c.classId)}`}
+          className="rounded-md border px-1.5 py-0.5 text-xs tabular-nums hover:bg-secondary"
+          title={`Lớp ${c.classId} · ${c.studentCount} sinh viên`}
+        >
+          {c.classId} · {c.studentCount} SV
+        </Link>
+      ))}
+    </span>
+  );
+}
+
 export function AccountsTable({
   accounts,
   currentUserId,
+  sort,
 }: {
   accounts: AccountDto[];
   currentUserId: string;
+  sort: { sort: string | null; dir: SortDir };
 }) {
   const columns: ColumnDef<AccountDto>[] = [
-    { accessorKey: 'userId', header: 'Mã' },
-    { accessorKey: 'fullName', header: 'Họ tên' },
+    { accessorKey: 'userId', header: 'Mã', meta: { sortKey: 'userId' } },
     {
-      accessorKey: 'email',
-      header: 'Email',
+      accessorKey: 'fullName',
+      header: 'Họ tên',
+      meta: { sortKey: 'fullName', mobile: 'title' },
+      // Email nằm chung cột họ tên để bảng đủ chỗ cho cột thao tác ở khổ desktop.
       cell: ({ row }) => (
         <span className="inline-flex flex-col">
-          {row.original.email}
-          {row.original.emailVerified === false && (
-            <span className="text-xs text-muted-foreground">Chưa xác minh email</span>
-          )}
+          <span className="font-medium">{row.original.fullName}</span>
+          <span className="text-xs text-muted-foreground">
+            {row.original.email}
+            {row.original.emailVerified === false && ' · chưa xác minh email'}
+          </span>
         </span>
       ),
     },
     {
       accessorKey: 'role',
       header: 'Vai trò',
-      cell: ({ row }) => (
-        <span className="inline-flex flex-col">
-          {ROLE_LABELS[row.original.role]}
-          {row.original.advisedClassCount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              Phụ trách {row.original.advisedClassCount} lớp
-            </span>
-          )}
-        </span>
-      ),
+      meta: { sortKey: 'role' },
+      cell: ({ row }) => ROLE_LABELS[row.original.role],
+    },
+    {
+      id: 'classes',
+      header: 'Lớp',
+      meta: { label: 'Lớp' },
+      cell: ({ row }) => <AccountClasses account={row.original} />,
     },
     {
       accessorKey: 'accountStatus',
       header: 'Trạng thái',
+      meta: { sortKey: 'accountStatus' },
       cell: ({ row }) => <AccountStatusBadge status={row.original.accountStatus} />,
     },
     {
@@ -241,6 +280,7 @@ export function AccountsTable({
       columns={columns}
       data={accounts}
       getRowId={(a) => a.userId}
+      serverSort={sort}
       emptyMessage="Không có tài khoản nào khớp bộ lọc."
     />
   );

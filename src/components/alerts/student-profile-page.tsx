@@ -1,10 +1,10 @@
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { PageBreadcrumbs } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listTermOptions, pickTerm } from '@/modules/alerts/services/alert-terms';
 import { getStudentProfile } from '@/modules/alerts/services/student-profile.service';
+import { getStudentInsights } from '@/modules/alerts/services/student-insights.service';
+import { StudentInsightsPanel } from './student-insights';
 import { CourseSnapshotTable } from './student-profile-view';
 import { TermFilter } from './term-filter';
 
@@ -25,23 +25,26 @@ export async function StudentProfilePage({
 }) {
   const terms = await listTermOptions();
   const term = pickTerm(terms, requestedTerm);
-  const profile = term ? await getStudentProfile(studentId, term.termId) : null;
-  if (!profile || !term) notFound();
+  const [profile, insights] = term
+    ? await Promise.all([
+        getStudentProfile(studentId, term.termId),
+        getStudentInsights(studentId, term.termId),
+      ])
+    : [null, null];
+  if (!profile || !term || !insights) notFound();
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link href={backHref}>
-            <ArrowLeft aria-hidden />
-            {backLabel}
-          </Link>
-        </Button>
+        <PageBreadcrumbs
+          items={[{ label: backLabel, href: backHref }, { label: profile.fullName }]}
+        />
         <h1 className="mt-2">
           {profile.fullName} · {profile.studentId}
         </h1>
         <p className="mt-1 text-muted-foreground">Lớp {profile.classId}</p>
       </div>
       <TermFilter terms={terms} value={term.termId} />
+      <StudentInsightsPanel insights={insights} />
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Học tập theo học phần · {profile.termName}</CardTitle>

@@ -1,0 +1,55 @@
+{
+  "id": "01",
+  "title": "Nhập liệu: dòng lỗi từng loại, nạp phần đúng, nạp lại, file Excel",
+  "students": [
+    "KTPM2311101",
+    "KTPM2311102",
+    "KTPM2311103",
+    "KTPM2311104",
+    "KTPM2311105"
+  ],
+  "files": [
+    {
+      "file": "01_sinh_vien.csv",
+      "dataType": "STUDENT",
+      "termId": null,
+      "expectErrors": {
+        "INVALID_FORMAT": 2,
+        "CLASS_NOT_FOUND": 1,
+        "DUPLICATE": 1
+      }
+    },
+    {
+      "file": "02_diem_danh_co_loi.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026",
+      "expectErrors": {
+        "STUDENT_NOT_FOUND": 1,
+        "OUT_OF_RANGE": 1,
+        "TERM_MISMATCH": 1,
+        "INVALID_FORMAT": 1
+      }
+    },
+    {
+      "file": "03_diem_danh_da_sua.csv",
+      "dataType": "ATTENDANCE_SUMMARY",
+      "termId": "HK1_2026",
+      "expectErrors": {}
+    },
+    {
+      "file": "04_ket_qua_giua_ky.csv",
+      "dataType": "COURSE_RESULT",
+      "termId": "HK1_2026",
+      "asXlsx": true,
+      "expectErrors": {}
+    }
+  ],
+  "evaluations": [
+    {
+      "termId": "HK1_2026",
+      "asOf": "2026-10-10",
+      "triggers": [],
+      "alerts": []
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "params": {
+      "assignmentids": [25, 26, 27]
+    },
+    "response": {
+      "assignments": [
+        {
+          "assignmentid": 26,
+          "userflags": [
+            {
+              "id": 5,
+              "userid": 19,
+              "locked": 0,
+              "mailed": 2,
+              "extensionduedate": 1794589140,
+              "workflowstate": ""
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        {
+          "item": "assignment",
+          "itemid": 25,
+          "warningcode": "3",
+          "message": "No user flags found"
+        },
+        {
+          "item": "assignment",
+          "itemid": 27,
+          "warningcode": "3",
+          "message": "No user flags found"
+        }
+      ]
+    }
+  },
+  {
+    "params": {
+      "assignmentids": [30, 28, 29]
+    },
+    "response": {
+      "assignments": [],
+      "warnings": [
+        {
+          "item": "assignment",
+          "itemid": 30,
+          "warningcode": "3",
+          "message": "No user flags found"
+        },
+        {
+          "item": "assignment",
+          "itemid": 28,
+          "warningcode": "3",
+          "message": "No user flags found"
+        },
+        {
+          "item": "assignment",
+          "itemid": 29,
+          "warningcode": "3",
+          "message": "No user flags found"
+        }
+      ]
+    }
+  }
+]

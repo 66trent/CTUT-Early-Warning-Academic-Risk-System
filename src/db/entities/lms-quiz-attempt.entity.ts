@@ -10,13 +10,15 @@ import {
 import { QuizAttemptStatus } from '../enums';
 import { Enrollment } from './enrollment.entity';
 import { ImportBatch } from './import-batch.entity';
+import { LmsActivity } from './lms-activity.entity';
 
 /**
- * 1 lượt làm bài kiểm tra trên LMS (docs/rules/10). Chỉ lưu lượt có thật —
+ * 1 lượt làm bài trắc nghiệm trên LMS (docs/rules/10). Chỉ lưu lượt có thật —
  * bài bị bỏ được rule-engine suy ra (LMS-01). Nạp lại cùng lượt = cập nhật.
  */
 @Entity('lms_quiz_attempts')
-@Index(['enrollmentId', 'quizKey', 'attemptNumber'], { unique: true })
+@Index(['enrollmentId', 'activityId', 'attemptNumber'], { unique: true })
+@Index(['activityId'])
 @Index(['importBatchId'])
 export class LmsQuizAttempt {
   @PrimaryGeneratedColumn('uuid')
@@ -25,12 +27,9 @@ export class LmsQuizAttempt {
   @Column({ type: 'uuid' })
   enrollmentId!: string;
 
-  /** `ma_bai`, hoặc tên bài đã chuẩn hóa khi nguồn không có mã. */
-  @Column({ type: 'varchar', length: 100 })
-  quizKey!: string;
-
-  @Column({ type: 'varchar', length: 200 })
-  quizName!: string;
+  /** Bài trắc nghiệm (`LmsActivity` loại QUIZ). */
+  @Column({ type: 'uuid' })
+  activityId!: string;
 
   @Column({ type: 'int' })
   attemptNumber!: number;
@@ -50,11 +49,15 @@ export class LmsQuizAttempt {
   @Column({ type: 'double precision', nullable: true })
   maxScore!: number | null;
 
+  /** Số câu làm đúng — chỉ hiển thị, không dùng để cảnh báo. */
+  @Column({ type: 'int', nullable: true })
+  correctCount!: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  totalQuestions!: number | null;
+
   @Column({ type: 'enum', enum: QuizAttemptStatus, enumName: 'quiz_attempt_status' })
   status!: QuizAttemptStatus;
-
-  @Column({ type: 'varchar', length: 30, nullable: true })
-  sectionCode!: string | null;
 
   /** Lô cập nhật gần nhất. */
   @Column({ type: 'uuid' })
@@ -63,6 +66,10 @@ export class LmsQuizAttempt {
   @ManyToOne(() => Enrollment, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'enrollment_id' })
   enrollment?: Relation<Enrollment>;
+
+  @ManyToOne(() => LmsActivity, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'activity_id' })
+  activity?: Relation<LmsActivity>;
 
   @ManyToOne(() => ImportBatch, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'import_batch_id' })

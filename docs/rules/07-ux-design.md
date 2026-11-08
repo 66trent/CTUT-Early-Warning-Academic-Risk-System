@@ -16,7 +16,7 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 ## CVHT — người dùng chính, tần suất cao
 
 - MUST: màn hình chính của CVHT mặc định mở ra danh sách `Alert` cần hành động (`OPEN`/`ACKNOWLEDGED`) — MUST NOT mở màn hình thống kê tổng quan làm mặc định.
-- MUST: luồng "Xác nhận → Ghi can thiệp" tối đa 2 lần click từ danh sách — dùng Sheet/Dialog hiển thị chi tiết + form can thiệp trên cùng màn hình, MUST NOT chuyển sang trang riêng.
+- MUST: luồng "Xác nhận → Ghi can thiệp" tối đa 2 lần click từ danh sách — dùng Sheet/Dialog hiển thị chi tiết + form can thiệp trên cùng màn hình, MUST NOT chuyển sang trang riêng. Phase 11: bấm cả dòng để mở (tên sinh viên là nút cho bàn phím); hành động chính + "Ghi can thiệp" ghim ở đáy Sheet, "Bỏ qua" và "Không còn hiệu lực" nằm trong menu "Khác"; tab "Cần xử lý" bỏ cột Trạng thái, chỉ gắn nhãn "Mở lại"; bộ lọc mức / nguồn / trạng thái thu vào nút "Bộ lọc", đang lọc thì hiện chip.
 - MUST: khi 1 `Alert` có nhiều `RuleTrigger`, hiển thị tóm tắt trước (ví dụ "3 nguyên nhân: vắng học, giảm tương tác LMS, điểm giữa kỳ thấp"), cho mở rộng xem chi tiết — MUST NOT bắt đọc hết log ngay từ đầu.
 - SHOULD: có chế độ "Đánh dấu đã xem tất cả" cho `Alert` mức `LOW` để giảm cảm giác quá tải.
 
@@ -30,16 +30,29 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 ## Admin — cấu hình an toàn
 
+- MUST (Phase 11): trang Nhập dữ liệu chia 3 tab theo URL `?tab=new|needs|history` (link cũ có bộ lọc mở tab Lịch sử); đợt nhập chờ xác nhận luôn nhắc ở đầu trang. Trạng thái đợt nhập có màu theo việc cần làm: chờ xác nhận hổ phách, bị từ chối đỏ.
+- MUST (Phase 11): lịch sử Chạy đánh giá theo học kỳ (mặc định hiện tại, cho đổi), khối "Lần chạy gần nhất" ở trên, cột Dấu hiệu là cụm số theo mức (`RC 3`, `C 6`).
+- MUST (Phase 11): Nhật ký hệ thống hiện tên đối tượng và nhãn tiếng Việt; JSON, mã lỗi gấp vào "Thông tin kỹ thuật". Trang Bắt đầu gấp giai đoạn đã xong. Danh sách luật gom theo nhóm; trang sửa luật chỉ giữ 1 bảng ngưỡng (bảng chỉ đọc chỉ hiện khi có bản nháp để so sánh).
+
 - MUST: màn hình cấu hình luật có chế độ xem trước tác động trước khi kích hoạt (ước tính số sinh viên bị ảnh hưởng nếu áp dụng ngưỡng mới).
 - MUST: thao tác nguy hiểm (kích hoạt luật mới, hủy batch, đổi trọng số lớn) có bước xác nhận thứ hai (AlertDialog) — MUST NOT thực hiện ngay sau 1 lần click.
 - MUST: có nút "Chạy đánh giá ngay" (chọn học kỳ, tùy chọn học phần) hiển thị tiến độ thật từ `EvaluationRun` (VD: "Đã xử lý 340/1200 sinh viên") và bản tóm tắt khi xong (số cảnh báo mới, số cập nhật, số sinh viên thiếu dữ liệu). Khi đã có lần chạy đang diễn ra, nút bị vô hiệu kèm lời giải thích.
 - MUST: sau khi kích hoạt luật mới, hiển thị lời gợi ý "Chạy đánh giá trên dữ liệu hiện có" ngay trên màn hình xác nhận.
 - SHOULD: trang tổng quan Admin hiển thị thống kê chất lượng nhập liệu (tỷ lệ dòng lỗi theo batch, số sinh viên `INSUFFICIENT`) ở vị trí dễ thấy.
 
+- Trang **Kết nối Moodle** (`/admin/moodle`, Phase 10b): thẻ trạng thái kết nối (tên site, phiên bản, số hàm được cấp — hoặc hướng dẫn cấu hình / lỗi dễ hiểu), chip chọn học kỳ, khung Đồng bộ (Đồng bộ ngay; lần gần nhất: 3 lô với trạng thái + số dòng + link chi tiết, file không đổi, ghi chú theo khóa; "Xác nhận nạp cả 3" / "Hủy" có xác nhận lần 2; tự làm mới khi đang chạy), bảng khóa học Moodle (Course ID number sai hiện rõ lý do; Bật/Tắt có xác nhận; Sửa mã/tên học phần + tổng tiết; danh sách sinh viên Moodle chưa có trong EWARS). Lịch sử nạp gắn nhãn "Moodle" cho lô do đồng bộ sinh. Phase 10c: mỗi khóa đang bật có nút "Bật Tự động" / "Về Chạy tay" (xác nhận lần 2, giải thích điều kiện), cột Đồng bộ ghi chế độ; khung trạng thái Tự động (số khóa, sự kiện gần nhất + số sự kiện 24 giờ hoặc cảnh báo thiếu `MOODLE_WEBHOOK_SECRET`, lần dò gần nhất); mỗi lần đồng bộ ghi chế độ + nguồn kích hoạt; lần Tự động nhiều lỗi hiện "Cần Admin xem (lỗi > 10%)" kèm hướng dẫn; lần chờ xác nhận luôn hiện đủ dù có lần tự động mới hơn; danh sách "sinh viên đã rời khóa / bài đã xóa trên Moodle" (bật lên) kèm hướng dẫn đánh dấu Rút học phần.
+
 ## Trạng thái rỗng, lỗi, đang tải
 
-- MUST: mọi danh sách có thể rỗng có empty state có ý nghĩa (không chỉ "Không có dữ liệu") — ví dụ danh sách `Alert` rỗng: "Chưa có sinh viên nào cần chú ý trong học kỳ này".
+- MUST: mọi danh sách có thể rỗng có empty state có ý nghĩa (không chỉ "Không có dữ liệu") — ví dụ danh sách `Alert` rỗng: "Chưa có sinh viên nào cần chú ý trong học kỳ này". Dùng `EmptyState` (biểu tượng + tiêu đề + 1 câu giải thích + nút việc làm tiếp) khi có việc cụ thể để làm.
+- MUST (Phase 8b): mỗi khu vực vai trò có `loading.tsx` (khung chờ cùng bố cục trang), `error.tsx` (câu dễ hiểu + "Thử lại" + mã tra cứu `digest`, MUST NOT hiện nội dung lỗi kỹ thuật) và `not-found.tsx`.
+- MUST (Phase 8b): tìm nhanh Ctrl+K / ⌘K (Admin, CVHT): sinh viên theo MSSV hoặc họ tên, gõ không dấu được (bỏ dấu cả 2 phía bằng `translate`, không cần extension), tối đa 8 kết quả, MSSV khớp đầu chuỗi lên trước; CVHT chỉ thấy sinh viên lớp mình (lọc ở server); 60 lần/phút/người; kèm mục "Đi tới trang". Không có index trigram — đo trên `ewars_perf` (ghi `PROGRESS.md`).
+- MUST (Phase 8c): trang Bắt đầu là tài liệu hướng dẫn: 4 phần (Thiết lập ban đầu · Mỗi học kỳ · Hằng tuần · Cuối kỳ), mỗi bước có "Làm gì" / "Vì sao cần" / "Cần chuẩn bị" (file mẫu) + trạng thái thật + nút tới trang, thanh tiến độ, khối "Bước tiếp theo", mục lục (màn hình lớn), hỏi đáp. Nội dung ở `getting-started-content.ts`, KHÔNG ghi ngưỡng luật cụ thể (lệch khi Admin đổi luật). Không có câu lệnh kỹ thuật trên giao diện.
+- MUST (Phase 8d, chốt 2026-10-19): 2 trang tổng quan (Admin `/admin`, Cố vấn học tập `/advisor`) dùng chung `dashboard.service.ts` (phạm vi học kỳ + khoa | lớp CVHT) và `components/dashboard/*`. Dải "Cần chú ý" chỉ hiện mục có số; mỗi khối bấm sang danh sách cảnh báo đã lọc (`?severity=&status=waiting|following|done|overdue&classId=`, chip "Đang lọc" + bỏ lọc). Xu hướng = các lần đánh giá cả học kỳ đã xong (trục mốc dữ liệu, mỗi ngày mốc 1 điểm). "Quá 7 ngày" tính giờ thật; "học phần chậm dữ liệu" so với ngày dữ liệu mới nhất của học kỳ. CVHT: menu Tổng quan · Cảnh báo cần xử lý · Sinh viên phụ trách.
+- MUST (Phase 8e, chốt 2026-10-19): Cố vấn học tập có menu Tổng quan · Cảnh báo cần xử lý · Sinh viên phụ trách · Ma trận lớp · Thông báo. Danh sách cảnh báo (Admin, CVHT) phân trang ở server, cột "Vì sao" = câu lý do của dấu hiệu nặng nhất + "và N dấu hiệu khác", nhãn "Quá 7 ngày chưa xác nhận", lọc từ khóa / lớp / mức / nguồn / nhóm trạng thái, xuất `.xlsx` + CSV theo bộ lọc (không có nội dung can thiệp, chống chèn công thức). Ma trận = sinh viên × học phần của 1 lớp (+ cột "Cả học kỳ"), ô ghi chữ viết tắt mức kèm màu, bấm ô mở cảnh báo. Hồ sơ sinh viên: mức theo nguồn, biểu đồ tỷ lệ vắng + vạch ngưỡng ATT-01 đang áp dụng (KHÔNG ghi cứng 20%), ĐTB hệ 4 các học kỳ, dòng thời gian (cảnh báo, can thiệp chỉ ghi loại, ngày chốt điểm danh / công bố điểm). Trang sinh viên: thẻ từng học phần, không còn nhãn "Ổn định"; thẻ "Lần đầu dùng?" cho CVHT và sinh viên (nhớ đóng/mở trên trình duyệt).
+- MUST (Phase 8b): trang chi tiết có breadcrumb thay nút "Quay lại"; trang Admin có nút "?" mở đúng bước trên trang Bắt đầu (`src/lib/help-links.ts`, neo `#buoc-<key>`).
 - MUST: lỗi nhập file hiển thị có thể hành động — chỉ rõ dòng, cột, lý do, và nút "Tải file lỗi để sửa" ngay tại chỗ báo lỗi, MUST NOT chỉ báo "Lỗi" chung chung.
+- MUST (Phase 8f): form nhập nhận kéo thả / chọn nhiều file cùng loại (≤ 50), liệt kê file đã chọn (tên, dung lượng, nút bỏ), báo ngay file sai đuôi / quá 20MB; tải lên hiện thanh "Đang tải lên x/N file". Lô nhiều file: màn xem trước có bảng từng file (học phần, số dòng, hợp lệ, lỗi); dòng lỗi và cảnh báo ghi "tên file · dòng N". Trang nhập có bảng "Học phần nào cần nạp dữ liệu" (cùng tiêu chí "Chậm" của tổng quan, mặc định chỉ hiện học phần cần nạp; LMS "chưa có" màu trung tính vì có thể không dùng LMS).
 - SHOULD: loading state cho thao tác chạy lâu (nhập file lớn, tính RiskScore) hiển thị tiến độ có ý nghĩa (VD: "Đang xử lý 340/1200 sinh viên") thay vì spinner vô nghĩa, nếu API hỗ trợ trả tiến độ.
 
 ## Khả năng tiếp cận
@@ -62,5 +75,15 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 
 ## Nhất quán thuật ngữ
 
+- MUST (người dùng chốt 2026-11-08): chữ hiển thị dùng **Nhập** (không "Nạp"), **đợt nhập** (không "lô"), **Thủ công** (không "Chạy tay"), **Tính đến ngày / tính đến** (không "Mốc dữ liệu"), **Điểm ưu tiên** (không "Điểm rủi ro" — tên kỹ thuật `RiskScore` trong code và tài liệu giữ nguyên). Chữ "demo" không hiện trên giao diện, dùng "trình diễn".
+- MUST (người dùng chốt 2026-11-08): Cố vấn học tập không thấy mã luật (`ATT-01`…): câu lý do viết bằng tên nguồn + mức, chi tiết cảnh báo ghi tên luật; Admin vẫn thấy mã. Không dùng tên hàm, tên biến môi trường, câu lệnh trong lời nhắn giao diện.
 - MUST: dùng đúng 1 tên gọi xuyên suốt app/email/tài liệu cho mỗi vai trò/khái niệm (tên hệ thống trên giao diện, email và báo cáo MUST giống nhau; "Cố vấn học tập" — không đổi thành "CVHT"/"Giảng viên chủ nhiệm"/"Advisor" tùy màn hình; "Cảnh báo sớm" — không đổi tên khác ở nơi khác).
+- MUST: bộ lọc Khoa (suy ra qua lớp sinh hoạt) ở Tổng quan Admin, danh sách cảnh báo Admin và ô chọn học phần khi chạy đánh giá — người dùng chốt 2026-10-15.
+- MUST (Phase 9a, chốt 2026-10-22): bộ lọc **Ngành** (ngành của lớp sinh hoạt, gom mọi khóa) cạnh bộ lọc Khoa ở Tổng quan Admin, Cảnh báo sớm (Admin, kể cả xuất file), Sinh viên, Khoa và lớp (bảng có cột Ngành); danh sách ngành theo khoa đang chọn, đổi khoa thì bỏ lọc ngành; khoa chưa có danh mục ngành thì ẩn ô lọc. Form tạo / sửa lớp chọn ngành của khoa đã chọn.
 - MUST: trang Nhật ký kiểm toán (Admin, chỉ đọc, phân trang) lọc theo khoảng thời gian, loại hành động, người thực hiện (mã/email), đối tượng (MSSV, mã lô…) — người dùng chốt 2026-10-13.
+
+## Chuông thông báo (Phase 10c, người dùng chốt 2026-11-08)
+
+- Admin và Cố vấn học tập đều có chuông ở thanh trên. CVHT: thông báo cảnh báo (như cũ) + "đánh giá đã cập nhật"; Admin: "đánh giá đã cập nhật". Danh sách gộp, mới nhất trước (20 dòng), dòng chưa đọc tô nền; dòng cập nhật có biểu tượng làm mới, tiêu đề theo nguồn + số đếm; bấm → trang lần đánh giá (Admin) / Cảnh báo (CVHT). "Đánh dấu tất cả đã đọc".
+- Chuông tự tải lại mỗi 15 giây + khi quay lại tab. Có thông báo mới khi đang mở trang → toast kèm nút "Tải lại" (làm mới dữ liệu trang, không tải lại cả trang).
+- MUST (Phase 11 đợt 4, chốt 2026-11-08): khổ điện thoại, thẻ cảnh báo gồm mức + tên 1 hàng, lý do 1 dòng, cả thẻ bấm được (`meta.mobile` của `DataTable`: `lead`, `plain`). Sinh viên phụ trách: mức cao lên đầu, tìm theo mã hoặc họ tên, gõ không dấu được. Danh sách Sinh viên của Admin có cột mức cảnh báo học kỳ hiện tại. Ô trống dùng `EmptyState` (1 câu vì sao trống, kèm việc nên làm khi có).

@@ -3,62 +3,66 @@ import { QuizAttemptStatus, RuleGroup, Severity } from '@/db/enums';
 import { maxSeverity, severitySchema } from '../helpers';
 import { type CourseRule, type EnrollmentFacts } from '../types';
 
-const conditionSchema = z.object({
-  /** Dải theo số bài đến hạn bị bỏ; lấy dải cao nhất khớp. */
-  bands: z
-    .array(z.object({ minMissed: z.number().int().min(1).max(50), severity: severitySchema }))
-    .min(1),
-});
+/** Dải theo số bài bị bỏ; lấy dải cao nhất khớp. Dùng chung cho LMS-01, LMS-03. */
+export const countBandsSchema = z
+  .array(z.object({ minCount: z.number().int().min(1).max(50), severity: severitySchema }))
+  .min(1);
+
+export function matchCountBands(bands: z.infer<typeof countBandsSchema>, count: number) {
+  return maxSeverity(bands.filter((b) => count >= b.minCount).map((b) => b.severity));
+}
+
+const conditionSchema = z.object({ bands: countBandsSchema });
 export type Lms01Condition = z.infer<typeof conditionSchema>;
 
-/** Bài đến hạn mà sinh viên chưa có lượt SUBMITTED. */
+/** Bài trắc nghiệm đến hạn mà sinh viên chưa có lượt SUBMITTED (tại asOf). */
 export function missedDueQuizzes(facts: EnrollmentFacts) {
   const submitted = new Set(
-    facts.lms.attempts
+    facts.quiz.attempts
       .filter((a) => a.status === QuizAttemptStatus.SUBMITTED)
-      .map((a) => a.quizKey),
+      .map((a) => a.activityId),
   );
-  return facts.lms.dueQuizzes.filter((q) => !submitted.has(q.quizKey));
+  return facts.quiz.dueQuizzes.filter((q) => !submitted.has(q.activityId));
 }
 
 /**
- * LMS-01 — Bỏ bài kiểm tra (docs/rules/08). "Đến hạn" tính theo nhóm (xem `lms-groups.ts`);
- * chỉ bắt được bài đa số lớp đã làm (giới hạn đã biết — không có danh sách bài từ LMS).
+ * LMS-01 — Bỏ bài trắc nghiệm (docs/rules/08). "Đến hạn" theo hạn nộp; bài không có hạn nộp
+ * dùng cách dự phòng theo lớp (xem `lms-groups.ts`).
  */
 export const lms01: CourseRule<Lms01Condition> = {
   kind: 'PER_COURSE',
   stage: 'BASE',
+  appliesTo: 'REGISTERED',
   meta: {
     ruleCode: 'LMS-01',
-    ruleName: 'Bỏ bài kiểm tra',
+    ruleName: 'Bỏ bài trắc nghiệm',
     ruleGroup: RuleGroup.LMS,
     scope: 'PER_COURSE',
     priority: 40,
-    requires: 'LMS',
+    signal: 'QUIZ',
+    requires: 'LMS_QUIZ',
   },
   conditionSchema,
   defaultCondition: {
     bands: [
-      { minMissed: 1, severity: Severity.MEDIUM },
-      { minMissed: 2, severity: Severity.HIGH },
+      { minCount: 1, severity: Severity.MEDIUM },
+      { minCount: 2, severity: Severity.HIGH },
     ],
   },
   maxSeverity: (c) => maxSeverity(c.bands.map((b) => b.severity)) ?? Severity.HIGH,
 
   evaluate({ facts }, c) {
     const missed = missedDueQuizzes(facts);
-    const severity = maxSeverity(
-      c.bands.filter((b) => missed.length >= b.minMissed).map((b) => b.severity),
-    );
+    const severity = matchCountBands(c.bands, missed.length);
     if (!severity) return { hit: null };
     return {
       hit: {
         severity,
-        reason: `Bỏ ${missed.length}/${facts.lms.dueQuizzes.length} bài kiểm tra đã đến hạn: ${missed.map((q) => q.quizName).join(', ')}.`,
+        reason: `Bỏ ${missed.length}/${facts.quiz.dueQuizzes.length} bài trắc nghiệm đã đến hạn: ${missed.map((q) => q.quizName).join(', ')}.`,
         inputSnapshot: {
           missedCount: missed.length,
-          dueCount: facts.lms.dueQuizzes.length,
-          missedQuizzes: missed.map((q) => q.quizKey).join(','),
+          dueCount: facts.quiz.dueQuizzes.length,
+          missedQuizzes: missed.map((q) => q.quizName).join(', '),
         },
       },
     };

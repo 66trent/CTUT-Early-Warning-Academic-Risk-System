@@ -24,6 +24,10 @@ export class ImportErrorRow {
   @Column({ type: 'int' })
   sourceRowNumber!: number;
 
+  /** Tên file chứa dòng lỗi (lô nhiều file — Phase 8f); NULL ở lô cũ. */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  sourceFileName!: string | null;
+
   /** Dữ liệu nguyên trạng dòng lỗi: { header gốc: giá trị }. */
   @Column({ type: 'jsonb' })
   rawData!: Record<string, string>;
