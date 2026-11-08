@@ -4,7 +4,7 @@
  * hạn nộp. Lô tự xác nhận khi lỗi ≤ 10% (người dùng chốt), nạp xong tự đánh giá (kể cả DEMO_MODE).
  * Người thực hiện: tài khoản hệ thống `SYSTEM_MOODLE`.
  */
-import { In, IsNull, LessThanOrEqual, Not } from 'typeorm';
+import { In, IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { ImportBatch } from '@/db/entities/import-batch.entity';
 import { MoodleCourseLink } from '@/db/entities/moodle-course-link.entity';
@@ -38,9 +38,11 @@ import {
 import {
   buildStudentResolver,
   createSyncRun,
+  discardMoodleSync,
   ensureMoodleSystemUser,
   failInterruptedMoodleRuns,
   hasPendingRun,
+  isSyncRunStale,
   type RunMoodleSyncDeps,
   runMoodleSync,
 } from './moodle-sync.service';
@@ -189,6 +191,7 @@ async function probeCourse(
 /** Lịch 10 phút: mỗi học kỳ, khóa nào đổi dấu vân tay → 1 lần đồng bộ `SCHEDULED`. */
 export async function pollMoodleCourses(deps: MoodleAutoDeps = {}): Promise<MoodleSyncRun[]> {
   await failInterruptedMoodleRuns();
+  await retryAutoConfirm(deps.enqueueImport);
   const links = await autoLinks(deps.termId ? { termId: deps.termId } : {});
   if (links.length === 0) return [];
   const now = deps.now ?? new Date();
@@ -282,6 +285,43 @@ export async function autoConfirmMoodleBatch(
   if (errorRate > HIGH_ERROR_RATE) return 'NEEDS_REVIEW';
   await confirmImportBatch(batchId, await ensureMoodleSystemUser(), enqueue);
   return 'CONFIRMED';
+}
+
+/**
+ * Lưới an toàn: lô của lần đồng bộ Tự động (7 ngày gần nhất) đã kiểm tra xong mà chưa xác nhận (VD
+ * worker dừng giữa 2 bước) → thử tự xác nhận lại; lô nhiều lỗi vẫn chờ Admin. Gọi ở lịch dò.
+ */
+export async function retryAutoConfirm(
+  enqueue: ImportEnqueuer = enqueueImportJob,
+): Promise<number> {
+  const since = new Date(Date.now() - 7 * 24 * 3600 * 1000);
+  const runs = await (await getDataSource()).getRepository(MoodleSyncRun).find({
+    where: { mode: 'AUTO', status: 'STAGED', createdAt: MoreThan(since) },
+  });
+  let confirmed = 0;
+  for (const run of runs) {
+    // Đã có lần mới hơn nạp cho cùng khóa → lô chờ này đã cũ: hủy (không được đè dữ liệu mới).
+    if (await isSyncRunStale(run)) {
+      await discardMoodleSync(run.id, await ensureMoodleSystemUser()).catch(() => undefined);
+      continue;
+    }
+    for (const batchId of Object.values(run.batchIds)) {
+      if (!batchId) continue;
+      if ((await autoConfirmMoodleBatch(batchId, enqueue)) === 'CONFIRMED') confirmed += 1;
+      else await reloadLostBatch(batchId, enqueue);
+    }
+  }
+  return confirmed;
+}
+
+/** Lô đã xác nhận > 2 phút mà vẫn `STAGED` = job nạp bị mất (worker dừng) → đưa lại (nạp idempotent). */
+async function reloadLostBatch(batchId: string, enqueue: ImportEnqueuer): Promise<void> {
+  const batch = await (await getDataSource()).getRepository(ImportBatch).findOneBy({ id: batchId });
+  const confirmedAt = batch ? readSummary(batch.summary).confirmedAt : undefined;
+  if (batch?.status !== ImportBatchStatus.STAGED || !confirmedAt) return;
+  if (Date.now() - new Date(confirmedAt).getTime() < 2 * 60_000) return;
+  logger.warn({ batchId }, 'đồng bộ Moodle: lô đã xác nhận chưa được nạp — đưa lại vào hàng đợi');
+  await enqueue('load', batchId);
 }
 
 // ── Đổi chế độ 1 khóa ──────────────────────────────────────────────────────────────────

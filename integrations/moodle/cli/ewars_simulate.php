@@ -3,8 +3,9 @@
 // Tự động mà không cần mở giao diện Moodle. Đi qua ĐÚNG mã của Moodle → phát sự kiện thật → plugin
 // local_ewars gửi sang EWARS ở lần cron kế tiếp (≤ 1 phút).
 // Chạy trong container:
-//   php ewars_simulate.php --course=010100089201 --absent=KTPM2411905 [--status=A]
-//       Điểm danh sinh viên ở buổi đã điểm danh gần nhất (mặc định A = vắng không phép).
+//   php ewars_simulate.php --course=010100089201 --absent=KTPM2411905 [--status=A] [--session=1]
+//       Điểm danh sinh viên ở buổi đã điểm danh gần nhất (--session=2 = buổi liền trước…; mặc định
+//       A = vắng không phép).
 //   php ewars_simulate.php --course=010100089201 --due-in=3 [--assign="Bài thực hành 3"]
 //       Đổi hạn nộp 1 bài thực hành thành "N phút nữa" (như giảng viên sửa hạn) — để thử job hạn nộp.
 
@@ -19,11 +20,11 @@ require_once($CFG->dirroot . '/mod/attendance/locallib.php');
 require_once($CFG->dirroot . '/mod/attendance/classes/structure.php');
 
 [$options] = cli_get_params(
-    ['course' => '', 'absent' => '', 'status' => 'A', 'due-in' => '', 'assign' => '', 'help' => false],
+    ['course' => '', 'absent' => '', 'status' => 'A', 'session' => '1', 'due-in' => '', 'assign' => '', 'help' => false],
     ['h' => 'help']
 );
 if ($options['help'] || $options['course'] === '') {
-    echo "Dùng: --course=<Course ID number> (--absent=<MSSV> [--status=A] | --due-in=<phút> [--assign=<tên>])\n";
+    echo "Dùng: --course=<Course ID number> (--absent=<MSSV> [--status=A] [--session=1] | --due-in=<phút> [--assign=<tên>])\n";
     exit($options['help'] ? 0 : 1);
 }
 
@@ -39,7 +40,7 @@ if ($options['absent'] !== '') {
         [$attendance->id, time()],
         'sessdate DESC',
         '*',
-        0,
+        max(0, (int) $options['session'] - 1),
         1
     );
     $session = reset($sessions);

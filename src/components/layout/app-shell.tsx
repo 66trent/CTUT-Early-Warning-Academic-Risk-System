@@ -157,7 +157,13 @@ export function AppShell({ user, currentTermName, children }: AppShellProps) {
 
           <div className="ml-auto flex items-center gap-2">
             {user.role !== UserRole.STUDENT && <QuickSearch role={user.role} />}
-            {user.role === UserRole.ADVISOR && <NotificationBell />}
+            {user.role !== UserRole.STUDENT && (
+              <NotificationBell
+                allHref={
+                  user.role === UserRole.ADMIN ? '/admin/evaluations' : '/advisor/notifications'
+                }
+              />
+            )}
             <ThemeToggle />
             <div className="hidden text-right leading-tight sm:block">
               <p className="text-sm font-semibold">{user.fullName}</p>

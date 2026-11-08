@@ -1,7 +1,7 @@
 <?php
 // CTUT-EWARS — gửi 1 sự kiện sang EWARS: POST JSON, ký HMAC-SHA256(khóa bí mật, "<timestamp>.<thân>").
-// Lỗi mạng / EWARS lỗi 5xx / 429 → ném lỗi để Moodle thử lại adhoc task (giãn dần). 4xx khác (chữ ký
-// sai, sự kiện không hợp lệ) → bỏ, không thử lại.
+// Lỗi mạng / 404 / 408 / 429 / 5xx → ném lỗi để Moodle thử lại adhoc task (giãn dần). 4xx khác (chữ
+// ký sai, sự kiện không hợp lệ) → bỏ, không thử lại.
 
 namespace local_ewars\task;
 
@@ -40,7 +40,8 @@ class send_event extends \core\task\adhoc_task {
         ]);
         $curl->post($url, $body, ['CURLOPT_TIMEOUT' => 10, 'CURLOPT_CONNECTTIMEOUT' => 5]);
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
-        if ($curl->get_errno() || $code === 0 || $code === 429 || $code >= 500) {
+        // Thử lại: lỗi mạng, 404 (EWARS chưa bật nhận sự kiện / đang khởi động lại), 408, 429, 5xx.
+        if ($curl->get_errno() || in_array($code, [0, 404, 408, 429], true) || $code >= 500) {
             throw new \moodle_exception('senderror', 'local_ewars', '', $code . ' ' . $curl->error);
         }
         if ($code >= 400) {

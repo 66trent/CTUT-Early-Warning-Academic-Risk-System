@@ -220,3 +220,12 @@ Mỗi phase ghi tối đa ~15 dòng: đã làm gì, file chính, kết quả tes
 - DB dev: 2 khóa `HK1_2026` ở chế độ Tự động; hạn "Thực hành 2" trên Moodle đã bị đổi khi thử → `npm run moodle:setup -- --reset`.
 - Việc còn lại: Phase 10d (kịch bản trình diễn Moodle, sơ đồ tích hợp, ảnh chụp).
 - Tự kiểm tra: `npm run moodle:up` → `npm run moodle:setup` → chạy app + worker → Kết nối Moodle → Bật Tự động → làm theo `docs/huong-dan-moodle.md` mục 5 (lệnh `ewars_simulate.php`).
+
+## Phase 10c bổ sung — Chuông cập nhật + kịch bản Moodle trọng tâm (2026-11-08)
+
+- Người dùng chốt: chuông cho Admin + CVHT lớp liên quan; 1 thông báo / lần đánh giá xong (mọi nguồn); tự tải lại 15 giây; kịch bản thuyết trình lấy Moodle làm trọng tâm.
+- Làm: bảng `update_notifications` + `alerts/services/update-notification.service.ts` (gọi khi lần đánh giá xong), `data-import/services/import-describe.service.ts` (mô tả lô / lần đồng bộ Moodle), chuông `notification-bell.tsx` cho Admin + CVHT (toast "Tải lại" 20 giây), action `listMyBellAction` / `markUpdatesReadAction`; viết lại `docs/bao-cao/kich-ban-thuyet-trinh.md` (16 slide, demo M1–M9, hỏi đáp Moodle) và `docs/demo-script.md` (A. Moodle, B. nạp file); `ewars_simulate.php --session=N`.
+- Diễn tập thật lộ 4 lỗi (đã sửa + test): lô kiểm tra trước khi lần đồng bộ ghi xong; tự coi mình là lần mới hơn (micro-giây); job nạp mất khi worker dừng; plugin không thử lại 404. Gốc: Docker tự bật container cũ (bẫy #0).
+- Kiểm tra: typecheck, lint, format, migration:check, 472 test, build — xanh. Kiểm tay: GV001 giải quyết 906 → Moodle điểm danh vắng → chuông "Lớp KTPM2411: 1 mở lại" + email; toast chuông hiện sau 38 giây.
+- DB dev: học kỳ `HK1_2026` đã bị diễn tập nhiều lần; trước buổi bảo vệ làm đúng mục Chuẩn bị của `docs/demo-script.md` (demo:reset + moodle:setup --reset + đặt học kỳ hiện tại).
+- Tự kiểm tra: đăng nhập Admin hoặc GV001 → chuông góc trên; thao tác trên Moodle (hoặc lệnh `ewars_simulate.php`) → ~1 phút có toast "… vừa cập nhật" + nút Tải lại.

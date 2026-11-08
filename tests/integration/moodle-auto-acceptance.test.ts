@@ -9,10 +9,15 @@ import { MoodleCourseLink } from '@/db/entities/moodle-course-link.entity';
 import { type MoodleSyncRun } from '@/db/entities/moodle-sync-run.entity';
 import { RuleTrigger } from '@/db/entities/rule-trigger.entity';
 import { Term } from '@/db/entities/term.entity';
+import { UpdateNotification } from '@/db/entities/update-notification.entity';
 import { User } from '@/db/entities/user.entity';
 import { ImportBatchStatus, Severity, UserAccountStatus, UserRole } from '@/db/enums';
 import { getEnv } from '@/lib/env';
 import { MOODLE_SYSTEM_USER_ID } from '@/lib/system-accounts';
+import {
+  listUpdateNotifications,
+  notifyEvaluationCompleted,
+} from '@/modules/alerts/services/update-notification.service';
 import { type MoodleParams } from '@/modules/data-import/moodle/client';
 import { createImportBatch } from '@/modules/data-import/services/import-batch.service';
 import {
@@ -26,6 +31,7 @@ import {
   type MoodleAutoDeps,
   pollMoodleCourses,
   recordMoodleEvent,
+  retryAutoConfirm,
   runMoodleDueJob,
   setMoodleSyncMode,
 } from '@/modules/data-import/services/moodle-auto.service';
@@ -298,6 +304,18 @@ describe('Đồng bộ Moodle — chế độ Tự động (Phase 10c)', () => {
     // DEMO_MODE vẫn tự đánh giá lô Moodle tự động (lô Chạy tay thì không).
     const autoRun = await requestEvaluationAfterImport(batch, noEnqueue);
     expect(autoRun).not.toBeNull();
+    // Chuông: lần đánh giá sau lô Moodle → tiêu đề nêu nguồn + học phần; CVHT lớp có SV học phần đó.
+    await notifyEvaluationCompleted(autoRun ?? '', []);
+    const bell = await ds
+      .getRepository(UpdateNotification)
+      .findBy({ evaluationRunId: autoRun ?? '' });
+    const advisorBell = bell.find((n) => n.recipientId === ADVISOR);
+    expect(advisorBell?.title).toBe('Moodle: Điểm danh — Mạng máy tính vừa cập nhật');
+    expect(advisorBell?.body).toBe(`Lớp ${CLS}: không có thay đổi cảnh báo`);
+    expect(bell.find((n) => n.recipientId === IMPORT_ACTOR)?.link).toBe(
+      `/admin/evaluations/${autoRun}`,
+    );
+    expect(bell.some((n) => n.recipientId === MOODLE_SYSTEM_USER_ID)).toBe(false);
     await ds.query(`DELETE FROM evaluation_runs WHERE id = $1`, [autoRun]);
     if (getEnv().DEMO_MODE) {
       const manual = { id: batch.id, termId: TERM, summary: { confirmedBy: IMPORT_ACTOR } };
@@ -310,6 +328,15 @@ describe('Đồng bộ Moodle — chế độ Tự động (Phase 10c)', () => {
       ruleCode: 'ATT-01',
     });
     expect(att?.severity).toBe(Severity.CRITICAL);
+    // Lần chạy tay (không có lô) → CVHT nhận vì lớp có cảnh báo mới.
+    const mine = await ds
+      .getRepository(UpdateNotification)
+      .findOneBy({ evaluationRunId: evaluationId, recipientId: ADVISOR });
+    expect(mine?.title).toBe('Admin chạy đánh giá');
+    expect(mine?.body).toMatch(new RegExp(`^Lớp ${CLS}: \\d+ cảnh báo mới`));
+    const listed = await listUpdateNotifications(ADVISOR);
+    expect(listed.unread).toBeGreaterThanOrEqual(1);
+    expect(Object.getPrototypeOf(listed.items[0])).toBe(Object.prototype);
   });
 
   it('sửa điểm danh lại như cũ → file giống 1 lô cũ hơn vẫn được nạp (không bị bỏ qua nhầm)', async () => {
@@ -321,6 +348,41 @@ describe('Đồng bộ Moodle — chế độ Tự động (Phase 10c)', () => {
     expect((await batchOf(run?.batchIds.ATTENDANCE_SUMMARY)).status).toBe(
       ImportBatchStatus.RECONCILED,
     );
+  });
+
+  it('lô chỉ vào hàng đợi kiểm tra SAU khi lần đồng bộ ghi xong; lô bị sót được lịch dò tự xác nhận', async () => {
+    patches = [absentAll(6)]; // 902 vắng — chỉ để có dữ liệu mới
+    await moodleEvent('\\mod_attendance\\event\\attendance_taken');
+    const seenAtEnqueue: boolean[] = [];
+    const run = await flushMoodleEvents(TERM, {
+      ...deps,
+      enqueueImport: async (_step, batchId) => {
+        const rows = await ds.query<unknown[]>(
+          `SELECT 1 FROM moodle_sync_runs r, jsonb_each_text(r.batch_ids) e WHERE e.value = $1`,
+          [batchId],
+        );
+        seenAtEnqueue.push(rows.length > 0);
+      },
+    });
+    expect(seenAtEnqueue).toEqual([true]); // bước tự xác nhận tìm được lần đồng bộ
+    // Worker dừng giữa "kiểm tra" và "tự xác nhận" → lô kẹt chờ; lịch dò gỡ.
+    const batchId = run?.batchIds.ATTENDANCE_SUMMARY ?? '';
+    await validateImportBatch(batchId);
+    expect(await retryAutoConfirm(noEnqueue)).toBe(1);
+    // Đã xác nhận nhưng job nạp bị mất (worker dừng) → quá 2 phút, lịch dò đưa lại vào hàng đợi nạp.
+    await ds.query(
+      `UPDATE import_batches SET summary = jsonb_set(summary, '{confirmedAt}', to_jsonb($2::text)) WHERE id = $1`,
+      [batchId, new Date(Date.now() - 3 * 60_000).toISOString()],
+    );
+    const requeued: string[] = [];
+    await retryAutoConfirm((step, id) => {
+      requeued.push(`${step}:${id}`);
+      return Promise.resolve();
+    });
+    expect(requeued).toContain(`load:${batchId}`);
+    await loadImportBatch(batchId, { retried: false, afterReconciled: noEnqueue });
+    expect((await batchOf(batchId)).status).toBe(ImportBatchStatus.RECONCILED);
+    patches = [];
   });
 
   let reviewRun: MoodleSyncRun | null = null;

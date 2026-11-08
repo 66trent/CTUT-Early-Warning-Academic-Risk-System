@@ -75,3 +75,8 @@ Xem `00-project-context.md` cho glossary và vai trò người dùng.
 - MUST: bộ lọc Khoa (suy ra qua lớp sinh hoạt) ở Tổng quan Admin, danh sách cảnh báo Admin và ô chọn học phần khi chạy đánh giá — người dùng chốt 2026-10-15.
 - MUST (Phase 9a, chốt 2026-10-22): bộ lọc **Ngành** (ngành của lớp sinh hoạt, gom mọi khóa) cạnh bộ lọc Khoa ở Tổng quan Admin, Cảnh báo sớm (Admin, kể cả xuất file), Sinh viên, Khoa và lớp (bảng có cột Ngành); danh sách ngành theo khoa đang chọn, đổi khoa thì bỏ lọc ngành; khoa chưa có danh mục ngành thì ẩn ô lọc. Form tạo / sửa lớp chọn ngành của khoa đã chọn.
 - MUST: trang Nhật ký kiểm toán (Admin, chỉ đọc, phân trang) lọc theo khoảng thời gian, loại hành động, người thực hiện (mã/email), đối tượng (MSSV, mã lô…) — người dùng chốt 2026-10-13.
+
+## Chuông thông báo (Phase 10c, người dùng chốt 2026-11-08)
+
+- Admin và Cố vấn học tập đều có chuông ở thanh trên. CVHT: thông báo cảnh báo (như cũ) + "đánh giá đã cập nhật"; Admin: "đánh giá đã cập nhật". Danh sách gộp, mới nhất trước (20 dòng), dòng chưa đọc tô nền; dòng cập nhật có biểu tượng làm mới, tiêu đề theo nguồn + số đếm; bấm → trang lần đánh giá (Admin) / Cảnh báo (CVHT). "Đánh dấu tất cả đã đọc".
+- Chuông tự tải lại mỗi 15 giây + khi quay lại tab. Có thông báo mới khi đang mở trang → toast kèm nút "Tải lại" (làm mới dữ liệu trang, không tải lại cả trang).

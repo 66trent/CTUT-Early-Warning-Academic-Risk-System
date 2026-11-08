@@ -5,7 +5,7 @@
  * nhận nạp cả 3"; Tự động: tự xác nhận khi lỗi ≤ 10% (`moodle-auto.service`). File trùng file MỚI NHẤT
  * của cùng khóa bị bỏ qua; sinh viên Moodle chưa có trong EWARS bị bỏ qua và đếm riêng.
  */
-import { type EntityManager, In, LessThan, MoreThan } from 'typeorm';
+import { type EntityManager, In, LessThan, MoreThanOrEqual, Not } from 'typeorm';
 import { getDataSource } from '@/db/data-source';
 import { ImportBatch } from '@/db/entities/import-batch.entity';
 import { MoodleCourseLink, type MoodleSeenActivity } from '@/db/entities/moodle-course-link.entity';
@@ -448,11 +448,13 @@ export async function runMoodleSync(
     for (const link of await linksOf(run))
       collected.push(await collectCourse(link, collectDeps, files));
     const courses = collected.map((c) => c.stat);
-    const { batchIds, unchangedFiles } = await stageFiles(
-      run,
-      files,
-      deps.enqueueImport ?? enqueueImportJob,
-    );
+    // Hoãn đưa lô vào hàng đợi kiểm tra tới khi lần đồng bộ đã ghi `batchIds`: bước tự xác nhận
+    // (sau kiểm tra) tra lần đồng bộ theo id lô — kiểm tra chạy nhanh hơn thì không thấy (Phase 10c).
+    const deferred: Parameters<ImportEnqueuer>[] = [];
+    const { batchIds, unchangedFiles } = await stageFiles(run, files, (step, batchId) => {
+      deferred.push([step, batchId]);
+      return Promise.resolve();
+    });
     if (run.mode === 'AUTO') {
       await (deps.scheduleDue ?? scheduleMoodleDueJobs)(
         collected.flatMap((c) => c.dueJobs),
@@ -471,6 +473,8 @@ export async function runMoodleSync(
         finishedAt: new Date(),
       },
     );
+    const enqueueImport = deps.enqueueImport ?? enqueueImportJob;
+    for (const [step, batchId] of deferred) await enqueueImport(step, batchId);
     if (run.mode === 'AUTO' && status === 'STAGED') {
       await writeAuditLog({
         actorId: MOODLE_SYSTEM_USER_ID,
@@ -542,7 +546,14 @@ export async function isSyncRunStale(run: MoodleSyncRun): Promise<boolean> {
   const mine = new Set(runLinkIds(run));
   const later = (
     await (await getDataSource()).getRepository(MoodleSyncRun).find({
-      where: { termId: run.termId, status: 'STAGED', createdAt: MoreThan(run.createdAt) },
+      // Loại chính nó: `createdAt` của JS chỉ tới mili-giây, cột timestamptz tới micro-giây → chính lần
+      // này cũng "lớn hơn" mốc của nó.
+      where: {
+        id: Not(run.id),
+        termId: run.termId,
+        status: 'STAGED',
+        createdAt: MoreThanOrEqual(run.createdAt),
+      },
     })
   ).filter((r) => runLinkIds(r).some((id) => mine.has(id)));
   const batches = await batchesOf(later);

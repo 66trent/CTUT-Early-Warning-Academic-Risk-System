@@ -54,7 +54,8 @@ Xem `00-project-context.md` cho glossary và bảng phạm vi role.
 ## Thông báo và email sinh viên
 
 - MUST: địa chỉ email của `STUDENT` kết thúc bằng `@student.ctuet.edu.vn` — validate bằng Zod ở mọi điểm vào (import CSV, tạo tài khoản) và ràng buộc ở DB (xem `09-data-schema-identity.md`).
-- Người nhận thông báo: CHỈ Cố vấn học tập phụ trách (`Alert.assignedAdvisorId`; NULL → không gửi). Sinh viên KHÔNG nhận email — xem trên trang của mình, và chỉ thấy cảnh báo SAU KHI Cố vấn học tập xác nhận (`ACKNOWLEDGED`/`IN_PROGRESS`/`RESOLVED`; không bao giờ thấy `OPEN`/`REOPENED`/`DISMISSED`/`INVALIDATED`) — người dùng chốt 2026-10-13.
+- Chuông "đánh giá đã cập nhật" (Phase 10c, `UpdateNotification` — `11`): Admin + Cố vấn học tập lớp liên quan, chỉ số đếm + tên học phần (không tên sinh viên); mỗi người chỉ đọc / đánh dấu đã đọc thông báo của chính mình.
+- Người nhận thông báo cảnh báo: CHỈ Cố vấn học tập phụ trách (`Alert.assignedAdvisorId`; NULL → không gửi). Sinh viên KHÔNG nhận email — xem trên trang của mình, và chỉ thấy cảnh báo SAU KHI Cố vấn học tập xác nhận (`ACKNOWLEDGED`/`IN_PROGRESS`/`RESOLVED`; không bao giờ thấy `OPEN`/`REOPENED`/`DISMISSED`/`INVALIDATED`) — người dùng chốt 2026-10-13.
 - MUST: gửi thông báo khi `Alert` được tạo mới, chuyển `REOPENED`, hoặc `severity` tăng — chạy lại đánh giá mà cảnh báo không đổi mức thì KHÔNG gửi. `LOW`: chỉ `IN_APP`, không gửi email; `MEDIUM`/`HIGH`/`CRITICAL`: `IN_APP` + `EMAIL` gửi ngay. Không có chống gửi trùng / giới hạn tần suất (người dùng quyết định bỏ). Kênh chỉ gồm `EMAIL` và `IN_APP`.
 - MUST NOT: đưa `inputSnapshot` thô hoặc nội dung `Intervention` mức `SENSITIVE` vào nội dung email.
 

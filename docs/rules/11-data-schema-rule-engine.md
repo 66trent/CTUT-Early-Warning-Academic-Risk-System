@@ -121,6 +121,10 @@ RÀNG BUỘC chuyển trạng thái (MUST validate ở service, không chỉ ở
 | evaluationRunId | String (uuid) | NOT NULL | | Lần chạy làm phát sinh sự kiện. UNIQUE `(alertId, channel, event, evaluationRunId)` chặn trùng khi job chạy lại |
 | createdAt | DateTime | NOT NULL | | |
 
+### UpdateNotification — `update_notifications` (Phase 10c, người dùng chốt 2026-11-08)
+
+Chuông "dữ liệu vừa cập nhật / đánh giá đã cập nhật": 1 dòng / lần đánh giá xong (`COMPLETED`) / người nhận. Trường: `id` (uuid), `recipientId` (FK `users`, xóa theo), `evaluationRunId` (FK, xóa theo), `termId`, `title` (≤ 200, theo nguồn: "Moodle: Điểm danh — Mạng máy tính vừa cập nhật" / "Nạp file: …" / "Admin chạy đánh giá" / "Đánh giá tự động theo lịch" / "Chốt học kỳ — đánh giá lần cuối"), `body` (≤ 300, số đếm: "Đánh giá xong 20 sinh viên · 1 cảnh báo mới · 1 tăng mức" hoặc "Lớp KTPM2411: …"), `link`, `readAt`, `createdAt`. UNIQUE (`evaluationRunId`, `recipientId`) — idempotent. Người nhận: mọi `ADMIN` `ACTIVE` (tài khoản hệ thống `SUSPENDED` không nhận) + `ADVISOR` `ACTIVE` của lớp có cảnh báo mới / mở lại / tăng mức trong lần chạy HOẶC có sinh viên học các học phần của lô vừa nạp (lô Moodle: gộp mọi lô cùng lần đồng bộ). Chỉ trong ứng dụng, không email, không dữ liệu cá nhân sinh viên.
+
 RÀNG BUỘC: không có cơ chế chống gửi trùng / giới hạn tần suất (người dùng quyết định bỏ). `Notification` chỉ được tạo khi có sự kiện ở `06-security.md` (mục "Thông báo và email sinh viên"); index `(alertId, createdAt)`.
 
 ## AlertStateHistory — append-only

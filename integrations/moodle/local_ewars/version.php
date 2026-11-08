@@ -6,7 +6,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ewars';
-$plugin->version   = 2026110800;
+$plugin->version   = 2026110801;
 $plugin->requires  = 2026081800; // Moodle 5.3.
 $plugin->maturity  = MATURITY_BETA;
 $plugin->release   = '0.1 (Phase 10c)';
